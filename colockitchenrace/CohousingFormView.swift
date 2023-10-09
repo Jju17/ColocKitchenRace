@@ -46,6 +46,10 @@ struct CohousingFormView: View {
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             Form {
+                Section {
+                    TextField("Nom de la coloc", text: viewStore.$cohousing.name)
+                }
+
                 Section("Localisation") {
                     TextField("Address", text: viewStore.$cohousing.address)
                     TextField("Postcode", text: viewStore.$cohousing.postCode)
@@ -65,6 +69,7 @@ struct CohousingFormView: View {
                     }
                 }
 
+                // TODO: JR: TODO
                 Section {
                     Picker(selection: viewStore.$cohousing.users, content: {
                         ForEach(viewStore.cohousing.users) {
@@ -75,7 +80,6 @@ struct CohousingFormView: View {
                     })
                 }
             }
-            .navigationBarTitle("Zone 88")
         }
     }
 }
