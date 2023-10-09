@@ -97,7 +97,7 @@ struct CohousingDetailView: View {
                             }
                             ToolbarItem(placement: .cancellationAction) {
                                 Button("Cancel") {
-                                    <#code#>
+                                    viewStore.send(.cancelCohousingButtonTapped)
                                 }
                             }
                         }

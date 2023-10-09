@@ -9,11 +9,11 @@ import Foundation
 
 struct Cohousing: Equatable, Hashable {
     var id: UUID
-    var name: String
-    var users: [User]
-    var address: String
-    var postCode: String
-    var city: String
+    var name: String = ""
+    var users: [User] = []
+    var address: String = ""
+    var postCode: String = ""
+    var city: String = ""
 }
 
 extension Cohousing {

@@ -9,11 +9,11 @@ import Foundation
 
 struct User: Equatable, Hashable, Identifiable {
     var id: UUID
-    var isContactUser: Bool
-    var displayName: String
+    var isContactUser: Bool = false
+    var displayName: String = ""
     var phoneNumber: String?
     var email: String?
-    var foodIntolerences: [String]
+    var foodIntolerences: [String] = []
 }
 
 extension User {
