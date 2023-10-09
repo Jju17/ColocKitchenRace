@@ -22,13 +22,18 @@ struct AppFeature: Reducer {
     struct Path: Reducer {
         enum State {
             case detail(CohousingDetailFeature.State)
+            case userProfile(UserProfileFeature.State)
         }
         enum Action {
             case detail(CohousingDetailFeature.Action)
+            case userProfile(UserProfileFeature.Action)
         }
         var body: some ReducerOf<Self> {
             Scope(state: /State.detail, action: /Action.detail) {
                 CohousingDetailFeature()
+            }
+            Scope(state: /State.userProfile, action: /Action.userProfile) {
+                UserProfileFeature()
             }
         }
     }
@@ -71,24 +76,14 @@ struct AppView: View {
                 CaseLet(
                     /AppFeature.Path.State.detail,
                      action: AppFeature.Path.Action.detail
-                ) { store in
-                    CohousingDetailView(store: store)
-                }
+                ) { CohousingDetailView(store: $0) }
+            case .userProfile:
+                CaseLet(
+                    /AppFeature.Path.State.userProfile,
+                     action: AppFeature.Path.Action.userProfile
+                ) { UserProfileView(store: $0) }
             }
         }
-
-//        NavigationStackStore(
-//            self.store.scope(state: \.path, action: { .path($0) })
-//        ) {
-//            HomeView(
-//                store: self.store.scope(
-//                    state: \.home,
-//                    action: { .home($0) }
-//                )
-//            )
-//        } destination: { store in
-//            CohousingDetailView(store: store)
-//        }
     }
 }
 

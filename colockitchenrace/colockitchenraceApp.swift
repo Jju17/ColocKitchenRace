@@ -23,11 +23,13 @@ struct colockitchenraceApp: App {
 
     var body: some Scene {
         WindowGroup {
-            HomeView(
+            AppView(
                 store: Store(
-                    initialState: HomeFeature.State(cohousing: .mock)
+                    initialState: AppFeature.State(
+                        home: HomeFeature.State()
+                    )
                 ) {
-                    HomeFeature()
+                    AppFeature()
                 }
             )
         }

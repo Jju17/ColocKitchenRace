@@ -14,7 +14,7 @@ struct CohousingDetailFeature: Reducer {
 
     struct State: Equatable {
         @PresentationState var editCohousing: CohousingFormFeature.State?
-        var cohousing: Cohousing
+        @BindingState var cohousing: Cohousing
     }
 
     enum Action {

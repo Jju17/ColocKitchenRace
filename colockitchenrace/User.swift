@@ -10,15 +10,17 @@ import Foundation
 struct User: Equatable, Hashable, Identifiable {
     var id: UUID
     var isContactUser: Bool = false
+    var isSubscribeToNews: Bool = false
     var displayName: String = ""
     var phoneNumber: String?
     var email: String?
     var foodIntolerences: [String] = []
+    var foodIntolerence: String = ""
 }
 
 extension User {
     static var mockUser: User {
-        return User(id: UUID(), isContactUser: false, displayName: "Julien Rahier", foodIntolerences: ["Lactose"])
+        return User(id: UUID(), isContactUser: false, isSubscribeToNews: true, displayName: "Julien Rahier", phoneNumber: "+32 479 50 68 41", email: "julien.rahier@gmail.com", foodIntolerences: ["Lactose"], foodIntolerence: "Lactose")
     }
 
     static var mockUsers: [User] {

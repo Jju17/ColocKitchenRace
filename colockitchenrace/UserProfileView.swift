@@ -5,45 +5,80 @@
 //  Created by Julien Rahier on 08/10/2023.
 //
 
+import ComposableArchitecture
 import SwiftUI
 
-struct UserProfileView: View {
-    @State var prenom: String = ""
-    @State var name: String = ""
-    @State var email: String = ""
-    @State var phoneNumber: String = ""
-    @State var foodIntolerences: String = ""
-    @State var isContactUser: Bool = false
-    @State var isSubscribeToNews: Bool = false
+struct UserProfileFeature: Reducer {
+    struct State: Equatable {
+        @BindingState var user: User
+    }
+    enum Action: BindableAction {
+        case backButtonTapped
+        case binding(BindingAction<State>)
+        case signOutButtonTapped
+    }
 
-    var body: some View {
-        Form {
-            Section("Basic info") {
-                TextField("Prenom", text: self.$prenom)
-                TextField("Nom", text: self.$name)
-                TextField("Email", text: self.$email)
-                TextField("GSM", text: self.$phoneNumber)
-            }
+    var body: some ReducerOf<Self> {
+        BindingReducer()
 
-            Section("Food related") {
-                TextField("Food intolerances", text: self.$foodIntolerences)
-            }
-
-            Section("CKR") {
-                Toggle(isOn: self.$isContactUser) {
-                    Text("Are you the contact person ?")
-                }
-                Toggle(isOn: self.$isSubscribeToNews) {
-                    Text("Do you want to have news from CKR team ?")
-                }
+        Reduce { state, action in
+            switch action {
+            case .backButtonTapped:
+                return .none
+            case .binding(_):
+                return .none
+            case .signOutButtonTapped:
+                return .none
             }
         }
-        .navigationBarTitle("Julien Rahier")
+    }
+}
+
+struct UserProfileView: View {
+    let store: StoreOf<UserProfileFeature>
+
+    var body: some View {
+        WithViewStore(self.store, observe: { $0 }) { viewStore in
+            Form {
+                Section("Basic info") {
+                    TextField("Name", text: viewStore.$user.displayName)
+                    TextField("Email", text: viewStore.$user.email ?? "")
+                    TextField("GSM", text: viewStore.$user.phoneNumber ?? "")
+                }
+
+                // TODO: JR: This would be an array of Objects
+                Section("Food related") {
+                    TextField("Food intolerances", text: viewStore.$user.foodIntolerence)
+                }
+
+                Section("CKR") {
+                    Toggle(isOn: viewStore.$user.isContactUser) {
+                        Text("Are you the contact person ?")
+                    }
+                    Toggle(isOn: viewStore.$user.isSubscribeToNews) {
+                        Text("Do you want to have news from CKR team ?")
+                    }
+                }
+
+                Section {
+                    Button {
+                        viewStore.send(.signOutButtonTapped)
+                    } label: {
+                        Text("Sign out")
+                            .foregroundStyle(Color.red)
+                    }
+
+                }
+            }
+            .navigationBarTitle("Julien Rahier")
+        }
     }
 }
 
 #Preview {
     NavigationStack {
-        UserProfileView()
+        UserProfileView(store: Store(initialState: UserProfileFeature.State(user: .mockUser)){
+            UserProfileFeature()
+        })
     }
 }
