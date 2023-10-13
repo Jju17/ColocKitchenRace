@@ -55,6 +55,7 @@
 		6423D3A22AD35121009DB3F7 /* UserProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileView.swift; sourceTree = "<group>"; };
 		6423D3A42AD35159009DB3F7 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		6423D3A72AD36B76009DB3F7 /* CohousingFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CohousingFormView.swift; sourceTree = "<group>"; };
+		6426838F2AD4B29C00F01A20 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		647B1CBD2AD49B7800BD2B25 /* Global.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Global.swift; sourceTree = "<group>"; };
 		64F17B2F2AD2A3BC0047F6F3 /* colockitchenrace.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = colockitchenrace.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		64F17B322AD2A3BC0047F6F3 /* colockitchenraceApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = colockitchenraceApp.swift; sourceTree = "<group>"; };
@@ -142,6 +143,7 @@
 		64F17B312AD2A3BC0047F6F3 /* colockitchenrace */ = {
 			isa = PBXGroup;
 			children = (
+				6426838F2AD4B29C00F01A20 /* Info.plist */,
 				64FB41BD2AD407E700C93A34 /* Assets */,
 				64F17B652AD2D5470047F6F3 /* Models */,
 				64F17B6A2AD2F2840047F6F3 /* Utils */,
@@ -559,6 +561,7 @@
 				DEVELOPMENT_TEAM = YXXNH92P5F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = colockitchenrace/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Kitchen Race";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -592,6 +595,7 @@
 				DEVELOPMENT_TEAM = YXXNH92P5F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = colockitchenrace/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Kitchen Race";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
