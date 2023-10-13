@@ -40,6 +40,15 @@ struct UserProfileView: View {
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             Form {
+                HStack {
+                    Spacer()
+                    Image("Louis")
+                        .resizable()
+                        .frame(width:100, height: 100)
+                    .clipShape(Circle())
+                    Spacer()
+                }
+                
                 Section("Basic info") {
                     TextField("Name", text: viewStore.$user.displayName)
                     TextField("Email", text: viewStore.$user.email ?? "")
