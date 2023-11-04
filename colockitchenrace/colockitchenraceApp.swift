@@ -26,7 +26,7 @@ struct colockitchenraceApp: App {
             AppView(
                 store: Store(
                     initialState: AppFeature.State(
-                        home: HomeFeature.State()
+                        root: RootFeature.State()
                     )
                 ) {
                     AppFeature()

@@ -17,13 +17,13 @@ struct CohousingDetailFeature: Reducer {
         @BindingState var cohousing: Cohousing
     }
 
-    enum Action {
+    enum Action: Equatable {
         case cancelCohousingButtonTapped
         case delegate(Delegate)
         case editButtonTapped
         case editCohousing(PresentationAction<CohousingFormFeature.Action>)
         case saveCohousingButtonTapped
-        enum Delegate {
+        enum Delegate: Equatable {
             case cohousingUpdated(Cohousing)
         }
     }
@@ -120,8 +120,7 @@ struct CohousingDetailView: View {
 
 #Preview {
     NavigationStack {
-        CohousingDetailView(
-            store: Store(initialState: CohousingDetailFeature.State(cohousing: .mock)) {
+        CohousingDetailView(store: Store(initialState: CohousingDetailFeature.State(cohousing: .mock)) {
                 CohousingDetailFeature()
             }
         )

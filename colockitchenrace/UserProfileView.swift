@@ -12,7 +12,7 @@ struct UserProfileFeature: Reducer {
     struct State: Equatable {
         @BindingState var user: User
     }
-    enum Action: BindableAction {
+    enum Action: BindableAction, Equatable {
         case backButtonTapped
         case binding(BindingAction<State>)
         case signOutButtonTapped

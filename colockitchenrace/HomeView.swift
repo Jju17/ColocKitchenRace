@@ -82,9 +82,6 @@ struct HomeFeature: Reducer {
 }
 
 struct HomeView: View {
-
-    // MARK: - Store
-
     let store: StoreOf<HomeFeature>
 
     var body: some View {

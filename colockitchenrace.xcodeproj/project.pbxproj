@@ -17,6 +17,7 @@
 		64325AFC2AF69DDC00038EA5 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64325AFB2AF69DDC00038EA5 /* LoginView.swift */; };
 		64325AFE2AF69DFB00038EA5 /* CohouseTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64325AFD2AF69DFB00038EA5 /* CohouseTileView.swift */; };
 		64325B002AF69E5E00038EA5 /* CountdownTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64325AFF2AF69E5E00038EA5 /* CountdownTileView.swift */; };
+		64325B022AF6A00200038EA5 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64325B012AF6A00200038EA5 /* RootView.swift */; };
 		647B1CBE2AD49B7800BD2B25 /* Global.swift in Sources */ = {isa = PBXBuildFile; fileRef = 647B1CBD2AD49B7800BD2B25 /* Global.swift */; };
 		64884E552AE43CF40075BB39 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		64DD972C2AD9F96000C8F6C7 /* CKRSignInOnboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64DD972B2AD9F96000C8F6C7 /* CKRSignInOnboarding.swift */; };
@@ -68,6 +69,7 @@
 		64325AFB2AF69DDC00038EA5 /* LoginView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		64325AFD2AF69DFB00038EA5 /* CohouseTileView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CohouseTileView.swift; sourceTree = "<group>"; };
 		64325AFF2AF69E5E00038EA5 /* CountdownTileView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountdownTileView.swift; sourceTree = "<group>"; };
+		64325B012AF6A00200038EA5 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		647B1CBD2AD49B7800BD2B25 /* Global.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Global.swift; sourceTree = "<group>"; };
 		64DD972B2AD9F96000C8F6C7 /* CKRSignInOnboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CKRSignInOnboarding.swift; sourceTree = "<group>"; };
 		64F17B2F2AD2A3BC0047F6F3 /* colockitchenrace.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = colockitchenrace.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -126,7 +128,7 @@
 			children = (
 				64325AF82AF6999F00038EA5 /* Login */,
 				64325AF72AF6999600038EA5 /* Home */,
-				64325AF62AF6999100038EA5 /* Menu */,
+				64325AF62AF6999100038EA5 /* Navigation */,
 				64F17B5F2AD2CD0A0047F6F3 /* CohousingDetailView.swift */,
 				6423D3A72AD36B76009DB3F7 /* CohousingFormView.swift */,
 				6423D3A42AD35159009DB3F7 /* OnboardingView.swift */,
@@ -136,11 +138,12 @@
 			name = Views;
 			sourceTree = "<group>";
 		};
-		64325AF62AF6999100038EA5 /* Menu */ = {
+		64325AF62AF6999100038EA5 /* Navigation */ = {
 			isa = PBXGroup;
 			children = (
+				64325B012AF6A00200038EA5 /* RootView.swift */,
 			);
-			name = Menu;
+			name = Navigation;
 			sourceTree = "<group>";
 		};
 		64325AF72AF6999600038EA5 /* Home */ = {
@@ -444,6 +447,7 @@
 				64F17B692AD2D85A0047F6F3 /* Cohousing+Utils.swift in Sources */,
 				647B1CBE2AD49B7800BD2B25 /* Global.swift in Sources */,
 				64F17B622AD2D11B0047F6F3 /* Cohousing.swift in Sources */,
+				64325B022AF6A00200038EA5 /* RootView.swift in Sources */,
 				64DD972C2AD9F96000C8F6C7 /* CKRSignInOnboarding.swift in Sources */,
 				64F17B6C2AD2F29D0047F6F3 /* Date+Utils.swift in Sources */,
 				6423D3A32AD35121009DB3F7 /* UserProfileView.swift in Sources */,
