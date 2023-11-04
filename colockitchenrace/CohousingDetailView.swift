@@ -19,9 +19,13 @@ struct CohousingDetailFeature: Reducer {
 
     enum Action {
         case cancelCohousingButtonTapped
+        case delegate(Delegate)
         case editButtonTapped
         case editCohousing(PresentationAction<CohousingFormFeature.Action>)
         case saveCohousingButtonTapped
+        enum Delegate {
+            case cohousingUpdated(Cohousing)
+        }
     }
 
     var body: some ReducerOf<Self> {
@@ -29,6 +33,8 @@ struct CohousingDetailFeature: Reducer {
             switch action {
             case .cancelCohousingButtonTapped:
                 state.editCohousing = nil
+                return .none
+            case .delegate:
                 return .none
             case .editButtonTapped:
                 state.editCohousing = CohousingFormFeature.State(cohousing: state.cohousing)
@@ -46,6 +52,11 @@ struct CohousingDetailFeature: Reducer {
         .ifLet(\.$editCohousing , action: /Action.editCohousing) {
             CohousingFormFeature()
         }
+        .onChange(of: \.cohousing) { oldValue, newValue in
+            Reduce { state, action in
+                .send(.delegate(.cohousingUpdated(newValue)))
+            }
+        }
     }
 }
 
@@ -55,7 +66,7 @@ struct CohousingDetailView: View {
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             Form {
-                Section("Personne de contact") {
+                Section("Contact person") {
                     HStack {
                         Text("\(viewStore.cohousing.contactUser?.displayName ?? "")")
                         Spacer()

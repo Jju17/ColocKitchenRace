@@ -79,14 +79,15 @@ struct UserProfileView: View {
 
                 }
             }
-            .navigationBarTitle("Julien Rahier")
+            .navigationBarTitle("Profile")
         }
     }
 }
 
 #Preview {
     NavigationStack {
-        UserProfileView(store: Store(initialState: UserProfileFeature.State(user: .mockUser)){
+        UserProfileView(
+            store: Store(initialState: UserProfileFeature.State(user: .mockUser)) {
             UserProfileFeature()
         })
     }

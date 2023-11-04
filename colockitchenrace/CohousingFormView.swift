@@ -13,7 +13,7 @@ struct CohousingFormFeature: Reducer {
         @BindingState var cohousing: Cohousing
     }
 
-    enum Action: BindableAction {
+    enum Action: BindableAction, Equatable {
         case addUserButtonTapped
         case binding(BindingAction<State>)
         case deleteUsers(atOffset: IndexSet)
@@ -47,7 +47,7 @@ struct CohousingFormView: View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             Form {
                 Section {
-                    TextField("Nom de la coloc", text: viewStore.$cohousing.name)
+                    TextField("Cohousing name", text: viewStore.$cohousing.name)
                 }
 
                 Section("Localisation") {
@@ -76,7 +76,7 @@ struct CohousingFormView: View {
                             Text($0.displayName).tag($0.isContactUser)
                         }
                     }, label: {
-                        Text("Personne de contact")
+                        Text("Contact person")
                     })
                 }
             }

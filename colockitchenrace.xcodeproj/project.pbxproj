@@ -10,7 +10,15 @@
 		6423D3A32AD35121009DB3F7 /* UserProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6423D3A22AD35121009DB3F7 /* UserProfileView.swift */; };
 		6423D3A52AD35159009DB3F7 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6423D3A42AD35159009DB3F7 /* OnboardingView.swift */; };
 		6423D3A82AD36B76009DB3F7 /* CohousingFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6423D3A72AD36B76009DB3F7 /* CohousingFormView.swift */; };
+		642701AA2ADEA5F700850684 /* (null) in Resources */ = {isa = PBXBuildFile; };
+		642701AC2AE12F9300850684 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		64325AF52AF698D400038EA5 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		64325AFA2AF69B4C00038EA5 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		64325AFC2AF69DDC00038EA5 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64325AFB2AF69DDC00038EA5 /* LoginView.swift */; };
+		64325AFE2AF69DFB00038EA5 /* CohouseTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64325AFD2AF69DFB00038EA5 /* CohouseTileView.swift */; };
+		64325B002AF69E5E00038EA5 /* CountdownTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64325AFF2AF69E5E00038EA5 /* CountdownTileView.swift */; };
 		647B1CBE2AD49B7800BD2B25 /* Global.swift in Sources */ = {isa = PBXBuildFile; fileRef = 647B1CBD2AD49B7800BD2B25 /* Global.swift */; };
+		64884E552AE43CF40075BB39 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		64DD972C2AD9F96000C8F6C7 /* CKRSignInOnboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64DD972B2AD9F96000C8F6C7 /* CKRSignInOnboarding.swift */; };
 		64F17B332AD2A3BC0047F6F3 /* colockitchenraceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F17B322AD2A3BC0047F6F3 /* colockitchenraceApp.swift */; };
 		64F17B352AD2A3BC0047F6F3 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F17B342AD2A3BC0047F6F3 /* HomeView.swift */; };
@@ -57,6 +65,9 @@
 		6423D3A42AD35159009DB3F7 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		6423D3A72AD36B76009DB3F7 /* CohousingFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CohousingFormView.swift; sourceTree = "<group>"; };
 		6426838F2AD4B29C00F01A20 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		64325AFB2AF69DDC00038EA5 /* LoginView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		64325AFD2AF69DFB00038EA5 /* CohouseTileView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CohouseTileView.swift; sourceTree = "<group>"; };
+		64325AFF2AF69E5E00038EA5 /* CountdownTileView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountdownTileView.swift; sourceTree = "<group>"; };
 		647B1CBD2AD49B7800BD2B25 /* Global.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Global.swift; sourceTree = "<group>"; };
 		64DD972B2AD9F96000C8F6C7 /* CKRSignInOnboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CKRSignInOnboarding.swift; sourceTree = "<group>"; };
 		64F17B2F2AD2A3BC0047F6F3 /* colockitchenrace.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = colockitchenrace.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -113,14 +124,48 @@
 		6423D3A62AD35165009DB3F7 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				64325AF82AF6999F00038EA5 /* Login */,
+				64325AF72AF6999600038EA5 /* Home */,
+				64325AF62AF6999100038EA5 /* Menu */,
 				64F17B5F2AD2CD0A0047F6F3 /* CohousingDetailView.swift */,
 				6423D3A72AD36B76009DB3F7 /* CohousingFormView.swift */,
-				64F17B342AD2A3BC0047F6F3 /* HomeView.swift */,
 				6423D3A42AD35159009DB3F7 /* OnboardingView.swift */,
 				6423D3A22AD35121009DB3F7 /* UserProfileView.swift */,
 				64DD972B2AD9F96000C8F6C7 /* CKRSignInOnboarding.swift */,
 			);
 			name = Views;
+			sourceTree = "<group>";
+		};
+		64325AF62AF6999100038EA5 /* Menu */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Menu;
+			sourceTree = "<group>";
+		};
+		64325AF72AF6999600038EA5 /* Home */ = {
+			isa = PBXGroup;
+			children = (
+				64325AFD2AF69DFB00038EA5 /* CohouseTileView.swift */,
+				64325AFF2AF69E5E00038EA5 /* CountdownTileView.swift */,
+				64F17B342AD2A3BC0047F6F3 /* HomeView.swift */,
+			);
+			name = Home;
+			sourceTree = "<group>";
+		};
+		64325AF82AF6999F00038EA5 /* Login */ = {
+			isa = PBXGroup;
+			children = (
+				64325AFB2AF69DDC00038EA5 /* LoginView.swift */,
+			);
+			name = Login;
+			sourceTree = "<group>";
+		};
+		64884E532AE43CD60075BB39 /* Clients */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Clients;
 			sourceTree = "<group>";
 		};
 		64F17B262AD2A3BC0047F6F3 = {
@@ -148,6 +193,7 @@
 			children = (
 				6426838F2AD4B29C00F01A20 /* Info.plist */,
 				64FB41BD2AD407E700C93A34 /* Assets */,
+				64884E532AE43CD60075BB39 /* Clients */,
 				64F17B652AD2D5470047F6F3 /* Models */,
 				64F17B6A2AD2F2840047F6F3 /* Utils */,
 				6423D3A62AD35165009DB3F7 /* Views */,
@@ -307,6 +353,8 @@
 			knownRegions = (
 				en,
 				Base,
+				fr,
+				es,
 			);
 			mainGroup = 64F17B262AD2A3BC0047F6F3;
 			packageReferences = (
@@ -331,6 +379,7 @@
 			files = (
 				64F17B3A2AD2A3BE0047F6F3 /* Preview Assets.xcassets in Resources */,
 				64F17B372AD2A3BE0047F6F3 /* Assets.xcassets in Resources */,
+				642701AA2ADEA5F700850684 /* (null) in Resources */,
 				64FB41BC2AD407D600C93A34 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -383,11 +432,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				64325B002AF69E5E00038EA5 /* CountdownTileView.swift in Sources */,
+				64325AF52AF698D400038EA5 /* (null) in Sources */,
 				64FB41C92AD4155000C93A34 /* App.swift in Sources */,
 				64F17B352AD2A3BC0047F6F3 /* HomeView.swift in Sources */,
 				64F17B602AD2CD0A0047F6F3 /* CohousingDetailView.swift in Sources */,
+				64325AFA2AF69B4C00038EA5 /* (null) in Sources */,
 				64F17B6E2AD318D70047F6F3 /* DateComponents+Utils.swift in Sources */,
 				64F17B672AD2D7210047F6F3 /* CKR.swift in Sources */,
+				64325AFE2AF69DFB00038EA5 /* CohouseTileView.swift in Sources */,
 				64F17B692AD2D85A0047F6F3 /* Cohousing+Utils.swift in Sources */,
 				647B1CBE2AD49B7800BD2B25 /* Global.swift in Sources */,
 				64F17B622AD2D11B0047F6F3 /* Cohousing.swift in Sources */,
@@ -397,7 +450,10 @@
 				6423D3A82AD36B76009DB3F7 /* CohousingFormView.swift in Sources */,
 				64F17B642AD2D4460047F6F3 /* User.swift in Sources */,
 				6423D3A52AD35159009DB3F7 /* OnboardingView.swift in Sources */,
+				642701AC2AE12F9300850684 /* (null) in Sources */,
 				64F17B332AD2A3BC0047F6F3 /* colockitchenraceApp.swift in Sources */,
+				64325AFC2AF69DDC00038EA5 /* LoginView.swift in Sources */,
+				64884E552AE43CF40075BB39 /* (null) in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -570,6 +626,7 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -604,6 +661,7 @@
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				LD_RUNPATH_SEARCH_PATHS = (

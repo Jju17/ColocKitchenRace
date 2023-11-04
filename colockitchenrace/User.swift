@@ -9,6 +9,7 @@ import Foundation
 
 struct User: Equatable, Hashable, Identifiable {
     var id: UUID
+    var uid: String = ""
     var isContactUser: Bool = false
     var isSubscribeToNews: Bool = false
     var displayName: String = ""
@@ -21,6 +22,10 @@ struct User: Equatable, Hashable, Identifiable {
 extension User {
     static var mockUser: User {
         return User(id: UUID(), isContactUser: true, isSubscribeToNews: true, displayName: "Louis de Potter", phoneNumber: "+32 479 50 68 41", email: "louisdepotter@gmail.com", foodIntolerences: ["Lactose"], foodIntolerence: "Lactose")
+    }
+
+    static var mockUser2: User {
+        return User(id: UUID(), isContactUser: true, isSubscribeToNews: true, displayName: "Julien Rahier", phoneNumber: "+32 479 50 68 41", email: "julien.rahier@gmail.com", foodIntolerences: ["Lactose"], foodIntolerence: "Lactose")
     }
 
     static var mockUsers: [User] {

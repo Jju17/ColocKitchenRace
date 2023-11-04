@@ -13,46 +13,70 @@ struct HomeFeature: Reducer {
     // MARK: - Reducer
 
     struct State: Equatable {
-        @PresentationState var addCohousing: CohousingFormFeature.State?
-        var currentUser: User?
-        var cohousing: Cohousing?
+        @PresentationState var destination: Destination.State?
+        @BindingState var currentUser: User?
+        @BindingState var cohousing: Cohousing?
     }
 
-    enum Action {
-        case addCohousing(PresentationAction<CohousingFormFeature.Action>)
+    enum Action: Equatable {
+        case destination(PresentationAction<Destination.Action>)
         case addCohousingButtonTapped
         case cancelCohousingButtonTapped
+        case onAppear
         case saveCohousingButtonTapped
         case signInButtonTapped
         case userProfileButtonTapped
+    }
+
+    struct Destination: Reducer {
+        enum State: Equatable {
+            case addCohousing(CohousingFormFeature.State)
+        }
+
+        enum Action: Equatable {
+            case addCohousing(CohousingFormFeature.Action)
+        }
+
+        var body: some ReducerOf<Self> {
+            Scope(
+                state: /State.addCohousing,
+                action: /Action.addCohousing) {
+                    CohousingFormFeature()
+                }
+        }
     }
 
     @Dependency(\.uuid) var uuid
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .addCohousing:
+            case .destination(.presented(.addCohousing)):
+                return .none
+            case .destination(.dismiss):
                 return .none
             case .addCohousingButtonTapped:
-                state.addCohousing = CohousingFormFeature.State(cohousing: Cohousing(id: self.uuid()))
+                state.destination = .addCohousing(CohousingFormFeature.State(cohousing: Cohousing(id: self.uuid())))
                 return .none
             case .cancelCohousingButtonTapped:
-                state.addCohousing = nil
+                state.destination = nil
+                return .none
+            case .onAppear:
                 return .none
             case .saveCohousingButtonTapped:
-                guard let cohousing = state.addCohousing?.cohousing
+                guard case let .addCohousing(cohousing) = state.destination
                 else { return .none }
-                state.cohousing = cohousing
-                state.addCohousing = nil
+                state.cohousing = cohousing.cohousing
+                state.destination = nil
                 return .none
             case .signInButtonTapped:
                 return .none
             case .userProfileButtonTapped:
                 return .none
+
             }
         }
-        .ifLet(\.$addCohousing, action: /Action.addCohousing) {
-            CohousingFormFeature()
+        .ifLet(\.$destination, action: /Action.destination) {
+            Destination()
         }
     }
 }
@@ -63,145 +87,36 @@ struct HomeView: View {
 
     let store: StoreOf<HomeFeature>
 
-    // MARK: - States
-
-    @State var nowDate: Date = Date()
-
-    // MARK: - Private properties
-
-    private let nextKitchenRace = Date.from(year: 2024, month: 03, day: 23, hour: 18)
-    private var timer: Timer {
-        Timer.scheduledTimer(withTimeInterval: 1, repeats: true) {_ in
-            self.nowDate = Date()
-        }
-    }
-    private var countDownComponents: DateComponents {
-        return Date.countdownDateComponents(from: self.nowDate, to: self.nextKitchenRace)
-    }
-
     var body: some View {
         WithViewStore(self.store, observe: { $0 }) { viewStore in
             VStack {
-                if let cohousing = viewStore.cohousing {
+                if let _ = viewStore.cohousing {
                     NavigationLink(
-                        state: AppFeature.Path.State.detail(CohousingDetailFeature.State(cohousing: cohousing))
+                        state: AppFeature.Path.State.details(CohousingDetailFeature.State(cohousing: viewStore.cohousing!))
                     ) {
-                        ZStack {
-                            Image("defaultColocBackground")
-                                .resizable()
-                                .scaledToFill()
-                            Rectangle()
-                                .foregroundColor(.clear)
-                                .background(
-                                    LinearGradient(gradient: Gradient(colors: [.clear, .black]), startPoint: .top, endPoint: .bottom))
-                            if let name = viewStore.cohousing?.name {
-                                Text(name)
-                                    .font(.system(size: 40))
-                                    .fontWeight(.heavy)
-                                    .foregroundStyle(.white)
-                            } else {
-                                Image(systemName: "plus.circle")
-                                    .font(.system(size: 40))
-                                    .fontWeight(.bold)
-                                    .foregroundStyle(.white)
-                            }
-                        }
-                        .frame(height: 130)
-                        .clipped()
-                        .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
-                        .padding()
+                        CohouseTileView(name: viewStore.cohousing?.name)
                     }
                 } else {
                     Button {
                         viewStore.send(.addCohousingButtonTapped)
                     } label: {
-                        ZStack {
-                            Image("defaultColocBackground")
-                                .resizable()
-                                .scaledToFill()
-                            Rectangle()
-                                .foregroundColor(.clear)
-                                .background(
-                                    LinearGradient(gradient: Gradient(colors: [.clear, .black]), startPoint: .top, endPoint: .bottom))
-                            if let name = viewStore.cohousing?.name {
-                                Text(name)
-                                    .font(.system(size: 40))
-                                    .fontWeight(.heavy)
-                                    .foregroundStyle(.white)
-                            } else {
-                                Image(systemName: "plus.circle")
-                                    .font(.system(size: 40))
-                                    .fontWeight(.bold)
-                                    .foregroundStyle(.white)
-                            }
-                        }
-                        .frame(height: 130)
-                        .clipped()
-                        .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
-                        .padding()
+                        CohouseTileView(name: viewStore.cohousing?.name)
                     }
                 }
-                VStack(alignment: .leading) {
-                    Text("Prochaine Kitchen Race")
-                        .frame(maxWidth: .infinity)
-                        .font(.system(size: 30))
-                        .fontWeight(.bold)
-                        .foregroundStyle(.white)
-                        .padding(.vertical, 30)
-
-                    Spacer()
-
-                    VStack(alignment: .leading, spacing: 30) {
-                        Text("Day \(self.countDownComponents.formattedDays)")
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        Text("Hour \(self.countDownComponents.formattedHours)")
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        Text("Minute \(self.countDownComponents.formattedMinutes)")
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        Text("Second \(self.countDownComponents.formattedSeconds)")
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .foregroundColor(.white)
-                    .font(.system(size: 45))
-                    .fontWeight(.heavy)
-                    .clipped()
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .padding()
-                    .onAppear(perform: {
-                        _ = self.timer
-                    })
-
-                    Spacer()
-
-                    Button(action: {}) {
-                        Label("Sign In", systemImage: "arrow.up")
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .frame(maxWidth: .infinity)
-                    .padding()
-
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.green)
-                .clipped()
-                .clipShape(RoundedRectangle(cornerRadius: 15))
-                .padding()
-
+                CountdownTileView(nextKitchenRace: Date.from(year: 2024, month: 03, day: 23, hour: 18))
             }
-            .navigationTitle("Bienvenue")
+            .navigationTitle("Welcome")
             .toolbar {
                 NavigationLink(
-                    state: AppFeature.Path.State.userProfile(UserProfileFeature.State(user: .mockUser))
+                    state: AppFeature.Path.State.userProfile(UserProfileFeature.State(user: viewStore.currentUser ?? .mockUser2))
                 ) {
                     Image(systemName: "person.crop.circle.fill")
                 }
             }
             .sheet(
-                store: self.store.scope(
-                    state: \.$addCohousing,
-                    action: { .addCohousing($0) }
-                )
+                store: self.store.scope(state: \.$destination, action: { .destination($0) } ),
+                state: /HomeFeature.Destination.State.addCohousing,
+                action: HomeFeature.Destination.Action.addCohousing
             ) { store in
                 NavigationStack {
                     CohousingFormView(store: store)
@@ -212,7 +127,6 @@ struct HomeView: View {
                                     viewStore.send(.saveCohousingButtonTapped)
                                 }
                             }
-
                             ToolbarItem(placement: .cancellationAction) {
                                 Button("Cancel") {
                                     viewStore.send(.cancelCohousingButtonTapped)
@@ -220,6 +134,9 @@ struct HomeView: View {
                             }
                         }
                 }
+            }
+            .onAppear {
+                viewStore.send(.onAppear)
             }
         }
     }

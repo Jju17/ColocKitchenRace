@@ -21,19 +21,24 @@ struct AppFeature: Reducer {
 
     struct Path: Reducer {
         enum State {
-            case detail(CohousingDetailFeature.State)
+            case details(CohousingDetailFeature.State)
+            case login(LoginFeature.State)
             case userProfile(UserProfileFeature.State)
         }
         enum Action {
-            case detail(CohousingDetailFeature.Action)
+            case details(CohousingDetailFeature.Action)
+            case login(LoginFeature.Action)
             case userProfile(UserProfileFeature.Action)
         }
         var body: some ReducerOf<Self> {
-            Scope(state: /State.detail, action: /Action.detail) {
+            Scope(state: /State.details, action: /Action.details) {
                 CohousingDetailFeature()
             }
             Scope(state: /State.userProfile, action: /Action.userProfile) {
                 UserProfileFeature()
+            }
+            Scope(state: /State.login, action: /Action.login) {
+                LoginFeature()
             }
         }
     }
@@ -45,6 +50,21 @@ struct AppFeature: Reducer {
 
         Reduce { state, action in
             switch action {
+            case let .path(.element(id: _, action: .details(.delegate(action)))):
+                switch action {
+                case let .cohousingUpdated(cohousing):
+                    state.home.cohousing = cohousing
+                    return .none
+                }
+            case let .path(.element(id: _, action: .login(.delegate(action)))):
+                switch action {
+                case let .userUpdated(user):
+                    state.home.currentUser = user
+                    return .none
+                }
+            case .home(.onAppear):
+                state.path.append(.login(LoginFeature.State()))
+                return .none
             case .home:
                 return .none
             case .path:
@@ -72,16 +92,24 @@ struct AppView: View {
             )
         } destination: { state in
             switch state {
-            case .detail:
+            case .details:
                 CaseLet(
-                    /AppFeature.Path.State.detail,
-                     action: AppFeature.Path.Action.detail
-                ) { CohousingDetailView(store: $0) }
+                    /AppFeature.Path.State.details,
+                     action: AppFeature.Path.Action.details,
+                     then: CohousingDetailView.init(store:)
+                )
             case .userProfile:
                 CaseLet(
                     /AppFeature.Path.State.userProfile,
-                     action: AppFeature.Path.Action.userProfile
-                ) { UserProfileView(store: $0) }
+                     action: AppFeature.Path.Action.userProfile,
+                     then: UserProfileView.init(store:)
+                )
+            case .login:
+                CaseLet(
+                    /AppFeature.Path.State.login,
+                     action: AppFeature.Path.Action.login,
+                     then: LoginView.init(store:)
+                )
             }
         }
     }
