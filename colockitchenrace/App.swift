@@ -41,13 +41,13 @@ struct AppFeature: Reducer {
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case let .path(.element(id: _, action: .details(.delegate(action)))):
+//            case let .path(.element(id: _, action: .details(.delegate(action)))):
 //                switch action {
 //                case let .cohousingUpdated(cohousing):
 //                    state.home.cohousing = cohousing
 //                    return .none
 //                }
-                return .none
+//                return .none
 //            case .home(.onAppear):
 //                print("JR: Home is appeared")
 ////                state.path.append(.login(LoginFeature.State()))

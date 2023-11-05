@@ -18,6 +18,7 @@
 		64325AFE2AF69DFB00038EA5 /* CohouseTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64325AFD2AF69DFB00038EA5 /* CohouseTileView.swift */; };
 		64325B002AF69E5E00038EA5 /* CountdownTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64325AFF2AF69E5E00038EA5 /* CountdownTileView.swift */; };
 		64325B022AF6A00200038EA5 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64325B012AF6A00200038EA5 /* RootView.swift */; };
+		64325B042AF7D9A100038EA5 /* AuthentificationClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64325B032AF7D9A100038EA5 /* AuthentificationClient.swift */; };
 		647B1CBE2AD49B7800BD2B25 /* Global.swift in Sources */ = {isa = PBXBuildFile; fileRef = 647B1CBD2AD49B7800BD2B25 /* Global.swift */; };
 		64884E552AE43CF40075BB39 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		64DD972C2AD9F96000C8F6C7 /* CKRSignInOnboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64DD972B2AD9F96000C8F6C7 /* CKRSignInOnboarding.swift */; };
@@ -70,6 +71,7 @@
 		64325AFD2AF69DFB00038EA5 /* CohouseTileView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CohouseTileView.swift; sourceTree = "<group>"; };
 		64325AFF2AF69E5E00038EA5 /* CountdownTileView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountdownTileView.swift; sourceTree = "<group>"; };
 		64325B012AF6A00200038EA5 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		64325B032AF7D9A100038EA5 /* AuthentificationClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthentificationClient.swift; sourceTree = "<group>"; };
 		647B1CBD2AD49B7800BD2B25 /* Global.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Global.swift; sourceTree = "<group>"; };
 		64DD972B2AD9F96000C8F6C7 /* CKRSignInOnboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CKRSignInOnboarding.swift; sourceTree = "<group>"; };
 		64F17B2F2AD2A3BC0047F6F3 /* colockitchenrace.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = colockitchenrace.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -167,6 +169,7 @@
 		64884E532AE43CD60075BB39 /* Clients */ = {
 			isa = PBXGroup;
 			children = (
+				64325B032AF7D9A100038EA5 /* AuthentificationClient.swift */,
 			);
 			name = Clients;
 			sourceTree = "<group>";
@@ -440,6 +443,7 @@
 				64FB41C92AD4155000C93A34 /* App.swift in Sources */,
 				64F17B352AD2A3BC0047F6F3 /* HomeView.swift in Sources */,
 				64F17B602AD2CD0A0047F6F3 /* CohousingDetailView.swift in Sources */,
+				64325B042AF7D9A100038EA5 /* AuthentificationClient.swift in Sources */,
 				64325AFA2AF69B4C00038EA5 /* (null) in Sources */,
 				64F17B6E2AD318D70047F6F3 /* DateComponents+Utils.swift in Sources */,
 				64F17B672AD2D7210047F6F3 /* CKR.swift in Sources */,
@@ -618,11 +622,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Apple Development: Julien Rahier (Q75662T298)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"colockitchenrace/Preview Content\"";
-				DEVELOPMENT_TEAM = YXXNH92P5F;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = YXXNH92P5F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = colockitchenrace/Info.plist;
@@ -640,6 +647,8 @@
 				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.julienrahier.colocskitchenrace;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "ad profile";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -654,10 +663,13 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Apple Development: Julien Rahier (Q75662T298)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"colockitchenrace/Preview Content\"";
-				DEVELOPMENT_TEAM = YXXNH92P5F;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = YXXNH92P5F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = colockitchenrace/Info.plist;
@@ -675,6 +687,8 @@
 				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.julienrahier.colocskitchenrace;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "ad profile";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
