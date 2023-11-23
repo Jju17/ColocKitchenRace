@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct User: Equatable, Hashable, Identifiable {
+struct User: Equatable, Hashable, Identifiable, Codable {
     var id: UUID
     var uid: String = ""
     var isContactUser: Bool = false

@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6414C9002AF9AE740026CEC6 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 6414C8FF2AF9AE740026CEC6 /* FirebaseFirestore */; };
+		6414C9022AF9AE740026CEC6 /* FirebaseFirestoreSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 6414C9012AF9AE740026CEC6 /* FirebaseFirestoreSwift */; };
 		6423D3A32AD35121009DB3F7 /* UserProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6423D3A22AD35121009DB3F7 /* UserProfileView.swift */; };
 		6423D3A52AD35159009DB3F7 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6423D3A42AD35159009DB3F7 /* OnboardingView.swift */; };
 		6423D3A82AD36B76009DB3F7 /* CohousingFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6423D3A72AD36B76009DB3F7 /* CohousingFormView.swift */; };
@@ -103,8 +105,10 @@
 				64FB41C02AD4086100C93A34 /* FirebaseAnalyticsSwift in Frameworks */,
 				64FB41C22AD4086100C93A34 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
 				64FB41C62AD4086100C93A34 /* FirebaseCrashlytics in Frameworks */,
+				6414C9022AF9AE740026CEC6 /* FirebaseFirestoreSwift in Frameworks */,
 				64F17B5E2AD2CC9B0047F6F3 /* ComposableArchitecture in Frameworks */,
 				64FB41C42AD4086100C93A34 /* FirebaseAuth in Frameworks */,
+				6414C9002AF9AE740026CEC6 /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -288,6 +292,8 @@
 				64FB41C12AD4086100C93A34 /* FirebaseAnalyticsWithoutAdIdSupport */,
 				64FB41C32AD4086100C93A34 /* FirebaseAuth */,
 				64FB41C52AD4086100C93A34 /* FirebaseCrashlytics */,
+				6414C8FF2AF9AE740026CEC6 /* FirebaseFirestore */,
+				6414C9012AF9AE740026CEC6 /* FirebaseFirestoreSwift */,
 			);
 			productName = colockitchenrace;
 			productReference = 64F17B2F2AD2A3BC0047F6F3 /* colockitchenrace.app */;
@@ -622,14 +628,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_IDENTITY = "Apple Development: Julien Rahier (Q75662T298)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_ASSET_PATHS = "\"colockitchenrace/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = YXXNH92P5F;
+				DEVELOPMENT_TEAM = YXXNH92P5F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = colockitchenrace/Info.plist;
@@ -648,7 +652,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.julienrahier.colocskitchenrace;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "ad profile";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -663,13 +666,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_IDENTITY = "Apple Development: Julien Rahier (Q75662T298)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"colockitchenrace/Preview Content\"";
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = YXXNH92P5F;
+				DEVELOPMENT_TEAM = YXXNH92P5F;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = colockitchenrace/Info.plist;
@@ -688,7 +689,6 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.julienrahier.colocskitchenrace;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "ad profile";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
@@ -835,6 +835,16 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		6414C8FF2AF9AE740026CEC6 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 64FB41BE2AD4086100C93A34 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		6414C9012AF9AE740026CEC6 /* FirebaseFirestoreSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 64FB41BE2AD4086100C93A34 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestoreSwift;
+		};
 		64F17B5D2AD2CC9B0047F6F3 /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 64F17B5C2AD2CC9B0047F6F3 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
