@@ -6,16 +6,18 @@
 //
 
 import ComposableArchitecture
+import FirebaseAuth
 import SwiftUI
 
 struct AppFeature: Reducer {
     struct State: Equatable {
-        var root = RootFeature.State()
+        var home = HomeFeature.State()
         var path = StackState<Path.State>()
+        var userSession: FirebaseAuth.User?
     }
 
     enum Action: Equatable {
-        case root(RootFeature.Action)
+        case home(HomeFeature.Action)
         case path(StackAction<Path.State, Path.Action>)
     }
 
@@ -34,6 +36,9 @@ struct AppFeature: Reducer {
             Scope(state: /State.details, action: /Action.details) {
                 CohousingDetailFeature()
             }
+            Scope(state: /State.login, action: /Action.login) {
+                LoginFeature()
+            }
             Scope(state: /State.userProfile, action: /Action.userProfile) {
                 UserProfileFeature()
             }
@@ -41,18 +46,15 @@ struct AppFeature: Reducer {
     }
 
     var body: some ReducerOf<Self> {
+        Scope(state: \.home, action: /Action.home) {
+            HomeFeature()
+        }
+
         Reduce { state, action in
             switch action {
-            case let .path(.element(id: _, action: .login(.delegate(action)))):
-                switch action {
-                case let .userSessionUpdated(newUserSession):
-        
-                    state.root.userSession = newUserSession
-                    return .none
-                }
             case .path:
                 return .none
-            case .root:
+            case .home:
                 return .none
             }
         }
@@ -69,10 +71,10 @@ struct AppView: View {
         NavigationStackStore(
             self.store.scope(state: \.path, action: { .path($0) })
         ) {
-            RootView(
+            HomeView(
                 store: self.store.scope(
-                    state: \.root,
-                    action: { .root($0) }
+                    state: \.home,
+                    action: { .home($0) }
                 )
             )
         } destination: { state in

@@ -57,7 +57,7 @@ struct LoginFeature: Reducer {
                         let result = try await Auth.auth().signIn(withEmail: email, password: password)
                         await send(.delegate(.userSessionUpdated(result.user)))
                     } catch {
-
+                        fatalError()
                     }
                 }
             }

@@ -360,7 +360,7 @@
 			};
 			buildConfigurationList = 64F17B2A2AD2A3BC0047F6F3 /* Build configuration list for PBXProject "colockitchenrace" */;
 			compatibilityVersion = "Xcode 14.0";
-			developmentRegion = en;
+			developmentRegion = fr;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,

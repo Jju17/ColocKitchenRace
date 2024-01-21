@@ -3,4 +3,69 @@
    uuid = "F872672D-0ABB-4294-91B9-C7D200EE17C9"
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "1DEBB6EA-3758-40A4-A4C8-A4BE3286FB09"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "colockitchenrace/LoginView.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "58"
+            endingLineNumber = "58"
+            landmarkName = "body"
+            landmarkType = "24">
+            <Locations>
+               <Location
+                  uuid = "1DEBB6EA-3758-40A4-A4C8-A4BE3286FB09 - ae04d45aa49193f5"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for closure #1 @Sendable (ComposableArchitecture.Send&lt;colockitchenrace.LoginFeature.Action&gt;) async -&gt; () in closure #1 (inout colockitchenrace.LoginFeature.State, colockitchenrace.LoginFeature.Action) -&gt; ComposableArchitecture.Effect&lt;colockitchenrace.LoginFeature.Action&gt; in colockitchenrace.LoginFeature.body.getter : some"
+                  moduleName = "colockitchenrace"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/jrahier/colockitchenrace/colockitchenrace/LoginView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "58"
+                  endingLineNumber = "58"
+                  offsetFromSymbolStart = "120">
+               </Location>
+               <Location
+                  uuid = "1DEBB6EA-3758-40A4-A4C8-A4BE3286FB09 - 87a95d637e5c2d74"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(4) suspend resume partial function for closure #1 @Sendable (ComposableArchitecture.Send&lt;colockitchenrace.LoginFeature.Action&gt;) async -&gt; () in closure #1 (inout colockitchenrace.LoginFeature.State, colockitchenrace.LoginFeature.Action) -&gt; ComposableArchitecture.Effect&lt;colockitchenrace.LoginFeature.Action&gt; in colockitchenrace.LoginFeature.body.getter : some"
+                  moduleName = "colockitchenrace"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/jrahier/colockitchenrace/colockitchenrace/LoginView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "58"
+                  endingLineNumber = "58"
+                  offsetFromSymbolStart = "20">
+               </Location>
+               <Location
+                  uuid = "1DEBB6EA-3758-40A4-A4C8-A4BE3286FB09 - f94dc60b371ecef7"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(5) suspend resume partial function for closure #1 @Sendable (ComposableArchitecture.Send&lt;colockitchenrace.LoginFeature.Action&gt;) async -&gt; () in closure #1 (inout colockitchenrace.LoginFeature.State, colockitchenrace.LoginFeature.Action) -&gt; ComposableArchitecture.Effect&lt;colockitchenrace.LoginFeature.Action&gt; in colockitchenrace.LoginFeature.body.getter : some"
+                  moduleName = "colockitchenrace"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/jrahier/colockitchenrace/colockitchenrace/LoginView.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "58"
+                  endingLineNumber = "58"
+                  offsetFromSymbolStart = "52">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>
