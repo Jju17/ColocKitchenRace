@@ -25,9 +25,7 @@ struct colockitchenraceApp: App {
         WindowGroup {
             AppView(
                 store: Store(
-                    initialState: AppFeature.State(
-                        home: HomeFeature.State()
-                    )
+                    initialState: AppFeature.State.loggedOut(LoginFeature.State())
                 ) {
                     AppFeature()
                 }

@@ -19,10 +19,10 @@
 		64325AFC2AF69DDC00038EA5 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64325AFB2AF69DDC00038EA5 /* LoginView.swift */; };
 		64325AFE2AF69DFB00038EA5 /* CohouseTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64325AFD2AF69DFB00038EA5 /* CohouseTileView.swift */; };
 		64325B002AF69E5E00038EA5 /* CountdownTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64325AFF2AF69E5E00038EA5 /* CountdownTileView.swift */; };
-		64325B022AF6A00200038EA5 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64325B012AF6A00200038EA5 /* RootView.swift */; };
 		64325B042AF7D9A100038EA5 /* AuthentificationClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64325B032AF7D9A100038EA5 /* AuthentificationClient.swift */; };
 		647B1CBE2AD49B7800BD2B25 /* Global.swift in Sources */ = {isa = PBXBuildFile; fileRef = 647B1CBD2AD49B7800BD2B25 /* Global.swift */; };
 		64884E552AE43CF40075BB39 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		64B66EC62B5D50DB00B8F30B /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 64B66EC52B5D50DB00B8F30B /* ComposableArchitecture */; };
 		64DD972C2AD9F96000C8F6C7 /* CKRSignInOnboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64DD972B2AD9F96000C8F6C7 /* CKRSignInOnboarding.swift */; };
 		64F17B332AD2A3BC0047F6F3 /* colockitchenraceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F17B322AD2A3BC0047F6F3 /* colockitchenraceApp.swift */; };
 		64F17B352AD2A3BC0047F6F3 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F17B342AD2A3BC0047F6F3 /* HomeView.swift */; };
@@ -31,7 +31,6 @@
 		64F17B442AD2A3BE0047F6F3 /* colockitchenraceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F17B432AD2A3BE0047F6F3 /* colockitchenraceTests.swift */; };
 		64F17B4E2AD2A3BE0047F6F3 /* colockitchenraceUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F17B4D2AD2A3BE0047F6F3 /* colockitchenraceUITests.swift */; };
 		64F17B502AD2A3BE0047F6F3 /* colockitchenraceUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F17B4F2AD2A3BE0047F6F3 /* colockitchenraceUITestsLaunchTests.swift */; };
-		64F17B5E2AD2CC9B0047F6F3 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 64F17B5D2AD2CC9B0047F6F3 /* ComposableArchitecture */; };
 		64F17B602AD2CD0A0047F6F3 /* CohousingDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F17B5F2AD2CD0A0047F6F3 /* CohousingDetailView.swift */; };
 		64F17B622AD2D11B0047F6F3 /* Cohousing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F17B612AD2D11B0047F6F3 /* Cohousing.swift */; };
 		64F17B642AD2D4460047F6F3 /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F17B632AD2D4460047F6F3 /* User.swift */; };
@@ -72,7 +71,6 @@
 		64325AFB2AF69DDC00038EA5 /* LoginView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		64325AFD2AF69DFB00038EA5 /* CohouseTileView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CohouseTileView.swift; sourceTree = "<group>"; };
 		64325AFF2AF69E5E00038EA5 /* CountdownTileView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountdownTileView.swift; sourceTree = "<group>"; };
-		64325B012AF6A00200038EA5 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		64325B032AF7D9A100038EA5 /* AuthentificationClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthentificationClient.swift; sourceTree = "<group>"; };
 		647B1CBD2AD49B7800BD2B25 /* Global.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Global.swift; sourceTree = "<group>"; };
 		64DD972B2AD9F96000C8F6C7 /* CKRSignInOnboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CKRSignInOnboarding.swift; sourceTree = "<group>"; };
@@ -104,9 +102,9 @@
 			files = (
 				64FB41C02AD4086100C93A34 /* FirebaseAnalyticsSwift in Frameworks */,
 				64FB41C22AD4086100C93A34 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
+				64B66EC62B5D50DB00B8F30B /* ComposableArchitecture in Frameworks */,
 				64FB41C62AD4086100C93A34 /* FirebaseCrashlytics in Frameworks */,
 				6414C9022AF9AE740026CEC6 /* FirebaseFirestoreSwift in Frameworks */,
-				64F17B5E2AD2CC9B0047F6F3 /* ComposableArchitecture in Frameworks */,
 				64FB41C42AD4086100C93A34 /* FirebaseAuth in Frameworks */,
 				6414C9002AF9AE740026CEC6 /* FirebaseFirestore in Frameworks */,
 			);
@@ -134,7 +132,6 @@
 			children = (
 				64325AF82AF6999F00038EA5 /* Login */,
 				64325AF72AF6999600038EA5 /* Home */,
-				64325AF62AF6999100038EA5 /* Navigation */,
 				64F17B5F2AD2CD0A0047F6F3 /* CohousingDetailView.swift */,
 				6423D3A72AD36B76009DB3F7 /* CohousingFormView.swift */,
 				6423D3A42AD35159009DB3F7 /* OnboardingView.swift */,
@@ -142,14 +139,6 @@
 				64DD972B2AD9F96000C8F6C7 /* CKRSignInOnboarding.swift */,
 			);
 			name = Views;
-			sourceTree = "<group>";
-		};
-		64325AF62AF6999100038EA5 /* Navigation */ = {
-			isa = PBXGroup;
-			children = (
-				64325B012AF6A00200038EA5 /* RootView.swift */,
-			);
-			name = Navigation;
 			sourceTree = "<group>";
 		};
 		64325AF72AF6999600038EA5 /* Home */ = {
@@ -287,13 +276,13 @@
 			);
 			name = colockitchenrace;
 			packageProductDependencies = (
-				64F17B5D2AD2CC9B0047F6F3 /* ComposableArchitecture */,
 				64FB41BF2AD4086100C93A34 /* FirebaseAnalyticsSwift */,
 				64FB41C12AD4086100C93A34 /* FirebaseAnalyticsWithoutAdIdSupport */,
 				64FB41C32AD4086100C93A34 /* FirebaseAuth */,
 				64FB41C52AD4086100C93A34 /* FirebaseCrashlytics */,
 				6414C8FF2AF9AE740026CEC6 /* FirebaseFirestore */,
 				6414C9012AF9AE740026CEC6 /* FirebaseFirestoreSwift */,
+				64B66EC52B5D50DB00B8F30B /* ComposableArchitecture */,
 			);
 			productName = colockitchenrace;
 			productReference = 64F17B2F2AD2A3BC0047F6F3 /* colockitchenrace.app */;
@@ -370,8 +359,8 @@
 			);
 			mainGroup = 64F17B262AD2A3BC0047F6F3;
 			packageReferences = (
-				64F17B5C2AD2CC9B0047F6F3 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 				64FB41BE2AD4086100C93A34 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				64B66EC42B5D50DB00B8F30B /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 			);
 			productRefGroup = 64F17B302AD2A3BC0047F6F3 /* Products */;
 			projectDirPath = "";
@@ -457,7 +446,6 @@
 				64F17B692AD2D85A0047F6F3 /* Cohousing+Utils.swift in Sources */,
 				647B1CBE2AD49B7800BD2B25 /* Global.swift in Sources */,
 				64F17B622AD2D11B0047F6F3 /* Cohousing.swift in Sources */,
-				64325B022AF6A00200038EA5 /* RootView.swift in Sources */,
 				64DD972C2AD9F96000C8F6C7 /* CKRSignInOnboarding.swift in Sources */,
 				64F17B6C2AD2F29D0047F6F3 /* Date+Utils.swift in Sources */,
 				6423D3A32AD35121009DB3F7 /* UserProfileView.swift in Sources */,
@@ -644,6 +632,7 @@
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -681,6 +670,7 @@
 				INFOPLIST_KEY_UIStatusBarStyle = "";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -816,12 +806,12 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		64F17B5C2AD2CC9B0047F6F3 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
+		64B66EC42B5D50DB00B8F30B /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
+			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.2.0;
+				minimumVersion = 1.7.0;
 			};
 		};
 		64FB41BE2AD4086100C93A34 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
@@ -845,9 +835,9 @@
 			package = 64FB41BE2AD4086100C93A34 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFirestoreSwift;
 		};
-		64F17B5D2AD2CC9B0047F6F3 /* ComposableArchitecture */ = {
+		64B66EC52B5D50DB00B8F30B /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 64F17B5C2AD2CC9B0047F6F3 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
+			package = 64B66EC42B5D50DB00B8F30B /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
 			productName = ComposableArchitecture;
 		};
 		64FB41BF2AD4086100C93A34 /* FirebaseAnalyticsSwift */ = {

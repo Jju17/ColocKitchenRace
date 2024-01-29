@@ -9,57 +9,40 @@ import ComposableArchitecture
 import FirebaseAuth
 import SwiftUI
 
-struct AppFeature: Reducer {
-    struct State: Equatable {
-        var home = HomeFeature.State()
-        var path = StackState<Path.State>()
-        var userSession: FirebaseAuth.User?
+@Reducer
+struct AppFeature {
+
+    @ObservableState
+    enum State {
+        case loggedIn(HomeFeature.State)
+        case loggedOut(LoginFeature.State)
     }
 
-    enum Action: Equatable {
-        case home(HomeFeature.Action)
-        case path(StackAction<Path.State, Path.Action>)
-    }
-
-    struct Path: Reducer {
-        enum State: Equatable {
-            case details(CohousingDetailFeature.State)
-            case login(LoginFeature.State)
-            case userProfile(UserProfileFeature.State)
-        }
-        enum Action: Equatable {
-            case details(CohousingDetailFeature.Action)
-            case login(LoginFeature.Action)
-            case userProfile(UserProfileFeature.Action)
-        }
-        var body: some ReducerOf<Self> {
-            Scope(state: /State.details, action: /Action.details) {
-                CohousingDetailFeature()
-            }
-            Scope(state: /State.login, action: /Action.login) {
-                LoginFeature()
-            }
-            Scope(state: /State.userProfile, action: /Action.userProfile) {
-                UserProfileFeature()
-            }
-        }
+    enum Action {
+        case loggedIn(HomeFeature.Action)
+        case loggedOut(LoginFeature.Action)
+        case logIn
     }
 
     var body: some ReducerOf<Self> {
-        Scope(state: \.home, action: /Action.home) {
+        Scope(state: /AppFeature.State.loggedIn, action: /AppFeature.Action.loggedIn) {
             HomeFeature()
+        }
+
+        Scope(state: /AppFeature.State.loggedOut, action: /AppFeature.Action.loggedOut) {
+            LoginFeature()
         }
 
         Reduce { state, action in
             switch action {
-            case .path:
+            case .logIn:
+                state = .loggedIn(HomeFeature.State())
                 return .none
-            case .home:
+            case .loggedIn:
+                return .none
+            case .loggedOut:
                 return .none
             }
-        }
-        .forEach(\.path, action: /Action.path) {
-            Path()
         }
     }
 }
@@ -67,36 +50,19 @@ struct AppFeature: Reducer {
 struct AppView: View {
     let store: StoreOf<AppFeature>
 
+    init(store: StoreOf<AppFeature>) {
+        self.store = store
+    }
+
     var body: some View {
-        NavigationStackStore(
-            self.store.scope(state: \.path, action: { .path($0) })
-        ) {
-            HomeView(
-                store: self.store.scope(
-                    state: \.home,
-                    action: { .home($0) }
-                )
-            )
-        } destination: { state in
-            switch state {
-            case .details:
-                CaseLet(
-                    /AppFeature.Path.State.details,
-                     action: AppFeature.Path.Action.details,
-                     then: CohousingDetailView.init(store:)
-                )
-            case .userProfile:
-                CaseLet(
-                    /AppFeature.Path.State.userProfile,
-                     action: AppFeature.Path.Action.userProfile,
-                     then: UserProfileView.init(store:)
-                )
-            case .login:
-                CaseLet(
-                    /AppFeature.Path.State.login,
-                     action: AppFeature.Path.Action.login,
-                     then: LoginView.init(store:)
-                )
+        switch store.state {
+        case .loggedIn:
+            if let homeStore = store.scope(state: \.loggedIn, action: \.loggedIn) {
+                HomeView(store: homeStore)
+            }
+        case .loggedOut:
+            if let signInStore = store.scope(state: \.loggedOut, action: \.loggedOut) {
+                LoginView(store: signInStore)
             }
         }
     }
@@ -104,7 +70,7 @@ struct AppView: View {
 
 #Preview {
     AppView(
-        store: Store(initialState: AppFeature.State()) {
+        store: Store(initialState: AppFeature.State.loggedOut(LoginFeature.State())) {
             AppFeature()
         }
     )

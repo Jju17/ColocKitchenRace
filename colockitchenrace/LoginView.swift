@@ -11,10 +11,13 @@ import FirebaseFirestore
 import FirebaseFirestoreSwift
 import SwiftUI
 
-struct LoginFeature: Reducer {
+@Reducer
+struct LoginFeature {
+
+    @ObservableState
     struct State: Equatable {
-        @BindingState var email: String = ""
-        @BindingState var password: String = ""
+        var email: String = ""
+        var password: String = ""
     }
 
     enum Action: BindableAction, Equatable {
@@ -72,19 +75,19 @@ struct LoginFeature: Reducer {
 }
 
 struct LoginView: View {
-    let store: StoreOf<LoginFeature>
+    @Perception.Bindable var store: StoreOf<LoginFeature>
 
     var body: some View {
-        WithViewStore(self.store, observe: { $0 }) { viewStore in
+        WithPerceptionTracking {
             Form {
-                TextField("Email", text: viewStore.$email)
+                TextField("Email", text: $store.email)
                     .autocapitalization(.none)
                     .keyboardType(.emailAddress)
                     .textContentType(.emailAddress)
-                TextField("••••••••", text: viewStore.$password)
+                TextField("••••••••", text: $store.password)
                 Button(
                     action: {
-                        viewStore.send(.loginButtonTapped)
+                        store.send(.loginButtonTapped)
                     },
                     label: {
                         Text("Login")
