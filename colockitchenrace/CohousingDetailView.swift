@@ -8,13 +8,13 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct CohousingDetailFeature: Reducer {
+@Reducer
+struct CohousingDetailFeature {
 
-    // MARK: - Reducer
-
+    @ObservableState
     struct State: Equatable {
-        @PresentationState var editCohousing: CohousingFormFeature.State?
-        @BindingState var cohousing: Cohousing
+        @Presents var editCohousing: CohousingFormFeature.State?
+        var cohousing: Cohousing
     }
 
     enum Action: Equatable {
@@ -49,71 +49,71 @@ struct CohousingDetailFeature: Reducer {
                 return .none
             }
         }
-        .ifLet(\.$editCohousing , action: /Action.editCohousing) {
-            CohousingFormFeature()
-        }
-        .onChange(of: \.cohousing) { oldValue, newValue in
-            Reduce { state, action in
-                .send(.delegate(.cohousingUpdated(newValue)))
-            }
-        }
+//        .ifLet(\.$editCohousing , action: /Action.editCohousing) {
+//            CohousingFormFeature()
+//        }
+//        .onChange(of: \.cohousing) { oldValue, newValue in
+//            Reduce { state, action in
+//                .send(.delegate(.cohousingUpdated(newValue)))
+//            }
+//        }
     }
 }
 
 struct CohousingDetailView: View {
-    let store: StoreOf<CohousingDetailFeature>
+    @Perception.Bindable var store: StoreOf<CohousingDetailFeature>
 
     var body: some View {
-        WithViewStore(self.store, observe: { $0 }) { viewStore in
+        WithPerceptionTracking {
             Form {
                 Section("Contact person") {
                     HStack {
-                        Text("\(viewStore.cohousing.contactUser?.displayName ?? "")")
+                        Text("\(store.cohousing.contactUser?.displayName ?? "")")
                         Spacer()
-                        Text("\(viewStore.cohousing.contactUser?.phoneNumber ?? "")")
+                        Text("\(store.cohousing.contactUser?.phoneNumber ?? "")")
                     }
                 }
 
                 Section("Localisation") {
-                    Text(viewStore.cohousing.address)
-                    Text("\(viewStore.cohousing.postCode) \(viewStore.cohousing.city)")
+                    Text(store.cohousing.address.street)
+                    Text("\(store.cohousing.address.postalCode) \(store.cohousing.address.city)")
                 }
 
                 Section("Membres") {
-                    ForEach(viewStore.cohousing.users) { user in
+                    ForEach(store.cohousing.users) { user in
                         Text(user.displayName)
                     }
                 }
             }
-            .navigationBarTitle(viewStore.cohousing.name)
+            .navigationBarTitle(store.cohousing.name)
             .toolbar {
                 Button("Edit") {
-                    viewStore.send(.editButtonTapped)
+                    store.send(.editButtonTapped)
                 }
             }
-            .sheet(
-                store: self.store.scope(
-                    state: \.$editCohousing,
-                    action: { .editCohousing($0) }
-                )
-            ) { store in
-                NavigationStack {
-                    CohousingFormView(store: store)
-                        .navigationTitle("Edit Cohousing")
-                        .toolbar {
-                            ToolbarItem {
-                                Button("Save") {
-                                    viewStore.send(.saveCohousingButtonTapped)
-                                }
-                            }
-                            ToolbarItem(placement: .cancellationAction) {
-                                Button("Cancel") {
-                                    viewStore.send(.cancelCohousingButtonTapped)
-                                }
-                            }
-                        }
-                }
-            }
+//                .sheet(
+//                    item: $store.scope(
+//                        state: \.editCohousing,
+//                        action: \.editCohousing
+//                    )
+//                ) { store in
+//                    NavigationStack {
+//                        CohousingFormView(store: store)
+//                            .navigationTitle("Edit Cohousing")
+//                            .toolbar {
+//                                ToolbarItem {
+//                                    Button("Save") {
+//                                        store.send(.saveCohousingButtonTapped)
+//                                    }
+//                                }
+//                                ToolbarItem(placement: .cancellationAction) {
+//                                    Button("Cancel") {
+//                                        store.send(.cancelCohousingButtonTapped)
+//                                    }
+//                                }
+//                            }
+//                    }
+//                }
         }
     }
 }

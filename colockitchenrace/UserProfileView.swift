@@ -8,9 +8,12 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct UserProfileFeature: Reducer {
+@Reducer
+struct UserProfileFeature {
+
+    @ObservableState
     struct State: Equatable {
-        @BindingState var user: User
+        var user: User
     }
     enum Action: BindableAction, Equatable {
         case backButtonTapped
@@ -35,10 +38,10 @@ struct UserProfileFeature: Reducer {
 }
 
 struct UserProfileView: View {
-    let store: StoreOf<UserProfileFeature>
+    @Perception.Bindable var store: StoreOf<UserProfileFeature>
 
     var body: some View {
-        WithViewStore(self.store, observe: { $0 }) { viewStore in
+        WithPerceptionTracking {
             Form {
                 HStack {
                     Spacer()
@@ -50,28 +53,28 @@ struct UserProfileView: View {
                 }
                 
                 Section("Basic info") {
-                    TextField("Name", text: viewStore.$user.displayName)
-                    TextField("Email", text: viewStore.$user.email ?? "")
-                    TextField("GSM", text: viewStore.$user.phoneNumber ?? "")
+                    TextField("Name", text: $store.user.displayName)
+                    TextField("Email", text: $store.user.email ?? "")
+                    TextField("GSM", text: $store.user.phoneNumber ?? "")
                 }
 
                 // TODO: JR: This would be an array of Objects
                 Section("Food related") {
-                    TextField("Food intolerances", text: viewStore.$user.foodIntolerence)
+                    TextField("Food intolerances", text: $store.user.foodIntolerence)
                 }
 
                 Section("CKR") {
-                    Toggle(isOn: viewStore.$user.isContactUser) {
+                    Toggle(isOn: $store.user.isContactUser) {
                         Text("Are you the contact person ?")
                     }
-                    Toggle(isOn: viewStore.$user.isSubscribeToNews) {
+                    Toggle(isOn: $store.user.isSubscribeToNews) {
                         Text("Do you want to have news from CKR team ?")
                     }
                 }
 
                 Section {
                     Button {
-                        viewStore.send(.signOutButtonTapped)
+                        store.send(.signOutButtonTapped)
                     } label: {
                         Text("Sign out")
                             .foregroundStyle(Color.red)

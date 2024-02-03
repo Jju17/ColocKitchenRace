@@ -14,17 +14,33 @@ struct HomeFeature {
     // MARK: - Reducer
 
     @ObservableState
-    struct State: Equatable {
+    struct State {
+        var path = StackState<Path.State>()
         var currentUser: User?
         var cohousing: Cohousing?
     }
 
-    enum Action: Equatable {
+    enum Action {
         case addCohousingButtonTapped
         case cancelCohousingButtonTapped
-        case onAppear
+        case path(StackAction<Path.State, Path.Action>)
         case saveCohousingButtonTapped
-        case userProfileButtonTapped
+    }
+
+    @Reducer
+    struct Path {
+        @ObservableState
+        enum State {
+            case profile(UserProfileFeature.State)
+        }
+        enum Action {
+            case profile(UserProfileFeature.Action)
+        }
+        var body: some ReducerOf<Self> {
+            Scope(state: \.profile, action: \.profile) {
+                UserProfileFeature()
+            }
+        }
     }
 
     @Dependency(\.uuid) var uuid
@@ -36,24 +52,22 @@ struct HomeFeature {
                 return .none
             case .cancelCohousingButtonTapped:
                 return .none
-            case .onAppear:
+            case .path:
                 return .none
             case .saveCohousingButtonTapped:
                 return .none
-            case .userProfileButtonTapped:
-                return .none
-
             }
         }
+        .forEach(\.path, action: \.path) { Path() }
     }
 }
 
 struct HomeView: View {
-    let store: StoreOf<HomeFeature>
+    @Perception.Bindable var store: StoreOf<HomeFeature>
 
     var body: some View {
         WithPerceptionTracking {
-            NavigationStack {
+            NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
                 VStack {
                     if let _ = store.cohousing {
                         //                    NavigationLink(
@@ -72,7 +86,18 @@ struct HomeView: View {
                 }
                 .navigationTitle("Welcome")
                 .toolbar {
-                    Image(systemName: "person.crop.circle.fill")
+                    NavigationLink(
+                        state: HomeFeature.Path.State.profile(UserProfileFeature.State(user: store.currentUser ?? .mockUser))
+                    ) {
+                        Image(systemName: "person.crop.circle.fill")
+                    }
+                }
+            } destination: { store in
+                switch store.state {
+                case .profile:
+                    if let store = store.scope(state: \.profile, action: \.profile) {
+                        UserProfileView(store: store)
+                    }
                 }
             }
         }

@@ -6,43 +6,30 @@
 //
 
 import ComposableArchitecture
-import FirebaseAuth
 import SwiftUI
+
 
 @Reducer
 struct AppFeature {
 
     @ObservableState
     enum State {
-        case loggedIn(HomeFeature.State)
+        case loggedIn(RootFeature.State)
         case loggedOut(LoginFeature.State)
     }
 
     enum Action {
-        case loggedIn(HomeFeature.Action)
+        case loggedIn(RootFeature.Action)
         case loggedOut(LoginFeature.Action)
-        case logIn
     }
 
     var body: some ReducerOf<Self> {
         Scope(state: /AppFeature.State.loggedIn, action: /AppFeature.Action.loggedIn) {
-            HomeFeature()
+            RootFeature()
         }
 
         Scope(state: /AppFeature.State.loggedOut, action: /AppFeature.Action.loggedOut) {
             LoginFeature()
-        }
-
-        Reduce { state, action in
-            switch action {
-            case .logIn:
-                state = .loggedIn(HomeFeature.State())
-                return .none
-            case .loggedIn:
-                return .none
-            case .loggedOut:
-                return .none
-            }
         }
     }
 }
@@ -50,15 +37,11 @@ struct AppFeature {
 struct AppView: View {
     let store: StoreOf<AppFeature>
 
-    init(store: StoreOf<AppFeature>) {
-        self.store = store
-    }
-
     var body: some View {
         switch store.state {
         case .loggedIn:
-            if let homeStore = store.scope(state: \.loggedIn, action: \.loggedIn) {
-                HomeView(store: homeStore)
+            if let rootStore = store.scope(state: \.loggedIn, action: \.loggedIn) {
+                RootView(store: rootStore)
             }
         case .loggedOut:
             if let signInStore = store.scope(state: \.loggedOut, action: \.loggedOut) {
@@ -70,8 +53,10 @@ struct AppView: View {
 
 #Preview {
     AppView(
-        store: Store(initialState: AppFeature.State.loggedOut(LoginFeature.State())) {
+        store: Store(initialState: AppFeature.State.loggedIn(RootFeature.State())) {
             AppFeature()
         }
     )
 }
+
+

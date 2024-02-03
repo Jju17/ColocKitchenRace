@@ -8,9 +8,12 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct CohousingFormFeature: Reducer {
+@Reducer
+struct CohousingFormFeature {
+
+    @ObservableState
     struct State: Equatable {
-        @BindingState var cohousing: Cohousing
+        var cohousing: Cohousing
     }
 
     enum Action: BindableAction, Equatable {
@@ -41,38 +44,38 @@ struct CohousingFormFeature: Reducer {
 }
 
 struct CohousingFormView: View {
-    let store: StoreOf<CohousingFormFeature>
+    @Perception.Bindable var store: StoreOf<CohousingFormFeature>
 
     var body: some View {
-        WithViewStore(self.store, observe: { $0 }) { viewStore in
+        WithPerceptionTracking {
             Form {
                 Section {
-                    TextField("Cohousing name", text: viewStore.$cohousing.name)
+                    TextField("Cohousing name", text: $store.cohousing.name)
                 }
 
                 Section("Localisation") {
-                    TextField("Address", text: viewStore.$cohousing.address)
-                    TextField("Postcode", text: viewStore.$cohousing.postCode)
-                    TextField("City", text: viewStore.$cohousing.city)
+                    TextField("Address", text: $store.cohousing.address.street)
+                    TextField("Postcode", text: $store.cohousing.address.postalCode)
+                    TextField("City", text: $store.cohousing.address.city)
                 }
 
                 Section("Membres") {
-                    ForEach(viewStore.$cohousing.users) { $user in
+                    ForEach($store.cohousing.users) { $user in
                         TextField("Name", text: $user.displayName)
                     }
                     .onDelete { indices in
-                        viewStore.send(.deleteUsers(atOffset: indices))
+                        store.send(.deleteUsers(atOffset: indices))
                     }
 
                     Button("Add user") {
-                        viewStore.send(.addUserButtonTapped)
+                        store.send(.addUserButtonTapped)
                     }
                 }
 
                 // TODO: JR: TODO
                 Section {
-                    Picker(selection: viewStore.$cohousing.users, content: {
-                        ForEach(viewStore.cohousing.users) {
+                    Picker(selection: $store.cohousing.users, content: {
+                        ForEach(store.cohousing.users) {
                             Text($0.displayName).tag($0.isContactUser)
                         }
                     }, label: {

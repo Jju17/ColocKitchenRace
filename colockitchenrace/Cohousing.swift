@@ -7,17 +7,18 @@
 
 import Foundation
 
-struct Cohousing: Equatable, Hashable {
+struct Cohousing: Equatable, Hashable, Codable {
     var id: UUID
     var name: String = ""
     var users: [User] = []
-    var address: String = ""
-    var postCode: String = ""
-    var city: String = ""
+    var address: PostalAddress = PostalAddress()
 }
 
 extension Cohousing {
     static var mock: Cohousing {
-        return Cohousing(id: UUID(), name: "Zone 88", users: User.mockUsers, address: "88 Avenue des Eperviers", postCode: "1150", city: "Woluwe-Saint-Pierre")
+        return Cohousing(id: UUID(),
+                         name: "Zone 88",
+                         users: User.mockUsers,
+                         address: .mock)
     }
 }
