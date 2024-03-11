@@ -7,36 +7,32 @@
 
 import ComposableArchitecture
 import FirebaseAuth
-import FirebaseFirestore
-import FirebaseFirestoreSwift
 import SwiftUI
 
 @Reducer
 struct LoginFeature {
 
     @ObservableState
-    struct State: Equatable {
+    struct State {
         var email: String = ""
         var password: String = ""
+        var user: User?
     }
 
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<State>)
-        case delegate(Delegate)
         case loginButtonTapped
-        enum Delegate: Equatable {
-            case userSessionUpdated(FirebaseAuth.User)
-        }
+        case userResponse(User)
     }
 
     var body: some ReducerOf<Self> {
         BindingReducer()
-
         Reduce { state, action in
             switch action {
             case .binding:
                 return .none
-            case .delegate:
+            case let .userResponse(user):
+                state.user = user
                 return .none
 //            case .fetchUser:
 //                return .run { send in
@@ -46,31 +42,22 @@ struct LoginFeature {
 //                    else { return }
 //                    await send(.fetchUserResult(user))
 //                }
-//            case let .fetchUserResult(result):
-//                state.currentUser = result
-//                return .none
-//            case let .loginAuthResult(result):
-//                state.userSession = result.user
-//                return .run { send in
-//                    await send(.fetchUser)
-//                }
             case .loginButtonTapped:
                 return .run { [email = state.email, password = state.password] send in
                     do {
                         let result = try await Auth.auth().signIn(withEmail: email, password: password)
-                        await send(.delegate(.userSessionUpdated(result.user)))
+                        let firebaseUser: FirebaseAuth.User = result.user
+                        let user = colockitchenrace.User(id: UUID(),
+                                        uid: firebaseUser.uid,
+                                        displayName: firebaseUser.displayName ?? "No name",
+                                        email: firebaseUser.email)
+                        await send(.userResponse(user))
                     } catch {
-                        fatalError()
+                        print("Error: \(error.localizedDescription)")
                     }
                 }
             }
         }
-//        .onChange(of: \.currentUser) { oldValue, newValue in
-//            Reduce { state, action in
-//                guard let newUser = newValue else { return .none }
-//                return .send(.delegate(.userUpdated(newUser)))
-//            }
-//        }
     }
 }
 
@@ -84,7 +71,9 @@ struct LoginView: View {
                     .autocapitalization(.none)
                     .keyboardType(.emailAddress)
                     .textContentType(.emailAddress)
-                TextField("••••••••", text: $store.password)
+                    .autocorrectionDisabled()
+                SecureField("••••••••", text: $store.password)
+                    .autocorrectionDisabled()
                 Button(
                     action: {
                         store.send(.loginButtonTapped)

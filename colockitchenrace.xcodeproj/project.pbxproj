@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6414C9002AF9AE740026CEC6 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 6414C8FF2AF9AE740026CEC6 /* FirebaseFirestore */; };
-		6414C9022AF9AE740026CEC6 /* FirebaseFirestoreSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 6414C9012AF9AE740026CEC6 /* FirebaseFirestoreSwift */; };
 		6423D3A32AD35121009DB3F7 /* UserProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6423D3A22AD35121009DB3F7 /* UserProfileView.swift */; };
 		6423D3A52AD35159009DB3F7 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6423D3A42AD35159009DB3F7 /* OnboardingView.swift */; };
 		6423D3A82AD36B76009DB3F7 /* CohousingFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6423D3A72AD36B76009DB3F7 /* CohousingFormView.swift */; };
@@ -26,7 +24,6 @@
 		647B1CBE2AD49B7800BD2B25 /* Global.swift in Sources */ = {isa = PBXBuildFile; fileRef = 647B1CBD2AD49B7800BD2B25 /* Global.swift */; };
 		64884E552AE43CF40075BB39 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		64B66EC62B5D50DB00B8F30B /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 64B66EC52B5D50DB00B8F30B /* ComposableArchitecture */; };
-		64DD972C2AD9F96000C8F6C7 /* CKRSignInOnboarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64DD972B2AD9F96000C8F6C7 /* CKRSignInOnboarding.swift */; };
 		64F17B332AD2A3BC0047F6F3 /* colockitchenraceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F17B322AD2A3BC0047F6F3 /* colockitchenraceApp.swift */; };
 		64F17B352AD2A3BC0047F6F3 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F17B342AD2A3BC0047F6F3 /* HomeView.swift */; };
 		64F17B372AD2A3BE0047F6F3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 64F17B362AD2A3BE0047F6F3 /* Assets.xcassets */; };
@@ -49,6 +46,9 @@
 		64FB41C42AD4086100C93A34 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 64FB41C32AD4086100C93A34 /* FirebaseAuth */; };
 		64FB41C62AD4086100C93A34 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 64FB41C52AD4086100C93A34 /* FirebaseCrashlytics */; };
 		64FB41C92AD4155000C93A34 /* App.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FB41C82AD4155000C93A34 /* App.swift */; };
+		64FE3CE42B8D56E400E6AAAE /* UserClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64FE3CE32B8D56E400E6AAAE /* UserClient.swift */; };
+		64FE3CE72B8D58B800E6AAAE /* Dependencies in Frameworks */ = {isa = PBXBuildFile; productRef = 64FE3CE62B8D58B800E6AAAE /* Dependencies */; };
+		64FE3CE92B8D58B800E6AAAE /* DependenciesMacros in Frameworks */ = {isa = PBXBuildFile; productRef = 64FE3CE82B8D58B800E6AAAE /* DependenciesMacros */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,7 +81,6 @@
 		646504262B67C22C00F67FD6 /* TabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabView.swift; sourceTree = "<group>"; };
 		6465042A2B67CE6600F67FD6 /* ChallengeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChallengeView.swift; sourceTree = "<group>"; };
 		647B1CBD2AD49B7800BD2B25 /* Global.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Global.swift; sourceTree = "<group>"; };
-		64DD972B2AD9F96000C8F6C7 /* CKRSignInOnboarding.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CKRSignInOnboarding.swift; sourceTree = "<group>"; };
 		64F17B2F2AD2A3BC0047F6F3 /* colockitchenrace.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = colockitchenrace.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		64F17B322AD2A3BC0047F6F3 /* colockitchenraceApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = colockitchenraceApp.swift; sourceTree = "<group>"; };
 		64F17B342AD2A3BC0047F6F3 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -103,6 +102,7 @@
 		64F62A942B6EC82C00FE3B37 /* NoCohousingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoCohousingView.swift; sourceTree = "<group>"; };
 		64FB41BB2AD407D600C93A34 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		64FB41C82AD4155000C93A34 /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
+		64FE3CE32B8D56E400E6AAAE /* UserClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserClient.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -113,10 +113,10 @@
 				64FB41C02AD4086100C93A34 /* FirebaseAnalyticsSwift in Frameworks */,
 				64FB41C22AD4086100C93A34 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */,
 				64B66EC62B5D50DB00B8F30B /* ComposableArchitecture in Frameworks */,
+				64FE3CE72B8D58B800E6AAAE /* Dependencies in Frameworks */,
 				64FB41C62AD4086100C93A34 /* FirebaseCrashlytics in Frameworks */,
-				6414C9022AF9AE740026CEC6 /* FirebaseFirestoreSwift in Frameworks */,
+				64FE3CE92B8D58B800E6AAAE /* DependenciesMacros in Frameworks */,
 				64FB41C42AD4086100C93A34 /* FirebaseAuth in Frameworks */,
-				6414C9002AF9AE740026CEC6 /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -164,7 +164,6 @@
 		64325AF82AF6999F00038EA5 /* Login */ = {
 			isa = PBXGroup;
 			children = (
-				64DD972B2AD9F96000C8F6C7 /* CKRSignInOnboarding.swift */,
 				64325AFB2AF69DDC00038EA5 /* LoginView.swift */,
 			);
 			name = Login;
@@ -205,6 +204,13 @@
 			name = Clients;
 			sourceTree = "<group>";
 		};
+		64AD9DDE2B9FB28400790A9F /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		64F17B262AD2A3BC0047F6F3 = {
 			isa = PBXGroup;
 			children = (
@@ -212,6 +218,7 @@
 				64F17B422AD2A3BE0047F6F3 /* colockitchenraceTests */,
 				64F17B4C2AD2A3BE0047F6F3 /* colockitchenraceUITests */,
 				64F17B302AD2A3BC0047F6F3 /* Products */,
+				64AD9DDE2B9FB28400790A9F /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -228,6 +235,7 @@
 		64F17B312AD2A3BC0047F6F3 /* colockitchenrace */ = {
 			isa = PBXGroup;
 			children = (
+				64FE3CE22B8D56C800E6AAAE /* Dependencies */,
 				6426838F2AD4B29C00F01A20 /* Info.plist */,
 				64FB41BD2AD407E700C93A34 /* Assets */,
 				64884E532AE43CD60075BB39 /* Clients */,
@@ -297,6 +305,14 @@
 			name = Assets;
 			sourceTree = "<group>";
 		};
+		64FE3CE22B8D56C800E6AAAE /* Dependencies */ = {
+			isa = PBXGroup;
+			children = (
+				64FE3CE32B8D56E400E6AAAE /* UserClient.swift */,
+			);
+			name = Dependencies;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -319,9 +335,9 @@
 				64FB41C12AD4086100C93A34 /* FirebaseAnalyticsWithoutAdIdSupport */,
 				64FB41C32AD4086100C93A34 /* FirebaseAuth */,
 				64FB41C52AD4086100C93A34 /* FirebaseCrashlytics */,
-				6414C8FF2AF9AE740026CEC6 /* FirebaseFirestore */,
-				6414C9012AF9AE740026CEC6 /* FirebaseFirestoreSwift */,
 				64B66EC52B5D50DB00B8F30B /* ComposableArchitecture */,
+				64FE3CE62B8D58B800E6AAAE /* Dependencies */,
+				64FE3CE82B8D58B800E6AAAE /* DependenciesMacros */,
 			);
 			productName = colockitchenrace;
 			productReference = 64F17B2F2AD2A3BC0047F6F3 /* colockitchenrace.app */;
@@ -400,6 +416,7 @@
 			packageReferences = (
 				64FB41BE2AD4086100C93A34 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				64B66EC42B5D50DB00B8F30B /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
+				64FE3CE52B8D58B800E6AAAE /* XCRemoteSwiftPackageReference "swift-dependencies" */,
 			);
 			productRefGroup = 64F17B302AD2A3BC0047F6F3 /* Products */;
 			projectDirPath = "";
@@ -483,10 +500,10 @@
 				64F17B672AD2D7210047F6F3 /* CKR.swift in Sources */,
 				64325AFE2AF69DFB00038EA5 /* CohouseTileView.swift in Sources */,
 				64F17B692AD2D85A0047F6F3 /* Cohousing+Utils.swift in Sources */,
+				64FE3CE42B8D56E400E6AAAE /* UserClient.swift in Sources */,
 				647B1CBE2AD49B7800BD2B25 /* Global.swift in Sources */,
 				643693642B67F06B00099D3B /* CohousingView.swift in Sources */,
 				64F17B622AD2D11B0047F6F3 /* Cohousing.swift in Sources */,
-				64DD972C2AD9F96000C8F6C7 /* CKRSignInOnboarding.swift in Sources */,
 				64F17B6C2AD2F29D0047F6F3 /* Date+Utils.swift in Sources */,
 				6423D3A32AD35121009DB3F7 /* UserProfileView.swift in Sources */,
 				6423D3A82AD36B76009DB3F7 /* CohousingFormView.swift in Sources */,
@@ -670,6 +687,7 @@
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = colockitchenrace/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Kitchen Race";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -708,6 +726,7 @@
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = colockitchenrace/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Kitchen Race";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -855,7 +874,7 @@
 			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.7.2;
+				minimumVersion = 1.8.2;
 			};
 		};
 		64FB41BE2AD4086100C93A34 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
@@ -866,19 +885,17 @@
 				minimumVersion = 10.16.0;
 			};
 		};
+		64FE3CE52B8D58B800E6AAAE /* XCRemoteSwiftPackageReference "swift-dependencies" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-dependencies";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		6414C8FF2AF9AE740026CEC6 /* FirebaseFirestore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 64FB41BE2AD4086100C93A34 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseFirestore;
-		};
-		6414C9012AF9AE740026CEC6 /* FirebaseFirestoreSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 64FB41BE2AD4086100C93A34 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseFirestoreSwift;
-		};
 		64B66EC52B5D50DB00B8F30B /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 64B66EC42B5D50DB00B8F30B /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
@@ -903,6 +920,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 64FB41BE2AD4086100C93A34 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCrashlytics;
+		};
+		64FE3CE62B8D58B800E6AAAE /* Dependencies */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 64FE3CE52B8D58B800E6AAAE /* XCRemoteSwiftPackageReference "swift-dependencies" */;
+			productName = Dependencies;
+		};
+		64FE3CE82B8D58B800E6AAAE /* DependenciesMacros */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 64FE3CE52B8D58B800E6AAAE /* XCRemoteSwiftPackageReference "swift-dependencies" */;
+			productName = DependenciesMacros;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

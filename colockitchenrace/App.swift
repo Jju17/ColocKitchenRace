@@ -8,22 +8,31 @@
 import ComposableArchitecture
 import SwiftUI
 
-
 @Reducer
 struct AppFeature {
-
+    
     @ObservableState
     enum State {
         case loggedIn(RootFeature.State)
         case loggedOut(LoginFeature.State)
     }
-
+    
     enum Action {
         case loggedIn(RootFeature.Action)
         case loggedOut(LoginFeature.Action)
     }
-
+    
     var body: some ReducerOf<Self> {
+        Reduce { state, action in
+            switch action {
+            case let .loggedOut(.userResponse(user)):
+                state = AppFeature.State.loggedIn(RootFeature.State())
+                return .none
+            case .loggedOut, .loggedIn:
+                return .none
+            }
+
+        }
         Scope(state: /AppFeature.State.loggedIn, action: /AppFeature.Action.loggedIn) {
             RootFeature()
         }
@@ -31,6 +40,7 @@ struct AppFeature {
         Scope(state: /AppFeature.State.loggedOut, action: /AppFeature.Action.loggedOut) {
             LoginFeature()
         }
+    
     }
 }
 

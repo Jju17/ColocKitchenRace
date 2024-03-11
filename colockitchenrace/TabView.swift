@@ -12,14 +12,14 @@ import SwiftUI
 struct RootFeature {
     @ObservableState
     struct State {
-        var tab = 0
+        var selectedTab: Tab = .home
         var challenge = ChallengeFeature.State()
         var cohouse = CohousingFeature.State.noCohousing(NoCohouseFeature.State())
         var home = HomeFeature.State()
     }
 
     enum Action {
-        case tabChanged(Int)
+        case tabChanged(Tab)
         case challenge(ChallengeFeature.Action)
         case cohouse(CohousingFeature.Action)
         case home(HomeFeature.Action)
@@ -29,7 +29,7 @@ struct RootFeature {
         Reduce { state, action in
             switch action {
             case let .tabChanged(tab):
-                state.tab = tab
+                state.selectedTab = tab
                 return .none
             case .challenge:
                 return .none
@@ -42,12 +42,16 @@ struct RootFeature {
     }
 }
 
+enum Tab {
+    case home, challenges, cohouse
+}
+
 struct RootView: View {
     @Perception.Bindable var store: StoreOf<RootFeature>
 
     var body: some View {
         WithPerceptionTracking {
-            TabView(selection: $store.tab.sending(\.tabChanged)) {
+            TabView(selection: $store.selectedTab.sending(\.tabChanged)) {
                 HomeView(
                     store: self.store.scope(
                         state: \.home,
@@ -57,7 +61,7 @@ struct RootView: View {
                 .tabItem {
                     Label("Home", systemImage: "house.fill")
                 }
-                .tag(0)
+                .tag(Tab.home)
 
                 ChallengeView(
                     store: self.store.scope(
@@ -68,7 +72,7 @@ struct RootView: View {
                 .tabItem {
                     Label("Challenges", systemImage: "star.fill")
                 }
-                .tag(1)
+                .tag(Tab.challenges)
 
                 CohousingView(
                     store: self.store.scope(
@@ -79,7 +83,7 @@ struct RootView: View {
                 .tabItem {
                     Label("Cohouse", systemImage: "person.3.fill")
                 }
-                .tag(2)
+                .tag(Tab.cohouse)
             }
         }
     }
