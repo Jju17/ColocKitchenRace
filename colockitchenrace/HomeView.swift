@@ -68,22 +68,13 @@ struct HomeView: View {
     var body: some View {
         WithPerceptionTracking {
             NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
-                VStack {
-                    if let _ = store.cohousing {
-                        //                    NavigationLink(
-                        //                        state: AppFeature.Path.State.details(CohousingDetailFeature.State(cohousing: viewStore.cohousing!))
-                        //                    ) {
-                        //                        CohouseTileView(name: viewStore.cohousing?.name)
-                        //                    }
-                    } else {
-                        Button {
-                            store.send(.addCohousingButtonTapped)
-                        } label: {
-                            CohouseTileView(name: store.cohousing?.name)
-                        }
+                ScrollView {
+                    VStack(spacing: 15) {
+                        CohouseTileView(name: store.cohousing?.name)
+                        CountdownTileView(nextKitchenRace: Date.from(year: 2024, month: 03, day: 23, hour: 18))
                     }
-                    CountdownTileView(nextKitchenRace: Date.from(year: 2024, month: 03, day: 23, hour: 18))
                 }
+                .padding()
                 .navigationTitle("Welcome")
                 .toolbar {
                     NavigationLink(
@@ -95,8 +86,8 @@ struct HomeView: View {
             } destination: { store in
                 switch store.state {
                 case .profile:
-                    if let store = store.scope(state: \.profile, action: \.profile) {
-                        UserProfileView(store: store)
+                    if let userStore = store.scope(state: \.profile, action: \.profile) {
+                        UserProfileView(store: userStore)
                     }
                 }
             }

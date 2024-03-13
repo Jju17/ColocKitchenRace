@@ -10,7 +10,7 @@ import FirebaseAuth
 import SwiftUI
 
 @Reducer
-struct LoginFeature {
+struct SigninFeature {
 
     @ObservableState
     struct State {
@@ -21,6 +21,7 @@ struct LoginFeature {
 
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<State>)
+        case changeToSignupButtonTapped
         case loginButtonTapped
         case userResponse(User)
     }
@@ -30,6 +31,8 @@ struct LoginFeature {
         Reduce { state, action in
             switch action {
             case .binding:
+                return .none
+            case .changeToSignupButtonTapped:
                 return .none
             case let .userResponse(user):
                 state.user = user
@@ -62,7 +65,7 @@ struct LoginFeature {
 }
 
 struct LoginView: View {
-    @Perception.Bindable var store: StoreOf<LoginFeature>
+    @Perception.Bindable var store: StoreOf<SigninFeature>
 
     var body: some View {
         WithPerceptionTracking {
@@ -82,6 +85,13 @@ struct LoginView: View {
                         Text("Login")
                     }
                 )
+                HStack {
+                    Text("You need an account ?")
+                    Button("Click here") {
+                        self.store.send(.changeToSignupButtonTapped)
+                    }
+                }
+                .font(.system(size: 14))
             }
         }
     }
@@ -89,8 +99,8 @@ struct LoginView: View {
 
 #Preview {
     LoginView(
-        store: Store(initialState: LoginFeature.State()) {
-            LoginFeature()
+        store: Store(initialState: SigninFeature.State()) {
+            SigninFeature()
         }
     )
 }

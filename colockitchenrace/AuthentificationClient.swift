@@ -9,7 +9,7 @@ import Dependencies
 import FirebaseAuth
 
 struct AuthentificationClient {
-    var load: () async throws -> AuthDataResult
+    var load: () async throws -> User
     var signUp: (String, String, String) async throws -> AuthDataResult
     var signIn: (String, String) async throws -> AuthDataResult
     var signOut: () -> Void
@@ -20,7 +20,7 @@ struct AuthentificationClient {
 extension AuthentificationClient: DependencyKey {
     static let liveValue = Self(
         load: {
-            return try await Auth.auth().createUser(withEmail: "", password: "")
+            return User(id: UUID())
         },
         signUp: { email, password, fullName in
             return try await Auth.auth().createUser(withEmail: email, password: password)

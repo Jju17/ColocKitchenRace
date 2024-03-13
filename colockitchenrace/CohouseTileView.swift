@@ -32,10 +32,9 @@ struct CohouseTileView: View {
                     .foregroundStyle(.white)
             }
         }
-        .frame(height: 130)
+        .frame(height: 150)
         .clipped()
         .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
-        .padding()
     }
 }
 

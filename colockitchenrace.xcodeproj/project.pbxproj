@@ -19,10 +19,16 @@
 		64325B002AF69E5E00038EA5 /* CountdownTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64325AFF2AF69E5E00038EA5 /* CountdownTileView.swift */; };
 		64325B042AF7D9A100038EA5 /* AuthentificationClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64325B032AF7D9A100038EA5 /* AuthentificationClient.swift */; };
 		643693642B67F06B00099D3B /* CohousingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643693632B67F06B00099D3B /* CohousingView.swift */; };
+		64549DB72BA1EF1A0025A9F2 /* SignupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64549DB62BA1EF1A0025A9F2 /* SignupView.swift */; };
+		64549DB92BA1EFF40025A9F2 /* SignupFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64549DB82BA1EFF40025A9F2 /* SignupFeature.swift */; };
 		646504272B67C22C00F67FD6 /* TabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646504262B67C22C00F67FD6 /* TabView.swift */; };
 		6465042B2B67CE6600F67FD6 /* ChallengeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6465042A2B67CE6600F67FD6 /* ChallengeView.swift */; };
 		647B1CBE2AD49B7800BD2B25 /* Global.swift in Sources */ = {isa = PBXBuildFile; fileRef = 647B1CBD2AD49B7800BD2B25 /* Global.swift */; };
 		64884E552AE43CF40075BB39 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		649426042BA1F28800E8552A /* Color+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649426032BA1F28800E8552A /* Color+Utils.swift */; };
+		649426072BA20E6300E8552A /* CKRTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649426062BA20E6300E8552A /* CKRTextField.swift */; };
+		649426092BA216D400E8552A /* CKRButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649426082BA216D400E8552A /* CKRButton.swift */; };
+		6494260B2BA2285E00E8552A /* SignupUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6494260A2BA2285E00E8552A /* SignupUser.swift */; };
 		64B66EC62B5D50DB00B8F30B /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 64B66EC52B5D50DB00B8F30B /* ComposableArchitecture */; };
 		64F17B332AD2A3BC0047F6F3 /* colockitchenraceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F17B322AD2A3BC0047F6F3 /* colockitchenraceApp.swift */; };
 		64F17B352AD2A3BC0047F6F3 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F17B342AD2A3BC0047F6F3 /* HomeView.swift */; };
@@ -78,9 +84,15 @@
 		64325AFF2AF69E5E00038EA5 /* CountdownTileView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountdownTileView.swift; sourceTree = "<group>"; };
 		64325B032AF7D9A100038EA5 /* AuthentificationClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthentificationClient.swift; sourceTree = "<group>"; };
 		643693632B67F06B00099D3B /* CohousingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CohousingView.swift; sourceTree = "<group>"; };
+		64549DB62BA1EF1A0025A9F2 /* SignupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignupView.swift; sourceTree = "<group>"; };
+		64549DB82BA1EFF40025A9F2 /* SignupFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignupFeature.swift; sourceTree = "<group>"; };
 		646504262B67C22C00F67FD6 /* TabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabView.swift; sourceTree = "<group>"; };
 		6465042A2B67CE6600F67FD6 /* ChallengeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChallengeView.swift; sourceTree = "<group>"; };
 		647B1CBD2AD49B7800BD2B25 /* Global.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Global.swift; sourceTree = "<group>"; };
+		649426032BA1F28800E8552A /* Color+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Color+Utils.swift"; sourceTree = "<group>"; };
+		649426062BA20E6300E8552A /* CKRTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CKRTextField.swift; sourceTree = "<group>"; };
+		649426082BA216D400E8552A /* CKRButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CKRButton.swift; sourceTree = "<group>"; };
+		6494260A2BA2285E00E8552A /* SignupUser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignupUser.swift; sourceTree = "<group>"; };
 		64F17B2F2AD2A3BC0047F6F3 /* colockitchenrace.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = colockitchenrace.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		64F17B322AD2A3BC0047F6F3 /* colockitchenraceApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = colockitchenraceApp.swift; sourceTree = "<group>"; };
 		64F17B342AD2A3BC0047F6F3 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -140,6 +152,8 @@
 		6423D3A62AD35165009DB3F7 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				649426052BA20E5000E8552A /* Global */,
+				64549DB52BA1EF050025A9F2 /* Signup */,
 				646504282B67CDCB00F67FD6 /* Challenge */,
 				646504292B67CDD100F67FD6 /* Cohouse */,
 				64325AF72AF6999600038EA5 /* Home */,
@@ -167,6 +181,15 @@
 				64325AFB2AF69DDC00038EA5 /* LoginView.swift */,
 			);
 			name = Login;
+			sourceTree = "<group>";
+		};
+		64549DB52BA1EF050025A9F2 /* Signup */ = {
+			isa = PBXGroup;
+			children = (
+				64549DB82BA1EFF40025A9F2 /* SignupFeature.swift */,
+				64549DB62BA1EF1A0025A9F2 /* SignupView.swift */,
+			);
+			name = Signup;
 			sourceTree = "<group>";
 		};
 		646504252B67AE2800F67FD6 /* Navigation */ = {
@@ -202,6 +225,15 @@
 				64325B032AF7D9A100038EA5 /* AuthentificationClient.swift */,
 			);
 			name = Clients;
+			sourceTree = "<group>";
+		};
+		649426052BA20E5000E8552A /* Global */ = {
+			isa = PBXGroup;
+			children = (
+				649426062BA20E6300E8552A /* CKRTextField.swift */,
+				649426082BA216D400E8552A /* CKRButton.swift */,
+			);
+			name = Global;
 			sourceTree = "<group>";
 		};
 		64AD9DDE2B9FB28400790A9F /* Frameworks */ = {
@@ -281,6 +313,7 @@
 				64F17B612AD2D11B0047F6F3 /* Cohousing.swift */,
 				64F17B632AD2D4460047F6F3 /* User.swift */,
 				64F62A922B6EC2B000FE3B37 /* PostalAddress.swift */,
+				6494260A2BA2285E00E8552A /* SignupUser.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -292,6 +325,7 @@
 				64F17B6B2AD2F29D0047F6F3 /* Date+Utils.swift */,
 				64F17B6D2AD318D70047F6F3 /* DateComponents+Utils.swift */,
 				647B1CBD2AD49B7800BD2B25 /* Global.swift */,
+				649426032BA1F28800E8552A /* Color+Utils.swift */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -387,7 +421,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1500;
-				LastUpgradeCheck = 1500;
+				LastUpgradeCheck = 1530;
 				TargetAttributes = {
 					64F17B2E2AD2A3BC0047F6F3 = {
 						CreatedOnToolsVersion = 15.0;
@@ -489,6 +523,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6494260B2BA2285E00E8552A /* SignupUser.swift in Sources */,
 				64325B002AF69E5E00038EA5 /* CountdownTileView.swift in Sources */,
 				64325AF52AF698D400038EA5 /* (null) in Sources */,
 				64FB41C92AD4155000C93A34 /* App.swift in Sources */,
@@ -501,14 +536,18 @@
 				64325AFE2AF69DFB00038EA5 /* CohouseTileView.swift in Sources */,
 				64F17B692AD2D85A0047F6F3 /* Cohousing+Utils.swift in Sources */,
 				64FE3CE42B8D56E400E6AAAE /* UserClient.swift in Sources */,
+				64549DB72BA1EF1A0025A9F2 /* SignupView.swift in Sources */,
 				647B1CBE2AD49B7800BD2B25 /* Global.swift in Sources */,
+				64549DB92BA1EFF40025A9F2 /* SignupFeature.swift in Sources */,
 				643693642B67F06B00099D3B /* CohousingView.swift in Sources */,
 				64F17B622AD2D11B0047F6F3 /* Cohousing.swift in Sources */,
 				64F17B6C2AD2F29D0047F6F3 /* Date+Utils.swift in Sources */,
 				6423D3A32AD35121009DB3F7 /* UserProfileView.swift in Sources */,
+				649426092BA216D400E8552A /* CKRButton.swift in Sources */,
 				6423D3A82AD36B76009DB3F7 /* CohousingFormView.swift in Sources */,
 				64F17B642AD2D4460047F6F3 /* User.swift in Sources */,
 				6423D3A52AD35159009DB3F7 /* OnboardingView.swift in Sources */,
+				649426072BA20E6300E8552A /* CKRTextField.swift in Sources */,
 				64F62A932B6EC2B000FE3B37 /* PostalAddress.swift in Sources */,
 				646504272B67C22C00F67FD6 /* TabView.swift in Sources */,
 				642701AC2AE12F9300850684 /* (null) in Sources */,
@@ -516,6 +555,7 @@
 				64F17B332AD2A3BC0047F6F3 /* colockitchenraceApp.swift in Sources */,
 				64325AFC2AF69DDC00038EA5 /* LoginView.swift in Sources */,
 				64884E552AE43CF40075BB39 /* (null) in Sources */,
+				649426042BA1F28800E8552A /* Color+Utils.swift in Sources */,
 				64F62A952B6EC82C00FE3B37 /* NoCohousingView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -558,6 +598,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
@@ -621,6 +662,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";

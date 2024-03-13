@@ -20,7 +20,7 @@ struct CountdownTileView: View {
 // MARK: - Private properties
 
     private var timer: Timer {
-        Timer.scheduledTimer(withTimeInterval: 1, repeats: true) {_ in
+        Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
             self.nowDate = Date()
         }
     }
@@ -35,62 +35,63 @@ struct CountdownTileView: View {
     // MARK: - Body
 
     var body: some View {
-        VStack(alignment: .leading) {
-            VStack(alignment: .leading) {
-                HStack {
-                    Text("Next Kitchen Race")
-                    Spacer()
+        ZStack(alignment: .leading) {
+            RoundedRectangle(cornerRadius: 15)
+                .fill(Color.CKRPurple)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+            VStack(spacing: 12) {
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack {
+                        Text("Next Edition In")
+                            .font(.system(size: 26))
+                            .fontWeight(.heavy)
+                        Spacer()
+                    }
+                    Text(self.nextKitchenRace.formatted(date: .long, time: .omitted))
+                        .font(.system(size: 12))
+                        .fontWeight(.light)
+                        .textCase(.uppercase)
                 }
-                Text("In")
+                .frame(maxWidth: .infinity)
+                .foregroundStyle(.white)
+                
+
+                VStack {
+                    HStack {
+                        Text("Days")
+                        Spacer()
+                        Text("\(self.countDownComponents.formattedDays)")
+                    }
+                    Spacer(minLength: 2)
+                    HStack {
+                        Text("Hours")
+                        Spacer()
+                        Text("\(self.countDownComponents.formattedHours)")
+                    }
+                    Spacer(minLength: 2)
+                    HStack {
+                        Text("Minutes")
+                        Spacer()
+                        Text("\(self.countDownComponents.formattedMinutes)")
+                    }
+                    Spacer(minLength: 2)
+                    HStack {
+                        Text("Seconds")
+                        Spacer()
+                        Text("\(self.countDownComponents.formattedSeconds)")
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .foregroundColor(.white)
+                .font(.system(size: 26))
+                .fontWeight(.heavy)
             }
-            .frame(maxWidth: .infinity)
-            .font(.system(size: 28))
-            .fontWeight(.bold)
-            .foregroundStyle(.white)
-            .padding(.top, 30)
-            .padding(.bottom, 5)
-            .padding(.horizontal, 15)
-
-
-            Spacer()
-
-            VStack(alignment: .leading) {
-                Text("Days \(self.countDownComponents.formattedDays)")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                Spacer()
-                Text("Hours \(self.countDownComponents.formattedHours)")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                Spacer()
-                Text("Minutes \(self.countDownComponents.formattedMinutes)")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                Spacer()
-                Text("Seconds \(self.countDownComponents.formattedSeconds)")
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .foregroundColor(.white)
-            .font(.system(size: 45))
-            .fontWeight(.heavy)
-            .clipped()
-            .clipShape(RoundedRectangle(cornerRadius: 10))
-            .padding(.horizontal, 15)
-            .onAppear(perform: {
-                _ = self.timer
-            })
-
-            Button(action: {}) {
-                Label("Sign In", systemImage: "arrow.up")
-            }
-            .buttonStyle(.borderedProminent)
-            .frame(maxWidth: .infinity)
             .padding()
-
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.green)
-        .clipped()
-        .clipShape(RoundedRectangle(cornerRadius: 15))
-        .padding()
+        .frame(height: 230)
+        .onAppear {
+            let _ = self.timer
+        }
     }
 }
 
