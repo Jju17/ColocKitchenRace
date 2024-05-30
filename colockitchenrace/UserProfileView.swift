@@ -16,22 +16,24 @@ struct UserProfileFeature {
         var user: User
     }
     enum Action: BindableAction, Equatable {
-        case backButtonTapped
         case binding(BindingAction<State>)
         case signOutButtonTapped
     }
+
+    @Dependency(\.authentificationClient) var authentificationClient
 
     var body: some ReducerOf<Self> {
         BindingReducer()
 
         Reduce { state, action in
             switch action {
-            case .backButtonTapped:
-                return .none
-            case .binding(_):
+            case .binding:
                 return .none
             case .signOutButtonTapped:
-                return .none
+                print("JR test")
+                return .run { _ in
+                    self.authentificationClient.signOut()
+                }
             }
         }
     }
@@ -51,7 +53,10 @@ struct UserProfileView: View {
                     .clipShape(Circle())
                     Spacer()
                 }
-                
+                Button("test") {
+                    self.store.send(.signOutButtonTapped)
+                }
+
                 Section("Basic info") {
                     TextField("Name", text: $store.user.displayName)
                     TextField("Email", text: $store.user.email ?? "")
@@ -74,7 +79,7 @@ struct UserProfileView: View {
 
                 Section {
                     Button {
-                        store.send(.signOutButtonTapped)
+                        self.store.send(.signOutButtonTapped)
                     } label: {
                         Text("Sign out")
                             .foregroundStyle(Color.red)

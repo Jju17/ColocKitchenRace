@@ -22,21 +22,31 @@ struct SignupFeature {
     
     enum Action: BindableAction {
         case binding(BindingAction<State>)
-        case changeToSigninButtonTapped
+        case goToSigninButtonTapped
         case signupButtonTapped
+        case delegate(Delegate)
+
+        enum Delegate {
+            case switchToSigninButtonTapped
+        }
     }
-    
+
+    @Dependency(\.authentificationClient) var authentificationClient
+
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case .binding:
                 return .none
-            case .changeToSigninButtonTapped:
+            case .goToSigninButtonTapped:
+                return .send(.delegate(.switchToSigninButtonTapped))
+            case .delegate:
                 return .none
             case .signupButtonTapped:
-                return .none
+                return .run { _ in
+                    try await self.authentificationClient.signIn(email: "julien@gmail.com", password: "jujurahier")
+                }
             }
         }
     }
-    
 }

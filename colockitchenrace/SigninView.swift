@@ -1,5 +1,5 @@
 //
-//  LoginView.swift
+//  SigninView.swift
 //  colockitchenrace
 //
 //  Created by Julien Rahier on 19/10/2023.
@@ -22,9 +22,11 @@ struct SigninFeature {
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<State>)
         case changeToSignupButtonTapped
-        case loginButtonTapped
+        case signinButtonTapped
         case userResponse(User)
     }
+
+    @Dependency(\.authentificationClient) var authentificationClient
 
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -45,60 +47,61 @@ struct SigninFeature {
 //                    else { return }
 //                    await send(.fetchUserResult(user))
 //                }
-            case .loginButtonTapped:
-                return .run { [email = state.email, password = state.password] send in
-                    do {
-                        let result = try await Auth.auth().signIn(withEmail: email, password: password)
-                        let firebaseUser: FirebaseAuth.User = result.user
-                        let user = colockitchenrace.User(id: UUID(),
-                                        uid: firebaseUser.uid,
-                                        displayName: firebaseUser.displayName ?? "No name",
-                                        email: firebaseUser.email)
-                        await send(.userResponse(user))
-                    } catch {
-                        print("Error: \(error.localizedDescription)")
-                    }
+            case .signinButtonTapped:
+                return .run { _ in
+                    try await self.authentificationClient.signIn(email: "julien@gmail.com", password: "jujurahier")
                 }
             }
         }
     }
 }
 
-struct LoginView: View {
+struct SigninView: View {
     @Perception.Bindable var store: StoreOf<SigninFeature>
 
     var body: some View {
         WithPerceptionTracking {
-            Form {
-                TextField("Email", text: $store.email)
+            VStack(spacing: 10) {
+                Image("Logo")
+                    .resizable()
+                    .frame(width: 150, height: 150, alignment: .center)
+
+                VStack(spacing: 10) {
+                    CKRTextField(value: $store.email) {
+                        Text("EMAIL")
+                    }
                     .autocapitalization(.none)
                     .keyboardType(.emailAddress)
                     .textContentType(.emailAddress)
                     .autocorrectionDisabled()
-                SecureField("••••••••", text: $store.password)
-                    .autocorrectionDisabled()
-                Button(
-                    action: {
-                        store.send(.loginButtonTapped)
-                    },
-                    label: {
-                        Text("Login")
+                    CKRTextField(value: $store.password) {
+                        Text("PASSWORD")
                     }
-                )
-                HStack {
-                    Text("You need an account ?")
-                    Button("Click here") {
-                        self.store.send(.changeToSignupButtonTapped)
+                    VStack(spacing: 12) {
+                        CKRButton("Sign in") {
+                            self.store.send(.signinButtonTapped)
+                        }
+                        .frame(height: 50)
+                        HStack {
+                            Text("You need an account ?")
+                            Button("Click here") {
+                                self.store.send(.changeToSignupButtonTapped)
+                            }
+                        }
+                        .font(.system(size: 14))
                     }
+                    .padding(.top)
                 }
-                .font(.system(size: 14))
+                .padding(.horizontal)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background { Color.CKRGreen.ignoresSafeArea() }
         }
     }
 }
 
 #Preview {
-    LoginView(
+    SigninView(
         store: Store(initialState: SigninFeature.State()) {
             SigninFeature()
         }

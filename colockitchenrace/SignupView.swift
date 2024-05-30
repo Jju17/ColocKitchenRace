@@ -20,22 +20,12 @@ struct SignupView: View {
                 
                 VStack(spacing: 10) {
                     HStack(spacing: 15) {
-                        CKRTextField(value: $store.name) {
-                            Text("NAME")
-                        }
-                        CKRTextField(value: $store.surname) {
-                            Text("SURNAME")
-                        }
+                        CKRTextField(value: $store.name) { Text("NAME") }
+                        CKRTextField(value: $store.surname) { Text("SURNAME") }
                     }
-                    CKRTextField(value: $store.email) {
-                        Text("EMAIL")
-                    }
-                    CKRTextField(value: $store.password) {
-                        Text("PASSWORD")
-                    }
-                    CKRTextField(value: $store.phone) {
-                        Text("PHONE")
-                    }
+                    CKRTextField(value: $store.email) { Text("EMAIL") }
+                    CKRTextField(value: $store.password) { Text("PASSWORD") }
+                    CKRTextField(value: $store.phone) { Text("PHONE") }
                     VStack(spacing: 12) {
                         CKRButton("Sign up") {
                             self.store.send(.signupButtonTapped)
@@ -44,7 +34,7 @@ struct SignupView: View {
                         HStack {
                             Text("Already have an account ?")
                             Button("Click here") {
-                                self.store.send(.changeToSigninButtonTapped)
+                                self.store.send(.goToSigninButtonTapped)
                             }
                         }
                         .font(.system(size: 14))

@@ -11,7 +11,10 @@ import SwiftUI
 @Reducer
 struct HomeFeature {
 
-    // MARK: - Reducer
+    @Reducer
+    enum Path {
+        case profile(UserProfileFeature)
+    }
 
     @ObservableState
     struct State {
@@ -23,27 +26,9 @@ struct HomeFeature {
     enum Action {
         case addCohousingButtonTapped
         case cancelCohousingButtonTapped
-        case path(StackAction<Path.State, Path.Action>)
+        case path(StackActionOf<Path>)
         case saveCohousingButtonTapped
     }
-
-    @Reducer
-    struct Path {
-        @ObservableState
-        enum State {
-            case profile(UserProfileFeature.State)
-        }
-        enum Action {
-            case profile(UserProfileFeature.Action)
-        }
-        var body: some ReducerOf<Self> {
-            Scope(state: \.profile, action: \.profile) {
-                UserProfileFeature()
-            }
-        }
-    }
-
-    @Dependency(\.uuid) var uuid
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -58,7 +43,7 @@ struct HomeFeature {
                 return .none
             }
         }
-        .forEach(\.path, action: \.path) { Path() }
+        .forEach(\.path, action: \.path)
     }
 }
 
@@ -71,7 +56,7 @@ struct HomeView: View {
                 ScrollView {
                     VStack(spacing: 15) {
                         CohouseTileView(name: store.cohousing?.name)
-                        CountdownTileView(nextKitchenRace: Date.from(year: 2024, month: 03, day: 23, hour: 18))
+                        CountdownTileView(nextKitchenRace: Date.from(year: 2024, month: 06, day: 14, hour: 18))
                     }
                 }
                 .padding()
@@ -84,11 +69,9 @@ struct HomeView: View {
                     }
                 }
             } destination: { store in
-                switch store.state {
-                case .profile:
-                    if let userStore = store.scope(state: \.profile, action: \.profile) {
-                        UserProfileView(store: userStore)
-                    }
+                switch store.case {
+                case let .profile(store):
+                    UserProfileView(store: store)
                 }
             }
         }

@@ -6,52 +6,69 @@
 //
 
 import ComposableArchitecture
+import FirebaseAuth
 import SwiftUI
 
 @Reducer
 struct AppFeature {
-    
+
     @ObservableState
     enum State {
-        case root(RootFeature.State)
+        case tab(TabFeature.State)
         case signin(SigninFeature.State)
         case signup(SignupFeature.State)
+        case splashScreen(SplashScreenFeature.State)
     }
-    
+
     enum Action {
-        case root(RootFeature.Action)
+        case onTask
+        case tab(TabFeature.Action)
         case signin(SigninFeature.Action)
         case signup(SignupFeature.Action)
+        case splashScreen(SplashScreenFeature.Action)
+        case newAuthStateTrigger(FirebaseAuth.User?)
     }
-    
+
+    @Dependency(\.authentificationClient) var authentificationClient
+
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .signup(.changeToSigninButtonTapped):
-                state = AppFeature.State.signin(SigninFeature.State())
+            case .onTask:
+                return .run { send in
+                    for await user in try authentificationClient.listenAuthState() {
+                        await send(.newAuthStateTrigger(user))
+                    }
+                }
+            case let .newAuthStateTrigger(user):
+                if user != nil {
+                    state = AppFeature.State.tab(TabFeature.State())
+                } else {
+                    state = AppFeature.State.signin(SigninFeature.State())
+                }
                 return .none
-            case .signin(.changeToSignupButtonTapped):
-                state = AppFeature.State.signup(SignupFeature.State())
-                return .none
-            case let .signin(.userResponse(_)):
-                state = AppFeature.State.root(RootFeature.State())
-                return .none
-            case .signup(.signupButtonTapped):
-                state = AppFeature.State.root(RootFeature.State())
-                return .none
-            case .signin, .signup, .root:
+            case let .signup(.delegate(action)):
+                switch action {
+                case .switchToSigninButtonTapped:
+                    state = AppFeature.State.signin(SigninFeature.State())
+                    return .none
+                }
+            case .tab, .signin, .signup, .splashScreen:
                 return .none
             }
 
         }
-        Scope(state: /AppFeature.State.root, action: /AppFeature.Action.root) {
-            RootFeature()
+        .ifCaseLet(/State.tab, action: /Action.tab) {
+            TabFeature()
         }
-        Scope(state: /AppFeature.State.signin, action: /AppFeature.Action.signin) {
+        .ifCaseLet(/State.signin, action: /Action.signin) {
             SigninFeature()
         }
-        Scope(state: /AppFeature.State.signup, action: /AppFeature.Action.signup) {
+        .ifCaseLet(/State.signup, action: /Action.signup) {
             SignupFeature()
+        }
+        .ifCaseLet(/State.splashScreen, action: /Action.splashScreen) {
+            SplashScreenFeature()
         }
     }
 }
@@ -60,26 +77,35 @@ struct AppView: View {
     let store: StoreOf<AppFeature>
 
     var body: some View {
-        switch store.state {
-        case .root:
-            if let rootStore = store.scope(state: \.root, action: \.root) {
-                RootView(store: rootStore)
+        Group {
+            switch store.state {
+            case .tab:
+                if let rootStore = store.scope(state: \.tab, action: \.tab) {
+                    MyTabView(store: rootStore)
+                }
+            case .signin:
+                if let signinStore = store.scope(state: \.signin, action: \.signin) {
+                    SigninView(store: signinStore)
+                }
+            case .signup:
+                if let signupStore = store.scope(state: \.signup, action: \.signup) {
+                    SignupView(store: signupStore)
+                }
+            case .splashScreen:
+                if let splashScreenStore = store.scope(state: \.splashScreen, action: \.splashScreen) {
+                    SplashScreenView(store: splashScreenStore)
+                }
             }
-        case .signin:
-            if let signinStore = store.scope(state: \.signin, action: \.signin) {
-                LoginView(store: signinStore)
-            }
-        case .signup:
-            if let signupStore = store.scope(state: \.signup, action: \.signup) {
-                SignupView(store: signupStore)
-            }
+        }
+        .task {
+            self.store.send(.onTask)
         }
     }
 }
 
 #Preview {
     AppView(
-        store: Store(initialState: AppFeature.State.root(RootFeature.State())) {
+        store: Store(initialState: AppFeature.State.tab(TabFeature.State())) {
             AppFeature()
         }
     )

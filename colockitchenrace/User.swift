@@ -21,7 +21,7 @@ struct User: Equatable, Hashable, Identifiable, Codable {
 
 extension User {
     static var mockUser: User {
-        return User(id: UUID(), isContactUser: true, isSubscribeToNews: true, displayName: "Louis de Potter", phoneNumber: "+32 479 50 68 41", email: "louisdepotter@gmail.com", foodIntolerences: ["Lactose"], foodIntolerence: "Lactose")
+        return User(id: UUID(), isContactUser: true, isSubscribeToNews: true, displayName: "Blob", phoneNumber: "123456789", email: "blob@gmail.com", foodIntolerences: ["Lactose"], foodIntolerence: "Lactose")
     }
 
     static var mockUser2: User {

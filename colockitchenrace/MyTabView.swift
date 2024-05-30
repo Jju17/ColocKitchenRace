@@ -1,5 +1,5 @@
 //
-//  TabView.swift
+//  MyTabView.swift
 //  colockitchenrace
 //
 //  Created by Julien Rahier on 29/01/2024.
@@ -9,7 +9,7 @@ import ComposableArchitecture
 import SwiftUI
 
 @Reducer
-struct RootFeature {
+struct TabFeature {
     @ObservableState
     struct State {
         var selectedTab: Tab = .home
@@ -46,8 +46,8 @@ enum Tab {
     case home, challenges, cohouse
 }
 
-struct RootView: View {
-    @Perception.Bindable var store: StoreOf<RootFeature>
+struct MyTabView: View {
+    @Perception.Bindable var store: StoreOf<TabFeature>
 
     var body: some View {
         WithPerceptionTracking {

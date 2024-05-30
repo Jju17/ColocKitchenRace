@@ -52,17 +52,27 @@ struct ChallengeView: View {
     var body: some View {
         WithPerceptionTracking {
             NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
-                ScrollView(.horizontal) {
-                    HStack {
-                        Color(.blue)
-                            .frame(minWidth: 350, maxHeight: .infinity)
-                        Color(.yellow)
-                            .frame(minWidth: 350, maxHeight: .infinity)
-                        Color(.red)
-                            .frame(minWidth: 350, maxHeight: .infinity)
-
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 0) {
+                        Group {
+                            Color(.blue)
+                                .padding()
+                        }
+                        .frame(minWidth: UIScreen.main.bounds.width, maxHeight: .infinity)
+                        Group {
+                            Color(.yellow)
+                                .padding()
+                        }
+                        .frame(minWidth: UIScreen.main.bounds.width, maxHeight: .infinity)
+                        Group {
+                            Color(.red)
+                                .padding()
+                        }
+                        .frame(minWidth: UIScreen.main.bounds.width, maxHeight: .infinity)
                     }
-                    .padding()
+                }
+                .onAppear {
+                    UIScrollView.appearance().isPagingEnabled = true
                 }
                 .navigationTitle("Challenges")
             } destination: { store in

@@ -14,3 +14,15 @@ struct SignupUser: Codable {
     var password: String
     var phone: String
 }
+
+extension SignupUser {
+    static var mock: Self {
+        return Self(
+            name: "",
+            surname: "",
+            email: "",
+            password: "",
+            phone: ""
+        )
+    }
+}
