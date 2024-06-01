@@ -26,9 +26,12 @@ struct HomeFeature {
     enum Action {
         case addCohousingButtonTapped
         case cancelCohousingButtonTapped
+        case logoutButtonTapped
         case path(StackActionOf<Path>)
         case saveCohousingButtonTapped
     }
+
+    @Dependency(\.authentificationClient) var authentificationClient
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -36,6 +39,9 @@ struct HomeFeature {
             case .addCohousingButtonTapped:
                 return .none
             case .cancelCohousingButtonTapped:
+                return .none
+            case .logoutButtonTapped:
+                self.authentificationClient.signOut()
                 return .none
             case .path:
                 return .none
@@ -66,6 +72,11 @@ struct HomeView: View {
                         state: HomeFeature.Path.State.profile(UserProfileFeature.State(user: store.currentUser ?? .mockUser))
                     ) {
                         Image(systemName: "person.crop.circle.fill")
+                    }
+                    Button {
+                        self.store.send(.logoutButtonTapped)
+                    } label: {
+                      Image(systemName: "nosign.app.fill")
                     }
                 }
             } destination: { store in

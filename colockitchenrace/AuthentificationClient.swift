@@ -14,7 +14,7 @@ struct AuthentificationClient {
     var load: () async throws -> User
     var signUp: @Sendable (_ email: String, _ password: String) async throws -> Result<User, Error>
     var signIn: @Sendable (_ email: String, _ password: String) async throws -> Result<User, Error>
-    var signOut: @Sendable () -> Void
+    var signOut: () -> Void
     var deleteAccount: () -> Void
     var fetchUser: () async -> Void
     var listenAuthState: @Sendable () throws -> AsyncStream<FirebaseAuth.User?>
@@ -56,7 +56,9 @@ extension AuthentificationClient: DependencyKey {
             }
         },
         signOut: {
-            do { try Auth.auth().signOut() }
+            do {
+                try Auth.auth().signOut()
+            }
             catch { print("already logged out") }
         },
         deleteAccount: {},
@@ -65,7 +67,6 @@ extension AuthentificationClient: DependencyKey {
             return AsyncStream { continuation in
                 DispatchQueue.main.async {
                     let handle = Auth.auth().addStateDidChangeListener { (auth, user) in
-                        print("JR has user : \(user != nil)")
                         continuation.yield(user)
                     }
                 }

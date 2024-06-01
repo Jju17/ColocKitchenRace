@@ -26,16 +26,22 @@ struct TabFeature {
     }
 
     var body: some ReducerOf<Self> {
+        Scope(state: \.challenge, action: \.challenge) {
+            ChallengeFeature()
+        }
+        Scope(state: \.cohouse, action: \.cohouse) {
+            CohousingFeature()
+        }
+        Scope(state: \.home, action: \.home) {
+            HomeFeature()
+        }
+
         Reduce { state, action in
             switch action {
             case let .tabChanged(tab):
                 state.selectedTab = tab
                 return .none
-            case .challenge:
-                return .none
-            case .cohouse:
-                return .none
-            case .home:
+            case .challenge, .cohouse, .home:
                 return .none
             }
         }

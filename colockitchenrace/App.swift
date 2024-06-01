@@ -56,7 +56,6 @@ struct AppFeature {
             case .tab, .signin, .signup, .splashScreen:
                 return .none
             }
-
         }
         .ifCaseLet(/State.tab, action: /Action.tab) {
             TabFeature()

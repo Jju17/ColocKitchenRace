@@ -30,7 +30,6 @@ struct UserProfileFeature {
             case .binding:
                 return .none
             case .signOutButtonTapped:
-                print("JR test")
                 return .run { _ in
                     self.authentificationClient.signOut()
                 }
@@ -52,9 +51,6 @@ struct UserProfileView: View {
                         .frame(width:100, height: 100)
                     .clipShape(Circle())
                     Spacer()
-                }
-                Button("test") {
-                    self.store.send(.signOutButtonTapped)
                 }
 
                 Section("Basic info") {
