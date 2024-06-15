@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		6423D3A32AD35121009DB3F7 /* UserProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6423D3A22AD35121009DB3F7 /* UserProfileView.swift */; };
+		6423D3A32AD35121009DB3F7 /* UserProfileDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6423D3A22AD35121009DB3F7 /* UserProfileDetailView.swift */; };
 		6423D3A52AD35159009DB3F7 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6423D3A42AD35159009DB3F7 /* OnboardingView.swift */; };
 		6423D3A82AD36B76009DB3F7 /* CohousingFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6423D3A72AD36B76009DB3F7 /* CohousingFormView.swift */; };
 		642701AA2ADEA5F700850684 /* (null) in Resources */ = {isa = PBXBuildFile; };
@@ -19,6 +19,9 @@
 		64325B002AF69E5E00038EA5 /* CountdownTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64325AFF2AF69E5E00038EA5 /* CountdownTileView.swift */; };
 		64325B042AF7D9A100038EA5 /* AuthentificationClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64325B032AF7D9A100038EA5 /* AuthentificationClient.swift */; };
 		643693642B67F06B00099D3B /* CohousingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643693632B67F06B00099D3B /* CohousingView.swift */; };
+		643E31A92C0BAA23004E4CAE /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 643E31A82C0BAA23004E4CAE /* FirebaseFirestore */; };
+		643E31AB2C0C81B1004E4CAE /* URL+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643E31AA2C0C81B1004E4CAE /* URL+Utils.swift */; };
+		643E31AD2C0D0EFF004E4CAE /* PersistenceKey+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643E31AC2C0D0EFF004E4CAE /* PersistenceKey+Utils.swift */; };
 		64549DB72BA1EF1A0025A9F2 /* SignupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64549DB62BA1EF1A0025A9F2 /* SignupView.swift */; };
 		64549DB92BA1EFF40025A9F2 /* SignupFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64549DB82BA1EFF40025A9F2 /* SignupFeature.swift */; };
 		646504272B67C22C00F67FD6 /* MyTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646504262B67C22C00F67FD6 /* MyTabView.swift */; };
@@ -35,6 +38,9 @@
 		649C5D3E2C01065500FA4ED5 /* TextfieldChallengeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649C5D3D2C01065500FA4ED5 /* TextfieldChallengeView.swift */; };
 		649C5D412C012C5A00FA4ED5 /* SplashScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 649C5D402C012C5A00FA4ED5 /* SplashScreenView.swift */; };
 		64B66EC62B5D50DB00B8F30B /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 64B66EC52B5D50DB00B8F30B /* ComposableArchitecture */; };
+		64E1C6F32C12208C00F1276B /* NewsClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64E1C6F22C12208C00F1276B /* NewsClient.swift */; };
+		64E1C6F52C1225FA00F1276B /* Logger+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64E1C6F42C1225FA00F1276B /* Logger+Utils.swift */; };
+		64E1C6F82C12385E00F1276B /* UserProfileFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64E1C6F72C12385E00F1276B /* UserProfileFormView.swift */; };
 		64F17B332AD2A3BC0047F6F3 /* colockitchenraceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F17B322AD2A3BC0047F6F3 /* colockitchenraceApp.swift */; };
 		64F17B352AD2A3BC0047F6F3 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F17B342AD2A3BC0047F6F3 /* HomeView.swift */; };
 		64F17B372AD2A3BE0047F6F3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 64F17B362AD2A3BE0047F6F3 /* Assets.xcassets */; };
@@ -80,7 +86,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		6423D3A22AD35121009DB3F7 /* UserProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileView.swift; sourceTree = "<group>"; };
+		6423D3A22AD35121009DB3F7 /* UserProfileDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileDetailView.swift; sourceTree = "<group>"; };
 		6423D3A42AD35159009DB3F7 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
 		6423D3A72AD36B76009DB3F7 /* CohousingFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CohousingFormView.swift; sourceTree = "<group>"; };
 		6426838F2AD4B29C00F01A20 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -89,6 +95,8 @@
 		64325AFF2AF69E5E00038EA5 /* CountdownTileView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CountdownTileView.swift; sourceTree = "<group>"; };
 		64325B032AF7D9A100038EA5 /* AuthentificationClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthentificationClient.swift; sourceTree = "<group>"; };
 		643693632B67F06B00099D3B /* CohousingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CohousingView.swift; sourceTree = "<group>"; };
+		643E31AA2C0C81B1004E4CAE /* URL+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Utils.swift"; sourceTree = "<group>"; };
+		643E31AC2C0D0EFF004E4CAE /* PersistenceKey+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "PersistenceKey+Utils.swift"; path = "../../Documents/PersistenceKey+Utils.swift"; sourceTree = "<group>"; };
 		64549DB62BA1EF1A0025A9F2 /* SignupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignupView.swift; sourceTree = "<group>"; };
 		64549DB82BA1EFF40025A9F2 /* SignupFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignupFeature.swift; sourceTree = "<group>"; };
 		646504262B67C22C00F67FD6 /* MyTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyTabView.swift; sourceTree = "<group>"; };
@@ -103,6 +111,9 @@
 		649C5D3B2C01063A00FA4ED5 /* PictureChallengeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PictureChallengeView.swift; sourceTree = "<group>"; };
 		649C5D3D2C01065500FA4ED5 /* TextfieldChallengeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextfieldChallengeView.swift; sourceTree = "<group>"; };
 		649C5D402C012C5A00FA4ED5 /* SplashScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenView.swift; sourceTree = "<group>"; };
+		64E1C6F22C12208C00F1276B /* NewsClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewsClient.swift; sourceTree = "<group>"; };
+		64E1C6F42C1225FA00F1276B /* Logger+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Logger+Utils.swift"; sourceTree = "<group>"; };
+		64E1C6F72C12385E00F1276B /* UserProfileFormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserProfileFormView.swift; sourceTree = "<group>"; };
 		64F17B2F2AD2A3BC0047F6F3 /* colockitchenrace.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = colockitchenrace.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		64F17B322AD2A3BC0047F6F3 /* colockitchenraceApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = colockitchenraceApp.swift; sourceTree = "<group>"; };
 		64F17B342AD2A3BC0047F6F3 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -137,6 +148,7 @@
 				64B66EC62B5D50DB00B8F30B /* ComposableArchitecture in Frameworks */,
 				64FE3CE72B8D58B800E6AAAE /* Dependencies in Frameworks */,
 				64FB41C62AD4086100C93A34 /* FirebaseCrashlytics in Frameworks */,
+				643E31A92C0BAA23004E4CAE /* FirebaseFirestore in Frameworks */,
 				64FE3CE92B8D58B800E6AAAE /* DependenciesMacros in Frameworks */,
 				64FB41C42AD4086100C93A34 /* FirebaseAuth in Frameworks */,
 			);
@@ -162,6 +174,7 @@
 		6423D3A62AD35165009DB3F7 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				64E1C6F62C12382F00F1276B /* UserProfile */,
 				646504282B67CDCB00F67FD6 /* Challenge */,
 				646504292B67CDD100F67FD6 /* Cohouse */,
 				649426052BA20E5000E8552A /* Global */,
@@ -171,7 +184,6 @@
 				64549DB52BA1EF050025A9F2 /* Signup */,
 				649C5D402C012C5A00FA4ED5 /* SplashScreenView.swift */,
 				646504252B67AE2800F67FD6 /* Tab */,
-				6423D3A22AD35121009DB3F7 /* UserProfileView.swift */,
 			);
 			name = Views;
 			sourceTree = "<group>";
@@ -235,6 +247,7 @@
 			isa = PBXGroup;
 			children = (
 				64325B032AF7D9A100038EA5 /* AuthentificationClient.swift */,
+				64E1C6F22C12208C00F1276B /* NewsClient.swift */,
 			);
 			name = Clients;
 			sourceTree = "<group>";
@@ -264,6 +277,15 @@
 			children = (
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		64E1C6F62C12382F00F1276B /* UserProfile */ = {
+			isa = PBXGroup;
+			children = (
+				6423D3A22AD35121009DB3F7 /* UserProfileDetailView.swift */,
+				64E1C6F72C12385E00F1276B /* UserProfileFormView.swift */,
+			);
+			name = UserProfile;
 			sourceTree = "<group>";
 		};
 		64F17B262AD2A3BC0047F6F3 = {
@@ -345,10 +367,13 @@
 			isa = PBXGroup;
 			children = (
 				64F17B682AD2D85A0047F6F3 /* Cohousing+Utils.swift */,
+				649426032BA1F28800E8552A /* Color+Utils.swift */,
 				64F17B6B2AD2F29D0047F6F3 /* Date+Utils.swift */,
 				64F17B6D2AD318D70047F6F3 /* DateComponents+Utils.swift */,
 				647B1CBD2AD49B7800BD2B25 /* Global.swift */,
-				649426032BA1F28800E8552A /* Color+Utils.swift */,
+				643E31AC2C0D0EFF004E4CAE /* PersistenceKey+Utils.swift */,
+				643E31AA2C0C81B1004E4CAE /* URL+Utils.swift */,
+				64E1C6F42C1225FA00F1276B /* Logger+Utils.swift */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -395,6 +420,7 @@
 				64B66EC52B5D50DB00B8F30B /* ComposableArchitecture */,
 				64FE3CE62B8D58B800E6AAAE /* Dependencies */,
 				64FE3CE82B8D58B800E6AAAE /* DependenciesMacros */,
+				643E31A82C0BAA23004E4CAE /* FirebaseFirestore */,
 			);
 			productName = colockitchenrace;
 			productReference = 64F17B2F2AD2A3BC0047F6F3 /* colockitchenrace.app */;
@@ -553,8 +579,10 @@
 				64F17B352AD2A3BC0047F6F3 /* HomeView.swift in Sources */,
 				64F17B602AD2CD0A0047F6F3 /* CohousingDetailView.swift in Sources */,
 				64325B042AF7D9A100038EA5 /* AuthentificationClient.swift in Sources */,
+				64E1C6F32C12208C00F1276B /* NewsClient.swift in Sources */,
 				64325AFA2AF69B4C00038EA5 /* (null) in Sources */,
 				649C5D382C0103E900FA4ED5 /* DumbChallengeView.swift in Sources */,
+				643E31AB2C0C81B1004E4CAE /* URL+Utils.swift in Sources */,
 				64F17B6E2AD318D70047F6F3 /* DateComponents+Utils.swift in Sources */,
 				64F17B672AD2D7210047F6F3 /* CKR.swift in Sources */,
 				64325AFE2AF69DFB00038EA5 /* CohouseTileView.swift in Sources */,
@@ -563,13 +591,14 @@
 				649C5D412C012C5A00FA4ED5 /* SplashScreenView.swift in Sources */,
 				649C5D3A2C01061E00FA4ED5 /* QCMChallengeView.swift in Sources */,
 				64FE3CE42B8D56E400E6AAAE /* UserClient.swift in Sources */,
+				64E1C6F82C12385E00F1276B /* UserProfileFormView.swift in Sources */,
 				64549DB72BA1EF1A0025A9F2 /* SignupView.swift in Sources */,
 				647B1CBE2AD49B7800BD2B25 /* Global.swift in Sources */,
 				64549DB92BA1EFF40025A9F2 /* SignupFeature.swift in Sources */,
 				643693642B67F06B00099D3B /* CohousingView.swift in Sources */,
 				64F17B622AD2D11B0047F6F3 /* Cohousing.swift in Sources */,
 				64F17B6C2AD2F29D0047F6F3 /* Date+Utils.swift in Sources */,
-				6423D3A32AD35121009DB3F7 /* UserProfileView.swift in Sources */,
+				6423D3A32AD35121009DB3F7 /* UserProfileDetailView.swift in Sources */,
 				649426092BA216D400E8552A /* CKRButton.swift in Sources */,
 				6423D3A82AD36B76009DB3F7 /* CohousingFormView.swift in Sources */,
 				64F17B642AD2D4460047F6F3 /* User.swift in Sources */,
@@ -578,7 +607,9 @@
 				64F62A932B6EC2B000FE3B37 /* PostalAddress.swift in Sources */,
 				646504272B67C22C00F67FD6 /* MyTabView.swift in Sources */,
 				642701AC2AE12F9300850684 /* (null) in Sources */,
+				64E1C6F52C1225FA00F1276B /* Logger+Utils.swift in Sources */,
 				6465042B2B67CE6600F67FD6 /* ChallengeView.swift in Sources */,
+				643E31AD2C0D0EFF004E4CAE /* PersistenceKey+Utils.swift in Sources */,
 				64F17B332AD2A3BC0047F6F3 /* colockitchenraceApp.swift in Sources */,
 				649C5D3C2C01063A00FA4ED5 /* PictureChallengeView.swift in Sources */,
 				64325AFC2AF69DDC00038EA5 /* SigninView.swift in Sources */,
@@ -952,7 +983,7 @@
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 10.16.0;
+				minimumVersion = 10.27.0;
 			};
 		};
 		64FE3CE52B8D58B800E6AAAE /* XCRemoteSwiftPackageReference "swift-dependencies" */ = {
@@ -966,6 +997,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		643E31A82C0BAA23004E4CAE /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 64FB41BE2AD4086100C93A34 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
 		64B66EC52B5D50DB00B8F30B /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 64B66EC42B5D50DB00B8F30B /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;

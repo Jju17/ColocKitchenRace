@@ -61,7 +61,7 @@ struct CohousingFormView: View {
 
                 Section("Membres") {
                     ForEach($store.cohousing.users) { $user in
-                        TextField("Name", text: $user.displayName)
+                        TextField("Name", text: $user.firstName)
                     }
                     .onDelete { indices in
                         store.send(.deleteUsers(atOffset: indices))
@@ -76,7 +76,7 @@ struct CohousingFormView: View {
                 Section {
                     Picker(selection: $store.cohousing.users, content: {
                         ForEach(store.cohousing.users) {
-                            Text($0.displayName).tag($0.isContactUser)
+                            Text($0.firstName).tag($0.isContactUser)
                         }
                     }, label: {
                         Text("Contact person")

@@ -68,7 +68,7 @@ struct CohousingDetailView: View {
             Form {
                 Section("Contact person") {
                     HStack {
-                        Text("\(store.cohousing.contactUser?.displayName ?? "")")
+                        Text("\(store.cohousing.contactUser?.firstName ?? "")")
                         Spacer()
                         Text("\(store.cohousing.contactUser?.phoneNumber ?? "")")
                     }
@@ -81,7 +81,7 @@ struct CohousingDetailView: View {
 
                 Section("Membres") {
                     ForEach(store.cohousing.users) { user in
-                        Text(user.displayName)
+                        Text(user.firstName)
                     }
                 }
             }

@@ -13,7 +13,7 @@ struct HomeFeature {
 
     @Reducer
     enum Path {
-        case profile(UserProfileFeature)
+        case profile(UserProfileDetailFeature)
     }
 
     @ObservableState
@@ -69,7 +69,7 @@ struct HomeView: View {
                 .navigationTitle("Welcome")
                 .toolbar {
                     NavigationLink(
-                        state: HomeFeature.Path.State.profile(UserProfileFeature.State(user: store.currentUser ?? .mockUser))
+                        state: HomeFeature.Path.State.profile(UserProfileDetailFeature.State())
                     ) {
                         Image(systemName: "person.crop.circle.fill")
                     }
@@ -82,7 +82,7 @@ struct HomeView: View {
             } destination: { store in
                 switch store.case {
                 case let .profile(store):
-                    UserProfileView(store: store)
+                    UserProfileDetailView(store: store)
                 }
             }
         }

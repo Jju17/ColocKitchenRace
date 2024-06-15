@@ -1,22 +1,23 @@
 //
-//  UserProfileView.swift
+//  UserProfileFormView.swift
 //  colockitchenrace
 //
-//  Created by Julien Rahier on 08/10/2023.
+//  Created by Julien Rahier on 06/06/2024.
 //
 
 import ComposableArchitecture
 import SwiftUI
 
 @Reducer
-struct UserProfileFeature {
+struct UserProfileFormFeature {
 
     @ObservableState
     struct State: Equatable {
-        var user: User
+        var wipUser: User = .emptyUser
     }
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<State>)
+        case onAppearTriggered
         case signOutButtonTapped
     }
 
@@ -29,6 +30,11 @@ struct UserProfileFeature {
             switch action {
             case .binding:
                 return .none
+            case .onAppearTriggered:
+                @Shared(.userInfo) var user
+                guard let user = user else { return .none }
+                state.wipUser = user
+                return .none
             case .signOutButtonTapped:
                 return .run { _ in
                     self.authentificationClient.signOut()
@@ -38,37 +44,29 @@ struct UserProfileFeature {
     }
 }
 
-struct UserProfileView: View {
-    @Perception.Bindable var store: StoreOf<UserProfileFeature>
+struct UserProfileFormView: View {
+    @Perception.Bindable var store: StoreOf<UserProfileFormFeature>
 
     var body: some View {
         WithPerceptionTracking {
             Form {
-                HStack {
-                    Spacer()
-                    Image("Louis")
-                        .resizable()
-                        .frame(width:100, height: 100)
-                    .clipShape(Circle())
-                    Spacer()
-                }
-
                 Section("Basic info") {
-                    TextField("Name", text: $store.user.displayName)
-                    TextField("Email", text: $store.user.email ?? "")
-                    TextField("GSM", text: $store.user.phoneNumber ?? "")
+                    TextField("First name", text: $store.wipUser.firstName)
+                    TextField("Last name", text: $store.wipUser.lastName)
+                    TextField("Email", text: $store.wipUser.email ?? "")
+                    TextField("GSM", text: $store.wipUser.phoneNumber ?? "")
                 }
 
                 // TODO: JR: This would be an array of Objects
                 Section("Food related") {
-                    TextField("Food intolerances", text: $store.user.foodIntolerence)
+                    TextField("Food intolerances", text: $store.wipUser.foodIntolerence)
                 }
 
                 Section("CKR") {
-                    Toggle(isOn: $store.user.isContactUser) {
+                    Toggle(isOn: $store.wipUser.isContactUser) {
                         Text("Are you the contact person ?")
                     }
-                    Toggle(isOn: $store.user.isSubscribeToNews) {
+                    Toggle(isOn: $store.wipUser.isSubscribeToNews) {
                         Text("Do you want to have news from CKR team ?")
                     }
                 }
@@ -84,15 +82,17 @@ struct UserProfileView: View {
                 }
             }
             .navigationBarTitle("Profile")
+            .onAppear { store.send(.onAppearTriggered) }
         }
     }
 }
 
 #Preview {
     NavigationStack {
-        UserProfileView(
-            store: Store(initialState: UserProfileFeature.State(user: .mockUser)) {
-            UserProfileFeature()
-        })
+        UserProfileFormView(
+            store: Store(initialState: UserProfileFormFeature.State()) {
+                UserProfileFormFeature()
+            }
+        )
     }
 }

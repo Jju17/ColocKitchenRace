@@ -7,17 +7,15 @@
 
 import ComposableArchitecture
 import Foundation
+import os
 
 @Reducer
 struct SignupFeature {
     
     @ObservableState
     struct State {
-        var name: String = ""
-        var surname: String = ""
-        var email: String = ""
-        var password: String = ""
-        var phone: String = ""
+        var signupUserData = SignupUser()
+        @Shared(.userInfo) var userInfo
     }
     
     enum Action: BindableAction {
@@ -34,6 +32,7 @@ struct SignupFeature {
     @Dependency(\.authentificationClient) var authentificationClient
 
     var body: some ReducerOf<Self> {
+        BindingReducer()
         Reduce { state, action in
             switch action {
             case .binding:
@@ -43,8 +42,16 @@ struct SignupFeature {
             case .delegate:
                 return .none
             case .signupButtonTapped:
-                return .run { _ in
-                    try await self.authentificationClient.signIn(email: "julien@gmail.com", password: "jujurahier")
+                return .run { [signupUserData = state.signupUserData] send in
+                    let userDataResult = try await self.authentificationClient.signUp(signupUserData)
+                    switch userDataResult {
+                    case let .success(newUserData):
+                        @Shared(.userInfo) var userInfo
+                        userInfo = newUserData
+                    case let .failure(error):
+                        Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
+                        break
+                    }
                 }
             }
         }

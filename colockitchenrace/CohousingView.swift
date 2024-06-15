@@ -26,14 +26,14 @@ struct CohousingFeature {
     struct Path {
         @ObservableState
         enum State {
-            case profile(UserProfileFeature.State)
+            case profile(UserProfileDetailFeature.State)
         }
         enum Action {
-            case profile(UserProfileFeature.Action)
+            case profile(UserProfileDetailFeature.Action)
         }
         var body: some ReducerOf<Self> {
             Scope(state: \.profile, action: \.profile) {
-                UserProfileFeature()
+                UserProfileDetailFeature()
             }
         }
     }

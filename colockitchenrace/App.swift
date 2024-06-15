@@ -47,6 +47,12 @@ struct AppFeature {
                     state = AppFeature.State.signin(SigninFeature.State())
                 }
                 return .none
+            case let .signin(.delegate(action)):
+                switch action {
+                case .switchToSignupButtonTapped:
+                    state = AppFeature.State.signup(SignupFeature.State())
+                    return .none
+                }
             case let .signup(.delegate(action)):
                 switch action {
                 case .switchToSigninButtonTapped:

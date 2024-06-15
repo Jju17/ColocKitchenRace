@@ -7,22 +7,38 @@
 
 import Foundation
 
-struct SignupUser: Codable {
-    var name: String
-    var surname: String
-    var email: String
-    var password: String
-    var phone: String
+struct SignupUser: Codable, Equatable {
+    var firstName: String = ""
+    var lastName: String = ""
+    var email: String = ""
+    var password: String = ""
+    var phone: String = ""
 }
 
 extension SignupUser {
     static var mock: Self {
         return Self(
-            name: "",
-            surname: "",
+            firstName: "",
+            lastName: "",
             email: "",
             password: "",
             phone: ""
+        )
+    }
+}
+
+extension SignupUser {
+    func createUser(uid: String) -> User {
+        User(id: UUID(),
+             uid: uid,
+             isContactUser: false,
+             isSubscribeToNews: false,
+             firstName: self.firstName,
+             lastName: self.lastName,
+             phoneNumber: nil,
+             email: self.email,
+             foodIntolerences: [],
+             foodIntolerence: ""
         )
     }
 }

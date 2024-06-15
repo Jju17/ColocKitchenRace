@@ -24,14 +24,14 @@ struct ChallengeFeature {
     struct Path {
         @ObservableState
         enum State {
-            case profile(UserProfileFeature.State)
+            case profile(UserProfileDetailFeature.State)
         }
         enum Action {
-            case profile(UserProfileFeature.Action)
+            case profile(UserProfileDetailFeature.Action)
         }
         var body: some ReducerOf<Self> {
             Scope(state: \.profile, action: \.profile) {
-                UserProfileFeature()
+                UserProfileDetailFeature()
             }
         }
     }
@@ -79,7 +79,7 @@ struct ChallengeView: View {
                 switch store.state {
                 case .profile:
                     if let store = store.scope(state: \.profile, action: \.profile) {
-                        UserProfileView(store: store)
+                        UserProfileDetailView(store: store)
                     }
                 }
             }

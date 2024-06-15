@@ -16,14 +16,17 @@ struct SigninFeature {
     struct State {
         var email: String = ""
         var password: String = ""
-        var user: User?
     }
 
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<State>)
-        case changeToSignupButtonTapped
+        case switchToSignupButtonTapped
+        case delegate(Delegate)
         case signinButtonTapped
-        case userResponse(User)
+
+        enum Delegate {
+            case switchToSignupButtonTapped
+        }
     }
 
     @Dependency(\.authentificationClient) var authentificationClient
@@ -34,22 +37,13 @@ struct SigninFeature {
             switch action {
             case .binding:
                 return .none
-            case .changeToSignupButtonTapped:
+            case .switchToSignupButtonTapped:
+                return .send(.delegate(.switchToSignupButtonTapped))
+            case .delegate:
                 return .none
-            case let .userResponse(user):
-                state.user = user
-                return .none
-//            case .fetchUser:
-//                return .run { send in
-//                    guard let uid = Auth.auth().currentUser?.uid,
-//                          let snapshot = try? await Firestore.firestore().collection("users").document(uid).getDocument(),
-//                          let user = try? snapshot.data(as: User.self)
-//                    else { return }
-//                    await send(.fetchUserResult(user))
-//                }
             case .signinButtonTapped:
-                return .run { _ in
-                    try await self.authentificationClient.signIn(email: "julien@gmail.com", password: "jujurahier")
+                return .run { [state = state] _ in
+                    let _ = try await self.authentificationClient.signIn(email: state.email, password: state.password)
                 }
             }
         }
@@ -85,7 +79,7 @@ struct SigninView: View {
                         HStack {
                             Text("You need an account ?")
                             Button("Click here") {
-                                self.store.send(.changeToSignupButtonTapped)
+                                self.store.send(.switchToSignupButtonTapped)
                             }
                         }
                         .font(.system(size: 14))
