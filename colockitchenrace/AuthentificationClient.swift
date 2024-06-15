@@ -18,8 +18,7 @@ struct AuthentificationClient {
     var signIn: @Sendable (_ email: String, _ password: String) async throws -> Result<User, Error>
     var signOut: () -> Void
     var deleteAccount: () -> Void
-    var setUser: (_ uid: String) async -> Void
-    var fetchUser: (_ uid: String) async -> User?
+    var setUser: (_ user: User, _ uid: String) async throws -> Void
     var listenAuthState: @Sendable () throws -> AsyncStream<FirebaseAuth.User?>
 }
 
@@ -57,13 +56,11 @@ extension AuthentificationClient: DependencyKey {
             catch { print("already logged out") }
         },
         deleteAccount: {},
-        setUser: { uid in
+        setUser: { user, uid in
             let firestore = Firestore.firestore()
             let docRef = firestore.collection("users").document(uid)
-
-        },
-        fetchUser: { uid in
-            return nil
+            try docRef.setData(from: user)
+            @Shared(.userInfo) var user = user
         },
         listenAuthState: {
             return AsyncStream { continuation in

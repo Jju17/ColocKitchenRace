@@ -20,5 +20,79 @@
             landmarkType = "37">
          </BreakpointContent>
       </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "6970178B-AB9B-4F83-88CC-241DC6EA8DF6"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "colockitchenrace/AuthentificationClient.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "45"
+            endingLineNumber = "45"
+            landmarkName = "liveValue"
+            landmarkType = "24">
+            <Locations>
+               <Location
+                  uuid = "6970178B-AB9B-4F83-88CC-241DC6EA8DF6 - 4bc1a907a26d42ad"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(3) suspend resume partial function for closure #2 @Sendable (Swift.String, Swift.String) async -&gt; Swift.Result&lt;colockitchenrace.User, Swift.Error&gt; in variable initialization expression of static colockitchenrace.AuthentificationClient.liveValue : colockitchenrace.AuthentificationClient"
+                  moduleName = "colockitchenrace"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/jrahier/colockitchenrace/colockitchenrace/AuthentificationClient.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "45"
+                  endingLineNumber = "45">
+               </Location>
+               <Location
+                  uuid = "6970178B-AB9B-4F83-88CC-241DC6EA8DF6 - 8963a10b4b2f08d7"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(4) await resume partial function for closure #2 @Sendable (Swift.String, Swift.String) async -&gt; Swift.Result&lt;colockitchenrace.User, Swift.Error&gt; in variable initialization expression of static colockitchenrace.AuthentificationClient.liveValue : colockitchenrace.AuthentificationClient"
+                  moduleName = "colockitchenrace"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/jrahier/colockitchenrace/colockitchenrace/AuthentificationClient.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "45"
+                  endingLineNumber = "45">
+               </Location>
+               <Location
+                  uuid = "6970178B-AB9B-4F83-88CC-241DC6EA8DF6 - bc2203e3cc960eab"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(5) suspend resume partial function for closure #2 @Sendable (Swift.String, Swift.String) async -&gt; Swift.Result&lt;colockitchenrace.User, Swift.Error&gt; in variable initialization expression of static colockitchenrace.AuthentificationClient.liveValue : colockitchenrace.AuthentificationClient"
+                  moduleName = "colockitchenrace"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/jrahier/colockitchenrace/colockitchenrace/AuthentificationClient.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "45"
+                  endingLineNumber = "45">
+               </Location>
+               <Location
+                  uuid = "6970178B-AB9B-4F83-88CC-241DC6EA8DF6 - e68e65bf16bfcaa9"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "(7) suspend resume partial function for closure #2 @Sendable (Swift.String, Swift.String) async -&gt; Swift.Result&lt;colockitchenrace.User, Swift.Error&gt; in variable initialization expression of static colockitchenrace.AuthentificationClient.liveValue : colockitchenrace.AuthentificationClient"
+                  moduleName = "colockitchenrace"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/jrahier/colockitchenrace/colockitchenrace/AuthentificationClient.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "45"
+                  endingLineNumber = "45">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
    </Breakpoints>
 </Bucket>
