@@ -10,9 +10,11 @@ import SwiftUI
 
 struct SignupView: View {
     @Perception.Bindable var store: StoreOf<SignupFeature>
-    
-    var body: some View {
-        WithPerceptionTracking {
+    @FocusState var focusedField: SignupFeature.State.Field?
+
+        var body: some View {
+            WithPerceptionTracking {
+            
             VStack(spacing: 10) {
                 Image("Logo")
                     .resizable()
@@ -20,17 +22,50 @@ struct SignupView: View {
                 
                 VStack(spacing: 10) {
                     HStack(spacing: 15) {
-                        CKRTextField(value: $store.signupUserData.firstName) { Text("NAME") }
-                        CKRTextField(value: $store.signupUserData.lastName) { Text("SURNAME") }
+                        TextField("", text: $store.signupUserData.firstName)
+                            .textFieldStyle(CKRTextFieldStyle(title: "NAME"))
+                            .textContentType(.name)
+                            .textInputAutocapitalization(.words)
+                            .focused(self.$focusedField, equals: .name)
+                            .submitLabel(.next)
+                            .onSubmit { store.send(.setFocusedField(.surname)) }
+                        TextField("", text: $store.signupUserData.lastName)
+                            .textFieldStyle(CKRTextFieldStyle(title: "SURNAME"))
+                            .textContentType(.name)
+                            .textInputAutocapitalization(.words)
+                            .focused(self.$focusedField, equals: .surname)
+                            .submitLabel(.next)
+                            .onSubmit { store.send(.setFocusedField(.email)) }
                     }
-                    CKRTextField(value: $store.signupUserData.email) { Text("EMAIL") }
-                    SecureField("PASSWORD", text: $store.signupUserData.password)
-                    CKRTextField(value: $store.signupUserData.phone) { Text("PHONE") }
+                    TextField("", text: $store.signupUserData.email)
+                        .textFieldStyle(CKRTextFieldStyle(title: "EMAIL"))
+                        .textContentType(.emailAddress)
+                        .keyboardType(.emailAddress)
+                        .textInputAutocapitalization(.never)
+                        .focused(self.$focusedField, equals: .email)
+                        .submitLabel(.next)
+                        .onSubmit { store.send(.setFocusedField(.password)) }
+                    SecureField("", text: $store.signupUserData.password)
+                        .textFieldStyle(CKRTextFieldStyle(title: "PASSWORD"))
+                        .focused(self.$focusedField, equals: .password)
+                        .submitLabel(.next)
+                        .onSubmit { store.send(.setFocusedField(.phone)) }
+                    TextField("", text: $store.signupUserData.phone)
+                        .textFieldStyle(CKRTextFieldStyle(title: "PHONE"))
+                        .textContentType(.telephoneNumber)
+                        .focused(self.$focusedField, equals: .phone)
+                        .submitLabel(.done)
+                        .onSubmit { store.send(.setFocusedField(nil)) }
                     VStack(spacing: 12) {
                         CKRButton("Sign up") {
                             self.store.send(.signupButtonTapped)
                         }
                         .frame(height: 50)
+                        if let error = store.error {
+                            Text("\(error.localizedDescription)")
+                                .foregroundStyle(.red)
+                                .font(.footnote)
+                        }
                         HStack {
                             Text("Already have an account ?")
                             Button("Click here") {
@@ -41,6 +76,7 @@ struct SignupView: View {
                     }
                     .padding(.top)
                 }
+                .bind($store.focusedField, to: self.$focusedField)
                 .padding(.horizontal)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)

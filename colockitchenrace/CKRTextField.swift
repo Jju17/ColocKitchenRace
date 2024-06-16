@@ -10,7 +10,8 @@ import SwiftUI
 struct CKRTextField<Content: View>: View {
     @Binding var value: String
     var frame: CGFloat = 80
-    
+    var isSecure: Bool = false
+
     @ViewBuilder var content: () -> Content
     
     var body: some View {
@@ -22,11 +23,16 @@ struct CKRTextField<Content: View>: View {
                 RoundedRectangle(cornerRadius: 15)
                     .fill(Color.white)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
-                TextField("", text: self.$value)
-                    .padding(.horizontal)
+                if isSecure {
+                    SecureField("", text: $value)
+                        .padding(.horizontal)
+                } else {
+                    TextField("", text: self.$value)
+                        .padding(.horizontal)
+                }
             }
         }
-        .frame(maxHeight: self.frame)
+        .frame(height: self.frame)
     }
 }
 
@@ -38,4 +44,26 @@ struct CKRTextField<Content: View>: View {
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background { Color.CKRBlue.ignoresSafeArea() }
+}
+
+
+struct CKRTextFieldStyle: TextFieldStyle {
+    var title: String
+    var frame: CGFloat = 80
+
+    func _body(configuration: TextField<Self._Label>) -> some View {
+        VStack(alignment: .leading, spacing: 5) {
+            Text(self.title)
+                .foregroundStyle(.gray)
+                .font(.system(size: 14))
+            ZStack(alignment: .leading) {
+                RoundedRectangle(cornerRadius: 15)
+                    .fill(Color.white)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                configuration
+                    .padding(.horizontal)
+            }
+        }
+        .frame(height: self.frame)
+    }
 }
