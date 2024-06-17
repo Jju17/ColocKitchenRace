@@ -20,7 +20,7 @@ struct HomeFeature {
     struct State {
         var path = StackState<Path.State>()
         var currentUser: User?
-        var cohousing: Cohousing?
+        var cohousing: Cohouse?
     }
 
     enum Action {
@@ -62,7 +62,7 @@ struct HomeView: View {
                 ScrollView {
                     VStack(spacing: 15) {
                         CohouseTileView(name: store.cohousing?.name)
-                        CountdownTileView(nextKitchenRace: Date.from(year: 2024, month: 06, day: 14, hour: 18))
+                        CountdownTileView(nextKitchenRace: Date.from(year: 2024, month: 09, day: 06, hour: 18))
                     }
                 }
                 .padding()
@@ -76,8 +76,9 @@ struct HomeView: View {
                     Button {
                         self.store.send(.logoutButtonTapped)
                     } label: {
-                      Image(systemName: "nosign.app.fill")
+                        Image(systemName: "nosign.app.fill")
                     }
+
                 }
             } destination: { store in
                 switch store.case {

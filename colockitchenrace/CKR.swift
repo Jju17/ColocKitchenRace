@@ -8,7 +8,7 @@
 import Foundation
 
 struct CKR {
-    var colocations: [Cohousing] // 3 cohousing
+    var colocations: [Cohouse] // 3 cohousing
     var date: Date
     var theme: String
 

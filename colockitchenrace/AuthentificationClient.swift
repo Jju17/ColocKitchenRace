@@ -31,7 +31,8 @@ extension AuthentificationClient: DependencyKey {
                 let newUser = signupUserData.createUser(uid: userId)
 
                 try Firestore.firestore().collection("users").document(userId).setData(from: newUser)
-                @Shared(.userInfo) var user = newUser
+                @Shared(.userInfo) var user
+                user = newUser
                 return Result(.success(newUser))
             } catch {
                 Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
@@ -42,7 +43,8 @@ extension AuthentificationClient: DependencyKey {
             do {
                 let authDataResult = try await Auth.auth().signIn(withEmail: email, password: password)
                 let loggedUser = try await Firestore.firestore().collection("users").document(authDataResult.user.uid).getDocument(as: User.self)
-                @Shared(.userInfo) var user = loggedUser
+                @Shared(.userInfo) var user
+                user = loggedUser
                 return Result(.success(loggedUser))
             } catch {
                 return Result(.failure(error))
@@ -56,11 +58,12 @@ extension AuthentificationClient: DependencyKey {
             catch { print("already logged out") }
         },
         deleteAccount: {},
-        setUser: { user, uid in
+        setUser: { newUser, uid in
             let firestore = Firestore.firestore()
             let docRef = firestore.collection("users").document(uid)
-            try docRef.setData(from: user)
-            @Shared(.userInfo) var user = user
+            try docRef.setData(from: newUser)
+            @Shared(.userInfo) var user
+            user = newUser
         },
         listenAuthState: {
             return AsyncStream { continuation in

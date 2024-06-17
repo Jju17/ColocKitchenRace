@@ -16,18 +16,6 @@ struct SignupUser: Codable, Equatable {
 }
 
 extension SignupUser {
-    static var mock: Self {
-        return Self(
-            firstName: "",
-            lastName: "",
-            email: "",
-            password: "",
-            phone: ""
-        )
-    }
-}
-
-extension SignupUser {
     func createUser(uid: String) -> User {
         User(id: UUID(),
              uid: uid,
@@ -39,6 +27,18 @@ extension SignupUser {
              email: self.email,
              foodIntolerences: [],
              foodIntolerence: ""
+        )
+    }
+}
+
+extension SignupUser {
+    static var mock: Self {
+        return Self(
+            firstName: "",
+            lastName: "",
+            email: "",
+            password: "",
+            phone: ""
         )
     }
 }

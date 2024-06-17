@@ -43,23 +43,20 @@ struct UserProfileDetailView: View {
                     Text(store.userInfo?.firstName ?? "")
                     Text(store.userInfo?.lastName ?? "")
                     Text(store.userInfo?.email ?? "")
-                    Text(store.userInfo?.phoneNumber ?? "")
-                    Text(store.userInfo?.firstName ?? "")
+                    if let phoneNumber = store.userInfo?.phoneNumber {
+                        Text(phoneNumber)
+                    }
                 }
 
-                // TODO: JR: This would be an array of Objects
                 Section("Food related") {
-                    Text(store.userInfo?.foodIntolerences.joined(separator: ", ") ?? "")
+                    Text(store.userInfo?.formattedFoodIntolerenceList ?? "")
                 }
 
-                Section("CKR") {
-//                    Toggle(isOn: $store.userInfo.isContactUser) {
-//                        Text("Are you the contact person ?")
-//                    }
-//                    Toggle(isOn: $store.wipUser.isSubscribeToNews) {
-//                        Text("Do you want to have news from CKR team ?")
-//                    }
-                }
+                //                Section("CKR") {
+                //                    Toggle(isOn: $store.wipUser.isSubscribeToNews) {
+                //                        Text("Do you want to have news from CKR team ?")
+                //                    }
+                //                }
 
                 Section {
                     Button {
@@ -81,6 +78,6 @@ struct UserProfileDetailView: View {
         UserProfileDetailView(
             store: Store(initialState: UserProfileDetailFeature.State()) {
                 UserProfileDetailFeature()
-        })
+            })
     }
 }

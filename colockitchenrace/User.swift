@@ -21,6 +21,13 @@ struct User: Equatable, Hashable, Identifiable, Codable {
 }
 
 extension User {
+    var formattedFoodIntolerenceList: String {
+        guard !foodIntolerences.isEmpty else { return "No food intolerence" }
+        return self.foodIntolerences.joined(separator: ", ")
+    }
+}
+
+extension User {
     static var emptyUser: User {
         return User(id: .init())
     }
