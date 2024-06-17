@@ -14,17 +14,9 @@ struct SignupFeature {
     
     @ObservableState
     struct State {
-        var focusedField: Field?
+        var focusedField: SignupField?
         var signupUserData = SignupUser()
         var error: Error?
-
-        enum Field: String, Hashable {
-            case name
-            case surname
-            case email
-            case password
-            case phone
-        }
     }
 
     enum Action: BindableAction {
@@ -32,7 +24,7 @@ struct SignupFeature {
         case goToSigninButtonTapped
         case signupButtonTapped
         case delegate(Delegate)
-        case setFocusedField(SignupFeature.State.Field?)
+        case setFocusedField(SignupField?)
         case signupErrorTrigered(Error)
 
         enum Delegate {

@@ -7,7 +7,9 @@
 
 import ComposableArchitecture
 import FirebaseAuth
+import SwiftUIIntrospect
 import SwiftUI
+import os
 
 @Reducer
 struct SigninFeature {
@@ -15,14 +17,17 @@ struct SigninFeature {
     @ObservableState
     struct State {
         var email: String = ""
+        var error: Error?
+        var focusedField: SigninField?
         var password: String = ""
     }
 
-    enum Action: BindableAction, Equatable {
+    enum Action: BindableAction {
         case binding(BindingAction<State>)
         case switchToSignupButtonTapped
         case delegate(Delegate)
         case signinButtonTapped
+        case signinErrorTrigered(Error)
 
         enum Delegate {
             case switchToSignupButtonTapped
@@ -42,9 +47,19 @@ struct SigninFeature {
             case .delegate:
                 return .none
             case .signinButtonTapped:
-                return .run { [state = state] _ in
-                    let _ = try await self.authentificationClient.signIn(email: state.email, password: state.password)
+                return .run { [state = state] send in
+                    let userDataResult = try await self.authentificationClient.signIn(email: state.email, password: state.password)
+                    switch userDataResult {
+                    case .success:
+                        break
+                    case let .failure(error):
+                        Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
+                        await send(.signinErrorTrigered(error))
+                    }
                 }
+            case let .signinErrorTrigered(error):
+                state.error = error
+                return .none
             }
         }
     }
@@ -52,6 +67,9 @@ struct SigninFeature {
 
 struct SigninView: View {
     @Perception.Bindable var store: StoreOf<SigninFeature>
+    @FocusState var focusedField: SigninField?
+    let emailFieldDelegate = TextFieldDelegate()
+    let passwordFieldDelegate = TextFieldDelegate()
 
     var body: some View {
         WithPerceptionTracking {
@@ -61,21 +79,35 @@ struct SigninView: View {
                     .frame(width: 150, height: 150, alignment: .center)
 
                 VStack(spacing: 10) {
-                    CKRTextField(value: $store.email) {
-                        Text("EMAIL")
-                    }
-                    .autocapitalization(.none)
-                    .keyboardType(.emailAddress)
-                    .textContentType(.emailAddress)
-                    .autocorrectionDisabled()
-                    CKRTextField(value: $store.password) {
-                        Text("PASSWORD")
-                    }
+                    TextField("", text: $store.email)
+                        .textFieldStyle(CKRTextFieldStyle(title: "EMAIL"))
+                        .textContentType(.emailAddress)
+                        .keyboardType(.emailAddress)
+                        .textInputAutocapitalization(.never)
+                        .focused(self.$focusedField, equals: .email)
+                        .submitLabel(.next)
+                        .introspect(.textField, on: .iOS(.v16, .v17)) { textField in
+                            emailFieldDelegate.shouldReturn = {
+                                self.focusNextField()
+                                return false
+                            }
+
+                            textField.delegate = emailFieldDelegate
+                        }
+                    SecureField("", text: $store.password)
+                        .textFieldStyle(CKRTextFieldStyle(title: "PASSWORD"))
+                        .focused(self.$focusedField, equals: .password)
+                        .submitLabel(.done)
                     VStack(spacing: 12) {
                         CKRButton("Sign in") {
                             self.store.send(.signinButtonTapped)
                         }
                         .frame(height: 50)
+                        if let error = store.error {
+                            Text("\(error.localizedDescription)")
+                                .foregroundStyle(.red)
+                                .font(.footnote)
+                        }
                         HStack {
                             Text("You need an account ?")
                             Button("Click here") {
@@ -86,10 +118,40 @@ struct SigninView: View {
                     }
                     .padding(.top)
                 }
+                .bind($store.focusedField, to: self.$focusedField)
                 .padding(.horizontal)
+                .toolbar {
+                    ToolbarItem(placement: .keyboard) {
+                        Button(action: self.focusPreviousField) {
+                            Image(systemName: "chevron.up")
+                        }
+                    }
+                    ToolbarItem(placement: .keyboard) {
+                        Button(action: self.focusNextField) {
+                            Image(systemName: "chevron.down")
+                        }
+                    }
+                    ToolbarItem(placement: .keyboard) {
+                        Spacer()
+                    }
+                }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .background { Color.CKRGreen.ignoresSafeArea() }
+        }
+    }
+}
+
+extension SigninView {
+    private func focusPreviousField() {
+        focusedField = focusedField.map {
+            SigninField(rawValue: $0.rawValue - 1) ?? .password
+        }
+    }
+
+    private func focusNextField() {
+        focusedField = focusedField.map {
+            SigninField(rawValue: $0.rawValue + 1) ?? .email
         }
     }
 }
