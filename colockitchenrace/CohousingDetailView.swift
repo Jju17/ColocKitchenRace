@@ -14,7 +14,7 @@ struct CohousingDetailFeature {
     @ObservableState
     struct State: Equatable {
         @Presents var editCohousing: CohousingFormFeature.State?
-        var cohousing: Cohousing
+        var cohousing: Cohouse
     }
 
     enum Action: Equatable {
@@ -24,7 +24,7 @@ struct CohousingDetailFeature {
         case editCohousing(PresentationAction<CohousingFormFeature.Action>)
         case saveCohousingButtonTapped
         enum Delegate: Equatable {
-            case cohousingUpdated(Cohousing)
+            case cohousingUpdated(Cohouse)
         }
     }
 

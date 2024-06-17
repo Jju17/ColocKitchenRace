@@ -13,7 +13,7 @@ struct CohousingFormFeature {
 
     @ObservableState
     struct State: Equatable {
-        var cohousing: Cohousing
+        var cohousing: Cohouse
     }
 
     enum Action: BindableAction, Equatable {
