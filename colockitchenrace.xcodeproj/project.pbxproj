@@ -21,7 +21,6 @@
 		643693642B67F06B00099D3B /* CohousingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643693632B67F06B00099D3B /* CohousingView.swift */; };
 		643E31A92C0BAA23004E4CAE /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 643E31A82C0BAA23004E4CAE /* FirebaseFirestore */; };
 		643E31AB2C0C81B1004E4CAE /* URL+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643E31AA2C0C81B1004E4CAE /* URL+Utils.swift */; };
-		643E31AD2C0D0EFF004E4CAE /* PersistenceKey+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 643E31AC2C0D0EFF004E4CAE /* PersistenceKey+Utils.swift */; };
 		64549DB72BA1EF1A0025A9F2 /* SignupView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64549DB62BA1EF1A0025A9F2 /* SignupView.swift */; };
 		64549DB92BA1EFF40025A9F2 /* SignupFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64549DB82BA1EFF40025A9F2 /* SignupFeature.swift */; };
 		646504272B67C22C00F67FD6 /* MyTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 646504262B67C22C00F67FD6 /* MyTabView.swift */; };
@@ -62,6 +61,7 @@
 		64F17B6C2AD2F29D0047F6F3 /* Date+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F17B6B2AD2F29D0047F6F3 /* Date+Utils.swift */; };
 		64F17B6E2AD318D70047F6F3 /* DateComponents+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F17B6D2AD318D70047F6F3 /* DateComponents+Utils.swift */; };
 		64F5C2C12C21E4D200406EFC /* CohouseClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F5C2C02C21E4D200406EFC /* CohouseClient.swift */; };
+		64F5C2C32C223BBC00406EFC /* PersistenceKey+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F5C2C22C223BBC00406EFC /* PersistenceKey+Utils.swift */; };
 		64F62A932B6EC2B000FE3B37 /* PostalAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F62A922B6EC2B000FE3B37 /* PostalAddress.swift */; };
 		64F62A952B6EC82C00FE3B37 /* NoCohousingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64F62A942B6EC82C00FE3B37 /* NoCohousingView.swift */; };
 		64FB41BC2AD407D600C93A34 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 64FB41BB2AD407D600C93A34 /* GoogleService-Info.plist */; };
@@ -103,7 +103,6 @@
 		64325B032AF7D9A100038EA5 /* AuthentificationClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AuthentificationClient.swift; sourceTree = "<group>"; };
 		643693632B67F06B00099D3B /* CohousingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CohousingView.swift; sourceTree = "<group>"; };
 		643E31AA2C0C81B1004E4CAE /* URL+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+Utils.swift"; sourceTree = "<group>"; };
-		643E31AC2C0D0EFF004E4CAE /* PersistenceKey+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = "PersistenceKey+Utils.swift"; path = "../../Documents/PersistenceKey+Utils.swift"; sourceTree = "<group>"; };
 		64549DB62BA1EF1A0025A9F2 /* SignupView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignupView.swift; sourceTree = "<group>"; };
 		64549DB82BA1EFF40025A9F2 /* SignupFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignupFeature.swift; sourceTree = "<group>"; };
 		646504262B67C22C00F67FD6 /* MyTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyTabView.swift; sourceTree = "<group>"; };
@@ -144,6 +143,7 @@
 		64F17B6B2AD2F29D0047F6F3 /* Date+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Utils.swift"; sourceTree = "<group>"; };
 		64F17B6D2AD318D70047F6F3 /* DateComponents+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "DateComponents+Utils.swift"; sourceTree = "<group>"; };
 		64F5C2C02C21E4D200406EFC /* CohouseClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CohouseClient.swift; sourceTree = "<group>"; };
+		64F5C2C22C223BBC00406EFC /* PersistenceKey+Utils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "PersistenceKey+Utils.swift"; sourceTree = "<group>"; };
 		64F62A922B6EC2B000FE3B37 /* PostalAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PostalAddress.swift; sourceTree = "<group>"; };
 		64F62A942B6EC82C00FE3B37 /* NoCohousingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoCohousingView.swift; sourceTree = "<group>"; };
 		64FB41BB2AD407D600C93A34 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -398,7 +398,7 @@
 				64F17B6D2AD318D70047F6F3 /* DateComponents+Utils.swift */,
 				647B1CBD2AD49B7800BD2B25 /* Global.swift */,
 				64E1C6F42C1225FA00F1276B /* Logger+Utils.swift */,
-				643E31AC2C0D0EFF004E4CAE /* PersistenceKey+Utils.swift */,
+				64F5C2C22C223BBC00406EFC /* PersistenceKey+Utils.swift */,
 				643E31AA2C0C81B1004E4CAE /* URL+Utils.swift */,
 				64D2E2522C1E572300C8D756 /* View+Utils.swift */,
 			);
@@ -645,7 +645,7 @@
 				642701AC2AE12F9300850684 /* (null) in Sources */,
 				64E1C6F52C1225FA00F1276B /* Logger+Utils.swift in Sources */,
 				6465042B2B67CE6600F67FD6 /* ChallengeView.swift in Sources */,
-				643E31AD2C0D0EFF004E4CAE /* PersistenceKey+Utils.swift in Sources */,
+				64F5C2C32C223BBC00406EFC /* PersistenceKey+Utils.swift in Sources */,
 				64F17B332AD2A3BC0047F6F3 /* colockitchenraceApp.swift in Sources */,
 				649C5D3C2C01063A00FA4ED5 /* PictureChallengeView.swift in Sources */,
 				64325AFC2AF69DDC00038EA5 /* SigninView.swift in Sources */,
