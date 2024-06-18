@@ -19,16 +19,14 @@ struct HomeFeature {
     @ObservableState
     struct State {
         var path = StackState<Path.State>()
-        var currentUser: User?
-        var cohousing: Cohouse?
+        @Shared(.cohouse) var cohouse
+        @Shared(.news) var news
     }
 
     enum Action {
-        case addCohousingButtonTapped
-        case cancelCohousingButtonTapped
         case logoutButtonTapped
         case path(StackActionOf<Path>)
-        case saveCohousingButtonTapped
+        case switchToCohouseButtonTapped
     }
 
     @Dependency(\.authentificationClient) var authentificationClient
@@ -36,16 +34,12 @@ struct HomeFeature {
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .addCohousingButtonTapped:
-                return .none
-            case .cancelCohousingButtonTapped:
-                return .none
             case .logoutButtonTapped:
                 self.authentificationClient.signOut()
                 return .none
             case .path:
                 return .none
-            case .saveCohousingButtonTapped:
+            case .switchToCohouseButtonTapped:
                 return .none
             }
         }
@@ -61,7 +55,12 @@ struct HomeView: View {
             NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
                 ScrollView {
                     VStack(spacing: 15) {
-                        CohouseTileView(name: store.cohousing?.name)
+                        Button {
+                            store.send(.switchToCohouseButtonTapped)
+                        } label: {
+                            CohouseTileView(name: store.cohouse?.name)
+                        }
+
                         CountdownTileView(nextKitchenRace: Date.from(year: 2024, month: 09, day: 06, hour: 18))
                     }
                 }

@@ -9,4 +9,6 @@ import Foundation
 
 extension URL {
     static let userInfo = Self.documentsDirectory.appending(component: "userInfo.json")
+    static let cohouse = Self.documentsDirectory.appending(component: "userCohouse.json")
+    static let news = Self.documentsDirectory.appending(component: "news.json")
 }

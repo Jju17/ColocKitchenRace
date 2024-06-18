@@ -54,9 +54,9 @@ struct CohousingFormView: View {
                 }
 
                 Section("Localisation") {
-                    TextField("Address", text: $store.cohousing.address.street)
-                    TextField("Postcode", text: $store.cohousing.address.postalCode)
-                    TextField("City", text: $store.cohousing.address.city)
+                    TextField(text: $store.cohousing.address.street) { Text("Address") }
+                    TextField(text: $store.cohousing.address.postalCode) { Text("Postcode") }
+                    TextField(text: $store.cohousing.address.city) { Text("City") }
                 }
 
                 Section("Membres") {
@@ -72,7 +72,6 @@ struct CohousingFormView: View {
                     }
                 }
 
-                // TODO: JR: TODO
                 Section {
                     Picker(selection: $store.cohousing.users, content: {
                         ForEach(store.cohousing.users) {

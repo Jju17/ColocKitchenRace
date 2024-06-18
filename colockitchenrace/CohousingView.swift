@@ -39,6 +39,13 @@ struct CohousingFeature {
     }
 
     var body: some ReducerOf<Self> {
+        Scope(state: \.cohousing, action: \.cohousing) {
+            CohousingDetailFeature()
+        }
+        Scope(state: \.noCohousing, action: \.noCohousing) {
+            NoCohouseFeature()
+        }
+
         Reduce { state, action in
             switch action {
             case .cohousing:
