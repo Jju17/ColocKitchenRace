@@ -14,14 +14,14 @@ struct TabFeature {
     struct State {
         var selectedTab: Tab = .home
         var challenge = ChallengeFeature.State()
-        var cohouse = CohousingFeature.State.noCohousing(NoCohouseFeature.State())
+        var cohouse = CohouseFeature.State()
         var home = HomeFeature.State()
     }
 
     enum Action {
         case tabChanged(Tab)
         case challenge(ChallengeFeature.Action)
-        case cohouse(CohousingFeature.Action)
+        case cohouse(CohouseFeature.Action)
         case home(HomeFeature.Action)
     }
 
@@ -30,7 +30,7 @@ struct TabFeature {
             ChallengeFeature()
         }
         Scope(state: \.cohouse, action: \.cohouse) {
-            CohousingFeature()
+            CohouseFeature()
         }
         Scope(state: \.home, action: \.home) {
             HomeFeature()
@@ -83,7 +83,7 @@ struct MyTabView: View {
                 }
                 .tag(Tab.challenges)
 
-                CohousingView(
+                CohouseView(
                     store: self.store.scope(
                         state: \.cohouse,
                         action: \.cohouse

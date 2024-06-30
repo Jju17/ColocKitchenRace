@@ -1,5 +1,5 @@
 //
-//  NoCohousingView.swift
+//  NoCohouseView.swift
 //  colockitchenrace
 //
 //  Created by Julien Rahier on 03/02/2024.
@@ -11,13 +11,13 @@ import SwiftUI
 @Reducer
 struct NoCohouseFeature {
 
-    @Reducer(state: .equatable)
+    @Reducer
     enum Destination {
-      case create(CohousingFormFeature)
+      case create(CohouseFormFeature)
     }
 
     @ObservableState
-    struct State: Equatable {
+    struct State {
         @Presents var destination: Destination.State?
         var cohouseCode: String = ""
     }
@@ -41,13 +41,13 @@ struct NoCohouseFeature {
             case .confirmCreateCohouseButtonTapped:
                 guard case let .some(.create(editState)) = state.destination
                 else { return .none }
-                var newCohouse = editState.cohousing
-                let _ = try? self.cohouseClient.add(newCohouse)
-                state.destination = nil
+//                var newCohouse = editState.wipCohouse
+//                let _ = try? self.cohouseClient.add(newCohouse)
+//                state.destination = nil
                 return .none
             case .createCohouseButtonTapped:
                 state.destination = .create(
-                    CohousingFormFeature.State(cohousing: Cohouse(id: .init()))
+                    CohouseFormFeature.State(wipCohouse: Cohouse(id: .init()))
                 )
                 return .none
             case .destination:
@@ -62,7 +62,7 @@ struct NoCohouseFeature {
 
 }
 
-struct NoCohousingView: View {
+struct NoCohouseView: View {
     @Perception.Bindable var store: StoreOf<NoCohouseFeature>
     @FocusState var codeIsFocused: Bool
 
@@ -94,7 +94,7 @@ struct NoCohousingView: View {
               item: $store.scope(state: \.destination?.create, action: \.destination.create)
             ) { createCohouseStore in
               NavigationStack {
-                CohousingFormView(store: createCohouseStore)
+                CohouseFormView(store: createCohouseStore)
                   .navigationTitle("New cohouse")
                   .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
@@ -116,7 +116,7 @@ struct NoCohousingView: View {
 
 #Preview {
     NavigationStack {
-        NoCohousingView(store: .init(initialState: NoCohouseFeature.State(), reducer: {
+        NoCohouseView(store: .init(initialState: NoCohouseFeature.State(), reducer: {
             NoCohouseFeature()
         }))
     }

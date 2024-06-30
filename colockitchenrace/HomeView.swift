@@ -29,13 +29,11 @@ struct HomeFeature {
         case switchToCohouseButtonTapped
     }
 
-    @Dependency(\.authentificationClient) var authentificationClient
-
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case .logoutButtonTapped:
-                self.authentificationClient.signOut()
+                state.cohouse = nil
                 return .none
             case .path:
                 return .none
