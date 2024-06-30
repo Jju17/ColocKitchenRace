@@ -1,5 +1,5 @@
 //
-//  CohousingFormView.swift
+//  CohouseFormView.swift
 //  colockitchenrace
 //
 //  Created by Julien Rahier on 09/10/2023.
@@ -9,11 +9,11 @@ import ComposableArchitecture
 import SwiftUI
 
 @Reducer
-struct CohousingFormFeature {
+struct CohouseFormFeature {
 
     @ObservableState
-    struct State: Equatable {
-        var cohousing: Cohouse
+    struct State {
+        var wipCohouse: Cohouse
     }
 
     enum Action: BindableAction, Equatable {
@@ -28,14 +28,14 @@ struct CohousingFormFeature {
         Reduce { state, action in
             switch action {
             case .addUserButtonTapped:
-                state.cohousing.users.append(User(id: UUID()))
+                state.wipCohouse.users.append(User(id: UUID()))
                 return .none
             case .binding(_):
                 return .none
             case let .deleteUsers(atOffset: indices):
-                state.cohousing.users.remove(atOffsets: indices)
-                if state.cohousing.users.isEmpty {
-                    state.cohousing.users.append(User(id: UUID()))
+                state.wipCohouse.users.remove(atOffsets: indices)
+                if state.wipCohouse.users.isEmpty {
+                    state.wipCohouse.users.append(User(id: UUID()))
                 }
                 return .none
             }
@@ -43,24 +43,24 @@ struct CohousingFormFeature {
     }
 }
 
-struct CohousingFormView: View {
-    @Perception.Bindable var store: StoreOf<CohousingFormFeature>
+struct CohouseFormView: View {
+    @Perception.Bindable var store: StoreOf<CohouseFormFeature>
 
     var body: some View {
         WithPerceptionTracking {
             Form {
                 Section {
-                    TextField("Cohousing name", text: $store.cohousing.name)
+                    TextField("Cohouse name", text: $store.wipCohouse.name)
                 }
 
                 Section("Localisation") {
-                    TextField(text: $store.cohousing.address.street) { Text("Address") }
-                    TextField(text: $store.cohousing.address.postalCode) { Text("Postcode") }
-                    TextField(text: $store.cohousing.address.city) { Text("City") }
+                    TextField(text: $store.wipCohouse.address.street) { Text("Address") }
+                    TextField(text: $store.wipCohouse.address.postalCode) { Text("Postcode") }
+                    TextField(text: $store.wipCohouse.address.city) { Text("City") }
                 }
 
                 Section("Membres") {
-                    ForEach($store.cohousing.users) { $user in
+                    ForEach($store.wipCohouse.users) { $user in
                         TextField("Name", text: $user.firstName)
                     }
                     .onDelete { indices in
@@ -73,8 +73,8 @@ struct CohousingFormView: View {
                 }
 
                 Section {
-                    Picker(selection: $store.cohousing.users, content: {
-                        ForEach(store.cohousing.users) {
+                    Picker(selection: $store.wipCohouse.users, content: {
+                        ForEach(store.wipCohouse.users) {
                             Text($0.firstName).tag($0.isContactUser)
                         }
                     }, label: {
@@ -87,8 +87,8 @@ struct CohousingFormView: View {
 }
 
 #Preview {
-    CohousingFormView(
-        store: Store(initialState: CohousingFormFeature.State(cohousing: .mock)) {
-            CohousingFormFeature()
+    CohouseFormView(
+        store: Store(initialState: CohouseFormFeature.State(wipCohouse: .mock)) {
+            CohouseFormFeature()
         })
 }

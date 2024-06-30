@@ -33,7 +33,9 @@ extension CohouseClient: DependencyKey {
             do {
                 let cohouse = try await Firestore.firestore().collection("cohouses").document(id).getDocument(as: Cohouse.self)
                 @Shared(.cohouse) var currentCohouse
-                currentCohouse = cohouse
+                await $currentCohouse.withLock { currentCohouse in
+                    currentCohouse = cohouse
+                }
                 return .success(cohouse)
             } catch {
                 return .failure(error)
@@ -43,7 +45,9 @@ extension CohouseClient: DependencyKey {
             do {
                 try Firestore.firestore().collection("cohouses").document(id).setData(from: newCohouse)
                 @Shared(.cohouse) var currentCohouse
-                currentCohouse = newCohouse
+                await $currentCohouse.withLock { currentCohouse in
+                    currentCohouse = newCohouse
+                }
                 return .success(true)
             } catch {
                 return .failure(error)
