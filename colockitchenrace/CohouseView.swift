@@ -58,10 +58,16 @@ struct CohouseView: View {
     var body: some View {
         WithPerceptionTracking {
             NavigationStack {
-                if let cohouse = store.state.cohouse {
-                    CohouseDetailView(store: .init(initialState: CohouseDetailFeature.State(cohouse: Shared(cohouse)), reducer: {
-                        CohouseDetailFeature()
-                    }))
+                if let cohouse = Shared(store.state.$cohouse) {
+                    CohouseDetailView(
+                        store: Store(
+                            initialState: CohouseDetailFeature.State(
+                                cohouse: cohouse
+                            )
+                        ) {
+                            CohouseDetailFeature()
+                        }
+                    )
                 } else {
                     NoCohouseView(
                         store: self.store.scope(
@@ -77,7 +83,7 @@ struct CohouseView: View {
 
 #Preview {
     CohouseView(
-        store: .init(
+        store: Store(
             initialState: CohouseFeature.State()
         ) {
             CohouseFeature()

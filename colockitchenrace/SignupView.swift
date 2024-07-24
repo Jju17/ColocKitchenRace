@@ -20,7 +20,6 @@ struct SignupView: View {
 
     var body: some View {
         WithPerceptionTracking {
-
             VStack(spacing: 10) {
                 Image("Logo")
                     .resizable()

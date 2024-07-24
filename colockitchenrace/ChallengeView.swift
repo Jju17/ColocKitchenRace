@@ -54,11 +54,7 @@ struct ChallengeView: View {
             NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
                 ScrollView(.horizontal, showsIndicators: false) {
                     HStack(spacing: 0) {
-                        Group {
-                            Color(.blue)
-                                .padding()
-                        }
-                        .frame(minWidth: UIScreen.main.bounds.width, maxHeight: .infinity)
+                        ChallengeTileView(challenge: Shared(.mock))
                         Group {
                             Color(.yellow)
                                 .padding()

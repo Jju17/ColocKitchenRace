@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import FirebaseAuth
 import SwiftUI
 
 @Reducer
@@ -20,20 +21,27 @@ struct HomeFeature {
     struct State {
         var path = StackState<Path.State>()
         @Shared(.cohouse) var cohouse
+        @Shared(.globalInfos) var globalInfos
         @Shared(.news) var news
+        @Shared(.userInfo) var userInfo
     }
 
     enum Action {
-        case logoutButtonTapped
+        case openRegisterLink
         case path(StackActionOf<Path>)
         case switchToCohouseButtonTapped
     }
 
+    @Dependency(\.ckrClient) var ckrClient
+
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .logoutButtonTapped:
-                state.cohouse = nil
+            case .openRegisterLink:
+                guard let cohouse = state.cohouse,
+                      let userInfo = state.userInfo
+                else { return .none}
+                self.ckrClient.register(cohouse: cohouse, userInfo: userInfo)
                 return .none
             case .path:
                 return .none
@@ -59,7 +67,12 @@ struct HomeView: View {
                             CohouseTileView(name: store.cohouse?.name)
                         }
 
-                        CountdownTileView(nextKitchenRace: Date.from(year: 2024, month: 09, day: 06, hour: 18))
+                        Button {
+                            self.store.send(.openRegisterLink)
+                        } label: {
+                            CountdownTileView(nextKitchenRace: self.store.globalInfos?.nextCKR)
+                        }
+                        NewsTileView(allNews: self.store.news)
                     }
                 }
                 .padding()
@@ -69,11 +82,6 @@ struct HomeView: View {
                         state: HomeFeature.Path.State.profile(UserProfileDetailFeature.State())
                     ) {
                         Image(systemName: "person.crop.circle.fill")
-                    }
-                    Button {
-                        self.store.send(.logoutButtonTapped)
-                    } label: {
-                        Image(systemName: "nosign.app.fill")
                     }
 
                 }

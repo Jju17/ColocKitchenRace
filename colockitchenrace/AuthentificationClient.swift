@@ -32,7 +32,7 @@ extension AuthentificationClient: DependencyKey {
 
                 try Firestore.firestore().collection("users").document(userId).setData(from: newUser)
                 @Shared(.userInfo) var user
-                user = newUser
+
                 return Result(.success(newUser))
             } catch {
                 Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
@@ -44,7 +44,9 @@ extension AuthentificationClient: DependencyKey {
                 let authDataResult = try await Auth.auth().signIn(withEmail: email, password: password)
                 let loggedUser = try await Firestore.firestore().collection("users").document(authDataResult.user.uid).getDocument(as: User.self)
                 @Shared(.userInfo) var user
-                user = loggedUser
+                await $user.withLock { user in
+                    user = loggedUser
+                }
                 return Result(.success(loggedUser))
             } catch {
                 return Result(.failure(error))
@@ -63,7 +65,9 @@ extension AuthentificationClient: DependencyKey {
             let docRef = firestore.collection("users").document(uid)
             try docRef.setData(from: newUser)
             @Shared(.userInfo) var user
-            user = newUser
+            await $user.withLock { user in
+                user = newUser
+            }
         },
         listenAuthState: {
             return AsyncStream { continuation in

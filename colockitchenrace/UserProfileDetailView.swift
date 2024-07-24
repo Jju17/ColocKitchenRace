@@ -52,12 +52,6 @@ struct UserProfileDetailView: View {
                     Text(store.userInfo?.formattedFoodIntolerenceList ?? "")
                 }
 
-                //                Section("CKR") {
-                //                    Toggle(isOn: $store.wipUser.isSubscribeToNews) {
-                //                        Text("Do you want to have news from CKR team ?")
-                //                    }
-                //                }
-
                 Section {
                     Button {
                         self.store.send(.signOutButtonTapped)

@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import FirebaseAuth
 import SwiftUI
 
 @Reducer
@@ -28,14 +29,14 @@ struct CohouseFormFeature {
         Reduce { state, action in
             switch action {
             case .addUserButtonTapped:
-                state.wipCohouse.users.append(User(id: UUID()))
+                state.wipCohouse.users.append(CohouseUser(id: UUID()))
                 return .none
             case .binding(_):
                 return .none
             case let .deleteUsers(atOffset: indices):
                 state.wipCohouse.users.remove(atOffsets: indices)
                 if state.wipCohouse.users.isEmpty {
-                    state.wipCohouse.users.append(User(id: UUID()))
+                    state.wipCohouse.users.append(CohouseUser(id: UUID()))
                 }
                 return .none
             }
@@ -61,7 +62,7 @@ struct CohouseFormView: View {
 
                 Section("Membres") {
                     ForEach($store.wipCohouse.users) { $user in
-                        TextField("Name", text: $user.firstName)
+                        TextField("Name", text: $user.surname)
                     }
                     .onDelete { indices in
                         store.send(.deleteUsers(atOffset: indices))
@@ -70,16 +71,6 @@ struct CohouseFormView: View {
                     Button("Add user") {
                         store.send(.addUserButtonTapped)
                     }
-                }
-
-                Section {
-                    Picker(selection: $store.wipCohouse.users, content: {
-                        ForEach(store.wipCohouse.users) {
-                            Text($0.firstName).tag($0.isContactUser)
-                        }
-                    }, label: {
-                        Text("Contact person")
-                    })
                 }
             }
         }

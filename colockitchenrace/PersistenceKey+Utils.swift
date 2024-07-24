@@ -20,8 +20,20 @@ extension PersistenceKey where Self == PersistenceKeyDefault<FileStorageKey<Coho
     }
 }
 
-extension PersistenceKey where Self == PersistenceKeyDefault<FileStorageKey<News?>> {
+extension PersistenceKey where Self == PersistenceKeyDefault<FileStorageKey<[News]>> {
     static var news: Self  {
-        PersistenceKeyDefault(.fileStorage(.news), nil)
+        PersistenceKeyDefault(.fileStorage(.news), [])
+    }
+}
+
+extension PersistenceKey where Self == PersistenceKeyDefault<FileStorageKey<[Challenge]>> {
+    static var challenges: Self  {
+        PersistenceKeyDefault(.fileStorage(.challenges), [])
+    }
+}
+
+extension PersistenceKey where Self == PersistenceKeyDefault<FileStorageKey<GlobalInfo?>> {
+    static var globalInfos: Self  {
+        PersistenceKeyDefault(.fileStorage(.globalInfos), nil)
     }
 }

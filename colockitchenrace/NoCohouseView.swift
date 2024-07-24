@@ -41,9 +41,9 @@ struct NoCohouseFeature {
             case .confirmCreateCohouseButtonTapped:
                 guard case let .some(.create(editState)) = state.destination
                 else { return .none }
-//                var newCohouse = editState.wipCohouse
-//                let _ = try? self.cohouseClient.add(newCohouse)
-//                state.destination = nil
+                let newCohouse = editState.wipCohouse
+                let _ = try? self.cohouseClient.add(newCohouse)
+                state.destination = nil
                 return .none
             case .createCohouseButtonTapped:
                 state.destination = .create(

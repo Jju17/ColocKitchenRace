@@ -19,7 +19,8 @@ struct CohouseTileView: View {
             Rectangle()
                 .foregroundColor(.clear)
                 .background(
-                    LinearGradient(gradient: Gradient(colors: [.clear, .black]), startPoint: .top, endPoint: .bottom))
+                    LinearGradient(gradient: Gradient(colors: [.clear, .black]), startPoint: .top, endPoint: .bottom)
+                )
             if let name = self.name {
                 Text(name)
                     .font(.system(size: 40))

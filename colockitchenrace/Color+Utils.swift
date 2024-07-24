@@ -13,3 +13,10 @@ extension Color {
     static let CKRPurple = Color("CKRPurple")
     static let CKRYellow = Color("CKRYellow")
 }
+
+extension Color {
+    static var CKRRandom: Color {
+        let colors = [CKRBlue, CKRGreen, CKRPurple, CKRYellow]
+        return colors.randomElement()!
+    }
+}

@@ -18,12 +18,17 @@ struct User: Equatable, Hashable, Identifiable, Codable {
     var email: String?
     var foodIntolerences: [String] = []
     var foodIntolerence: String = ""
+    var gender: String?
 }
 
 extension User {
     var formattedFoodIntolerenceList: String {
         guard !foodIntolerences.isEmpty else { return "No food intolerence" }
         return self.foodIntolerences.joined(separator: ", ")
+    }
+
+    var fullName: String {
+        return "\(self.firstName) \(self.lastName)"
     }
 }
 

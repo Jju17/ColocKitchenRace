@@ -16,12 +16,19 @@ struct CohouseClient {
     var set: @Sendable (_ id: String, _ newCohouse: Cohouse) async throws -> Result<Bool, Error>
 }
 
-
 extension CohouseClient: DependencyKey {
     static let liveValue = Self(
         add: { newCohouse in
             do {
-                try Firestore.firestore().collection("cohouses").document().setData(from: newCohouse)
+                let cohouseRef = Firestore.firestore().collection("cohouses").document()
+                try cohouseRef.setData(from: newCohouse.toFIRCohouse)
+
+                // Reference to the "users" collection within the new "cohouse" document
+                let usersCollectionRef = cohouseRef.collection("users")
+                for user in newCohouse.users {
+                    try usersCollectionRef.addDocument(from: user)
+                }
+
                 @Shared(.cohouse) var currentCohouse
                 currentCohouse = newCohouse
                 return .success(true)

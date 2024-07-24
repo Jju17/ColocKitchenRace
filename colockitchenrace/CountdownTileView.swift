@@ -15,21 +15,18 @@ struct CountdownTileView: View {
 
     // MARK: - Properties
 
-    let nextKitchenRace: Date
+    let nextKitchenRace: Date?
 
-// MARK: - Private properties
+    // MARK: - Private properties
 
     private var timer: Timer {
         Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
             self.nowDate = Date()
         }
     }
-    private var countDownComponents: DateComponents {
-        return Date.countdownDateComponents(from: self.nowDate, to: self.nextKitchenRace)
-    }
-
-    init(nextKitchenRace: Date) {
-        self.nextKitchenRace = nextKitchenRace
+    private var countDownComponents: DateComponents? {
+        guard let nextKitchenRace = self.nextKitchenRace else { return nil }
+        return Date.countdownDateComponents(from: self.nowDate, to: nextKitchenRace)
     }
 
     // MARK: - Body
@@ -47,38 +44,38 @@ struct CountdownTileView: View {
                             .fontWeight(.heavy)
                         Spacer()
                     }
-                    Text(self.nextKitchenRace.formatted(date: .long, time: .omitted))
+                    Text(self.nextKitchenRace?.formatted(date: .long, time: .omitted) ?? "No next date provided.")
                         .font(.system(size: 12))
                         .fontWeight(.light)
                         .textCase(.uppercase)
                 }
                 .frame(maxWidth: .infinity)
                 .foregroundStyle(.white)
-                
+
 
                 VStack {
                     HStack {
                         Text("Days")
                         Spacer()
-                        Text("\(self.countDownComponents.formattedDays)")
+                        Text("\(self.countDownComponents?.formattedDays ?? "00")")
                     }
                     Spacer(minLength: 2)
                     HStack {
                         Text("Hours")
                         Spacer()
-                        Text("\(self.countDownComponents.formattedHours)")
+                        Text("\(self.countDownComponents?.formattedHours ?? "00")")
                     }
                     Spacer(minLength: 2)
                     HStack {
                         Text("Minutes")
                         Spacer()
-                        Text("\(self.countDownComponents.formattedMinutes)")
+                        Text("\(self.countDownComponents?.formattedMinutes ?? "00")")
                     }
                     Spacer(minLength: 2)
                     HStack {
                         Text("Seconds")
                         Spacer()
-                        Text("\(self.countDownComponents.formattedSeconds)")
+                        Text("\(self.countDownComponents?.formattedSeconds ?? "00")")
                     }
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -96,5 +93,5 @@ struct CountdownTileView: View {
 }
 
 #Preview {
-    CountdownTileView(nextKitchenRace: Date.from(year: 2024, month: 03, day: 23, hour: 18))
+    CountdownTileView(nextKitchenRace: Date.from(year: 2024, month: 09, day: 23, hour: 18))
 }

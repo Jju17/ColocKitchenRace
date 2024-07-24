@@ -12,8 +12,12 @@ import SwiftUI
 @main
 struct colockitchenraceApp: App {
 
+    @Dependency(\.globalInfoClient) var globalInfoClient
+    @Dependency(\.newsClient) var newsClient
+
     init() {
         FirebaseApp.configure()
+        self.performTasks()
     }
 
     var body: some Scene {
@@ -27,6 +31,15 @@ struct colockitchenraceApp: App {
                 }
             )
             .preferredColorScheme(.light)
+        }
+    }
+
+    private func performTasks() {
+        Task {
+            let _ = try? await self.globalInfoClient.getLast()
+        }
+        Task {
+            let _ = try? await self.newsClient.getLast()
         }
     }
 }
