@@ -14,6 +14,7 @@ struct ChallengeFeature {
     @ObservableState
     struct State {
         var path = StackState<Path.State>()
+        var challenges: [Challenge]
     }
 
     enum Action {
@@ -52,25 +53,19 @@ struct ChallengeView: View {
     var body: some View {
         WithPerceptionTracking {
             NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
-                ScrollView(.horizontal, showsIndicators: false) {
-                    HStack(spacing: 0) {
-                        ChallengeTileView(challenge: Shared(.mock))
-                        Group {
-                            Color(.yellow)
-                                .padding()
+                VStack {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 0) {
+                            ForEach(self.store.challenges) { challenge in
+                                ChallengeTileView(challenge: challenge)
+                            }
                         }
-                        .frame(minWidth: UIScreen.main.bounds.width, maxHeight: .infinity)
-                        Group {
-                            Color(.red)
-                                .padding()
-                        }
-                        .frame(minWidth: UIScreen.main.bounds.width, maxHeight: .infinity)
                     }
+                    .onAppear {
+                        UIScrollView.appearance().isPagingEnabled = true
+                    }
+                    .navigationTitle("Challenges")
                 }
-                .onAppear {
-                    UIScrollView.appearance().isPagingEnabled = true
-                }
-                .navigationTitle("Challenges")
             } destination: { store in
                 switch store.state {
                 case .profile:
@@ -84,7 +79,7 @@ struct ChallengeView: View {
 }
 
 #Preview {
-    ChallengeView(store: .init(initialState: ChallengeFeature.State()) {
+    ChallengeView(store: .init(initialState: ChallengeFeature.State(challenges: Challenge.mockList)) {
         ChallengeFeature()
     })
 }

@@ -10,7 +10,7 @@ import SwiftUI
 
 struct NewsTileView: View {
 
-    var allNews: [News]
+    @Shared var allNews: [News]
 
     // MARK: - Body
 
@@ -47,5 +47,5 @@ struct NewsTileView: View {
     }
 }
 #Preview {
-    NewsTileView(allNews: News.mockList)
+    NewsTileView(allNews: Shared(News.mockList))
 }

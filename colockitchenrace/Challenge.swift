@@ -8,7 +8,7 @@
 import Foundation
 import FirebaseFirestore
 
-struct Challenge: Equatable, Hashable, Codable {
+struct Challenge: Equatable, Hashable, Codable, Identifiable {
     let id: UUID
     let title: String
     let startTimestamp: Timestamp

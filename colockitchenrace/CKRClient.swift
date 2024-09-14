@@ -46,10 +46,6 @@ extension CKRClient: DependencyKey {
             URLOpener.open(urlString: url)
         }
     )
-
-    static var previewValue: CKRClient {
-        return .testValue
-    }
 }
 
 extension DependencyValues {

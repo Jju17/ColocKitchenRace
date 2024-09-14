@@ -19,6 +19,7 @@ struct CohouseDetailFeature {
     @ObservableState
     struct State {
         @Shared var cohouse: Cohouse
+        @Shared(.userInfo) var userInfo
         @Presents var destination: Destination.State?
     }
 
@@ -45,7 +46,7 @@ struct CohouseDetailFeature {
                 return .none
             case .editButtonTapped:
                 state.destination = .edit(
-                    CohouseFormFeature.State(wipCohouse: state.cohouse)
+                    CohouseFormFeature.State(wipCohouse: state.cohouse, isEditing: true)
                 )
                 return .none
             }
@@ -70,7 +71,7 @@ struct CohouseDetailView: View {
 
                 Section("") {
                     HStack {
-                        Text("Code : \(store.cohouse.joinCohouseId)")
+                        Text("Code : \(store.cohouse.code)")
                             .foregroundStyle(.white)
                         Spacer()
                         Button {
@@ -92,7 +93,19 @@ struct CohouseDetailView: View {
 
                 Section("MEMBERS") {
                     ForEach(store.cohouse.users) { user in
-                        Text(user.surname)
+                        HStack(alignment: .center) {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(user.surname)
+                                Text("Admin")
+                                    .foregroundStyle(.gray)
+                                    .font(.footnote)
+                            }
+                            Spacer()
+                            if user.userId == self.store.userInfo?.id.uuidString {
+                                Text("Me")
+                                    .foregroundStyle(.gray)
+                            }
+                        }
                     }
                 }
             }
@@ -107,7 +120,7 @@ struct CohouseDetailView: View {
             ) { editCohouseStore in
                 NavigationStack {
                     CohouseFormView(store: editCohouseStore)
-                        .navigationTitle("New cohouse")
+                        .navigationTitle("Edit cohouse")
                         .toolbar {
                             ToolbarItem(placement: .cancellationAction) {
                                 Button("Dismiss") {

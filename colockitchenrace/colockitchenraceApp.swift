@@ -37,8 +37,6 @@ struct colockitchenraceApp: App {
     private func performTasks() {
         Task {
             let _ = try? await self.globalInfoClient.getLast()
-        }
-        Task {
             let _ = try? await self.newsClient.getLast()
         }
     }

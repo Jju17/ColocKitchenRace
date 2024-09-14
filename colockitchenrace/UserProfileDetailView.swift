@@ -26,7 +26,10 @@ struct UserProfileDetailFeature {
             switch action {
             case .signOutButtonTapped:
                 return .run { _ in
-                    self.authentificationClient.signOut()
+                    do {
+                        try await self.authentificationClient.signOut()
+                    }
+                    catch { print("already logged out") }
                 }
             }
         }

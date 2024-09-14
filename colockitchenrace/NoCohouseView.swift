@@ -13,7 +13,8 @@ struct NoCohouseFeature {
 
     @Reducer
     enum Destination {
-      case create(CohouseFormFeature)
+        case create(CohouseFormFeature)
+        case setCohouseUser(CohouseSelectUserFeature)
     }
 
     @ObservableState
@@ -25,9 +26,12 @@ struct NoCohouseFeature {
     enum Action: BindableAction {
         case binding(BindingAction<State>)
         case confirmCreateCohouseButtonTapped
+        case confirmJoinCohouseButtonTapped
         case createCohouseButtonTapped
         case destination(PresentationAction<Destination.Action>)
-        case dismissCreateCohouseButtonTapped
+        case dismissDestinationButtonTapped
+        case findExistingCohouseButtonTapped
+        case setUserToCohouseFound(Cohouse)
     }
 
     @Dependency(\.cohouseClient) var cohouseClient
@@ -41,19 +45,56 @@ struct NoCohouseFeature {
             case .confirmCreateCohouseButtonTapped:
                 guard case let .some(.create(editState)) = state.destination
                 else { return .none }
+
                 let newCohouse = editState.wipCohouse
-                let _ = try? self.cohouseClient.add(newCohouse)
                 state.destination = nil
-                return .none
+
+                return .run { _ in
+                    let _ = try? await self.cohouseClient.add(newCohouse)
+                }
+            case .confirmJoinCohouseButtonTapped:
+                @Shared(.cohouse) var cohouse
+
+                guard case let .some(.setCohouseUser(selectState)) = state.destination
+                else { return .none }
+
+                let selectedCohouse = selectState.cohouse
+                let selectedUser = selectState.selectedUser
+
+                cohouse = selectedCohouse
+                state.destination = nil
+
+                return .run { [selectedUser = selectedUser, cohouseId = selectedCohouse.id.uuidString] _ in
+                    try await self.cohouseClient.setUser(selectedUser, cohouseId)
+                }
             case .createCohouseButtonTapped:
+                let uuid = UUID()
+                guard let code = uuid.uuidString.components(separatedBy: "-").first else { return .none }
                 state.destination = .create(
-                    CohouseFormFeature.State(wipCohouse: Cohouse(id: .init()))
+                    CohouseFormFeature.State(wipCohouse: Cohouse(id: uuid, code: code))
                 )
                 return .none
             case .destination:
               return .none
-            case .dismissCreateCohouseButtonTapped:
+            case .dismissDestinationButtonTapped:
                 state.destination = nil
+                return .none
+            case .findExistingCohouseButtonTapped:
+                return .run { [cohouseCode = state.cohouseCode] send in
+                    guard let cohouseResult = try? await self.cohouseClient.getByCode(cohouseCode) else { return }
+
+                    switch cohouseResult {
+                    case let .success(cohouse):
+                        await send(.setUserToCohouseFound(cohouse))
+                    case let .failure(error):
+                        print(error.localizedDescription)
+                    }
+                }
+            case let .setUserToCohouseFound(cohouse):
+                guard let firstUser = cohouse.users.first else { return .none }
+                state.destination = .setCohouseUser(
+                    CohouseSelectUserFeature.State(cohouse: cohouse, selectedUser: firstUser)
+                )
                 return .none
             }
         }
@@ -77,7 +118,9 @@ struct NoCohouseView: View {
                         }
                         .focused($codeIsFocused)
                     }
-                    Button("Join existing cohouse") {}
+                    Button("Join existing cohouse") {
+                        self.store.send(.findExistingCohouseButtonTapped)
+                    }
                 }
 
                 Section {
@@ -99,12 +142,32 @@ struct NoCohouseView: View {
                   .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
                       Button("Dismiss") {
-                        store.send(.dismissCreateCohouseButtonTapped)
+                        store.send(.dismissDestinationButtonTapped)
                       }
                     }
                     ToolbarItem(placement: .confirmationAction) {
                       Button("Create") {
                           store.send(.confirmCreateCohouseButtonTapped)
+                      }
+                    }
+                  }
+              }
+            }
+            .sheet(
+              item: $store.scope(state: \.destination?.setCohouseUser, action: \.destination.setCohouseUser)
+            ) { setCohouseUserStore in
+              NavigationStack {
+                CohouseSelectUserView(store: setCohouseUserStore)
+                  .navigationTitle("Select user")
+                  .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                      Button("Dismiss") {
+                        store.send(.dismissDestinationButtonTapped)
+                      }
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                      Button("Select") {
+                          store.send(.confirmJoinCohouseButtonTapped)
                       }
                     }
                   }

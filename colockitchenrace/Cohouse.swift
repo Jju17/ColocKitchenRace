@@ -5,21 +5,18 @@
 //  Created by Julien Rahier on 08/10/2023.
 //
 
+import ComposableArchitecture
 import Foundation
 
 struct Cohouse: Equatable, Hashable, Codable {
     var id: UUID
     var name: String = ""
     var address: PostalAddress = PostalAddress()
-    var users: [CohouseUser] = []
+    var code: String
+    var users: IdentifiedArrayOf<CohouseUser> = [CohouseUser.mock]
 }
 
 extension Cohouse {
-    var joinCohouseId: String {
-        let id = self.id.uuidString.split(separator: "-").first!
-        return String(id)
-    }
-
     var totalUsers: Int {
         self.users.count
     }
@@ -28,7 +25,8 @@ extension Cohouse {
         FirestoreCohouse(
             id: self.id,
             name: self.name,
-            address: self.address
+            address: self.address,
+            code: self.code
         )
     }
 
@@ -40,8 +38,11 @@ extension Cohouse {
 
 extension Cohouse {
     static var mock: Cohouse {
-        return Cohouse(id: UUID(),
-                       name: "Zone 88",
-                       address: .mock)
+        return Cohouse(
+            id: UUID(),
+            name: "Zone 88",
+            address: .mock,
+            code: "1234"
+        )
     }
 }

@@ -24,6 +24,7 @@ extension GlobalInfoClient: DependencyKey {
         getLast: {
             do {
                 @Shared(.globalInfos) var globalInfos
+                
                 let querySnapshot = try await Firestore.firestore().collection("general")
                     .order(by: "publishedTimestamp", descending: true)
                     .limit(to: 1)
@@ -44,10 +45,6 @@ extension GlobalInfoClient: DependencyKey {
             }
         }
     )
-
-    static var previewValue: GlobalInfoClient {
-        return .testValue
-    }
 }
 
 extension DependencyValues {

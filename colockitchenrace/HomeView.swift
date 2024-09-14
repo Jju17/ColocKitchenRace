@@ -72,7 +72,7 @@ struct HomeView: View {
                         } label: {
                             CountdownTileView(nextKitchenRace: self.store.globalInfos?.nextCKR)
                         }
-                        NewsTileView(allNews: self.store.news)
+                        NewsTileView(allNews: self.store.$news)
                     }
                 }
                 .padding()

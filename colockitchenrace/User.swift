@@ -9,7 +9,7 @@ import Foundation
 
 struct User: Equatable, Hashable, Identifiable, Codable {
     var id: UUID
-    var uid: String = ""
+    var authId: String = ""
     var isContactUser: Bool = false
     var isSubscribeToNews: Bool = false
     var firstName: String = ""

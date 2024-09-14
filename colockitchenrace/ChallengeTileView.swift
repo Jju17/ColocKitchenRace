@@ -9,7 +9,7 @@ import SwiftUI
 import ComposableArchitecture
 
 struct ChallengeTileView: View {
-    @Shared var challenge: Challenge
+    var challenge: Challenge
 
     var body: some View {
         ZStack {
@@ -29,7 +29,7 @@ struct ChallengeTileView: View {
         }
         .cornerRadius(20)
         .padding()
-        .frame(minWidth: UIScreen.main.bounds.width, maxHeight: .infinity)
+        .frame(width: UIScreen.main.bounds.width)
     }
 }
 
@@ -50,7 +50,6 @@ struct HeaderView: View {
                 }
             }
             .padding(.bottom)
-            .background(Color.green)
             VStack(alignment: .center, spacing: 20){
                 Text(self.title)
                     .frame(maxWidth: .infinity)
@@ -66,7 +65,6 @@ struct HeaderView: View {
                     }
                 }
             }
-            .background(Color.red)
         }
     }
 }
@@ -77,20 +75,11 @@ struct BodyView: View {
     var body: some View {
         Text(self.description)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            .background(Color.green)
-    }
-}
-
-struct FooterView: View {
-    var body: some View {
-        Text("Footer")
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Color.yellow)
     }
 }
 
 #Preview {
-    ChallengeTileView(challenge: Shared(.mock))
+    ChallengeTileView(challenge: .mock)
 }
 
 @ViewBuilder

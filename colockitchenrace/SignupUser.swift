@@ -16,9 +16,9 @@ struct SignupUser: Codable, Equatable {
 }
 
 extension SignupUser {
-    func createUser(uid: String) -> User {
+    func createUser(authId: String) -> User {
         User(id: UUID(),
-             uid: uid,
+             authId: authId,
              isContactUser: false,
              isSubscribeToNews: false,
              firstName: self.firstName,

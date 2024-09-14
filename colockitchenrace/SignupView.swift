@@ -21,7 +21,7 @@ struct SignupView: View {
     var body: some View {
         WithPerceptionTracking {
             VStack(spacing: 10) {
-                Image("Logo")
+                Image("logo")
                     .resizable()
                     .frame(width: 150, height: 150, alignment: .center)
 

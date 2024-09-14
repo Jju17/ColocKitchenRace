@@ -24,6 +24,7 @@ extension NewsClient: DependencyKey {
         getLast: {
             do {
                 @Shared(.news) var news
+                
                 let querySnapshot = try await Firestore.firestore().collection("news")
                     .order(by: "publicationTimestamp", descending: true)
                     .limit(to: 10)

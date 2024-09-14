@@ -15,13 +15,17 @@ struct CohouseFormFeature {
     @ObservableState
     struct State {
         var wipCohouse: Cohouse
+        var isEditing: Bool = false
     }
 
     enum Action: BindableAction, Equatable {
         case addUserButtonTapped
         case binding(BindingAction<State>)
         case deleteUsers(atOffset: IndexSet)
+        case quitCohouse
     }
+
+    @Dependency(\.cohouseClient) var cohouseClient
 
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -39,6 +43,10 @@ struct CohouseFormFeature {
                     state.wipCohouse.users.append(CohouseUser(id: UUID()))
                 }
                 return .none
+            case .quitCohouse:
+                return .run { _ in
+                    await self.cohouseClient.quitCohouse()
+                }
             }
         }
     }
@@ -72,6 +80,15 @@ struct CohouseFormView: View {
                         store.send(.addUserButtonTapped)
                     }
                 }
+
+                if store.isEditing {
+                    Section {
+                        Button("Quit cohouse") {
+                            store.send(.quitCohouse)
+                        }
+                        .foregroundStyle(.red)
+                    }
+                }
             }
         }
     }
@@ -79,7 +96,7 @@ struct CohouseFormView: View {
 
 #Preview {
     CohouseFormView(
-        store: Store(initialState: CohouseFormFeature.State(wipCohouse: .mock)) {
+        store: Store(initialState: CohouseFormFeature.State(wipCohouse: .mock, isEditing: true)) {
             CohouseFormFeature()
         })
 }
