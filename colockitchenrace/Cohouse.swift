@@ -13,7 +13,7 @@ struct Cohouse: Equatable, Hashable, Codable {
     var name: String = ""
     var address: PostalAddress = PostalAddress()
     var code: String
-    var users: IdentifiedArrayOf<CohouseUser> = [CohouseUser.mock]
+    var users: IdentifiedArrayOf<CohouseUser> = []
 }
 
 extension Cohouse {

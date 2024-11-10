@@ -61,14 +61,11 @@ struct UserProfileFormView: View {
                 }
 
                 // TODO: JR: This would be an array of Objects
-                Section("Food related") {
-                    TextField("Food intolerances", text: $store.wipUser.foodIntolerence)
-                }
+//                Section("Food related") {
+//                    TextField("Food intolerances", text: $store.wipUser.foodIntolerences)
+//                }
 
                 Section("CKR") {
-                    Toggle(isOn: $store.wipUser.isContactUser) {
-                        Text("Are you the contact person ?")
-                    }
                     Toggle(isOn: $store.wipUser.isSubscribeToNews) {
                         Text("Do you want to have news from CKR team ?")
                     }

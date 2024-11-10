@@ -19,6 +19,7 @@ struct NoCohouseFeature {
 
     @ObservableState
     struct State {
+        @Shared(.userInfo) var userInfo
         @Presents var destination: Destination.State?
         var cohouseCode: String = ""
     }
@@ -38,15 +39,23 @@ struct NoCohouseFeature {
 
     var body: some ReducerOf<Self> {
         BindingReducer()
-        Reduce { state, action in
+        Reduce {
+            state,
+            action in
             switch action {
             case .binding:
                 return .none
             case .confirmCreateCohouseButtonTapped:
-                guard case let .some(.create(editState)) = state.destination
+                guard case let .some(.create(cohouseFormFeature)) = state.destination
                 else { return .none }
 
-                let newCohouse = editState.wipCohouse
+                let newCohouse = cohouseFormFeature.wipCohouse
+
+                guard newCohouse.totalUsers > 0,
+                      newCohouse.users.allSatisfy({ $0.surname != "" }),
+                      newCohouse.users.first(where: { $0.isAdmin }) != nil
+                else { return .none }
+
                 state.destination = nil
 
                 return .run { _ in
@@ -68,10 +77,15 @@ struct NoCohouseFeature {
                     try await self.cohouseClient.setUser(selectedUser, cohouseId)
                 }
             case .createCohouseButtonTapped:
+                guard let userInfo = state.userInfo else { return .none }
                 let uuid = UUID()
                 guard let code = uuid.uuidString.components(separatedBy: "-").first else { return .none }
+                let owner = userInfo.toCohouseUser(isAdmin: true)
                 state.destination = .create(
-                    CohouseFormFeature.State(wipCohouse: Cohouse(id: uuid, code: code))
+                    CohouseFormFeature.State(
+                        wipCohouse: Cohouse(id: uuid, code: code, users: [owner]),
+                        isNewCohouse: true
+                    )
                 )
                 return .none
             case .destination:

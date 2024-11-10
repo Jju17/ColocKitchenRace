@@ -6,16 +6,27 @@
 //
 
 import ComposableArchitecture
+import os
 import SwiftUI
 
 @Reducer
 struct UserProfileDetailFeature {
 
+    @Reducer
+    enum Destination {
+        case editUser(UserProfileFormFeature)
+    }
+
     @ObservableState
-    struct State: Equatable {
+    struct State {
+        @Presents var destination: Destination.State?
         @Shared(.userInfo) var userInfo
     }
-    enum Action: Equatable {
+    enum Action {
+        case confirmEditUserButtonTapped
+        case destination(PresentationAction<Destination.Action>)
+        case dismissDestinationButtonTapped
+        case editUserButtonTapped
         case signOutButtonTapped
     }
 
@@ -24,15 +35,34 @@ struct UserProfileDetailFeature {
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
+            case .confirmEditUserButtonTapped:
+                guard case let .some(.editUser(editState)) = state.destination
+                else { return .none }
+                state.destination = nil
+                return .run { _ in
+                    try await authentificationClient.updateUser(editState.wipUser)
+                }
+            case .destination:
+                return .none
+            case .dismissDestinationButtonTapped:
+                state.destination = nil
+                return .none
+            case .editUserButtonTapped:
+                state.destination = .editUser(
+                    UserProfileFormFeature.State()
+                )
+                return .none
             case .signOutButtonTapped:
                 return .run { _ in
                     do {
                         try await self.authentificationClient.signOut()
+                    } catch {
+                        Logger.authLog.log(level: .fault, "Already logged out")
                     }
-                    catch { print("already logged out") }
                 }
             }
         }
+        .ifLet(\.$destination, action: \.destination)
     }
 }
 
@@ -52,7 +82,13 @@ struct UserProfileDetailView: View {
                 }
 
                 Section("Food related") {
-                    Text(store.userInfo?.formattedFoodIntolerenceList ?? "")
+                    if let foodIntolerences = store.userInfo?.foodIntolerences, !foodIntolerences.isEmpty {
+                        ForEach(foodIntolerences, id: \.self) { foodIntolerance in
+                            Text(foodIntolerance.rawValue)
+                        }
+                    } else {
+                        Text("No food intolerences")
+                    }
                 }
 
                 Section {
@@ -66,6 +102,31 @@ struct UserProfileDetailView: View {
                 }
             }
             .navigationBarTitle("Profile")
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Edit") {
+                        store.send(.editUserButtonTapped)
+                    }
+                }
+            }
+        }
+        .sheet(item: $store.scope(state: \.destination?.editUser, action: \.destination.editUser)) { editUserStore in
+            NavigationStack {
+                UserProfileFormView(store: editUserStore)
+                .navigationTitle("Edit profile")
+                .toolbar {
+                  ToolbarItem(placement: .cancellationAction) {
+                    Button("Dismiss") {
+                      store.send(.dismissDestinationButtonTapped)
+                    }
+                  }
+                  ToolbarItem(placement: .confirmationAction) {
+                    Button("Confirm") {
+                        store.send(.confirmEditUserButtonTapped)
+                    }
+                  }
+                }
+            }
         }
     }
 }

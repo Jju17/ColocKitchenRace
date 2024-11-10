@@ -19,14 +19,12 @@ extension SignupUser {
     func createUser(authId: String) -> User {
         User(id: UUID(),
              authId: authId,
-             isContactUser: false,
              isSubscribeToNews: false,
              firstName: self.firstName,
              lastName: self.lastName,
              phoneNumber: nil,
              email: self.email,
-             foodIntolerences: [],
-             foodIntolerence: ""
+             foodIntolerences: []
         )
     }
 }

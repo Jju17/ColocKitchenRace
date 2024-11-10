@@ -35,7 +35,7 @@ extension NewsClient: DependencyKey {
                     try? document.data(as: News.self)
                 }
 
-                await $news.withLock { $0 = lastNews }
+                $news.withLock { $0 = lastNews }
                 return .success(lastNews)
             } catch {
                 return .failure(.firebaseError(error.localizedDescription))

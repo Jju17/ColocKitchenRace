@@ -46,7 +46,7 @@ struct CohouseDetailFeature {
                 return .none
             case .editButtonTapped:
                 state.destination = .edit(
-                    CohouseFormFeature.State(wipCohouse: state.cohouse, isEditing: true)
+                    CohouseFormFeature.State(wipCohouse: state.cohouse)
                 )
                 return .none
             }

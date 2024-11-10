@@ -15,7 +15,7 @@ struct CohouseFormFeature {
     @ObservableState
     struct State {
         var wipCohouse: Cohouse
-        var isEditing: Bool = false
+        var isNewCohouse: Bool = false
     }
 
     enum Action: BindableAction, Equatable {
@@ -40,7 +40,7 @@ struct CohouseFormFeature {
             case let .deleteUsers(atOffset: indices):
                 state.wipCohouse.users.remove(atOffsets: indices)
                 if state.wipCohouse.users.isEmpty {
-                    state.wipCohouse.users.append(CohouseUser(id: UUID()))
+                    state.wipCohouse.users.append(CohouseUser(id: UUID(), isAdmin: true))
                 }
                 return .none
             case .quitCohouse:
@@ -81,7 +81,7 @@ struct CohouseFormView: View {
                     }
                 }
 
-                if store.isEditing {
+                if !store.isNewCohouse {
                     Section {
                         Button("Quit cohouse") {
                             store.send(.quitCohouse)
@@ -96,7 +96,7 @@ struct CohouseFormView: View {
 
 #Preview {
     CohouseFormView(
-        store: Store(initialState: CohouseFormFeature.State(wipCohouse: .mock, isEditing: true)) {
+        store: Store(initialState: CohouseFormFeature.State(wipCohouse: .mock, isNewCohouse: true)) {
             CohouseFormFeature()
         })
 }

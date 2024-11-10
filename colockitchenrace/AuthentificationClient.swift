@@ -23,7 +23,7 @@ struct AuthentificationClient {
     var signIn: @Sendable (_ email: String, _ password: String) async throws -> Result<User, AuthError>
     var signOut: () async throws -> Void
     var deleteAccount: () -> Void
-    var setUser: (_ user: User, _ uid: String) async throws -> Void
+    var updateUser: (_ user: User) async throws -> Void
     var listenAuthState: @Sendable () throws -> AsyncStream<FirebaseAuth.User?>
 }
 
@@ -39,7 +39,7 @@ extension AuthentificationClient: DependencyKey {
 
                 try Firestore.firestore().collection("users").document(newUser.id.uuidString).setData(from: newUser)
 
-                await $userInfo.withLock { $0 = newUser }
+                $userInfo.withLock { $0 = newUser }
                 return Result(.success(newUser))
             } catch {
                 Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
@@ -59,7 +59,7 @@ extension AuthentificationClient: DependencyKey {
                 guard let loggedUser = try querySnapshot.documents.first?.data(as: User.self)
                 else { return .failure(.failed)}
 
-                await $userInfo.withLock { $0 = loggedUser }
+                $userInfo.withLock { $0 = loggedUser }
                 return .success(loggedUser)
             } catch {
                 Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
@@ -74,21 +74,19 @@ extension AuthentificationClient: DependencyKey {
             @Shared(.news) var news
             @Shared(.challenges) var challenges
 
-            await $user.withLock { $0 = nil }
-            await $cohouse.withLock { $0 = nil }
-            await $globalInfos.withLock { $0 = nil }
-            await $news.withLock { $0 = [] }
-            await $challenges.withLock { $0 = [] }
+            $user.withLock { $0 = nil }
+            $cohouse.withLock { $0 = nil }
+            $globalInfos.withLock { $0 = nil }
+            $news.withLock { $0 = [] }
+            $challenges.withLock { $0 = [] }
         },
         deleteAccount: {},
-        setUser: { newUser, uid in
+        updateUser: { updatedUser in
             let firestore = Firestore.firestore()
-            let docRef = firestore.collection("users").document(uid)
-            try docRef.setData(from: newUser)
+            let docRef = firestore.collection("users").document(updatedUser.id.uuidString)
+            try docRef.setData(from: updatedUser)
             @Shared(.userInfo) var user
-            await $user.withLock { user in
-                user = newUser
-            }
+            $user.withLock { $0 = updatedUser }
         },
         listenAuthState: {
             return AsyncStream { continuation in

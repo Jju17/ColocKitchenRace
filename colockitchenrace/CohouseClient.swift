@@ -39,7 +39,7 @@ extension CohouseClient: DependencyKey {
                     try usersCollectionRef.document(user.id.uuidString).setData(from: user)
                 }
 
-                await $currentCohouse.withLock { $0 = newCohouse }
+                $currentCohouse.withLock { $0 = newCohouse }
                 return .success(true)
             } catch {
                 return .failure(error)
@@ -60,7 +60,7 @@ extension CohouseClient: DependencyKey {
                 }
 
                 let cohouse = firCohouse.toCohouseObject(with: cohouseUsers)
-                await $currentCohouse.withLock { $0 = cohouse }
+                $currentCohouse.withLock { $0 = cohouse }
                 return .success(cohouse)
             } catch {
                 return .failure(error)
@@ -106,7 +106,7 @@ extension CohouseClient: DependencyKey {
                     try usersCollectionRef.addDocument(from: user)
                 }
 
-                await $currentCohouse.withLock { $0 = newCohouse }
+                $currentCohouse.withLock { $0 = newCohouse }
                 return .success(true)
             } catch {
                 return .failure(error)
@@ -123,7 +123,7 @@ extension CohouseClient: DependencyKey {
 
             // Set personnal ID to selected user in cohouse
             try await usersCollectionRef.document(user.id.uuidString).updateData(["userId": userInfo.id.uuidString])
-            await $cohouse.withLock { cohouse in
+            $cohouse.withLock { cohouse in
                 guard let userId = cohouse?.users.index(id: user.id) else { return }
                 cohouse?.users[userId].userId = userInfo.id.uuidString
             }
@@ -131,7 +131,7 @@ extension CohouseClient: DependencyKey {
         quitCohouse: {
             @Shared(.cohouse) var cohouse
 
-            await $cohouse.withLock { $0 = nil }
+            $cohouse.withLock { $0 = nil }
             // TODO: In the near future, we'll also need to remove user from cohouse associated to it.
         }
     )
