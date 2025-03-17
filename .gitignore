@@ -1,0 +1,10 @@
+# macOS generated files
+.DS_Store
+
+# Firebase Configuration (Sensitive Data)
+/GoogleService-Info.plist
+
+# Xcode-specific files
+build/
+DerivedData/
+*.xcuserstate
