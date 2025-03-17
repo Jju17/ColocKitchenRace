@@ -8,63 +8,45 @@
 import SwiftUI
 
 struct MultipleChoiceView: View {
-    var choices: MultipleChoiceChallenge
+    var choices: [String]
+    var onChoiceSelected: (String) -> Void
+
+    private let columns = [
+        GridItem(.flexible()),
+        GridItem(.flexible())
+    ]
 
     var body: some View {
-        VStack(alignment: .center, spacing: 15) {
-            HStack(alignment: .center, spacing: 15) {
-                Button {
-
-                } label: {
-                    ZStack {
-                        Color.white
-                            .cornerRadius(.defaultRadius)
-                        Text(self.choices.choice1)
-                    }
-                }
-                Button {
-
-                } label: {
-                    ZStack {
-                        Color.white
-                            .cornerRadius(.defaultRadius)
-                        Text(self.choices.choice2)
-                    }
+        LazyVGrid(columns: columns, spacing: 15) {
+            ForEach(choices, id: \.self) { choice in
+                Button(action: {
+                    onChoiceSelected(choice)
+                }) {
+                    Text(choice)
+                        .frame(maxWidth: .infinity)
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(8)
+                        .foregroundColor(.black)
                 }
             }
-            HStack(alignment: .center, spacing: 15) {
-                Button {
-
-                } label: {
-                    ZStack {
-                        Color.white
-                            .cornerRadius(.defaultRadius)
-                        Text(self.choices.choice3)
-                    }
-                }
-                Button {
-
-                } label: {
-                    ZStack {
-                        Color.white
-                            .cornerRadius(.defaultRadius)
-                        Text(self.choices.choice4)
-                    }
-                }
-            }
-        }
-    }
-}
-
-#Preview {
-    ZStack {
-        Color.green
-        VStack {
-            Spacer()
-            MultipleChoiceView(choices: .mock)
-                .frame(width: .infinity, height: 150)
         }
         .padding()
     }
-    .ignoresSafeArea()
+}
+
+struct MultipleChoiceView_Previews: PreviewProvider {
+    static var previews: some View {
+        ZStack {
+            Color.green.ignoresSafeArea()
+            VStack {
+                Spacer()
+                MultipleChoiceView(choices: ["Choice 1", "Choice 2", "Choice 3", "Choice 4"]) { choice in
+                    print("Selected choice: \(choice)")
+                }
+                .frame(height: 150)
+            }
+            .padding()
+        }
+    }
 }

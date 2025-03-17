@@ -17,7 +17,7 @@ struct colockitchenraceApp: App {
 
     init() {
         FirebaseApp.configure()
-        self.performTasks()
+        self.performFetchs()
     }
 
     var body: some Scene {
@@ -34,7 +34,7 @@ struct colockitchenraceApp: App {
         }
     }
 
-    private func performTasks() {
+    private func performFetchs() {
         Task {
             let _ = try? await self.globalInfoClient.getLast()
             let _ = try? await self.newsClient.getLast()

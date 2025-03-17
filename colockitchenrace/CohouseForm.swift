@@ -14,15 +14,17 @@ struct CohouseFormFeature {
 
     @ObservableState
     struct State {
+        @Shared(.userInfo) var userInfo
         var wipCohouse: Cohouse
         var isNewCohouse: Bool = false
     }
 
     enum Action: BindableAction, Equatable {
         case addUserButtonTapped
+        case assignAdminButtonTapped
         case binding(BindingAction<State>)
         case deleteUsers(atOffset: IndexSet)
-        case quitCohouse
+        case quitCohouseButtonTapped
     }
 
     @Dependency(\.cohouseClient) var cohouseClient
@@ -35,17 +37,30 @@ struct CohouseFormFeature {
             case .addUserButtonTapped:
                 state.wipCohouse.users.append(CohouseUser(id: UUID()))
                 return .none
-            case .binding(_):
+            case .assignAdminButtonTapped:
+                return .none
+            case .binding:
                 return .none
             case let .deleteUsers(atOffset: indices):
-                state.wipCohouse.users.remove(atOffsets: indices)
+
+                // Filter out the indexes where users are admins
+                let nonAdminIndexes = indices.filter {
+                    !state.wipCohouse.users[$0].isAdmin
+                }
+
+                // Delete only non-admin users
+                for index in nonAdminIndexes.sorted(by: >) {
+                    state.wipCohouse.users.remove(at: index)
+                }
+
+                // Add a new user automatically if empty
                 if state.wipCohouse.users.isEmpty {
                     state.wipCohouse.users.append(CohouseUser(id: UUID(), isAdmin: true))
                 }
                 return .none
-            case .quitCohouse:
+            case .quitCohouseButtonTapped:
                 return .run { _ in
-                    await self.cohouseClient.quitCohouse()
+                    try await self.cohouseClient.quitCohouse()
                 }
             }
         }
@@ -81,17 +96,35 @@ struct CohouseFormView: View {
                     }
                 }
 
-                if !store.isNewCohouse {
+                if !store.isNewCohouse && !self.isActualUserIsAdmin() {
                     Section {
                         Button("Quit cohouse") {
-                            store.send(.quitCohouse)
+                            store.send(.quitCohouseButtonTapped)
                         }
                         .foregroundStyle(.red)
                     }
                 }
+
+                //TODO: Handle admin swap
+//                if !store.isNewCohouse && self.isActualUserIsAdmin() {
+//                    Section {
+//                        Button("Assign another admin") {
+//                            store.send(.assignAdminButtonTapped)
+//                        }
+//                        .foregroundStyle(.red)
+//                    }
+//                }
             }
         }
     }
+
+    func isActualUserIsAdmin() -> Bool {
+        let adminUser = store.wipCohouse.users.first { $0.isAdmin }?.userId
+        let userInfo = store.userInfo?.id.uuidString
+        return adminUser == userInfo
+    }
+
+
 }
 
 #Preview {

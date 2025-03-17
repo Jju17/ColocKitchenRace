@@ -21,7 +21,7 @@ struct CohouseClient {
     var getByCode: @Sendable (_ code: String) async throws -> Result<Cohouse, CohouseClientError>
     var set: @Sendable (_ id: String, _ newCohouse: Cohouse) async throws -> Result<Bool, Error>
     var setUser: @Sendable (_ user: CohouseUser, _ cohouseId: String) async throws -> Void
-    var quitCohouse: @Sendable () async -> Void
+    var quitCohouse: @Sendable () async throws -> Void
 }
 
 extension CohouseClient: DependencyKey {
@@ -130,9 +130,19 @@ extension CohouseClient: DependencyKey {
         },
         quitCohouse: {
             @Shared(.cohouse) var cohouse
+            @Shared(.userInfo) var userInfo
+
+            guard let cohouse, let userInfo else { return }
+
+            let cohouseRef = Firestore.firestore().collection("cohouses").document(cohouse.id.uuidString)
+            let usersCollectionRef = cohouseRef.collection("users")
+
+            let querySnapshot = try await usersCollectionRef.whereField("userId", isEqualTo: userInfo.id.uuidString).getDocuments()
+            guard let document = querySnapshot.documents.first else { return }
+
+            try await usersCollectionRef.document(document.documentID).delete()
 
             $cohouse.withLock { $0 = nil }
-            // TODO: In the near future, we'll also need to remove user from cohouse associated to it.
         }
     )
 

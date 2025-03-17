@@ -16,7 +16,11 @@ extension Color {
 
 extension Color {
     static var CKRRandom: Color {
-        let colors = [CKRBlue, CKRGreen, CKRPurple, CKRYellow]
-        return colors.randomElement()!
+        let colors = [CKRBlue, CKRGreen, CKRPurple, CKRYellow].filter { $0 != lastCKRColor }
+        let randomColor = colors.randomElement()!
+        Color.lastCKRColor = randomColor
+        return randomColor
     }
+
+    static var lastCKRColor: Color = CKRBlue
 }

@@ -33,10 +33,15 @@ struct CohouseDetailFeature {
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .confirmEditohouseButtonTapped: //TODO: Add edit cohouse client
-                guard let cohouse = state.destination?.edit?.wipCohouse
+            case .confirmEditohouseButtonTapped:
+                guard var wipCohouse = state.destination?.edit?.wipCohouse
                 else { return .none}
-                state.cohouse = cohouse
+
+                wipCohouse.users.removeAll { user in
+                    user.surname.isEmpty && !user.isAdmin
+                }
+
+                state.cohouse = wipCohouse //TODO: Add firestore set cohouse
                 state.destination = nil
                 return .none
             case .dismissEditCohouseButtonTapped:
@@ -70,19 +75,14 @@ struct CohouseDetailView: View {
                 .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
 
                 Section("") {
-                    HStack {
+                    VStack(alignment: .leading) {
                         Text("Code : \(store.cohouse.code)")
-                            .foregroundStyle(.white)
-                        Spacer()
-                        Button {
-
-                        } label: {
-                            Image(systemName: "info.circle")
-                                .tint(.white)
-                        }
+                            .font(Font.system(size: 20, weight: .semibold))
+                        Text("Share this code with your cohouse buddies")
+                            .font(.footnote)
                     }
                 }
-                .font(Font.system(size: 20, weight: .semibold))
+                .foregroundStyle(.white)
                 .listRowBackground(Color.CKRPurple)
 
                 Section("LOCATION") {
@@ -91,14 +91,16 @@ struct CohouseDetailView: View {
                     LabeledContent("City", value: store.cohouse.address.city)
                 }
 
-                Section("MEMBERS") {
+                Section("MEMBERS (\(store.cohouse.users.count))") {
                     ForEach(store.cohouse.users) { user in
                         HStack(alignment: .center) {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(user.surname)
-                                Text("Admin")
-                                    .foregroundStyle(.gray)
-                                    .font(.footnote)
+                                if user.isAdmin {
+                                    Text("Admin")
+                                        .foregroundStyle(.gray)
+                                        .font(.footnote)
+                                }
                             }
                             Spacer()
                             if user.userId == self.store.userInfo?.id.uuidString {
