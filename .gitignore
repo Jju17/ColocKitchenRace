@@ -11,3 +11,4 @@ DerivedData/
 
 # Ignore all .env files (environment secrets)
 .env
+*.xcbkptlist

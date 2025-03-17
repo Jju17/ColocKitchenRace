@@ -32,13 +32,13 @@ extension GlobalInfoClient: DependencyKey {
 
                 guard let document = querySnapshot.documents.first
                 else {
-                    await $globalInfos.withLock { $0 = nil }
+                    $globalInfos.withLock { $0 = nil }
                     return .failure(.noDocumentAvailable)
                 }
 
                 let infos = try? document.data(as: GlobalInfo.self)
 
-                await $globalInfos.withLock { $0 = infos }
+                $globalInfos.withLock { $0 = infos }
                 return .success(globalInfos)
             } catch {
                 return .failure(.firebaseError(error.localizedDescription))

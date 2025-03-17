@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "64F17B2E2AD2A3BC0047F6F3"
-               BuildableName = "colockitchenrace.app"
-               BlueprintName = "colockitchenrace"
+               BuildableName = "ColocKitchenRace.app"
+               BlueprintName = "ColocKitchenRace"
                ReferencedContainer = "container:colockitchenrace.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -35,8 +35,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "64F17B3E2AD2A3BE0047F6F3"
-               BuildableName = "colockitchenraceTests.xctest"
-               BlueprintName = "colockitchenraceTests"
+               BuildableName = "ColocKitchenRaceTests.xctest"
+               BlueprintName = "ColocKitchenRaceTests"
                ReferencedContainer = "container:colockitchenrace.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -46,8 +46,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "64F17B482AD2A3BE0047F6F3"
-               BuildableName = "colockitchenraceUITests.xctest"
-               BlueprintName = "colockitchenraceUITests"
+               BuildableName = "ColocKitchenRaceUITests.xctest"
+               BlueprintName = "ColocKitchenRaceUITests"
                ReferencedContainer = "container:colockitchenrace.xcodeproj">
             </BuildableReference>
          </TestableReference>
@@ -70,8 +70,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "64F17B2E2AD2A3BC0047F6F3"
-            BuildableName = "colockitchenrace.app"
-            BlueprintName = "colockitchenrace"
+            BuildableName = "ColocKitchenRace.app"
+            BlueprintName = "ColocKitchenRace"
             ReferencedContainer = "container:colockitchenrace.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -97,8 +97,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "64F17B2E2AD2A3BC0047F6F3"
-            BuildableName = "colockitchenrace.app"
-            BlueprintName = "colockitchenrace"
+            BuildableName = "ColocKitchenRace.app"
+            BlueprintName = "ColocKitchenRace"
             ReferencedContainer = "container:colockitchenrace.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
