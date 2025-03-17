@@ -8,3 +8,6 @@ colockitchenrace/GoogleService-Info.plist
 build/
 DerivedData/
 *.xcuserstate
+
+# Ignore all .env files (environment secrets)
+.env

@@ -88,7 +88,9 @@ func ChallengeContentView(challenge: Challenge) -> some View {
     case .picture:
         PictureChoiceView()
     case .multipleChoice:
-        MultipleChoiceView(choices: .mock)
+        MultipleChoiceView(choices: ["Choix 1", "Choix 2", "Choix 3"]) { selectedChoice in
+            print(selectedChoice)
+        }
     case .singleAnswer:
         SingleChoiceView(answer: .constant(""))
     case .noChoice:
