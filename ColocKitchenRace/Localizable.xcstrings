@@ -1,6 +1,9 @@
 {
   "sourceLanguage" : "en",
   "strings" : {
+    "" : {
+
+    },
     "%@" : {
       "localizations" : {
         "fr" : {
@@ -12,6 +15,7 @@
       }
     },
     "%@ %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -27,10 +31,8 @@
         }
       }
     },
-    "••••••••" : {
-
-    },
     "Add" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -60,7 +62,17 @@
         }
       }
     },
+    "Admin" : {
+
+    },
+    "Already have an account ?" : {
+
+    },
+    "Answer" : {
+
+    },
     "Are you the contact person ?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -81,6 +93,7 @@
       }
     },
     "Cancel" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -89,6 +102,9 @@
           }
         }
       }
+    },
+    "Challenges" : {
+
     },
     "City" : {
       "localizations" : {
@@ -110,7 +126,23 @@
         }
       }
     },
+    "Click here" : {
+
+    },
+    "Code" : {
+
+    },
+    "Code : %@" : {
+
+    },
+    "Cohouse" : {
+
+    },
+    "Cohouse name" : {
+
+    },
     "Cohousing name" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -120,7 +152,11 @@
         }
       }
     },
+    "Confirm" : {
+
+    },
     "Contact person" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -130,7 +166,20 @@
         }
       }
     },
+    "Create" : {
+
+    },
+    "Create new cohouse" : {
+
+    },
+    "Custom Picker" : {
+
+    },
+    "Days" : {
+
+    },
     "Days %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -139,6 +188,9 @@
           }
         }
       }
+    },
+    "Dismiss" : {
+
     },
     "Do you want to have news from CKR team ?" : {
       "localizations" : {
@@ -160,7 +212,11 @@
         }
       }
     },
+    "Edit cohouse" : {
+
+    },
     "Edit Cohousing" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -169,6 +225,9 @@
           }
         }
       }
+    },
+    "Edit profile" : {
+
     },
     "Email" : {
       "localizations" : {
@@ -180,7 +239,14 @@
         }
       }
     },
+    "END" : {
+
+    },
+    "First name" : {
+
+    },
     "Food intolerances" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -220,7 +286,14 @@
         }
       }
     },
+    "Home" : {
+
+    },
+    "Hours" : {
+
+    },
     "Hours %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -231,6 +304,7 @@
       }
     },
     "In" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -239,6 +313,12 @@
           }
         }
       }
+    },
+    "Join existing cohouse" : {
+
+    },
+    "Last name" : {
+
     },
     "Localisation" : {
       "localizations" : {
@@ -250,7 +330,13 @@
         }
       }
     },
-    "Login" : {
+    "LOCATION" : {
+
+    },
+    "Me" : {
+
+    },
+    "MEMBERS (%lld)" : {
 
     },
     "Membres" : {
@@ -263,7 +349,11 @@
         }
       }
     },
+    "Minutes" : {
+
+    },
     "Minutes %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -304,7 +394,14 @@
         }
       }
     },
+    "News" : {
+
+    },
+    "Next Edition In" : {
+
+    },
     "Next Kitchen Race" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -313,6 +410,9 @@
           }
         }
       }
+    },
+    "No food intolerences" : {
+
     },
     "Postcode" : {
       "localizations" : {
@@ -334,10 +434,14 @@
         }
       }
     },
-    "Save" : {
+    "Quit cohouse" : {
+
+    },
+    "Seconds" : {
 
     },
     "Seconds %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -347,7 +451,23 @@
         }
       }
     },
+    "Select" : {
+
+    },
+    "Select user" : {
+
+    },
+    "Select yourself" : {
+
+    },
+    "Share this code with your cohouse buddies" : {
+
+    },
+    "Sign in" : {
+
+    },
     "Sign In" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -367,6 +487,15 @@
         }
       }
     },
+    "Sign up" : {
+
+    },
+    "START" : {
+
+    },
+    "Submit" : {
+
+    },
     "Welcome" : {
       "localizations" : {
         "fr" : {
@@ -376,6 +505,12 @@
           }
         }
       }
+    },
+    "You need an account ?" : {
+
+    },
+    "ZIP Code" : {
+
     }
   },
   "version" : "1.0"
