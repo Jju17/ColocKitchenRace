@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
-   LastUpgradeVersion = "1530"
+   LastUpgradeVersion = "1620"
    version = "1.7">
    <BuildAction
       parallelizeBuildables = "YES"
@@ -17,7 +17,7 @@
                BlueprintIdentifier = "64F17B2E2AD2A3BC0047F6F3"
                BuildableName = "ColocKitchenRace.app"
                BlueprintName = "ColocKitchenRace"
-               ReferencedContainer = "container:colockitchenrace.xcodeproj">
+               ReferencedContainer = "container:ColocKitchenRace.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -37,7 +37,7 @@
                BlueprintIdentifier = "64F17B3E2AD2A3BE0047F6F3"
                BuildableName = "ColocKitchenRaceTests.xctest"
                BlueprintName = "ColocKitchenRaceTests"
-               ReferencedContainer = "container:colockitchenrace.xcodeproj">
+               ReferencedContainer = "container:ColocKitchenRace.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -48,7 +48,7 @@
                BlueprintIdentifier = "64F17B482AD2A3BE0047F6F3"
                BuildableName = "ColocKitchenRaceUITests.xctest"
                BlueprintName = "ColocKitchenRaceUITests"
-               ReferencedContainer = "container:colockitchenrace.xcodeproj">
+               ReferencedContainer = "container:ColocKitchenRace.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -72,7 +72,7 @@
             BlueprintIdentifier = "64F17B2E2AD2A3BC0047F6F3"
             BuildableName = "ColocKitchenRace.app"
             BlueprintName = "ColocKitchenRace"
-            ReferencedContainer = "container:colockitchenrace.xcodeproj">
+            ReferencedContainer = "container:ColocKitchenRace.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
@@ -99,7 +99,7 @@
             BlueprintIdentifier = "64F17B2E2AD2A3BC0047F6F3"
             BuildableName = "ColocKitchenRace.app"
             BlueprintName = "ColocKitchenRace"
-            ReferencedContainer = "container:colockitchenrace.xcodeproj">
+            ReferencedContainer = "container:ColocKitchenRace.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

@@ -19,6 +19,12 @@
 		64FB41C22AD4086100C93A34 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 64FB41C12AD4086100C93A34 /* FirebaseAnalyticsWithoutAdIdSupport */; };
 		64FB41C42AD4086100C93A34 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 64FB41C32AD4086100C93A34 /* FirebaseAuth */; };
 		64FB41C62AD4086100C93A34 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 64FB41C52AD4086100C93A34 /* FirebaseCrashlytics */; };
+		64FBE36E2D88682D00D8A89F /* FirebaseAnalyticsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 64FBE36D2D88682D00D8A89F /* FirebaseAnalyticsSwift */; };
+		64FBE3702D88682D00D8A89F /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 64FBE36F2D88682D00D8A89F /* FirebaseAuth */; };
+		64FBE3722D88682D00D8A89F /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 64FBE3712D88682D00D8A89F /* FirebaseCrashlytics */; };
+		64FBE3742D88682D00D8A89F /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 64FBE3732D88682D00D8A89F /* FirebaseFirestore */; };
+		64FBE3762D88682D00D8A89F /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 64FBE3752D88682D00D8A89F /* ComposableArchitecture */; };
+		64FBE3782D88682D00D8A89F /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = 64FBE3772D88682D00D8A89F /* SwiftUIIntrospect */; };
 		64FE3CE72B8D58B800E6AAAE /* Dependencies in Frameworks */ = {isa = PBXBuildFile; productRef = 64FE3CE62B8D58B800E6AAAE /* Dependencies */; };
 		64FE3CE92B8D58B800E6AAAE /* DependenciesMacros in Frameworks */ = {isa = PBXBuildFile; productRef = 64FE3CE82B8D58B800E6AAAE /* DependenciesMacros */; };
 /* End PBXBuildFile section */
@@ -48,6 +54,26 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		6405CBCD2D886B7400BE8B0D /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Assets/Assets.xcassets,
+				"Assets/GoogleService-Info.plist",
+				"Utils/CGFloat+Utils.swift",
+				"Utils/Color+Utils.swift",
+				"Utils/Date+Utils.swift",
+				"Utils/DateComponents+Utils.swift",
+				"Utils/Dictionnary+Utils.swift",
+				"Utils/Error+Utils.swift",
+				Utils/Global.swift,
+				Utils/Introspect/TextFieldDelegate.swift,
+				"Utils/Logger+Utils.swift",
+				"Utils/URL+Utils.swift",
+				Utils/URLOpener.swift,
+				"Utils/View+Utils.swift",
+			);
+			target = 64F17B2E2AD2A3BC0047F6F3 /* ColocKitchenRace */;
+		};
 		64FBE3442D88665300D8A89F /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -58,9 +84,10 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		6405CBC82D886B7400BE8B0D /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (6405CBCD2D886B7400BE8B0D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
 		64FBE0262D8860CC00D8A89F /* CKRAdmin */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = CKRAdmin; sourceTree = "<group>"; };
-		64FBE0362D8860DB00D8A89F /* colockitchenraceUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = colockitchenraceUITests; sourceTree = "<group>"; };
-		64FBE03A2D8860DF00D8A89F /* colockitchenraceTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = colockitchenraceTests; sourceTree = "<group>"; };
+		64FBE0362D8860DB00D8A89F /* ColocKitchenRaceUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ColocKitchenRaceUITests; sourceTree = "<group>"; };
+		64FBE03A2D8860DF00D8A89F /* ColocKitchenRaceTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ColocKitchenRaceTests; sourceTree = "<group>"; };
 		64FBE2FD2D88665300D8A89F /* ColocKitchenRace */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (64FBE3442D88665300D8A89F /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = ColocKitchenRace; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -99,6 +126,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				64FBE3762D88682D00D8A89F /* ComposableArchitecture in Frameworks */,
+				64FBE3722D88682D00D8A89F /* FirebaseCrashlytics in Frameworks */,
+				64FBE3742D88682D00D8A89F /* FirebaseFirestore in Frameworks */,
+				64FBE3782D88682D00D8A89F /* SwiftUIIntrospect in Frameworks */,
+				64FBE36E2D88682D00D8A89F /* FirebaseAnalyticsSwift in Frameworks */,
+				64FBE3702D88682D00D8A89F /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -115,9 +148,10 @@
 		64F17B262AD2A3BC0047F6F3 = {
 			isa = PBXGroup;
 			children = (
+				6405CBC82D886B7400BE8B0D /* Shared */,
 				64FBE2FD2D88665300D8A89F /* ColocKitchenRace */,
-				64FBE03A2D8860DF00D8A89F /* colockitchenraceTests */,
-				64FBE0362D8860DB00D8A89F /* colockitchenraceUITests */,
+				64FBE03A2D8860DF00D8A89F /* ColocKitchenRaceTests */,
+				64FBE0362D8860DB00D8A89F /* ColocKitchenRaceUITests */,
 				64FBE0262D8860CC00D8A89F /* CKRAdmin */,
 				64F17B302AD2A3BC0047F6F3 /* Products */,
 				64AD9DDE2B9FB28400790A9F /* Frameworks */,
@@ -184,7 +218,7 @@
 				64F17B412AD2A3BE0047F6F3 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				64FBE03A2D8860DF00D8A89F /* colockitchenraceTests */,
+				64FBE03A2D8860DF00D8A89F /* ColocKitchenRaceTests */,
 			);
 			name = ColocKitchenRaceTests;
 			productName = colockitchenraceTests;
@@ -205,7 +239,7 @@
 				64F17B4B2AD2A3BE0047F6F3 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				64FBE0362D8860DB00D8A89F /* colockitchenraceUITests */,
+				64FBE0362D8860DB00D8A89F /* ColocKitchenRaceUITests */,
 			);
 			name = ColocKitchenRaceUITests;
 			productName = colockitchenraceUITests;
@@ -225,10 +259,17 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				6405CBC82D886B7400BE8B0D /* Shared */,
 				64FBE0262D8860CC00D8A89F /* CKRAdmin */,
 			);
 			name = CKRAdmin;
 			packageProductDependencies = (
+				64FBE36D2D88682D00D8A89F /* FirebaseAnalyticsSwift */,
+				64FBE36F2D88682D00D8A89F /* FirebaseAuth */,
+				64FBE3712D88682D00D8A89F /* FirebaseCrashlytics */,
+				64FBE3732D88682D00D8A89F /* FirebaseFirestore */,
+				64FBE3752D88682D00D8A89F /* ComposableArchitecture */,
+				64FBE3772D88682D00D8A89F /* SwiftUIIntrospect */,
 			);
 			productName = CKRAdmin;
 			productReference = 64FBE0252D8860CC00D8A89F /* CKRAdmin.app */;
@@ -242,7 +283,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1620;
-				LastUpgradeCheck = 1530;
+				LastUpgradeCheck = 1620;
 				TargetAttributes = {
 					64F17B2E2AD2A3BC0047F6F3 = {
 						CreatedOnToolsVersion = 15.0;
@@ -260,7 +301,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 64F17B2A2AD2A3BC0047F6F3 /* Build configuration list for PBXProject "colockitchenrace" */;
+			buildConfigurationList = 64F17B2A2AD2A3BC0047F6F3 /* Build configuration list for PBXProject "ColocKitchenRace" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = fr;
 			hasScannedForEncodings = 0;
@@ -678,6 +719,7 @@
 				CODE_SIGN_ENTITLEMENTS = CKRAdmin/CKRAdmin.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"CKRAdmin/Preview Content\"";
 				DEVELOPMENT_TEAM = YXXNH92P5F;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -717,6 +759,7 @@
 				CODE_SIGN_ENTITLEMENTS = CKRAdmin/CKRAdmin.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "\"CKRAdmin/Preview Content\"";
 				DEVELOPMENT_TEAM = YXXNH92P5F;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -751,7 +794,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		64F17B2A2AD2A3BC0047F6F3 /* Build configuration list for PBXProject "colockitchenrace" */ = {
+		64F17B2A2AD2A3BC0047F6F3 /* Build configuration list for PBXProject "ColocKitchenRace" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				64F17B512AD2A3BE0047F6F3 /* Debug */,
@@ -868,6 +911,36 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 64FB41BE2AD4086100C93A34 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseCrashlytics;
+		};
+		64FBE36D2D88682D00D8A89F /* FirebaseAnalyticsSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 64FB41BE2AD4086100C93A34 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalyticsSwift;
+		};
+		64FBE36F2D88682D00D8A89F /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 64FB41BE2AD4086100C93A34 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		64FBE3712D88682D00D8A89F /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 64FB41BE2AD4086100C93A34 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+		64FBE3732D88682D00D8A89F /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 64FB41BE2AD4086100C93A34 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		64FBE3752D88682D00D8A89F /* ComposableArchitecture */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 64B66EC42B5D50DB00B8F30B /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
+			productName = ComposableArchitecture;
+		};
+		64FBE3772D88682D00D8A89F /* SwiftUIIntrospect */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6469FA6E2C1FAD2E002BDBF6 /* XCRemoteSwiftPackageReference "swiftui-introspect" */;
+			productName = SwiftUIIntrospect;
 		};
 		64FE3CE62B8D58B800E6AAAE /* Dependencies */ = {
 			isa = XCSwiftPackageProductDependency;

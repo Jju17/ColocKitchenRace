@@ -5,13 +5,27 @@
 //  Created by Julien Rahier on 3/17/25.
 //
 
+import ComposableArchitecture
+import Firebase
 import SwiftUI
 
 @main
-struct CKRAdminApp: App {
+struct AdminCKRApp: App {
+    init() {
+        FirebaseApp.configure()
+    }
+
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            AppView(
+                store: Store(
+                    initialState: AppFeature.State.splashScreen(SplashScreenFeature.State())
+                ) {
+                    AppFeature()
+                        ._printChanges()
+                }
+            )
+            .preferredColorScheme(.light)
         }
     }
 }
