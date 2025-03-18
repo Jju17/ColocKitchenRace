@@ -2,7 +2,7 @@
 .DS_Store
 
 # Firebase Configuration (Sensitive Data)
-colockitchenrace/GoogleService-Info.plist
+GoogleService-Info.plist
 
 # Xcode-specific files
 build/
