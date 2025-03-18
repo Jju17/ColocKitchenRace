@@ -150,9 +150,9 @@
 			children = (
 				6405CBC82D886B7400BE8B0D /* Shared */,
 				64FBE2FD2D88665300D8A89F /* ColocKitchenRace */,
+				64FBE0262D8860CC00D8A89F /* CKRAdmin */,
 				64FBE03A2D8860DF00D8A89F /* ColocKitchenRaceTests */,
 				64FBE0362D8860DB00D8A89F /* ColocKitchenRaceUITests */,
-				64FBE0262D8860CC00D8A89F /* CKRAdmin */,
 				64F17B302AD2A3BC0047F6F3 /* Products */,
 				64AD9DDE2B9FB28400790A9F /* Frameworks */,
 			);
