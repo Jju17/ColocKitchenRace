@@ -58,7 +58,6 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Assets/Assets.xcassets,
-				"Assets/GoogleService-Info.plist",
 				"Utils/CGFloat+Utils.swift",
 				"Utils/Color+Utils.swift",
 				"Utils/Date+Utils.swift",

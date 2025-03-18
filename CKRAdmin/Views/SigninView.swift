@@ -63,9 +63,9 @@ struct SigninView: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            Image("AdminLogo")
+            Image("AdminLogoNoFill")
                 .resizable()
-                .frame(width: 150, height: 150, alignment: .center)
+                .frame(width: 200, height: 200, alignment: .center)
 
             VStack(spacing: 10) {
                 TextField("", text: $store.email)
