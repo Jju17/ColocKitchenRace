@@ -70,7 +70,7 @@
 			<key>isShown</key>
 			<false/>
 			<key>orderHint</key>
-			<integer>1</integer>
+			<integer>2</integer>
 		</dict>
 		<key>colockitchenrace.xcscheme_^#shared#^_</key>
 		<dict>
@@ -91,6 +91,11 @@
 			<true/>
 		</dict>
 		<key>64F17B482AD2A3BE0047F6F3</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>64FBE0242D8860CC00D8A89F</key>
 		<dict>
 			<key>primary</key>
 			<true/>
