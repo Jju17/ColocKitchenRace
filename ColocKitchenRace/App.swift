@@ -4,15 +4,14 @@
 //
 //  Created by Julien Rahier on 09/10/2023.
 //
-
 import ComposableArchitecture
 import FirebaseAuth
 import SwiftUI
 
 @Reducer
 struct AppFeature {
-
     @ObservableState
+    @CasePathable
     enum State {
         case tab(TabFeature.State)
         case signin(SigninFeature.State)
@@ -20,6 +19,7 @@ struct AppFeature {
         case splashScreen(SplashScreenFeature.State)
     }
 
+    @CasePathable
     enum Action {
         case onTask
         case tab(TabFeature.Action)
@@ -42,39 +42,31 @@ struct AppFeature {
                 }
             case let .newAuthStateTrigger(user):
                 if user != nil {
-                    state = AppFeature.State.tab(TabFeature.State())
+                    state = State.tab(TabFeature.State())
                 } else {
-                    state = AppFeature.State.signin(SigninFeature.State())
+                    state = State.signin(SigninFeature.State())
                 }
                 return .none
             case let .signin(.delegate(action)):
                 switch action {
                 case .switchToSignupButtonTapped:
-                    state = AppFeature.State.signup(SignupFeature.State())
+                    state = State.signup(SignupFeature.State())
                     return .none
                 }
             case let .signup(.delegate(action)):
                 switch action {
                 case .switchToSigninButtonTapped:
-                    state = AppFeature.State.signin(SigninFeature.State())
+                    state = State.signin(SigninFeature.State())
                     return .none
                 }
             case .tab, .signin, .signup, .splashScreen:
                 return .none
             }
         }
-        .ifCaseLet(/State.tab, action: /Action.tab) {
-            TabFeature()
-        }
-        .ifCaseLet(/State.signin, action: /Action.signin) {
-            SigninFeature()
-        }
-        .ifCaseLet(/State.signup, action: /Action.signup) {
-            SignupFeature()
-        }
-        .ifCaseLet(/State.splashScreen, action: /Action.splashScreen) {
-            SplashScreenFeature()
-        }
+        .ifCaseLet(\.tab, action: \.tab) { TabFeature() }
+        .ifCaseLet(\.signin, action: \.signin) { SigninFeature() }
+        .ifCaseLet(\.signup, action: \.signup) { SignupFeature() }
+        .ifCaseLet(\.splashScreen, action: \.splashScreen) { SplashScreenFeature() }
     }
 }
 
@@ -115,5 +107,3 @@ struct AppView: View {
         }
     )
 }
-
-

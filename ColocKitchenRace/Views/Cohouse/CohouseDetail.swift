@@ -41,7 +41,7 @@ struct CohouseDetailFeature {
                     user.surname.isEmpty && !user.isAdmin
                 }
 
-                state.cohouse = wipCohouse //TODO: Add firestore set cohouse
+                state.$cohouse.withLock { $0 = wipCohouse } //TODO: Add firestore set cohouse
                 state.destination = nil
                 return .none
             case .dismissEditCohouseButtonTapped:
@@ -146,7 +146,7 @@ struct CohouseDetailView: View {
         CohouseDetailView(
             store: Store(
                 initialState: CohouseDetailFeature.State(
-                    cohouse: Shared(.mock)
+                    cohouse: Shared(value: .mock)
                 )
             ) {
                 CohouseDetailFeature()

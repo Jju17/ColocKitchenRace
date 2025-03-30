@@ -47,9 +47,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		64F17B2F2AD2A3BC0047F6F3 /* ColocKitchenRace.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ColocKitchenRace.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		64F17B3F2AD2A3BE0047F6F3 /* ColocKitchenRaceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ColocKitchenRaceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		64F17B492AD2A3BE0047F6F3 /* ColocKitchenRaceUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ColocKitchenRaceUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		64F17B2F2AD2A3BC0047F6F3 /* ColocsKitchenRace.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ColocsKitchenRace.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		64F17B3F2AD2A3BE0047F6F3 /* ColocsKitchenRaceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ColocsKitchenRaceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		64F17B492AD2A3BE0047F6F3 /* ColocsKitchenRaceUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ColocsKitchenRaceUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		64FBE0252D8860CC00D8A89F /* CKRAdmin.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CKRAdmin.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -72,14 +72,14 @@
 				Utils/URLOpener.swift,
 				"Utils/View+Utils.swift",
 			);
-			target = 64F17B2E2AD2A3BC0047F6F3 /* ColocKitchenRace */;
+			target = 64F17B2E2AD2A3BC0047F6F3 /* ColocsKitchenRace */;
 		};
 		64FBE3442D88665300D8A89F /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
 			);
-			target = 64F17B2E2AD2A3BC0047F6F3 /* ColocKitchenRace */;
+			target = 64F17B2E2AD2A3BC0047F6F3 /* ColocsKitchenRace */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -161,9 +161,9 @@
 		64F17B302AD2A3BC0047F6F3 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				64F17B2F2AD2A3BC0047F6F3 /* ColocKitchenRace.app */,
-				64F17B3F2AD2A3BE0047F6F3 /* ColocKitchenRaceTests.xctest */,
-				64F17B492AD2A3BE0047F6F3 /* ColocKitchenRaceUITests.xctest */,
+				64F17B2F2AD2A3BC0047F6F3 /* ColocsKitchenRace.app */,
+				64F17B3F2AD2A3BE0047F6F3 /* ColocsKitchenRaceTests.xctest */,
+				64F17B492AD2A3BE0047F6F3 /* ColocsKitchenRaceUITests.xctest */,
 				64FBE0252D8860CC00D8A89F /* CKRAdmin.app */,
 			);
 			name = Products;
@@ -172,9 +172,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		64F17B2E2AD2A3BC0047F6F3 /* ColocKitchenRace */ = {
+		64F17B2E2AD2A3BC0047F6F3 /* ColocsKitchenRace */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 64F17B532AD2A3BE0047F6F3 /* Build configuration list for PBXNativeTarget "ColocKitchenRace" */;
+			buildConfigurationList = 64F17B532AD2A3BE0047F6F3 /* Build configuration list for PBXNativeTarget "ColocsKitchenRace" */;
 			buildPhases = (
 				64F17B2B2AD2A3BC0047F6F3 /* Sources */,
 				64F17B2C2AD2A3BC0047F6F3 /* Frameworks */,
@@ -188,7 +188,7 @@
 			fileSystemSynchronizedGroups = (
 				64FBE2FD2D88665300D8A89F /* ColocKitchenRace */,
 			);
-			name = ColocKitchenRace;
+			name = ColocsKitchenRace;
 			packageProductDependencies = (
 				64FB41BF2AD4086100C93A34 /* FirebaseAnalyticsSwift */,
 				64FB41C12AD4086100C93A34 /* FirebaseAnalyticsWithoutAdIdSupport */,
@@ -201,12 +201,12 @@
 				6469FA6F2C1FAD2E002BDBF6 /* SwiftUIIntrospect */,
 			);
 			productName = colockitchenrace;
-			productReference = 64F17B2F2AD2A3BC0047F6F3 /* ColocKitchenRace.app */;
+			productReference = 64F17B2F2AD2A3BC0047F6F3 /* ColocsKitchenRace.app */;
 			productType = "com.apple.product-type.application";
 		};
-		64F17B3E2AD2A3BE0047F6F3 /* ColocKitchenRaceTests */ = {
+		64F17B3E2AD2A3BE0047F6F3 /* ColocsKitchenRaceTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 64F17B562AD2A3BE0047F6F3 /* Build configuration list for PBXNativeTarget "ColocKitchenRaceTests" */;
+			buildConfigurationList = 64F17B562AD2A3BE0047F6F3 /* Build configuration list for PBXNativeTarget "ColocsKitchenRaceTests" */;
 			buildPhases = (
 				64F17B3B2AD2A3BE0047F6F3 /* Sources */,
 				64F17B3C2AD2A3BE0047F6F3 /* Frameworks */,
@@ -220,14 +220,14 @@
 			fileSystemSynchronizedGroups = (
 				64FBE03A2D8860DF00D8A89F /* ColocKitchenRaceTests */,
 			);
-			name = ColocKitchenRaceTests;
+			name = ColocsKitchenRaceTests;
 			productName = colockitchenraceTests;
-			productReference = 64F17B3F2AD2A3BE0047F6F3 /* ColocKitchenRaceTests.xctest */;
+			productReference = 64F17B3F2AD2A3BE0047F6F3 /* ColocsKitchenRaceTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		64F17B482AD2A3BE0047F6F3 /* ColocKitchenRaceUITests */ = {
+		64F17B482AD2A3BE0047F6F3 /* ColocsKitchenRaceUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 64F17B592AD2A3BE0047F6F3 /* Build configuration list for PBXNativeTarget "ColocKitchenRaceUITests" */;
+			buildConfigurationList = 64F17B592AD2A3BE0047F6F3 /* Build configuration list for PBXNativeTarget "ColocsKitchenRaceUITests" */;
 			buildPhases = (
 				64F17B452AD2A3BE0047F6F3 /* Sources */,
 				64F17B462AD2A3BE0047F6F3 /* Frameworks */,
@@ -241,9 +241,9 @@
 			fileSystemSynchronizedGroups = (
 				64FBE0362D8860DB00D8A89F /* ColocKitchenRaceUITests */,
 			);
-			name = ColocKitchenRaceUITests;
+			name = ColocsKitchenRaceUITests;
 			productName = colockitchenraceUITests;
-			productReference = 64F17B492AD2A3BE0047F6F3 /* ColocKitchenRaceUITests.xctest */;
+			productReference = 64F17B492AD2A3BE0047F6F3 /* ColocsKitchenRaceUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 		64FBE0242D8860CC00D8A89F /* CKRAdmin */ = {
@@ -301,7 +301,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 64F17B2A2AD2A3BC0047F6F3 /* Build configuration list for PBXProject "ColocKitchenRace" */;
+			buildConfigurationList = 64F17B2A2AD2A3BC0047F6F3 /* Build configuration list for PBXProject "ColocsKitchenRace" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = fr;
 			hasScannedForEncodings = 0;
@@ -321,9 +321,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				64F17B2E2AD2A3BC0047F6F3 /* ColocKitchenRace */,
-				64F17B3E2AD2A3BE0047F6F3 /* ColocKitchenRaceTests */,
-				64F17B482AD2A3BE0047F6F3 /* ColocKitchenRaceUITests */,
+				64F17B2E2AD2A3BC0047F6F3 /* ColocsKitchenRace */,
+				64F17B3E2AD2A3BE0047F6F3 /* ColocsKitchenRaceTests */,
+				64F17B482AD2A3BE0047F6F3 /* ColocsKitchenRaceUITests */,
 				64FBE0242D8860CC00D8A89F /* CKRAdmin */,
 			);
 		};
@@ -426,12 +426,12 @@
 /* Begin PBXTargetDependency section */
 		64F17B412AD2A3BE0047F6F3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 64F17B2E2AD2A3BC0047F6F3 /* ColocKitchenRace */;
+			target = 64F17B2E2AD2A3BC0047F6F3 /* ColocsKitchenRace */;
 			targetProxy = 64F17B402AD2A3BE0047F6F3 /* PBXContainerItemProxy */;
 		};
 		64F17B4B2AD2A3BE0047F6F3 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 64F17B2E2AD2A3BC0047F6F3 /* ColocKitchenRace */;
+			target = 64F17B2E2AD2A3BC0047F6F3 /* ColocsKitchenRace */;
 			targetProxy = 64F17B4A2AD2A3BE0047F6F3 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -654,7 +654,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ColocKitchenRace.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ColocKitchenRace";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ColocsKitchenRace.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ColocsKitchenRace";
 			};
 			name = Debug;
 		};
@@ -673,7 +673,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ColocKitchenRace.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ColocKitchenRace";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ColocsKitchenRace.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ColocsKitchenRace";
 			};
 			name = Release;
 		};
@@ -800,7 +800,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		64F17B2A2AD2A3BC0047F6F3 /* Build configuration list for PBXProject "ColocKitchenRace" */ = {
+		64F17B2A2AD2A3BC0047F6F3 /* Build configuration list for PBXProject "ColocsKitchenRace" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				64F17B512AD2A3BE0047F6F3 /* Debug */,
@@ -809,7 +809,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		64F17B532AD2A3BE0047F6F3 /* Build configuration list for PBXNativeTarget "ColocKitchenRace" */ = {
+		64F17B532AD2A3BE0047F6F3 /* Build configuration list for PBXNativeTarget "ColocsKitchenRace" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				64F17B542AD2A3BE0047F6F3 /* Debug */,
@@ -818,7 +818,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		64F17B562AD2A3BE0047F6F3 /* Build configuration list for PBXNativeTarget "ColocKitchenRaceTests" */ = {
+		64F17B562AD2A3BE0047F6F3 /* Build configuration list for PBXNativeTarget "ColocsKitchenRaceTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				64F17B572AD2A3BE0047F6F3 /* Debug */,
@@ -827,7 +827,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		64F17B592AD2A3BE0047F6F3 /* Build configuration list for PBXNativeTarget "ColocKitchenRaceUITests" */ = {
+		64F17B592AD2A3BE0047F6F3 /* Build configuration list for PBXNativeTarget "ColocsKitchenRaceUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				64F17B5A2AD2A3BE0047F6F3 /* Debug */,
@@ -861,7 +861,7 @@
 			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 1.10.2;
+				minimumVersion = 1.18.0;
 			};
 		};
 		64FB41BE2AD4086100C93A34 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {

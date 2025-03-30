@@ -33,9 +33,7 @@ struct HomeFeature {
             switch action {
             case .onTask:
                 return .run { send in
-                    let totalUsersCountResult = try await self.userClient.totalUsersCount()
-                    let totalUsersCount = (try? totalUsersCountResult.get()) ?? 0
-
+                    let totalUsersCount = (try? await self.userClient.totalUsersCount().get()) ?? 0
                     await send(.totalUsersUpdated(totalUsersCount))
                 }
             case let .totalUsersUpdated(count):

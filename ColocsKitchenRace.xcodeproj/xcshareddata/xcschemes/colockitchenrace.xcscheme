@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "64F17B2E2AD2A3BC0047F6F3"
-               BuildableName = "ColocKitchenRace.app"
-               BlueprintName = "ColocKitchenRace"
-               ReferencedContainer = "container:ColocKitchenRace.xcodeproj">
+               BuildableName = "ColocsKitchenRace.app"
+               BlueprintName = "ColocsKitchenRace"
+               ReferencedContainer = "container:ColocsKitchenRace.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -35,9 +35,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "64F17B3E2AD2A3BE0047F6F3"
-               BuildableName = "ColocKitchenRaceTests.xctest"
-               BlueprintName = "ColocKitchenRaceTests"
-               ReferencedContainer = "container:ColocKitchenRace.xcodeproj">
+               BuildableName = "ColocsKitchenRaceTests.xctest"
+               BlueprintName = "ColocsKitchenRaceTests"
+               ReferencedContainer = "container:ColocsKitchenRace.xcodeproj">
             </BuildableReference>
          </TestableReference>
          <TestableReference
@@ -46,9 +46,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "64F17B482AD2A3BE0047F6F3"
-               BuildableName = "ColocKitchenRaceUITests.xctest"
-               BlueprintName = "ColocKitchenRaceUITests"
-               ReferencedContainer = "container:ColocKitchenRace.xcodeproj">
+               BuildableName = "ColocsKitchenRaceUITests.xctest"
+               BlueprintName = "ColocsKitchenRaceUITests"
+               ReferencedContainer = "container:ColocsKitchenRace.xcodeproj">
             </BuildableReference>
          </TestableReference>
       </Testables>
@@ -70,9 +70,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "64F17B2E2AD2A3BC0047F6F3"
-            BuildableName = "ColocKitchenRace.app"
-            BlueprintName = "ColocKitchenRace"
-            ReferencedContainer = "container:ColocKitchenRace.xcodeproj">
+            BuildableName = "ColocsKitchenRace.app"
+            BlueprintName = "ColocsKitchenRace"
+            ReferencedContainer = "container:ColocsKitchenRace.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <CommandLineArguments>
@@ -97,9 +97,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "64F17B2E2AD2A3BC0047F6F3"
-            BuildableName = "ColocKitchenRace.app"
-            BlueprintName = "ColocKitchenRace"
-            ReferencedContainer = "container:ColocKitchenRace.xcodeproj">
+            BuildableName = "ColocsKitchenRace.app"
+            BlueprintName = "ColocsKitchenRace"
+            ReferencedContainer = "container:ColocsKitchenRace.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

@@ -18,7 +18,7 @@
                BlueprintIdentifier = "64FBE0242D8860CC00D8A89F"
                BuildableName = "CKRAdmin.app"
                BlueprintName = "CKRAdmin"
-               ReferencedContainer = "container:ColocKitchenRace.xcodeproj">
+               ReferencedContainer = "container:ColocsKitchenRace.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -47,7 +47,7 @@
             BlueprintIdentifier = "64FBE0242D8860CC00D8A89F"
             BuildableName = "CKRAdmin.app"
             BlueprintName = "CKRAdmin"
-            ReferencedContainer = "container:ColocKitchenRace.xcodeproj">
+            ReferencedContainer = "container:ColocsKitchenRace.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -64,7 +64,7 @@
             BlueprintIdentifier = "64FBE0242D8860CC00D8A89F"
             BuildableName = "CKRAdmin.app"
             BlueprintName = "CKRAdmin"
-            ReferencedContainer = "container:ColocKitchenRace.xcodeproj">
+            ReferencedContainer = "container:ColocsKitchenRace.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

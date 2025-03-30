@@ -70,7 +70,7 @@ struct NoCohouseFeature {
                 let selectedCohouse = selectState.cohouse
                 let selectedUser = selectState.selectedUser
 
-                cohouse = selectedCohouse
+                $cohouse.withLock { $0 = selectedCohouse }
                 state.destination = nil
 
                 return .run { [selectedUser = selectedUser, cohouseId = selectedCohouse.id.uuidString] _ in

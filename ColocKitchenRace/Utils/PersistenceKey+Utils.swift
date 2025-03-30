@@ -5,35 +5,35 @@
 //  Created by Julien Rahier on 02/06/2024.
 //
 
-import ComposableArchitecture
 import Foundation
+import Sharing
 
-extension PersistenceKey where Self == PersistenceKeyDefault<FileStorageKey<User?>> {
-    static var userInfo: Self  {
-        PersistenceKeyDefault(.fileStorage(.userInfo), nil)
-    }
+extension SharedKey where Self == FileStorageKey<User?>.Default {
+  static var userInfo: Self {
+      Self[.fileStorage(.userInfo), default: nil]
+  }
 }
 
-extension PersistenceKey where Self == PersistenceKeyDefault<FileStorageKey<Cohouse?>> {
+extension SharedKey where Self == FileStorageKey<Cohouse?>.Default {
     static var cohouse: Self  {
-        PersistenceKeyDefault(.fileStorage(.cohouse), nil)
+        Self[.fileStorage(.cohouse), default: nil]
     }
 }
 
-extension PersistenceKey where Self == PersistenceKeyDefault<FileStorageKey<[News]>> {
+extension SharedKey where Self == FileStorageKey<[News]>.Default {
     static var news: Self  {
-        PersistenceKeyDefault(.fileStorage(.news), [])
+        Self[.fileStorage(.news), default: []]
     }
 }
 
-extension PersistenceKey where Self == PersistenceKeyDefault<FileStorageKey<[Challenge]>> {
+extension SharedKey where Self == FileStorageKey<[Challenge]>.Default {
     static var challenges: Self  {
-        PersistenceKeyDefault(.fileStorage(.challenges), [])
+        Self[.fileStorage(.challenges), default: []]
     }
 }
 
-extension PersistenceKey where Self == PersistenceKeyDefault<FileStorageKey<GlobalInfo?>> {
+extension SharedKey where Self == FileStorageKey<GlobalInfo?>.Default {
     static var globalInfos: Self  {
-        PersistenceKeyDefault(.fileStorage(.globalInfos), nil)
+        Self[.fileStorage(.globalInfos), default: nil]
     }
 }

@@ -47,5 +47,5 @@ struct NewsTileView: View {
     }
 }
 #Preview {
-    NewsTileView(allNews: Shared(News.mockList))
+    NewsTileView(allNews: Shared(value: News.mockList))
 }
