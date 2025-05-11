@@ -35,31 +35,31 @@ struct UserProfileDetailFeature {
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .confirmEditUserButtonTapped:
-                guard case let .some(.editUser(editState)) = state.destination
-                else { return .none }
-                state.destination = nil
-                return .run { _ in
-                    try await authentificationClient.updateUser(editState.wipUser)
-                }
-            case .destination:
-                return .none
-            case .dismissDestinationButtonTapped:
-                state.destination = nil
-                return .none
-            case .editUserButtonTapped:
-                state.destination = .editUser(
-                    UserProfileFormFeature.State()
-                )
-                return .none
-            case .signOutButtonTapped:
-                return .run { _ in
-                    do {
-                        try await self.authentificationClient.signOut()
-                    } catch {
-                        Logger.authLog.log(level: .fault, "Already logged out")
+                case .confirmEditUserButtonTapped:
+                    guard case let .some(.editUser(editState)) = state.destination
+                    else { return .none }
+                    state.destination = nil
+                    return .run { _ in
+                        try await authentificationClient.updateUser(editState.wipUser)
                     }
-                }
+                case .destination:
+                    return .none
+                case .dismissDestinationButtonTapped:
+                    state.destination = nil
+                    return .none
+                case .editUserButtonTapped:
+                    state.destination = .editUser(
+                        UserProfileFormFeature.State()
+                    )
+                    return .none
+                case .signOutButtonTapped:
+                    return .run { _ in
+                        do {
+                            try await self.authentificationClient.signOut()
+                        } catch {
+                            Logger.authLog.log(level: .fault, "Already logged out")
+                        }
+                    }
             }
         }
         .ifLet(\.$destination, action: \.destination)
@@ -109,22 +109,22 @@ struct UserProfileDetailView: View {
                     }
                 }
             }
-        }
-        .sheet(item: $store.scope(state: \.destination?.editUser, action: \.destination.editUser)) { editUserStore in
-            NavigationStack {
-                UserProfileFormView(store: editUserStore)
-                .navigationTitle("Edit profile")
-                .toolbar {
-                  ToolbarItem(placement: .cancellationAction) {
-                    Button("Dismiss") {
-                      store.send(.dismissDestinationButtonTapped)
-                    }
-                  }
-                  ToolbarItem(placement: .confirmationAction) {
-                    Button("Confirm") {
-                        store.send(.confirmEditUserButtonTapped)
-                    }
-                  }
+            .sheet(item: $store.scope(state: \.destination?.editUser, action: \.destination.editUser)) { editUserStore in
+                NavigationStack {
+                    UserProfileFormView(store: editUserStore)
+                        .navigationTitle("Edit profile")
+                        .toolbar {
+                            ToolbarItem(placement: .cancellationAction) {
+                                Button("Dismiss") {
+                                    store.send(.dismissDestinationButtonTapped)
+                                }
+                            }
+                            ToolbarItem(placement: .confirmationAction) {
+                                Button("Confirm") {
+                                    store.send(.confirmEditUserButtonTapped)
+                                }
+                            }
+                        }
                 }
             }
         }

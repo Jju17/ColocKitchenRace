@@ -86,8 +86,6 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		6405CBC82D886B7400BE8B0D /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (6405CBCD2D886B7400BE8B0D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
 		64FBE0262D8860CC00D8A89F /* CKRAdmin */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = CKRAdmin; sourceTree = "<group>"; };
-		64FBE0362D8860DB00D8A89F /* ColocKitchenRaceUITests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ColocKitchenRaceUITests; sourceTree = "<group>"; };
-		64FBE03A2D8860DF00D8A89F /* ColocKitchenRaceTests */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = ColocKitchenRaceTests; sourceTree = "<group>"; };
 		64FBE2FD2D88665300D8A89F /* ColocKitchenRace */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (64FBE3442D88665300D8A89F /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = ColocKitchenRace; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -151,8 +149,6 @@
 				6405CBC82D886B7400BE8B0D /* Shared */,
 				64FBE2FD2D88665300D8A89F /* ColocKitchenRace */,
 				64FBE0262D8860CC00D8A89F /* CKRAdmin */,
-				64FBE03A2D8860DF00D8A89F /* ColocKitchenRaceTests */,
-				64FBE0362D8860DB00D8A89F /* ColocKitchenRaceUITests */,
 				64F17B302AD2A3BC0047F6F3 /* Products */,
 				64AD9DDE2B9FB28400790A9F /* Frameworks */,
 			);
@@ -217,9 +213,6 @@
 			dependencies = (
 				64F17B412AD2A3BE0047F6F3 /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				64FBE03A2D8860DF00D8A89F /* ColocKitchenRaceTests */,
-			);
 			name = ColocsKitchenRaceTests;
 			productName = colockitchenraceTests;
 			productReference = 64F17B3F2AD2A3BE0047F6F3 /* ColocsKitchenRaceTests.xctest */;
@@ -237,9 +230,6 @@
 			);
 			dependencies = (
 				64F17B4B2AD2A3BE0047F6F3 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				64FBE0362D8860DB00D8A89F /* ColocKitchenRaceUITests */,
 			);
 			name = ColocsKitchenRaceUITests;
 			productName = colockitchenraceUITests;
@@ -566,7 +556,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_ASSET_PATHS = "\"colockitchenrace/Preview Content\"";
 				DEVELOPMENT_TEAM = YXXNH92P5F;
 				ENABLE_PREVIEWS = YES;
@@ -586,7 +576,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.julienrahier.colocskitchenrace;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.rahier.colocskitchenrace;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -607,6 +597,7 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_ASSET_PATHS = "\"colockitchenrace/Preview Content\"";
 				DEVELOPMENT_TEAM = YXXNH92P5F;
 				ENABLE_PREVIEWS = YES;
@@ -626,7 +617,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.julienrahier.colocskitchenrace;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.rahier.colocskitchenrace;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -742,7 +733,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.julienrahier.CKRAdmin;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.rahier.ckradmin;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -785,7 +776,7 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.julienrahier.CKRAdmin;
+				PRODUCT_BUNDLE_IDENTIFIER = dev.rahier.ckradmin;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
