@@ -76,7 +76,7 @@ struct HomeView: View {
                     }
                 }
                 .padding()
-                .navigationTitle("Welcome")
+                .navigationTitle("Colocs Kitchen Race")
                 .toolbar {
                     NavigationLink(
                         state: HomeFeature.Path.State.profile(UserProfileDetailFeature.State())

@@ -9,14 +9,23 @@ import ComposableArchitecture
 import Firebase
 import SwiftUI
 
+class AppDelegate: NSObject, UIApplicationDelegate {
+    func application(_ application: UIApplication,
+                     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+        FirebaseApp.configure()
+        return true
+    }
+}
+
 @main
 struct colockitchenraceApp: App {
+
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     @Dependency(\.globalInfoClient) var globalInfoClient
     @Dependency(\.newsClient) var newsClient
 
     init() {
-        FirebaseApp.configure()
         self.performFetchs()
     }
 

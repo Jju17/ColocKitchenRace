@@ -152,6 +152,9 @@
         }
       }
     },
+    "Colocs Kitchen Race" : {
+
+    },
     "Confirm" : {
 
     },
@@ -497,6 +500,7 @@
 
     },
     "Welcome" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
