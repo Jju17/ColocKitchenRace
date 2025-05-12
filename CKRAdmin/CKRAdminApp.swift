@@ -22,7 +22,6 @@ struct AdminCKRApp: App {
                     initialState: AppFeature.State.splashScreen(SplashScreenFeature.State())
                 ) {
                     AppFeature()
-                        ._printChanges()
                 }
             )
             .preferredColorScheme(.light)

@@ -24,7 +24,7 @@ struct NoChoiceView: View {
 #Preview {
     ZStack {
         Color.green
-        NoChoiceView(text: Challenge.mock.body)
+        NoChoiceView(text: ChallengeDTO.mock.body)
             .padding()
     }
     .ignoresSafeArea()

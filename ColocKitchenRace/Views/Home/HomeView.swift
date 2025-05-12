@@ -83,7 +83,6 @@ struct HomeView: View {
                     ) {
                         Image(systemName: "person.crop.circle.fill")
                     }
-
                 }
             } destination: { store in
                 switch store.case {

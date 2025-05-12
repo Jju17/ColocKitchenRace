@@ -44,10 +44,16 @@ struct CountdownTileView: View {
                             .fontWeight(.heavy)
                         Spacer()
                     }
-                    Text(self.nextKitchenRace?.formatted(date: .long, time: .omitted) ?? "No next date provided.")
-                        .font(.system(size: 12))
-                        .fontWeight(.light)
-                        .textCase(.uppercase)
+                    Group {
+                        if let nextKitchenRace {
+                            Text(nextKitchenRace.formatted(date: .long, time: .omitted))
+                        } else {
+                            Text("No next date provided")
+                        }
+                    }
+                    .font(.system(size: 12))
+                    .fontWeight(.light)
+                    .textCase(.uppercase)
                 }
                 .frame(maxWidth: .infinity)
                 .foregroundStyle(.white)

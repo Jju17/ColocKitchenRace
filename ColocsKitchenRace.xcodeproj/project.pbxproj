@@ -59,7 +59,16 @@
 			membershipExceptions = (
 				Assets/Assets.xcassets,
 				"Assets/GoogleService-Info.plist",
+				Assets/Localizable.xcstrings,
+				Models/Challenge/Challenge.swift,
+				Models/Challenge/ChallengeContent.swift,
+				Models/Challenge/ChallengeDTO.swift,
+				Models/Challenge/ChallengeType.swift,
+				Models/Challenge/MultipleChoiceContent.swift,
+				Models/Challenge/PictureContent.swift,
+				Models/Challenge/SingleAnswerContent.swift,
 				"Utils/CGFloat+Utils.swift",
+				"Utils/Collection+Utils.swift",
 				"Utils/Color+Utils.swift",
 				"Utils/Date+Utils.swift",
 				"Utils/DateComponents+Utils.swift",
@@ -299,6 +308,7 @@
 				en,
 				fr,
 				es,
+				Base,
 			);
 			mainGroup = 64F17B262AD2A3BC0047F6F3;
 			packageReferences = (
@@ -728,7 +738,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
@@ -771,7 +781,7 @@
 				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 15.2;

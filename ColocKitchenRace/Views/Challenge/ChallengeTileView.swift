@@ -17,8 +17,8 @@ struct ChallengeTileView: View {
             VStack(alignment: .center, spacing: 0) {
                 HeaderView(
                     title: self.challenge.title,
-                    startTime: self.challenge.startTimestamp.dateValue(),
-                    endTime: self.challenge.endTimestamp.dateValue()
+                    startTime: self.challenge.startDate,
+                    endTime: self.challenge.endDate
                 )
                 BodyView(description: self.challenge.body)
                     .padding(.vertical)
@@ -84,16 +84,14 @@ struct BodyView: View {
 
 @ViewBuilder
 func ChallengeContentView(challenge: Challenge) -> some View {
-    switch challenge.type {
-    case .picture:
-        PictureChoiceView()
-    case .multipleChoice:
-        MultipleChoiceView(choices: ["Choix 1", "Choix 2", "Choix 3"]) { selectedChoice in
-            print(selectedChoice)
-        }
-    case .singleAnswer:
-        SingleChoiceView(answer: .constant(""))
-    case .noChoice:
-        NoChoiceView(text: "")
+    switch challenge.content {
+        case .picture(let pictureContent):
+            PictureChoiceView()
+        case .multipleChoice(let multipleChoiceContent):
+            EmptyView()
+        case .singleAnswer(let singleAnswerContent):
+            EmptyView()
+        case .noChoice:
+            EmptyView()
     }
 }

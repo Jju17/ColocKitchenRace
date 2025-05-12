@@ -13,11 +13,13 @@ struct TabFeature {
     @ObservableState
     struct State {
         var selectedTab: Tab = .home
+        var challenge = ChallengeFeature.State()
         var home = HomeFeature.State()
     }
     
     enum Action {
         case tabChanged(Tab)
+        case challenge(ChallengeFeature.Action)
         case home(HomeFeature.Action)
     }
     
@@ -25,11 +27,17 @@ struct TabFeature {
         Scope(state: \.home, action: \.home) {
             HomeFeature()
         }
-        
+
+        Scope(state: \.challenge, action: \.challenge) {
+            ChallengeFeature()
+        }
+
         Reduce { state, action in
             switch action {
             case let .tabChanged(tab):
                 state.selectedTab = tab
+                return .none
+            case .challenge:
                 return .none
             case .home:
                 return .none
@@ -39,6 +47,7 @@ struct TabFeature {
 }
 
 enum Tab {
+    case challenge
     case home
 }
 
@@ -57,6 +66,16 @@ struct MyTabView: View {
                 Label("Home", systemImage: "house.fill")
             }
             .tag(Tab.home)
+            ChallengeView(
+                store: self.store.scope(
+                    state: \.challenge,
+                    action: \.challenge
+                )
+            )
+            .tabItem {
+                Label("Challenge", systemImage: "flag.2.crossed.fill")
+            }
+            .tag(Tab.challenge)
         }
     }
 }

@@ -1,32 +1,46 @@
 //
-//  Challenge.swift
-//  colockitchenrace
+//  ChallengeDTO.swift
+//  CKRAdmin
 //
-//  Created by Julien Rahier on 18/07/2024.
+//  Created by Julien Rahier on 11/05/2025.
 //
 
 import Foundation
 import FirebaseFirestore
 
-struct Challenge: Equatable, Hashable, Codable, Identifiable {
+struct ChallengeDTO: Equatable, Hashable, Codable, Identifiable {
     let id: UUID
-    let title: String
-    let startTimestamp: Timestamp
-    let endTimestamp: Timestamp
-    let body: String
-    let type: ChallengeType
+    var title: String
+    var startTimestamp: Timestamp
+    var endTimestamp: Timestamp
+    var body: String
+    var type: ChallengeType
+
+    func toChallenge() -> Challenge {
+        Challenge(
+            id: id,
+            title: title,
+            startDate: startTimestamp.dateValue(),
+            endDate: endTimestamp.dateValue(),
+            body: body,
+            content: type.toContent()
+        )
+    }
 }
 
-enum ChallengeType: Codable {
-    case picture
-    case multipleChoice
-    case singleAnswer
-    case noChoice
-}
+extension ChallengeDTO {
+    static var empty: ChallengeDTO {
+        return ChallengeDTO(id: UUID(),
+                            title: "",
+                            startTimestamp: Timestamp(),
+                            endTimestamp: Timestamp(),
+                            body: "",
+                            type: .noChoice
+        )
+    }
 
-extension Challenge {
-    static var mock: Challenge {
-        return Challenge(
+    static var mock: ChallengeDTO {
+        return ChallengeDTO(
             id: UUID(),
             title: "First to register !",
             startTimestamp: Timestamp(seconds: 1721901600, nanoseconds: 0),
@@ -36,9 +50,9 @@ extension Challenge {
         )
     }
 
-    static var mockList: [Challenge] {
+    static var mockList: [ChallengeDTO] {
         return [
-            Challenge(
+            ChallengeDTO(
                 id: UUID(),
                 title: "First to register !",
                 startTimestamp: Timestamp(seconds: 1721901600, nanoseconds: 0),
@@ -46,60 +60,60 @@ extension Challenge {
                 body: "Register to the next edition of coloc kitchen race 3, 2, 1, go !",
                 type: .noChoice
             ),
-            Challenge(
+            ChallengeDTO(
                 id: UUID(),
                 title: "Best cohouse name",
                 startTimestamp: Timestamp(seconds: 1721901600, nanoseconds: 0),
                 endTimestamp: Timestamp(seconds: 1721988000, nanoseconds: 0),
-                body: "Descritpion",
+                body: "Description",
                 type: .noChoice
             ),
-            Challenge(
+            ChallengeDTO(
                 id: UUID(),
                 title: "Young you",
                 startTimestamp: Timestamp(seconds: 1721901600, nanoseconds: 0),
                 endTimestamp: Timestamp(seconds: 1721988000, nanoseconds: 0),
-                body: "Descritpion",
+                body: "Description",
                 type: .picture
             ),
-            Challenge(
+            ChallengeDTO(
                 id: UUID(),
                 title: "Golden globe",
                 startTimestamp: Timestamp(seconds: 1721901600, nanoseconds: 0),
                 endTimestamp: Timestamp(seconds: 1721988000, nanoseconds: 0),
-                body: "Descritpion",
+                body: "Description",
                 type: .multipleChoice
             ),
-            Challenge(
+            ChallengeDTO(
                 id: UUID(),
-                title: "BEst dressing",
+                title: "Best dressing",
                 startTimestamp: Timestamp(seconds: 1721901600, nanoseconds: 0),
                 endTimestamp: Timestamp(seconds: 1721988000, nanoseconds: 0),
-                body: "Descritpion",
+                body: "Description",
                 type: .picture
             ),
-            Challenge(
+            ChallengeDTO(
                 id: UUID(),
                 title: "Best cohouse picture",
                 startTimestamp: Timestamp(seconds: 1721901600, nanoseconds: 0),
                 endTimestamp: Timestamp(seconds: 1721988000, nanoseconds: 0),
-                body: "Descritpion",
+                body: "Description",
                 type: .picture
             ),
-            Challenge(
+            ChallengeDTO(
                 id: UUID(),
                 title: "Enigma",
                 startTimestamp: Timestamp(seconds: 1721901600, nanoseconds: 0),
                 endTimestamp: Timestamp(seconds: 1721988000, nanoseconds: 0),
-                body: "Descritpion",
+                body: "Description",
                 type: .singleAnswer
             ),
-            Challenge(
+            ChallengeDTO(
                 id: UUID(),
                 title: "Best pyramid",
                 startTimestamp: Timestamp(seconds: 1721901600, nanoseconds: 0),
                 endTimestamp: Timestamp(seconds: 1721988000, nanoseconds: 0),
-                body: "Descritpion",
+                body: "Description",
                 type: .picture
             ),
         ]
