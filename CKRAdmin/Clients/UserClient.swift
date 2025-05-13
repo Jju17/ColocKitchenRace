@@ -12,14 +12,15 @@ import FirebaseAuth
 import FirebaseFirestore
 import os
 
-enum UserError: Error {
-    case failed
-    case failedWithError(String)
+enum UserError: Error, Equatable {
+    case networkError
+    case permissionDenied
+    case unknown(String)
 }
 
 @DependencyClient
 struct UserClient {
-    var totalUsersCount: @Sendable () async throws -> Result<Int, AuthError>
+    var totalUsersCount: @Sendable () async -> Result<Int, UserError> = { .success(0) }
 }
 
 extension UserClient: DependencyKey {
@@ -29,15 +30,30 @@ extension UserClient: DependencyKey {
                 let countQuery = Firestore.firestore().collection("users").count
                 let snapshot = try await countQuery.getAggregation(source: .server)
                 return .success(Int(truncating: snapshot.count))
-            } catch {
+            } catch let error as NSError {
                 Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
-                return .failure(.failedWithError(error.localizedDescription))
+                switch error.code {
+                case FirestoreErrorCode.unavailable.rawValue:
+                    return .failure(.networkError)
+                case FirestoreErrorCode.permissionDenied.rawValue:
+                    return .failure(.permissionDenied)
+                default:
+                    return .failure(.unknown(error.localizedDescription))
+                }
             }
         }
     )
 
     static var previewValue: UserClient {
-        return .testValue
+        Self(
+            totalUsersCount: { .success(42) }
+        )
+    }
+
+    static var testValue: UserClient {
+        Self(
+            totalUsersCount: { .success(0) }
+        )
     }
 }
 

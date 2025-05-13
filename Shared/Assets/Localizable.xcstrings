@@ -356,6 +356,9 @@
         }
       }
     },
+    "Error" : {
+
+    },
     "First name" : {
       "localizations" : {
         "fr" : {
@@ -659,6 +662,7 @@
       }
     },
     "Select a Picture" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {

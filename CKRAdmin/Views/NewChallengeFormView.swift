@@ -14,13 +14,13 @@ struct NewChallengeFormFeature {
     @ObservableState
     struct State {
         var wipChallenge: Challenge = .empty
-        var selectedImageItem: PhotosPickerItem? = nil
-        var selectedImage: Image?
+//        var selectedImageItem: PhotosPickerItem? = nil
+//        var selectedImage: Image?
     }
 
     enum Action: BindableAction {
         case binding(BindingAction<State>)
-        case imageLoaded(Result<UIImage, Error>)
+//        case imageLoaded(Result<UIImage, Error>)
         case updateChallengeContent(ChallengeContent)
         case updateMultipleChoiceChoices([String])
         case updateMultipleChoiceAllowMultipleSelection(Bool)
@@ -32,26 +32,26 @@ struct NewChallengeFormFeature {
         BindingReducer()
         Reduce { state, action in
             switch action {
-            case .binding(\.selectedImageItem):
-                return .run { [item = state.selectedImageItem] send in
-                    guard let item else { return }
-                    do {
-                        guard let imageData = try await item.loadTransferable(type: Data.self),
-                              let inputImage = UIImage(data: imageData) else {
-                            throw NSError(domain: "ImageLoading", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to load image"])
-                        }
-                        await send(.imageLoaded(.success(inputImage)))
-                    } catch {
-                        await send(.imageLoaded(.failure(error)))
-                    }
-                }
-            case .imageLoaded(.success(let image)):
-                state.selectedImage = Image(uiImage: image)
-                state.wipChallenge.content = .picture(PictureContent(imageData: image.pngData()))
-                return .none
-            case .imageLoaded(.failure(let error)):
-                print("Image loading error: \(error)") // TODO: Handle error
-                return .none
+//            case .binding(\.selectedImageItem):
+//                return .run { [item = state.selectedImageItem] send in
+//                    guard let item else { return }
+//                    do {
+//                        guard let imageData = try await item.loadTransferable(type: Data.self),
+//                              let inputImage = UIImage(data: imageData) else {
+//                            throw NSError(domain: "ImageLoading", code: -1, userInfo: [NSLocalizedDescriptionKey: "Failed to load image"])
+//                        }
+//                        await send(.imageLoaded(.success(inputImage)))
+//                    } catch {
+//                        await send(.imageLoaded(.failure(error)))
+//                    }
+//                }
+//            case .imageLoaded(.success(let image)):
+//                state.selectedImage = Image(uiImage: image)
+//                state.wipChallenge.content = .picture(PictureContent(imageData: image.pngData()))
+//                return .none
+//            case .imageLoaded(.failure(let error)):
+//                print("Image loading error: \(error)") // TODO: Handle error
+//                return .none
             case .updateChallengeContent(let content):
                 state.wipChallenge.content = content
                 return .none
@@ -110,16 +110,17 @@ struct NewChallengeFormView: View {
 
             switch store.wipChallenge.content {
             case .picture:
-                PhotosPicker(selection: $store.selectedImageItem) {
-                    if let processedImage = store.selectedImage {
-                        processedImage
-                            .resizable()
-                            .scaledToFit()
-                            .cornerRadius(10)
-                    } else {
-                        Text("Select a Picture")
-                    }
-                }
+                    EmptyView()
+//                PhotosPicker(selection: $store.selectedImageItem) {
+//                    if let processedImage = store.selectedImage {
+//                        processedImage
+//                            .resizable()
+//                            .scaledToFit()
+//                            .cornerRadius(10)
+//                    } else {
+//                        Text("Select a Picture")
+//                    }
+//                }
             case .multipleChoice(let content):
                 ForEach(0..<content.choices.count, id: \.self) { index in
                     TextField("Choice \(index + 1)", text: Binding(
