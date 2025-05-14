@@ -14,15 +14,17 @@ struct TabFeature {
     struct State {
         var selectedTab: Tab = .home
         var challenge = ChallengeFeature.State()
+        var challengeValidation = ChallengeValidationFeature.State()
         var home = HomeFeature.State()
     }
-    
+
     enum Action {
         case tabChanged(Tab)
         case challenge(ChallengeFeature.Action)
+        case challengeValidation(ChallengeValidationFeature.Action)
         case home(HomeFeature.Action)
     }
-    
+
     var body: some ReducerOf<Self> {
         Scope(state: \.home, action: \.home) {
             HomeFeature()
@@ -32,15 +34,21 @@ struct TabFeature {
             ChallengeFeature()
         }
 
+        Scope(state: \.challengeValidation, action: \.challengeValidation) {
+            ChallengeValidationFeature()
+        }
+
         Reduce { state, action in
             switch action {
-            case let .tabChanged(tab):
-                state.selectedTab = tab
-                return .none
-            case .challenge:
-                return .none
-            case .home:
-                return .none
+                case let .tabChanged(tab):
+                    state.selectedTab = tab
+                    return .none
+                case .challengeValidation:
+                    return .none
+                case .challenge:
+                    return .none
+                case .home:
+                    return .none
             }
         }
     }
@@ -48,12 +56,13 @@ struct TabFeature {
 
 enum Tab {
     case challenge
+    case challengeValidation
     case home
 }
 
 struct MyTabView: View {
     @Bindable var store: StoreOf<TabFeature>
-    
+
     var body: some View {
         TabView(selection: $store.selectedTab.sending(\.tabChanged)) {
             HomeView(
@@ -73,9 +82,19 @@ struct MyTabView: View {
                 )
             )
             .tabItem {
-                Label("Challenge", systemImage: "flag.2.crossed.fill")
+                Label("Challenges", systemImage: "flag.2.crossed.fill")
             }
             .tag(Tab.challenge)
+            ChallengeValidationView(
+                store: self.store.scope(
+                    state: \.challengeValidation,
+                    action: \.challengeValidation
+                )
+            )
+            .tabItem {
+                Label("Validation", systemImage: "checklist.checked")
+            }
+            .tag(Tab.challengeValidation)
         }
     }
 }

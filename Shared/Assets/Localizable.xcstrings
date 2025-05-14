@@ -44,6 +44,9 @@
         }
       }
     },
+    "Add test responses" : {
+
+    },
     "Add user" : {
       "localizations" : {
         "fr" : {
@@ -138,6 +141,9 @@
         }
       }
     },
+    "Challenge responses" : {
+
+    },
     "Challenges" : {
       "localizations" : {
         "fr" : {
@@ -157,6 +163,9 @@
           }
         }
       }
+    },
+    "Choice: %@" : {
+
     },
     "City" : {
       "localizations" : {
@@ -227,6 +236,9 @@
           }
         }
       }
+    },
+    "Cohouse: %@" : {
+
     },
     "Cohouses" : {
       "localizations" : {
@@ -379,6 +391,12 @@
     "Error" : {
 
     },
+    "Error : %@" : {
+
+    },
+    "Filter responses" : {
+
+    },
     "First name" : {
       "localizations" : {
         "fr" : {
@@ -449,6 +467,15 @@
         }
       }
     },
+    "Image not available" : {
+
+    },
+    "Invalidate" : {
+
+    },
+    "Invalidate response %@" : {
+
+    },
     "Join existing cohouse" : {
       "localizations" : {
         "fr" : {
@@ -468,6 +495,9 @@
           }
         }
       }
+    },
+    "Loading responses..." : {
+
     },
     "Localisation" : {
       "localizations" : {
@@ -603,6 +633,9 @@
         }
       }
     },
+    "No challenge response at the moment" : {
+
+    },
     "No food intolerences" : {
       "localizations" : {
         "fr" : {
@@ -623,6 +656,9 @@
           }
         }
       }
+    },
+    "No specific response" : {
+
     },
     "None" : {
       "localizations" : {
@@ -663,6 +699,9 @@
           }
         }
       }
+    },
+    "Response: %@" : {
+
     },
     "Seconds" : {
       "localizations" : {
@@ -806,6 +845,9 @@
         }
       }
     },
+    "Status: %@" : {
+
+    },
     "Submit" : {
       "localizations" : {
         "fr" : {
@@ -815,6 +857,9 @@
           }
         }
       }
+    },
+    "Submitted on: %@" : {
+
     },
     "Text" : {
 
@@ -837,6 +882,15 @@
     },
     "Total users :" : {
       "shouldTranslate" : false
+    },
+    "Validate" : {
+
+    },
+    "Validation" : {
+
+    },
+    "Valider la réponse %@" : {
+
     },
     "You need an account ?" : {
       "localizations" : {
