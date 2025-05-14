@@ -26,8 +26,8 @@ enum ChallengeType: String, Codable, CaseIterable, Identifiable {
         switch self {
             case .picture: return .picture(PictureContent())
             case .multipleChoice: return .multipleChoice(MultipleChoiceContent())
-            case .singleAnswer: return .singleAnswer(SingleAnswerContent(answer: ""))
-            case .noChoice: return .noChoice
+            case .singleAnswer: return .singleAnswer(SingleAnswerContent())
+            case .noChoice: return .noChoice(NoChoiceContent())
         }
     }
 

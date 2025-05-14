@@ -11,5 +11,5 @@ enum ChallengeContent: Equatable, Codable, Hashable {
     case picture(PictureContent)
     case multipleChoice(MultipleChoiceContent)
     case singleAnswer(SingleAnswerContent)
-    case noChoice
+    case noChoice(NoChoiceContent)
 }

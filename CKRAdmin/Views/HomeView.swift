@@ -132,7 +132,7 @@ struct HomeView: View {
                     }
                 }
             }
-            .navigationTitle("Stats")
+            .navigationTitle("Dashboard")
         }
         .task {
             store.send(.onTask)

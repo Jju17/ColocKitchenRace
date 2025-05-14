@@ -19,13 +19,37 @@ enum ChallengeError: Error, Equatable {
 
 @DependencyClient
 struct ChallengeClient {
+    var add: @Sendable (_ newChallenge: Challenge) async -> Result<Bool, ChallengeError> = { _ in .success(true) }
+    var getAll: @Sendable () async -> Result<[Challenge], Error> = { .success([]) }
     var totalChallengesCount: @Sendable () async -> Result<Int, ChallengeError> = { .success(0) }
     var activeChallengesCount: @Sendable () async -> Result<Int, ChallengeError> = { .success(0) }
     var nextChallengesCount: @Sendable () async -> Result<Int, ChallengeError> = { .success(0) }
+    var delete: (UUID) async throws -> Void
 }
 
 extension ChallengeClient: DependencyKey {
     static let liveValue = Self(
+        add: { newChallenge in
+            do {
+                let challengeRef = Firestore.firestore().collection("challenges").document(newChallenge.id.uuidString)
+                try challengeRef.setData(from: newChallenge)
+                return .success(true)
+            } catch {
+                return .failure(.unknown(error.localizedDescription))
+            }
+        },
+        getAll: {
+            do {
+                let querySnapshot = try await Firestore.firestore().collection("challenges").getDocuments()
+                let documents = querySnapshot.documents
+                let allChallenges = documents.compactMap { document in
+                    try? document.data(as: Challenge.self)
+                }
+                return .success(allChallenges)
+            } catch {
+                return .failure(error)
+            }
+        },
         totalChallengesCount: {
             do {
                 let db = Firestore.firestore()
@@ -79,26 +103,36 @@ extension ChallengeClient: DependencyKey {
                     return .failure(.networkError)
                 case FirestoreErrorCode.permissionDenied.rawValue:
                     return .failure(.permissionDenied)
-                default:
-                    return .failure(.unknown(error.localizedDescription))
+                    default:
+                        return .failure(.unknown(error.localizedDescription))
                 }
             }
+        },
+        delete: { id in
+            let db = Firestore.firestore()
+            try await db.collection("challenges").document(id.uuidString).delete()
         }
     )
 
     static var previewValue: ChallengeClient {
         Self(
+            add: { _ in .success(true) },
+            getAll: { .success([]) },
             totalChallengesCount: { .success(42) },
             activeChallengesCount: { .success(10) },
-            nextChallengesCount: { .success(5) }
+            nextChallengesCount: { .success(5) },
+            delete: { _ in }
         )
     }
 
     static var testValue: ChallengeClient {
         Self(
+            add: { _ in .success(true) },
+            getAll: { .success([]) },
             totalChallengesCount: { .success(0) },
             activeChallengesCount: { .success(0) },
-            nextChallengesCount: { .success(0) }
+            nextChallengesCount: { .success(0) },
+            delete: { _ in }
         )
     }
 }

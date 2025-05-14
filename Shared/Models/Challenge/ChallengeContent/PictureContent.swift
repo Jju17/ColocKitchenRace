@@ -7,6 +7,4 @@
 
 import Foundation
 
-struct PictureContent: Equatable, Codable, Hashable {
-    var imageData: Data?
-}
+struct PictureContent: Equatable, Codable, Hashable {}

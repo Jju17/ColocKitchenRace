@@ -7,6 +7,4 @@
 
 import Foundation
 
-struct SingleAnswerContent: Equatable, Codable, Hashable {
-    var answer: String = ""
-}
+struct SingleAnswerContent: Equatable, Codable, Hashable {}

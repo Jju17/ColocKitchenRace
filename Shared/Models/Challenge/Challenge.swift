@@ -5,8 +5,14 @@
 //  Created by Julien Rahier on 18/07/2024.
 //
 
-import Foundation
+import SwiftUI
 import FirebaseFirestore
+
+enum ChallengeState: String {
+    case done = "Done"
+    case ongoing = "Ongoing"
+    case notStarted = "Not started"
+}
 
 struct Challenge: Equatable, Hashable, Codable, Identifiable {
     let id: UUID
@@ -15,27 +21,37 @@ struct Challenge: Equatable, Hashable, Codable, Identifiable {
     var endDate: Date
     var body: String
     var content: ChallengeContent
-
-//    func toChallengeDTO() -> ChallengeDTO {
-//        ChallengeDTO(
-//            id: id,
-//            title: title,
-//            startTimestamp: Timestamp(date: startDate),
-//            endTimestamp: Timestamp(date: endDate),
-//            body: body,
-//            type:
-//        )
-//    }
 }
 
 extension Challenge {
+    var state: ChallengeState {
+        if Date() > endDate {
+            return .done
+        } else if Date() < startDate {
+            return .notStarted
+        } else {
+            return .ongoing
+        }
+    }
+
+    var stateColor: Color {
+        switch state {
+            case .done:
+                return .red
+            case .ongoing:
+                return .green
+            case .notStarted:
+                return .orange
+        }
+    }
+
     static var empty: Challenge {
         return Challenge(id: UUID(),
                          title: "",
                          startDate: Date(),
                          endDate: Date(),
                          body: "",
-                         content: .noChoice
+                         content: .noChoice(NoChoiceContent())
         )
     }
 }
@@ -47,7 +63,7 @@ extension Challenge {
                          startDate: Date(),
                          endDate: Date().addingTimeInterval(86400),
                          body: "This is a new challenge",
-                         content: .noChoice
+                         content: .noChoice(NoChoiceContent())
         )
     }
 
@@ -59,7 +75,7 @@ extension Challenge {
                 startDate: Date.from(year: 2025, month: 3, day: 1),
                 endDate: Date.from(year: 2025, month: 3, day: 4),
                 body: "Register to the next edition of coloc kitchen race 3, 2, 1, go !",
-                content: .noChoice
+                content: .noChoice(NoChoiceContent())
             ),
             Challenge(
                 id: UUID(),
@@ -67,7 +83,7 @@ extension Challenge {
                 startDate: Date.from(year: 2025, month: 3, day: 1),
                 endDate: Date.from(year: 2025, month: 3, day: 6),
                 body: "Description",
-                content: .noChoice
+                content: .noChoice(NoChoiceContent())
             ),
             Challenge(
                 id: UUID(),
