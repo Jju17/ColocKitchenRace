@@ -12,5 +12,5 @@ extension URL {
     static let cohouse = Self.documentsDirectory.appending(component: "userCohouse.json")
     static let news = Self.documentsDirectory.appending(component: "news.json")
     static let challenges = Self.documentsDirectory.appending(component: "challenges.json")
-    static let globalInfos = Self.documentsDirectory.appending(component: "globalInfos.json")
+    static let ckrGame = Self.documentsDirectory.appending(component: "ckrGame.json")
 }

@@ -32,8 +32,8 @@ extension SharedKey where Self == FileStorageKey<[Challenge]>.Default {
     }
 }
 
-extension SharedKey where Self == FileStorageKey<GlobalInfo?>.Default {
-    static var globalInfos: Self  {
-        Self[.fileStorage(.globalInfos), default: nil]
+extension SharedKey where Self == FileStorageKey<CKRGame?>.Default {
+    static var ckrGame: Self  {
+        Self[.fileStorage(.ckrGame), default: nil]
     }
 }

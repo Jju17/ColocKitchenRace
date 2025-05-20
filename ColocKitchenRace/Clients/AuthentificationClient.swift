@@ -70,13 +70,13 @@ extension AuthentificationClient: DependencyKey {
             try Auth.auth().signOut()
             @Shared(.userInfo) var user
             @Shared(.cohouse) var cohouse
-            @Shared(.globalInfos) var globalInfos
+            @Shared(.ckrGame) var ckrGame
             @Shared(.news) var news
             @Shared(.challenges) var challenges
 
             $user.withLock { $0 = nil }
             $cohouse.withLock { $0 = nil }
-            $globalInfos.withLock { $0 = nil }
+            $ckrGame.withLock { $0 = nil }
             $news.withLock { $0 = [] }
             $challenges.withLock { $0 = [] }
         },

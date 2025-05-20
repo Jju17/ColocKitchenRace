@@ -68,6 +68,7 @@
 				Models/Challenge/ChallengeContent/PictureContent.swift,
 				Models/Challenge/ChallengeContent/SingleAnswerContent.swift,
 				Models/Challenge/ChallengeType.swift,
+				Models/CKRGame.swift,
 				"Utils/CGFloat+Utils.swift",
 				"Utils/Collection+Utils.swift",
 				"Utils/Color+Utils.swift",

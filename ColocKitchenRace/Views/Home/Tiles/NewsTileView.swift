@@ -33,14 +33,25 @@ struct NewsTileView: View {
                 .padding(.horizontal)
                 .padding(.top)
 
-                List {
-                    ForEach(self.allNews) { news in
-                        NewsCell(news: news)
+                if !self.allNews.isEmpty {
+                    List {
+                        ForEach(self.allNews) { news in
+                            NewsCell(news: news)
+                        }
+                    }
+                    .listStyle(.inset)
+                    .cornerRadius(15)
+                    .padding()
+                } else {
+                    ZStack {
+                        Rectangle()
+                            .fill(.white)
+                            .cornerRadius(15)
+                            .padding()
+                        Text("No news at the moment")
+                            .foregroundColor(.gray)
                     }
                 }
-                .listStyle(.inset)
-                .cornerRadius(15)
-                .padding()
             }
         }
         .frame(height: 230)

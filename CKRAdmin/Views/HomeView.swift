@@ -11,6 +11,22 @@ import SwiftUI
 
 @Reducer
 struct HomeFeature {
+
+    @Reducer
+    enum Destination {
+        case addNewCKRGame(CKRGameFormFeature)
+        case alert(AlertState<Action.Alert>)
+
+        enum Action {
+            case addNewCKRGame(CKRGameFormFeature.Action)
+            case alert(Alert)
+
+            enum Alert {
+                case gameAlreadyGenerated
+            }
+        }
+    }
+
     @ObservableState
     struct State {
         struct UsersState {
@@ -24,6 +40,7 @@ struct HomeFeature {
             var active = 0
             var next = 0
         }
+        @Presents var destination: Destination.State?
         var users = UsersState()
         var cohouses = CohousesState()
         var challenges = ChallengesState()
@@ -31,6 +48,12 @@ struct HomeFeature {
     }
 
     enum Action {
+        case addNewCKRGameButtonTapped
+        case addNewCKRGameForm
+        case ckrGameAlreadyExists
+        case confirmAddCKRGameButtonTapped
+        case destination(PresentationAction<Destination.Action>)
+        case dismissDestinationButtonTapped
         case onTask
         case totalUsersUpdated(Int)
         case totalCohousesUpdated(Int)
@@ -43,10 +66,45 @@ struct HomeFeature {
     @Dependency(\.userClient) var userClient
     @Dependency(\.cohouseClient) var cohouseClient
     @Dependency(\.challengeClient) var challengeClient
+    @Dependency(\.ckrClient) var ckrClient
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
+                case .addNewCKRGameButtonTapped:
+                    return .run { send in
+                        guard let game = try await self.ckrClient.getGame().get() else {
+                            await send(.addNewCKRGameForm)
+                            return
+                        }
+
+                        await send(.ckrGameAlreadyExists)
+                    }
+                case .addNewCKRGameForm:
+                    state.destination = .addNewCKRGame(CKRGameFormFeature.State())
+                    return .none
+                case .ckrGameAlreadyExists:
+                    state.destination = .alert(
+                        AlertState {
+                            TextState("CKR Game already exists")
+                        } message: {
+                            TextState("For now, if you want to delete current game, please check with an Admin.")
+                        }
+                    )
+                    return .none
+                case .confirmAddCKRGameButtonTapped:
+                    guard case let .some(.addNewCKRGame(ckrGameFormFeature)) = state.destination
+                    else { return .none }
+
+                    let newGame = ckrGameFormFeature.wipCKRGame
+                    state.destination = nil
+
+                    return .run { _ in
+                        let _ = self.ckrClient.newGame(newGame)
+                    }
+                case .dismissDestinationButtonTapped:
+                    state.destination = nil
+                    return .none
                 case .onTask:
                     return .run { send in
                         async let users = self.userClient.totalUsersCount().get()
@@ -89,8 +147,11 @@ struct HomeFeature {
                 case let .errorOccurred(error):
                     state.error = error
                     return .none
+                case .destination:
+                    return .none
             }
         }
+        .ifLet(\.$destination, action: \.destination)
     }
 }
 
@@ -133,6 +194,39 @@ struct HomeView: View {
                 }
             }
             .navigationTitle("Dashboard")
+            .toolbar {
+                Button {
+                    self.store.send(.addNewCKRGameButtonTapped)
+                } label: {
+                    Image(systemName: "plus")
+                }
+            }
+        }
+        .alert(
+            $store.scope(
+                state: \.destination?.alert,
+                action: \.destination.alert
+            )
+        )
+        .sheet(
+            item: $store.scope(state: \.destination?.addNewCKRGame, action: \.destination.addNewCKRGame)
+        ) { addNewCKRGameStore in
+            NavigationStack {
+                CKRGameFormView(store: addNewCKRGameStore)
+                    .navigationTitle("New CKR Game")
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Dismiss") {
+                                store.send(.dismissDestinationButtonTapped)
+                            }
+                        }
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Create") {
+                                store.send(.confirmAddCKRGameButtonTapped)
+                            }
+                        }
+                    }
+            }
         }
         .task {
             store.send(.onTask)

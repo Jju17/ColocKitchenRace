@@ -21,7 +21,7 @@ struct HomeFeature {
     struct State {
         var path = StackState<Path.State>()
         @Shared(.cohouse) var cohouse
-        @Shared(.globalInfos) var globalInfos
+        @Shared(.ckrGame) var ckrGame
         @Shared(.news) var news
         @Shared(.userInfo) var userInfo
     }
@@ -38,10 +38,9 @@ struct HomeFeature {
         Reduce { state, action in
             switch action {
             case .openRegisterLink:
-                guard let cohouse = state.cohouse,
-                      let userInfo = state.userInfo
+                guard let cohouse = state.cohouse
                 else { return .none}
-                self.ckrClient.register(cohouse: cohouse, userInfo: userInfo)
+                let _ = self.ckrClient.registerCohouse(cohouse: cohouse)
                 return .none
             case .path:
                 return .none
@@ -70,12 +69,12 @@ struct HomeView: View {
                         Button {
                             self.store.send(.openRegisterLink)
                         } label: {
-                            CountdownTileView(nextKitchenRace: self.store.globalInfos?.nextCKR)
+                            CountdownTileView(nextKitchenRace: self.store.ckrGame?.nextGameDate)
                         }
                         NewsTileView(allNews: self.store.$news)
                     }
                 }
-                .padding()
+                .padding(.horizontal)
                 .navigationTitle("Colocs Kitchen Race")
                 .toolbar {
                     NavigationLink(

@@ -22,7 +22,7 @@ struct colockitchenraceApp: App {
 
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
-    @Dependency(\.globalInfoClient) var globalInfoClient
+    @Dependency(\.ckrClient) var ckrClient
     @Dependency(\.newsClient) var newsClient
 
     init() {
@@ -44,7 +44,7 @@ struct colockitchenraceApp: App {
 
     private func performFetchs() {
         Task {
-            let _ = try? await self.globalInfoClient.getLast()
+            let _ = try? await self.ckrClient.getLast()
             let _ = try? await self.newsClient.getLast()
         }
     }
