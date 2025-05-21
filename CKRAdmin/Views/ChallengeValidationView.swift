@@ -130,16 +130,8 @@ struct ChallengeValidationView: View {
                                             .foregroundColor(statusColor(for: response.status))
                                         // Display response content
                                         switch response.content {
-                                            case .picture(let data):
-                                                if let uiImage = UIImage(data: data) {
-                                                    Image(uiImage: uiImage)
-                                                        .resizable()
-                                                        .scaledToFit()
-                                                        .frame(height: 100)
-                                                        .cornerRadius(8)
-                                                } else {
-                                                    Text("Image not available")
-                                                }
+                                            case .picture(let path):
+                                                StorageImage(path: path)
                                             case .multipleChoice(let indices):
                                                 Text("Choice: \(indices.map { String($0 + 1) }.joined(separator: ", "))")
                                             case .singleAnswer(let answer):

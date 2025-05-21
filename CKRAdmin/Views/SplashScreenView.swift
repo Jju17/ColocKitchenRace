@@ -33,7 +33,7 @@ struct SplashScreenView: View {
             Color(Color.CKRPurple)
                 .ignoresSafeArea()
             VStack {
-                Image("AdminLogo")
+                Image("AdminLogoNoFill")
                     .resizable()
                     .frame(width: 150, height: 150, alignment: .center)
                 ProgressView()

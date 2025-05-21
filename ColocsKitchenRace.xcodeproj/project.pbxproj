@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		64118E132DDCEECF0075A0C4 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 64118E122DDCEECF0075A0C4 /* FirebaseStorage */; };
 		642701AA2ADEA5F700850684 /* (null) in Resources */ = {isa = PBXBuildFile; };
 		642701AC2AE12F9300850684 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		64325AF52AF698D400038EA5 /* (null) in Sources */ = {isa = PBXBuildFile; };
@@ -141,6 +142,7 @@
 				64FBE3742D88682D00D8A89F /* FirebaseFirestore in Frameworks */,
 				64FBE3782D88682D00D8A89F /* SwiftUIIntrospect in Frameworks */,
 				643653792DD5444D00EAEEE1 /* FirebaseAppCheck in Frameworks */,
+				64118E132DDCEECF0075A0C4 /* FirebaseStorage in Frameworks */,
 				64FBE36E2D88682D00D8A89F /* FirebaseAnalyticsSwift in Frameworks */,
 				64FBE3702D88682D00D8A89F /* FirebaseAuth in Frameworks */,
 			);
@@ -275,6 +277,7 @@
 				64FBE3752D88682D00D8A89F /* ComposableArchitecture */,
 				64FBE3772D88682D00D8A89F /* SwiftUIIntrospect */,
 				643653782DD5444D00EAEEE1 /* FirebaseAppCheck */,
+				64118E122DDCEECF0075A0C4 /* FirebaseStorage */,
 			);
 			productName = CKRAdmin;
 			productReference = 64FBE0252D8860CC00D8A89F /* CKRAdmin.app */;
@@ -890,6 +893,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		64118E122DDCEECF0075A0C4 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 64FB41BE2AD4086100C93A34 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
 		643653742DD5443E00EAEEE1 /* FirebaseAppCheck */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 64FB41BE2AD4086100C93A34 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;

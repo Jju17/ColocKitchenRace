@@ -13,13 +13,13 @@ struct ChallengeResponse: Equatable, Codable, Identifiable {
     let id: UUID
     let challengeId: UUID
     let cohouseId: String // Changed from userId to cohouseId
-    let content: ChallengeResponseContent
+    var content: ChallengeResponseContent
     var status: ChallengeResponseStatus // Changed from isValidated to status
     let submissionDate: Timestamp
 }
 
 enum ChallengeResponseContent: Equatable, Codable {
-    case picture(Data)
+    case picture(String)
     case multipleChoice([Int])
     case singleAnswer(String)
     case noChoice
@@ -58,7 +58,7 @@ extension ChallengeResponse {
                 id: UUID(),
                 challengeId: challengeIds[2], // "Young you" (picture)
                 cohouseId: "cohouse_beta",
-                content: .picture(Data()), // Placeholder for image data
+                content: .picture(""), // Placeholder for image data
                 status: .validated,
                 submissionDate: Timestamp(date: Date.from(year: 2025, month: 4, day: 15, hour: 14)) // During challenge
             ),
@@ -82,7 +82,7 @@ extension ChallengeResponse {
                 id: UUID(),
                 challengeId: challengeIds[4], // "Best dressing" (picture)
                 cohouseId: "cohouse_epsilon",
-                content: .picture(Data()),
+                content: .picture(""),
                 status: .validated,
                 submissionDate: Timestamp(date: Date.from(year: 2025, month: 4, day: 25, hour: 11)) // During challenge
             ),
@@ -98,7 +98,7 @@ extension ChallengeResponse {
                 id: UUID(),
                 challengeId: challengeIds[5], // "Best cohouse picture" (picture)
                 cohouseId: "cohouse_eta",
-                content: .picture(Data()),
+                content: .picture(""),
                 status: .waiting,
                 submissionDate: Timestamp(date: Date.from(year: 2025, month: 5, day: 12, hour: 15)) // During challenge
             )
