@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		64118E132DDCEECF0075A0C4 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 64118E122DDCEECF0075A0C4 /* FirebaseStorage */; };
+		641196452DDF7D030075A0C4 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 641196442DDF7D030075A0C4 /* FirebaseStorage */; };
 		642701AA2ADEA5F700850684 /* (null) in Resources */ = {isa = PBXBuildFile; };
 		642701AC2AE12F9300850684 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		64325AF52AF698D400038EA5 /* (null) in Sources */ = {isa = PBXBuildFile; };
@@ -86,6 +87,14 @@
 			);
 			target = 64F17B2E2AD2A3BC0047F6F3 /* ColocsKitchenRace */;
 		};
+		641196422DDF7CB50075A0C4 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Clients/ChallengeResponseClient.swift,
+				Models/ChallengeResponse.swift,
+			);
+			target = 64F17B2E2AD2A3BC0047F6F3 /* ColocsKitchenRace */;
+		};
 		64FBE3442D88665300D8A89F /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -97,7 +106,7 @@
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		6405CBC82D886B7400BE8B0D /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (6405CBCD2D886B7400BE8B0D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
-		64FBE0262D8860CC00D8A89F /* CKRAdmin */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = CKRAdmin; sourceTree = "<group>"; };
+		64FBE0262D8860CC00D8A89F /* CKRAdmin */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (641196422DDF7CB50075A0C4 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = CKRAdmin; sourceTree = "<group>"; };
 		64FBE2FD2D88665300D8A89F /* ColocKitchenRace */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (64FBE3442D88665300D8A89F /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = ColocKitchenRace; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -114,6 +123,7 @@
 				64FB41C62AD4086100C93A34 /* FirebaseCrashlytics in Frameworks */,
 				643E31A92C0BAA23004E4CAE /* FirebaseFirestore in Frameworks */,
 				64FE3CE92B8D58B800E6AAAE /* DependenciesMacros in Frameworks */,
+				641196452DDF7D030075A0C4 /* FirebaseStorage in Frameworks */,
 				643653752DD5443E00EAEEE1 /* FirebaseAppCheck in Frameworks */,
 				64FB41C42AD4086100C93A34 /* FirebaseAuth in Frameworks */,
 			);
@@ -211,6 +221,7 @@
 				643E31A82C0BAA23004E4CAE /* FirebaseFirestore */,
 				6469FA6F2C1FAD2E002BDBF6 /* SwiftUIIntrospect */,
 				643653742DD5443E00EAEEE1 /* FirebaseAppCheck */,
+				641196442DDF7D030075A0C4 /* FirebaseStorage */,
 			);
 			productName = colockitchenrace;
 			productReference = 64F17B2F2AD2A3BC0047F6F3 /* ColocsKitchenRace.app */;
@@ -894,6 +905,11 @@
 
 /* Begin XCSwiftPackageProductDependency section */
 		64118E122DDCEECF0075A0C4 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 64FB41BE2AD4086100C93A34 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
+		641196442DDF7D030075A0C4 /* FirebaseStorage */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 64FB41BE2AD4086100C93A34 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseStorage;

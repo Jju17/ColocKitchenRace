@@ -15,7 +15,7 @@ struct ChallengeResponse: Equatable, Codable, Identifiable {
     let cohouseId: String // Changed from userId to cohouseId
     var content: ChallengeResponseContent
     var status: ChallengeResponseStatus // Changed from isValidated to status
-    let submissionDate: Timestamp
+    let submissionDate: Date
 }
 
 enum ChallengeResponseContent: Equatable, Codable {
@@ -39,7 +39,7 @@ extension ChallengeResponse {
             cohouseId: "cohouse_alpha",
             content: .noChoice,
             status: .waiting,
-            submissionDate: Timestamp(date: Date.from(year: 2025, month: 5, day: 14, hour: 20)) // May 14, 2025, 8:00 PM
+            submissionDate: Date.from(year: 2025, month: 5, day: 14, hour: 20) // May 14, 2025, 8:00 PM
         )
     }
 
@@ -52,7 +52,7 @@ extension ChallengeResponse {
                 cohouseId: "cohouse_alpha",
                 content: .noChoice,
                 status: .waiting,
-                submissionDate: Timestamp(date: Date.from(year: 2025, month: 3, day: 2, hour: 10)) // During challenge
+                submissionDate: Date.from(year: 2025, month: 3, day: 2, hour: 10) // During challenge
             ),
             ChallengeResponse(
                 id: UUID(),
@@ -60,7 +60,7 @@ extension ChallengeResponse {
                 cohouseId: "cohouse_beta",
                 content: .picture(""), // Placeholder for image data
                 status: .validated,
-                submissionDate: Timestamp(date: Date.from(year: 2025, month: 4, day: 15, hour: 14)) // During challenge
+                submissionDate: Date.from(year: 2025, month: 4, day: 15, hour: 14) // During challenge
             ),
             ChallengeResponse(
                 id: UUID(),
@@ -68,7 +68,7 @@ extension ChallengeResponse {
                 cohouseId: "cohouse_gamma",
                 content: .multipleChoice([0, 1]), // Selected choices 1 and 2
                 status: .invalidated,
-                submissionDate: Timestamp(date: Date.from(year: 2025, month: 5, day: 1, hour: 9)) // During challenge
+                submissionDate: Date.from(year: 2025, month: 5, day: 1, hour: 9) // During challenge
             ),
             ChallengeResponse(
                 id: UUID(),
@@ -76,7 +76,7 @@ extension ChallengeResponse {
                 cohouseId: "cohouse_delta",
                 content: .singleAnswer("The answer is 42"),
                 status: .waiting,
-                submissionDate: Timestamp(date: Date.from(year: 2025, month: 5, day: 10, hour: 16)) // During challenge
+                submissionDate: Date.from(year: 2025, month: 5, day: 10, hour: 16) // During challenge
             ),
             ChallengeResponse(
                 id: UUID(),
@@ -84,7 +84,7 @@ extension ChallengeResponse {
                 cohouseId: "cohouse_epsilon",
                 content: .picture(""),
                 status: .validated,
-                submissionDate: Timestamp(date: Date.from(year: 2025, month: 4, day: 25, hour: 11)) // During challenge
+                submissionDate: Date.from(year: 2025, month: 4, day: 25, hour: 11) // During challenge
             ),
             ChallengeResponse(
                 id: UUID(),
@@ -92,7 +92,7 @@ extension ChallengeResponse {
                 cohouseId: "cohouse_zeta",
                 content: .noChoice,
                 status: .invalidated,
-                submissionDate: Timestamp(date: Date.from(year: 2025, month: 3, day: 5, hour: 12)) // During challenge
+                submissionDate: Date.from(year: 2025, month: 3, day: 5, hour: 12) // During challenge
             ),
             ChallengeResponse(
                 id: UUID(),
@@ -100,7 +100,7 @@ extension ChallengeResponse {
                 cohouseId: "cohouse_eta",
                 content: .picture(""),
                 status: .waiting,
-                submissionDate: Timestamp(date: Date.from(year: 2025, month: 5, day: 12, hour: 15)) // During challenge
+                submissionDate: Date.from(year: 2025, month: 5, day: 12, hour: 15) // During challenge
             )
         ]
     }

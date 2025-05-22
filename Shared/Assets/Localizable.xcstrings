@@ -99,6 +99,7 @@
       }
     },
     "Answer" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -140,6 +141,9 @@
           }
         }
       }
+    },
+    "Challenge completed" : {
+
     },
     "Challenge responses" : {
 
@@ -391,6 +395,9 @@
         }
       }
     },
+    "Enter answer" : {
+
+    },
     "Error" : {
 
     },
@@ -498,6 +505,9 @@
           }
         }
       }
+    },
+    "Loading challenges..." : {
+
     },
     "Loading responses..." : {
 
@@ -682,6 +692,9 @@
         }
       }
     },
+    "Option %lld" : {
+
+    },
     "Postcode" : {
       "localizations" : {
         "fr" : {
@@ -826,6 +839,9 @@
         }
       }
     },
+    "Start" : {
+
+    },
     "START" : {
       "localizations" : {
         "fr" : {
@@ -861,6 +877,7 @@
 
     },
     "Submit" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -869,6 +886,9 @@
           }
         }
       }
+    },
+    "SUBMIT" : {
+
     },
     "Submitted on: %@" : {
 
@@ -894,6 +914,9 @@
     },
     "Total users :" : {
       "shouldTranslate" : false
+    },
+    "UPLOAD YOUR PHOTO" : {
+
     },
     "Validate" : {
 
