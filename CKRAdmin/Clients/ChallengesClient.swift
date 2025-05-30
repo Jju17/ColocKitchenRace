@@ -20,7 +20,8 @@ enum ChallengeError: Error, Equatable {
 @DependencyClient
 struct ChallengeClient {
     var add: @Sendable (_ newChallenge: Challenge) async -> Result<Bool, ChallengeError> = { _ in .success(true) }
-    var getAll: @Sendable () async -> Result<[Challenge], Error> = { .success([]) }
+    var addAllMockChallenges: @Sendable () async -> Result<Void, ChallengeError> = { .success(()) }
+    var getAll: @Sendable () async -> Result<[Challenge], ChallengeError> = { .success([]) }
     var totalChallengesCount: @Sendable () async -> Result<Int, ChallengeError> = { .success(0) }
     var activeChallengesCount: @Sendable () async -> Result<Int, ChallengeError> = { .success(0) }
     var nextChallengesCount: @Sendable () async -> Result<Int, ChallengeError> = { .success(0) }
@@ -38,6 +39,29 @@ extension ChallengeClient: DependencyKey {
                 return .failure(.unknown(error.localizedDescription))
             }
         },
+        addAllMockChallenges: {
+            do {
+                let db = Firestore.firestore()
+                let batch = db.batch()
+                for response in Challenge.mockList {
+                    let responseRef = db.collection("challenges").document(response.id.uuidString)
+                    try batch.setData(from: response, forDocument: responseRef)
+                }
+                try await batch.commit()
+                Logger.challengeResponseLog.log(level: .info, "Successfully added \(ChallengeResponse.mockList.count) mock challenges")
+                return .success(())
+            } catch let error as NSError {
+                Logger.challengeResponseLog.log(level: .fault, "Failed to add mock challenge responses: \(error.localizedDescription)")
+                switch error.code {
+                    case FirestoreErrorCode.unavailable.rawValue:
+                        return .failure(.networkError)
+                    case FirestoreErrorCode.permissionDenied.rawValue:
+                        return .failure(.permissionDenied)
+                    default:
+                        return .failure(.unknown(error.localizedDescription))
+                }
+            }
+        },
         getAll: {
             do {
                 let querySnapshot = try await Firestore.firestore().collection("challenges").getDocuments()
@@ -47,7 +71,7 @@ extension ChallengeClient: DependencyKey {
                 }
                 return .success(allChallenges)
             } catch {
-                return .failure(error)
+                return .failure(.unknown(error.localizedDescription))
             }
         },
         totalChallengesCount: {
@@ -117,6 +141,7 @@ extension ChallengeClient: DependencyKey {
     static var previewValue: ChallengeClient {
         Self(
             add: { _ in .success(true) },
+            addAllMockChallenges: { .success(()) },
             getAll: { .success([]) },
             totalChallengesCount: { .success(42) },
             activeChallengesCount: { .success(10) },
@@ -128,6 +153,7 @@ extension ChallengeClient: DependencyKey {
     static var testValue: ChallengeClient {
         Self(
             add: { _ in .success(true) },
+            addAllMockChallenges: { .success(()) },
             getAll: { .success([]) },
             totalChallengesCount: { .success(0) },
             activeChallengesCount: { .success(0) },

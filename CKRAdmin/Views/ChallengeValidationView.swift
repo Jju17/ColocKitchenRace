@@ -20,7 +20,7 @@ struct ChallengeValidationFeature {
     }
 
     enum Action: BindableAction {
-        case addAllMockChallenges
+        case addAllMockChallengeResponses
         case binding(BindingAction<State>)
         case fetchResponses
         case responsesLoaded(Result<[ChallengeResponse], ChallengeResponseError>)
@@ -41,9 +41,9 @@ struct ChallengeValidationFeature {
         BindingReducer()
         Reduce { state, action in
             switch action {
-                case .addAllMockChallenges:
+                case .addAllMockChallengeResponses:
                     return .run { send in
-                        let result = await challengeResponseClient.addAllMockChallenges()
+                        let result = await challengeResponseClient.addAllMockChallengeResponses()
                         switch result {
                             case .success:
                                 let fetchResult = await challengeResponseClient.getAll()
@@ -185,7 +185,7 @@ struct ChallengeValidationView: View {
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button(action: {
-                        store.send(.addAllMockChallenges)
+                        store.send(.addAllMockChallengeResponses)
                     }) {
                         Image(systemName: "plus.circle")
                             .accessibilityLabel("Add test responses")

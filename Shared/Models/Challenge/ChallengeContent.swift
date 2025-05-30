@@ -13,3 +13,18 @@ enum ChallengeContent: Equatable, Codable, Hashable {
     case singleAnswer(SingleAnswerContent)
     case noChoice(NoChoiceContent)
 }
+
+extension ChallengeContent {
+    var toResponseContent: ChallengeResponseContent {
+        switch self {
+            case .picture:
+                return .picture("")
+            case .multipleChoice:
+                return .multipleChoice([])
+            case .singleAnswer:
+                return .singleAnswer("")
+            case .noChoice:
+                return .noChoice
+        }
+    }
+}

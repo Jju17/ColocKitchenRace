@@ -23,7 +23,7 @@ struct ChallengeFeature {
         case path(StackAction<Path.State, Path.Action>)
         case fetchChallenges
         case challengesLoaded([Challenge])
-        case startChallenge(UUID)
+        case startChallenge(Challenge)
         case submitResponse(UUID, Data?) // challengeId, imageData (nil if no photo)
         case responseSubmitted(Result<ChallengeResponse, ChallengeResponseError>)
     }
@@ -65,17 +65,17 @@ struct ChallengeFeature {
 //                state.isLoading = false
 //                state.errorMessage = error.localizedDescription
 //                return .none
-            case .startChallenge(let challengeId):
-                if state.responsesInProgress[challengeId] == nil {
+            case .startChallenge(let challenge):
+                    if state.responsesInProgress[challenge.id] == nil {
                     let response = ChallengeResponse(
                         id: UUID(),
-                        challengeId: challengeId,
+                        challengeId: challenge.id,
                         cohouseId: "cohouse_alpha", // Replace with authenticated cohouseId
-                        content: .noChoice,
+                        content: challenge.content.toResponseContent,
                         status: .waiting,
                         submissionDate: Date()
                     )
-                    state.responsesInProgress[challengeId] = response
+                        state.responsesInProgress[challenge.id] = response
                 }
                 return .none
             case .submitResponse(let challengeId, let imageData):
@@ -118,14 +118,14 @@ struct ChallengeView: View {
                                     ChallengeTileView(
                                         challenge: challenge,
                                         response: store.responsesInProgress[challenge.id],
-                                        onStart: { store.send(.startChallenge(challenge.id)) },
+                                        onStart: { store.send(.startChallenge(challenge)) },
                                         onSubmit: { imageData in store.send(.submitResponse(challenge.id, imageData)) }
                                     )
                                 }
                             }
                         }
-                        .onAppear {
-                            UIScrollView.appearance().isPagingEnabled = true
+                        .introspect(.scrollView, on: .iOS(.v16), .iOS(.v17), .iOS(.v18)) {
+                            $0.isPagingEnabled = true
                         }
                     }
                 }

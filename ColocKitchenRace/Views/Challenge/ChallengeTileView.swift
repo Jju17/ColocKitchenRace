@@ -47,7 +47,7 @@ struct ChallengeTileView: View {
     }
 }
 
-struct HeaderView: View {
+ struct HeaderView: View {
     var title: String
     var startTime: Date
     var endTime: Date
@@ -61,7 +61,6 @@ struct HeaderView: View {
                 } label: {
                     Image(systemName: "info.circle")
                         .imageScale(.large)
-                        .foregroundColor(.white)
                 }
             }
             .padding(.bottom)
@@ -69,23 +68,18 @@ struct HeaderView: View {
                 Text(title)
                     .frame(maxWidth: .infinity)
                     .font(.title)
-                    .foregroundColor(.white)
                     .multilineTextAlignment(.center)
                 HStack(alignment: .center, spacing: 50) {
                     VStack(spacing: 5) {
                         Text("START")
-                            .foregroundColor(.white)
                             .font(.caption)
                         Text(startTime.formatted(.dateTime.day().month(.defaultDigits).hour().minute()))
-                            .foregroundColor(.white)
                             .font(.caption)
                     }
                     VStack(spacing: 5) {
                         Text("END")
-                            .foregroundColor(.white)
                             .font(.caption)
                         Text(endTime.formatted(.dateTime.day().month(.defaultDigits).hour().minute()))
-                            .foregroundColor(.white)
                             .font(.caption)
                     }
                 }
@@ -99,8 +93,7 @@ struct BodyView: View {
 
     var body: some View {
         Text(description)
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            .foregroundColor(.white)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             .multilineTextAlignment(.center)
     }
 }

@@ -35,6 +35,8 @@ struct ChallengeFeature {
 
     enum Action: BindableAction {
         case addChallengeButtonTapped
+        case addAllMockChallenges
+        case responsesLoaded(Result<[Challenge], ChallengeError>)
         case binding(BindingAction<State>)
         case challengeUpdated([Challenge])
         case confirmAddChallengeButtonTapped
@@ -58,6 +60,22 @@ struct ChallengeFeature {
                     }
                 case .addChallengeButtonTapped:
                     state.destination = .addChallenge(ChallengeFormFeature.State())
+                    return .none
+                case .addAllMockChallenges:
+                    return .run { send in
+                        let result = await challengeClient.addAllMockChallenges()
+                        switch result {
+                            case .success:
+                                let fetchResult = await challengeClient.getAll()
+                                await send(.responsesLoaded(fetchResult))
+                            case .failure(let error):
+                                await send(.responsesLoaded(.failure(error)))
+                        }
+                    }
+                case .responsesLoaded(.success(let challenges)):
+                    state.challenges = challenges
+                    return .none
+                case .responsesLoaded(.failure): // Next handling of error here
                     return .none
                 case .binding:
                     return .none
@@ -110,8 +128,8 @@ struct ChallengeFeature {
                     return .none
                 case .onTask:
                     return .run { send in
-                        let challenges = await (try? self.challengeClient.getAll().get()) ?? []
-                        await send(.challengeUpdated(challenges))
+                        let fetchResult = await self.challengeClient.getAll()
+                        await send(.responsesLoaded(fetchResult))
                     }
             }
         }
@@ -163,10 +181,20 @@ struct ChallengeView: View {
             }
             .navigationTitle("Challenge")
             .toolbar {
-                Button {
-                    self.store.send(.addChallengeButtonTapped)
-                } label: {
-                    Image(systemName: "plus")
+                ToolbarItem(placement: .automatic) {
+                    Button {
+                        self.store.send(.addChallengeButtonTapped)
+                    } label: {
+                        Image(systemName: "plus")
+                    }
+                }
+                ToolbarItem(placement: .automatic) {
+                    Button {
+                        store.send(.addAllMockChallenges)
+                    } label: {
+                        Image(systemName: "plus.circle")
+                            .accessibilityLabel("Add test responses")
+                    }
                 }
             }
         }

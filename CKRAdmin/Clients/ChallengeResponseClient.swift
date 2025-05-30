@@ -22,7 +22,7 @@ enum ChallengeResponseError: Error, Equatable {
 struct ChallengeResponseClient {
     var getAll: @Sendable () async -> Result<[ChallengeResponse], ChallengeResponseError> = { .success([]) }
     var updateStatus: @Sendable (UUID, ChallengeResponseStatus) async -> Result<Void, ChallengeResponseError> = { _, _ in .success(()) }
-    var addAllMockChallenges: @Sendable () async -> Result<Void, ChallengeResponseError> = { .success(()) }
+    var addAllMockChallengeResponses: @Sendable () async -> Result<Void, ChallengeResponseError> = { .success(()) }
     var submitResponse: @Sendable (ChallengeResponse, Data?) async -> Result<ChallengeResponse, ChallengeResponseError> = { _, _ in .success(ChallengeResponse.mockList[0]) }
 }
 
@@ -67,7 +67,7 @@ extension ChallengeResponseClient: DependencyKey {
                 }
             }
         },
-        addAllMockChallenges: {
+        addAllMockChallengeResponses: {
             do {
                 let db = Firestore.firestore()
                 let batch = db.batch()
@@ -123,7 +123,7 @@ extension ChallengeResponseClient: DependencyKey {
         Self(
             getAll: { .success(ChallengeResponse.mockList) },
             updateStatus: { _, _ in .success(()) },
-            addAllMockChallenges: { .success(()) },
+            addAllMockChallengeResponses: { .success(()) },
             submitResponse: { response, _ in .success(response) }
         )
     }
@@ -132,7 +132,7 @@ extension ChallengeResponseClient: DependencyKey {
         Self(
             getAll: { .success([]) },
             updateStatus: { _, _ in .success(()) },
-            addAllMockChallenges: { .success(()) },
+            addAllMockChallengeResponses: { .success(()) },
             submitResponse: { response, _ in .success(response) }
         )
     }
