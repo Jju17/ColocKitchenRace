@@ -27,15 +27,12 @@ struct StorageImage: View {
             } else if isLoading {
                 ProgressView()
             } else if let errorMessage = errorMessage {
-                Text(errorMessage)
-                    .foregroundColor(.red)
+                Text(errorMessage).foregroundColor(.red)
             } else {
-                Color.clear // Placeholder before loading starts
+                Color.clear
             }
         }
-        .task {
-            await loadImage()
-        }
+        .task { await loadImage() }
     }
 
     private func loadImage() async {
@@ -43,24 +40,18 @@ struct StorageImage: View {
         errorMessage = nil
         let result = await storageClient.loadImage(path)
         switch result {
-        case .success(let uiImage):
-            self.image = uiImage
-        case .failure(let error):
-            self.errorMessage = errorMessage(for: error)
+            case .success(let uiImage): image = uiImage
+            case .failure(let error): errorMessage = errorMessage(for: error)
         }
         isLoading = false
     }
 
     private func errorMessage(for error: StorageError) -> String {
         switch error {
-        case .networkError:
-            return "Network error. Please check your connection."
-        case .permissionDenied:
-            return "Permission denied. Contact an administrator."
-        case .invalidData:
-            return "Invalid image data."
-        case .unknown(let message):
-            return "Unknown error: \(message)"
+            case .networkError: return "Network error."
+            case .permissionDenied: return "Permission denied."
+            case .invalidData: return "Invalid image data."
+            case .unknown(let msg): return "Unknown error: \(msg)"
         }
     }
 }

@@ -16,7 +16,7 @@ struct ChallengeValidationFeature {
         var responses: [ChallengeResponse] = []
         var isLoading: Bool = false
         var errorMessage: String?
-        var filterStatus: FilterStatus = .waiting
+        var filterStatus: FilterStatus = .all
     }
 
     enum Action: BindableAction {
@@ -93,6 +93,7 @@ struct ChallengeValidationFeature {
 
 struct ChallengeValidationView: View {
     @Bindable var store: StoreOf<ChallengeValidationFeature>
+    @State private var selectedImagePath: String?
 
     var body: some View {
         NavigationView {
@@ -123,7 +124,7 @@ struct ChallengeValidationView: View {
                                             .font(.headline)
                                         Text("Cohouse: \(response.cohouseId)")
                                             .font(.subheadline)
-                                        Text("Submitted on: \(response.submissionDate.dateValue(), formatter: dateFormatter)")
+                                        Text("Submitted on: \(response.submissionDate, formatter: dateFormatter)")
                                             .font(.caption)
                                         Text("Status: \(statusLabel(for: response.status))")
                                             .font(.caption)
@@ -132,6 +133,9 @@ struct ChallengeValidationView: View {
                                         switch response.content {
                                             case .picture(let path):
                                                 StorageImage(path: path)
+                                                    .onTapGesture {
+                                                        selectedImagePath = path
+                                                    }
                                             case .multipleChoice(let indices):
                                                 Text("Choice: \(indices.map { String($0 + 1) }.joined(separator: ", "))")
                                             case .singleAnswer(let answer):
@@ -143,35 +147,37 @@ struct ChallengeValidationView: View {
                                     Spacer()
                                     // Validation buttons
                                     VStack(spacing: 8) {
-                                        Button(action: {
+                                        ValidationButton(
+                                            label: "Validate",
+                                            color: .green,
+                                            isActive: response.status == .validated
+                                        ) {
                                             store.send(.setResponseStatus(response.id, .validated))
-                                        }) {
-                                            Text("Validate")
-                                                .foregroundColor(.green)
-                                                .padding(.vertical, 4)
-                                                .padding(.horizontal, 8)
-                                                .background(response.status == .validated ? Color.green.opacity(0.2) : Color.clear)
-                                                .cornerRadius(8)
                                         }
+                                        
                                         .disabled(response.status == .validated)
-                                        .accessibilityLabel("Valider la réponse \(response.id.uuidString)")
-                                        Button(action: {
+                                        .contentShape(Rectangle())
+                                        .accessibilityLabel("Validate response \(response.id.uuidString)")
+                                        ValidationButton(
+                                            label: "Invalidate",
+                                            color: .red,
+                                            isActive: response.status == .invalidated
+                                        ) {
                                             store.send(.setResponseStatus(response.id, .invalidated))
-                                        }) {
-                                            Text("Invalidate")
-                                                .foregroundColor(.red)
-                                                .padding(.vertical, 4)
-                                                .padding(.horizontal, 8)
-                                                .background(response.status == .invalidated ? Color.red.opacity(0.2) : Color.clear)
-                                                .cornerRadius(8)
                                         }
                                         .disabled(response.status == .invalidated)
+                                        .contentShape(Rectangle())
                                         .accessibilityLabel("Invalidate response \(response.id.uuidString)")
                                     }
                                 }
                                 .padding(.vertical, 4)
+                                .contentShape(Rectangle())
                             }
                         }
+                        .listStyle(.plain)
+                    }
+                    .fullScreenCover(item: $selectedImagePath) { path in
+                        FullScreenImageView(imagePath: path)
                     }
                 }
             }
@@ -213,9 +219,9 @@ struct ChallengeValidationView: View {
 
     private func statusLabel(for status: ChallengeResponseStatus) -> String {
         switch status {
-            case .waiting: return "En attente"
-            case .validated: return "Validé"
-            case .invalidated: return "Invalidé"
+            case .waiting: return "Waiting"
+            case .validated: return "Validate"
+            case .invalidated: return "Invalidate"
         }
     }
 
@@ -226,6 +232,10 @@ struct ChallengeValidationView: View {
             case .invalidated: return .red
         }
     }
+}
+
+extension String: Identifiable {
+    public var id: String { self }
 }
 
 #Preview {

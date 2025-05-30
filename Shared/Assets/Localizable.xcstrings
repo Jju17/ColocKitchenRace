@@ -480,6 +480,9 @@
         }
       }
     },
+    "Image failed to load" : {
+
+    },
     "Invalidate" : {
 
     },
@@ -921,10 +924,10 @@
     "Validate" : {
 
     },
-    "Validation" : {
+    "Validate response %@" : {
 
     },
-    "Valider la réponse %@" : {
+    "Validation" : {
 
     },
     "You need an account ?" : {
