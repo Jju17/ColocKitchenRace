@@ -19,6 +19,7 @@
 		6469FA702C1FAD2E002BDBF6 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = 6469FA6F2C1FAD2E002BDBF6 /* SwiftUIIntrospect */; };
 		64884E552AE43CF40075BB39 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		64B66EC62B5D50DB00B8F30B /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 64B66EC52B5D50DB00B8F30B /* ComposableArchitecture */; };
+		64C87C242DEB4D7F00EA27EB /* MijickPopups in Frameworks */ = {isa = PBXBuildFile; productRef = 64C87C232DEB4D7F00EA27EB /* MijickPopups */; };
 		64FB41C02AD4086100C93A34 /* FirebaseAnalyticsSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 64FB41BF2AD4086100C93A34 /* FirebaseAnalyticsSwift */; };
 		64FB41C22AD4086100C93A34 /* FirebaseAnalyticsWithoutAdIdSupport in Frameworks */ = {isa = PBXBuildFile; productRef = 64FB41C12AD4086100C93A34 /* FirebaseAnalyticsWithoutAdIdSupport */; };
 		64FB41C42AD4086100C93A34 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 64FB41C32AD4086100C93A34 /* FirebaseAuth */; };
@@ -62,7 +63,9 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Assets/Assets.xcassets,
+				Assets/Fonts/BaksoSapi.otf,
 				Assets/Localizable.xcstrings,
+				Clients/ChallengeResponseClient.swift,
 				Models/Challenge/Challenge.swift,
 				Models/Challenge/ChallengeContent.swift,
 				Models/Challenge/ChallengeContent/MultipleChoiceContent.swift,
@@ -79,6 +82,7 @@
 				"Utils/Dictionnary+Utils.swift",
 				"Utils/Error+Utils.swift",
 				Utils/Global.swift,
+				Utils/ImageProcessing.swift,
 				Utils/Introspect/TextFieldDelegate.swift,
 				"Utils/Logger+Utils.swift",
 				"Utils/URL+Utils.swift",
@@ -90,10 +94,16 @@
 		641196422DDF7CB50075A0C4 /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Clients/ChallengeResponseClient.swift,
 				Models/ChallengeResponse.swift,
 			);
 			target = 64F17B2E2AD2A3BC0047F6F3 /* ColocsKitchenRace */;
+		};
+		64C87C212DEB401800EA27EB /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 64FBE0242D8860CC00D8A89F /* CKRAdmin */;
 		};
 		64FBE3442D88665300D8A89F /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
@@ -106,7 +116,7 @@
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		6405CBC82D886B7400BE8B0D /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (6405CBCD2D886B7400BE8B0D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
-		64FBE0262D8860CC00D8A89F /* CKRAdmin */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (641196422DDF7CB50075A0C4 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = CKRAdmin; sourceTree = "<group>"; };
+		64FBE0262D8860CC00D8A89F /* CKRAdmin */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (641196422DDF7CB50075A0C4 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 64C87C212DEB401800EA27EB /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = CKRAdmin; sourceTree = "<group>"; };
 		64FBE2FD2D88665300D8A89F /* ColocKitchenRace */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (64FBE3442D88665300D8A89F /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = ColocKitchenRace; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -121,6 +131,7 @@
 				64B66EC62B5D50DB00B8F30B /* ComposableArchitecture in Frameworks */,
 				64FE3CE72B8D58B800E6AAAE /* Dependencies in Frameworks */,
 				64FB41C62AD4086100C93A34 /* FirebaseCrashlytics in Frameworks */,
+				64C87C242DEB4D7F00EA27EB /* MijickPopups in Frameworks */,
 				643E31A92C0BAA23004E4CAE /* FirebaseFirestore in Frameworks */,
 				64FE3CE92B8D58B800E6AAAE /* DependenciesMacros in Frameworks */,
 				641196452DDF7D030075A0C4 /* FirebaseStorage in Frameworks */,
@@ -222,6 +233,7 @@
 				6469FA6F2C1FAD2E002BDBF6 /* SwiftUIIntrospect */,
 				643653742DD5443E00EAEEE1 /* FirebaseAppCheck */,
 				641196442DDF7D030075A0C4 /* FirebaseStorage */,
+				64C87C232DEB4D7F00EA27EB /* MijickPopups */,
 			);
 			productName = colockitchenrace;
 			productReference = 64F17B2F2AD2A3BC0047F6F3 /* ColocsKitchenRace.app */;
@@ -336,6 +348,7 @@
 				64B66EC42B5D50DB00B8F30B /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 				64FE3CE52B8D58B800E6AAAE /* XCRemoteSwiftPackageReference "swift-dependencies" */,
 				6469FA6E2C1FAD2E002BDBF6 /* XCRemoteSwiftPackageReference "swiftui-introspect" */,
+				64C87C222DEB4D7F00EA27EB /* XCRemoteSwiftPackageReference "Popups" */,
 			);
 			productRefGroup = 64F17B302AD2A3BC0047F6F3 /* Products */;
 			projectDirPath = "";
@@ -746,6 +759,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CKRAdmin/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "CKR Admin";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -789,6 +803,7 @@
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = CKRAdmin/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "CKR Admin";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
@@ -885,6 +900,14 @@
 				minimumVersion = 1.18.0;
 			};
 		};
+		64C87C222DEB4D7F00EA27EB /* XCRemoteSwiftPackageReference "Popups" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Mijick/Popups.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.1;
+			};
+		};
 		64FB41BE2AD4086100C93A34 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -938,6 +961,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 64B66EC42B5D50DB00B8F30B /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
 			productName = ComposableArchitecture;
+		};
+		64C87C232DEB4D7F00EA27EB /* MijickPopups */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 64C87C222DEB4D7F00EA27EB /* XCRemoteSwiftPackageReference "Popups" */;
+			productName = MijickPopups;
 		};
 		64FB41BF2AD4086100C93A34 /* FirebaseAnalyticsSwift */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -22,7 +22,7 @@ struct ChallengeFeature {
     enum Action {
         case path(StackAction<Path.State, Path.Action>)
         case fetchChallenges
-        case challengesLoaded([Challenge])
+        case challengesLoaded(Result<[Challenge], ChallengesClientError>)
         case startChallenge(Challenge)
         case submitResponse(UUID, Data?) // challengeId, imageData (nil if no photo)
         case responseSubmitted(Result<ChallengeResponse, ChallengeResponseError>)
@@ -44,6 +44,7 @@ struct ChallengeFeature {
         }
     }
 
+    @Dependency(\.challengesClient) var challengesClient
     @Dependency(\.challengeResponseClient) var challengeResponseClient
 
     var body: some ReducerOf<Self> {
@@ -54,17 +55,18 @@ struct ChallengeFeature {
             case .fetchChallenges:
                 state.isLoading = true
                 return .run { send in
-                    await send(.challengesLoaded(Challenge.mockList))
+                    let result = try await self.challengesClient.getAll()
+                    await send(.challengesLoaded(result))
                 }
-            case .challengesLoaded(let challenges):
+                case .challengesLoaded(.success(let challenges)):
                 state.challenges = IdentifiedArray(uniqueElements: challenges)
                 state.isLoading = false
                 state.errorMessage = nil
                 return .none
-//            case .challengesLoaded(.failure(let error)):
-//                state.isLoading = false
-//                state.errorMessage = error.localizedDescription
-//                return .none
+            case .challengesLoaded(.failure(let error)):
+                state.isLoading = false
+                state.errorMessage = error.localizedDescription
+                return .none
             case .startChallenge(let challenge):
                     if state.responsesInProgress[challenge.id] == nil {
                     let response = ChallengeResponse(

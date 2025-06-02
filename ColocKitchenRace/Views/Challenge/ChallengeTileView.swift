@@ -7,6 +7,7 @@
 
 import SwiftUI
 import ComposableArchitecture
+import MijickPopups
 
 struct ChallengeTileView: View {
     let challenge: Challenge
@@ -20,7 +21,7 @@ struct ChallengeTileView: View {
 
     var body: some View {
         ZStack {
-            Color.CKRBlue
+            Color.CKRRandom
             VStack(alignment: .center, spacing: 0) {
                 HeaderView(
                     title: challenge.title,
@@ -57,32 +58,30 @@ struct ChallengeTileView: View {
             HStack(spacing: 0) {
                 Spacer()
                 Button {
-                    // Add navigation to details if needed
+                    
                 } label: {
                     Image(systemName: "info.circle")
                         .imageScale(.large)
+                        .foregroundStyle(.black)
                 }
             }
             .padding(.bottom)
             VStack(alignment: .center, spacing: 20) {
                 Text(title)
                     .frame(maxWidth: .infinity)
-                    .font(.title)
+                    .font(.custom("BaksoSapi", size: 24))
                     .multilineTextAlignment(.center)
                 HStack(alignment: .center, spacing: 50) {
                     VStack(spacing: 5) {
                         Text("START")
-                            .font(.caption)
                         Text(startTime.formatted(.dateTime.day().month(.defaultDigits).hour().minute()))
-                            .font(.caption)
                     }
                     VStack(spacing: 5) {
                         Text("END")
-                            .font(.caption)
                         Text(endTime.formatted(.dateTime.day().month(.defaultDigits).hour().minute()))
-                            .font(.caption)
                     }
                 }
+                .font(.custom("BaksoSapi", size: 11))
             }
         }
     }
@@ -94,7 +93,10 @@ struct BodyView: View {
     var body: some View {
         Text(description)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .font(.custom("BaksoSapi", size: 13))
+            .lineSpacing(8)
             .multilineTextAlignment(.center)
+            .padding(.top)
     }
 }
 

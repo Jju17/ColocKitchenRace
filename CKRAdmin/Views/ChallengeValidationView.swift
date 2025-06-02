@@ -145,7 +145,6 @@ struct ChallengeValidationView: View {
                                         }
                                     }
                                     Spacer()
-                                    // Validation buttons
                                     VStack(spacing: 8) {
                                         ValidationButton(
                                             label: "Validate",
@@ -174,7 +173,6 @@ struct ChallengeValidationView: View {
                                 .contentShape(Rectangle())
                             }
                         }
-                        .listStyle(.plain)
                     }
                     .fullScreenCover(item: $selectedImagePath) { path in
                         FullScreenImageView(imagePath: path)

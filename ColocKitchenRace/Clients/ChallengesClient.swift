@@ -16,12 +16,12 @@ enum ChallengesClientError: Error {
 
 @DependencyClient
 struct ChallengesClient {
-    var get: @Sendable () async throws -> Result<[Challenge], Error>
+    var getAll: @Sendable () async throws -> Result<[Challenge], ChallengesClientError>
 }
 
 extension ChallengesClient: DependencyKey {
     static let liveValue = Self(
-        get: {
+        getAll: {
             do {
                 @Shared(.challenges) var challenges
 
@@ -37,7 +37,7 @@ extension ChallengesClient: DependencyKey {
                 $challenges.withLock { $0 = allChallenges }
                 return .success(allChallenges)
             } catch {
-                return .failure(error)
+                return .failure(ChallengesClientError.failedWithError(error.localizedDescription))
             }
         }
     )

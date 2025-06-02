@@ -23,8 +23,7 @@ struct CohouseTileView: View {
                 )
             if let name = self.name {
                 Text(name)
-                    .font(.system(size: 40))
-                    .fontWeight(.heavy)
+                    .font(.custom("BaksoSapi", size: 45))
                     .foregroundStyle(.white)
             } else {
                 Image(systemName: "plus.circle")

@@ -95,16 +95,29 @@ extension ChallengeResponseClient: DependencyKey {
                 let db = Firestore.firestore()
                 let storage = Storage.storage().reference()
                 var updatedResponse = response
+
                 if let imageData = imageData, case .picture = response.content {
+                    guard let originalImage = UIImage(data: imageData) else {
+                        return .failure(.unknown("Image data is invalid"))
+                    }
+
+                    guard let finalImageData = ImageProcessing.prepareImageForUpload(image: originalImage) else {
+                        return .failure(.unknown("Failed to compress image"))
+                    }
+
                     let photoPath = "challenges/\(response.challengeId)/responses/\(response.id).jpg"
                     let photoRef = storage.child(photoPath)
-                    _ = try await photoRef.putDataAsync(imageData, metadata: StorageMetadata(dictionary: ["contentType": "image/jpeg"]))
+
+                    _ = try await photoRef.putDataAsync(finalImageData, metadata: StorageMetadata(dictionary: ["contentType": "image/jpeg"]))
                     updatedResponse.content = .picture(photoPath)
                 }
+
                 let responseRef = db.collection("challengeResponses").document(response.id.uuidString)
                 try responseRef.setData(from: updatedResponse)
+
                 Logger.challengeResponseLog.log(level: .info, "Successfully submitted response \(response.id)")
                 return .success(updatedResponse)
+
             } catch let error as NSError {
                 Logger.challengeResponseLog.log(level: .fault, "Failed to submit response: \(error.localizedDescription)")
                 switch error.code {
