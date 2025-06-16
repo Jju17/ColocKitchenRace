@@ -8,6 +8,7 @@
 import ComposableArchitecture
 import Firebase
 import SwiftUI
+import MijickPopups
 
 class AppDelegate: NSObject, UIApplicationDelegate {
     func application(_ application: UIApplication,
@@ -39,6 +40,17 @@ struct colockitchenraceApp: App {
                 }
             )
             .preferredColorScheme(.light)
+            .registerPopups(id: .shared) { config in config
+                    .vertical { $0
+                        .enableDragGesture(true)
+                        .tapOutsideToDismissPopup(true)
+                        .cornerRadius(32)
+                    }
+                    .center { $0
+                        .tapOutsideToDismissPopup(true)
+                        .backgroundColor(.white)
+                    }
+            }
         }
     }
 

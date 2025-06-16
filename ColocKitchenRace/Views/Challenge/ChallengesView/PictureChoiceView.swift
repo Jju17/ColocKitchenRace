@@ -5,17 +5,44 @@
 //  Created by Julien Rahier on 22/05/2025.
 //
 
+import ComposableArchitecture
 import SwiftUI
 
+@Reducer
+struct PictureChoiceFeature {
+
+    @ObservableState
+    struct State: Equatable {
+        var imageData: Data? = nil
+        var isImagePickerPresented = false
+    }
+
+    enum Action: BindableAction, Equatable {
+        case binding(BindingAction<State>)
+        case submitTapped
+    }
+
+    var body: some ReducerOf<Self> {
+        BindingReducer()
+
+        Reduce { state, action in
+            switch action {
+            case .binding:
+                return .none
+            case .submitTapped:
+                return .none
+            }
+        }
+    }
+}
+
 struct PictureChoiceView: View {
-    @Binding var imageData: Data?
-    @Binding var isImagePickerPresented: Bool
-    let onSubmit: (Data?) -> Void
+    @Perception.Bindable var store: StoreOf<PictureChoiceFeature>
 
     var body: some View {
         VStack {
             Button("UPLOAD YOUR PHOTO") {
-                isImagePickerPresented = true
+                store.isImagePickerPresented = true
             }
             .padding()
             .frame(maxWidth: .infinity)
@@ -23,9 +50,9 @@ struct PictureChoiceView: View {
             .foregroundColor(.blue)
             .cornerRadius(8)
 
-            if imageData != nil {
+            if store.imageData != nil {
                 Button("SUBMIT") {
-                    onSubmit(imageData)
+                    store.send(.submitTapped)
                 }
                 .padding()
                 .frame(maxWidth: .infinity)
@@ -34,8 +61,8 @@ struct PictureChoiceView: View {
                 .cornerRadius(8)
             }
         }
-        .sheet(isPresented: $isImagePickerPresented) {
-            ImagePicker(selectedImageData: $imageData)
+        .sheet(isPresented: $store.isImagePickerPresented) {
+            ImagePicker(selectedImageData: $store.imageData)
         }
     }
 }

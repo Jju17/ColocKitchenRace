@@ -15,6 +15,19 @@ enum ChallengeContent: Equatable, Codable, Hashable {
 }
 
 extension ChallengeContent {
+    var type: ChallengeType {
+        switch self {
+            case .picture:
+                return .picture
+            case .multipleChoice:
+                return .multipleChoice
+            case .singleAnswer:
+                return .singleAnswer
+            case .noChoice:
+                return .noChoice
+        }
+    }
+
     var toResponseContent: ChallengeResponseContent {
         switch self {
             case .picture:

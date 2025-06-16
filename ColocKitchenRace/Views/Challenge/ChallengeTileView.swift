@@ -9,56 +9,149 @@ import SwiftUI
 import ComposableArchitecture
 import MijickPopups
 
-struct ChallengeTileView: View {
-    let challenge: Challenge
-    let response: ChallengeResponse?
-    let onStart: () -> Void
-    let onSubmit: (Data?) -> Void
+struct ChallengeTileFeature: Reducer {
 
-    @State private var selectedAnswer: Int? = nil
-    @State private var imageData: Data? = nil
-    @State private var isImagePickerPresented = false
+    @ObservableState
+    struct State: Equatable, Identifiable {
+        let id: UUID
+        let challenge: Challenge
+        var response: ChallengeResponse?
+        var kind: ChallengeKind
+        var imageData: Data?
+        var selectedAnswer: Int?
+    }
+
+    enum Action: Equatable {
+            case startTapped
+            case delegate(Delegate)
+            case picture(PictureChoiceFeature.Action)
+
+            enum Delegate: Equatable {
+                case responseSubmitted(ChallengeResponse)
+            }
+        }
+
+    var body: some ReducerOf<Self> {
+        Reduce { state, action in
+            switch action {
+                case .startTapped:
+                    if state.response == nil {
+                        state.response = ChallengeResponse(
+                            id: UUID(),
+                            challengeId: state.challenge.id,
+                            cohouseId: "cohouse_alpha",
+                            content: state.challenge.content.toResponseContent,
+                            status: .waiting,
+                            submissionDate: Date()
+                        )
+                    }
+                    return .none
+
+                case .delegate:
+                    return .none
+                case .picture:
+                    return .none
+            }
+        }
+    }
+}
+
+// MARK: - View Hook
+
+enum ChallengeKind: Equatable {
+    case picture(PictureChoiceFeature.State)
+}
+
+struct ChallengeTileView: View {
+    @Perception.Bindable var store: StoreOf<ChallengeTileFeature>
 
     var body: some View {
         ZStack {
             Color.CKRRandom
-            VStack(alignment: .center, spacing: 0) {
+            VStack(spacing: 16) {
                 HeaderView(
-                    title: challenge.title,
-                    startTime: challenge.startDate,
-                    endTime: challenge.endDate
+                    title: store.challenge.title,
+                    startTime: store.challenge.startDate,
+                    endTime: store.challenge.endDate,
+                    challengeType: store.challenge.content.type
                 )
-                BodyView(description: challenge.body)
-                    .padding(.vertical)
-                ChallengeContentView(
-                    challenge: challenge,
-                    response: response,
-                    selectedAnswer: $selectedAnswer,
-                    imageData: $imageData,
-                    isImagePickerPresented: $isImagePickerPresented,
-                    onStart: onStart,
-                    onSubmit: onSubmit
-                )
+
+                BodyView(description: store.challenge.body)
+
+                if store.challenge.isActive {
+                    if store.response == nil {
+                        Button("Start") {
+                            store.send(.startTapped)
+                        }
+                        .buttonStyle(.borderedProminent)
+                    } else {
+                        switch store.kind {
+                            case .picture:
+                                PictureChoiceView(
+                                    store: store.scope(
+                                        state: \.kind.picture,
+                                        action: ChallengeTileFeature.Action.picture
+                                    )
+                                )
+                        }
+                    }
+                } else {
+                    Text("Challenge completed")
+                        .foregroundStyle(.gray)
+                }
             }
             .padding()
         }
         .cornerRadius(20)
         .padding()
         .frame(width: UIScreen.main.bounds.width)
+
     }
 }
 
- struct HeaderView: View {
+struct HeaderView: View {
     var title: String
     var startTime: Date
     var endTime: Date
+    var challengeType: ChallengeType
+
+    func makeChallengeInfoPopup() -> any CenterPopup {
+        switch self.challengeType {
+            case .picture:
+                ChallengeInfoPopup(
+                    symbol: "photo.artframe",
+                    title: "Picture Challenge",
+                    description: "Take your best shot to impress the jury between the screen, and don't forget to smile ! 😄"
+                )
+            case .multipleChoice:
+                ChallengeInfoPopup(
+                    symbol: "square.grid.3x3.bottomleft.filled",
+                    title: "Multiple choice ",
+                    description: "Choose the wright answer, you have only one chance, so don't waste it ! 🫣"
+                )
+            case .singleAnswer:
+                ChallengeInfoPopup(
+                    symbol: "bubble.and.pencil",
+                    title: "Single Answer",
+                    description: "Open answer. Answer it honneslty and wihtout cheating ! We are watching you. 👀"
+                )
+            case .noChoice:
+                ChallengeInfoPopup(
+                    symbol: "",
+                    title: "No choice",
+                    description: "No action needed here ! Just click the button when you are sure the challenge is done. This will be automatically vaidate if you accomplish the challenge."
+                )
+        }
+    }
 
     var body: some View {
         VStack(alignment: .center, spacing: 0) {
             HStack(spacing: 0) {
                 Spacer()
                 Button {
-                    
+                    Task {
+                        await self.makeChallengeInfoPopup().present()
+                    }
                 } label: {
                     Image(systemName: "info.circle")
                         .imageScale(.large)
@@ -125,18 +218,19 @@ func ChallengeContentView(
                 }
             } else {
                 switch challenge.content {
-                case .picture:
-                    PictureChoiceView(
-                        imageData: imageData,
-                        isImagePickerPresented: isImagePickerPresented,
-                        onSubmit: onSubmit
-                    )
-                case .multipleChoice:
-                    MultipleChoiceView(selectedAnswer: selectedAnswer, onSubmit: onSubmit)
-                case .singleAnswer:
-                    SingleAnswerView(onSubmit: onSubmit)
-                case .noChoice:
-                    NoChoiceView(onSubmit: onSubmit)
+                    case .picture:
+                        PictureChoiceView(
+                            store: store.scope(
+                                state: \.pictureChoice,
+                                action: ChallengeTileFeature.Action.pictureChoice
+                            )
+                        )
+                    case .multipleChoice:
+                        MultipleChoiceView(selectedAnswer: selectedAnswer, onSubmit: onSubmit)
+                    case .singleAnswer:
+                        SingleAnswerView(onSubmit: onSubmit)
+                    case .noChoice:
+                        NoChoiceView(onSubmit: onSubmit)
                 }
             }
         } else {
@@ -148,10 +242,9 @@ func ChallengeContentView(
 }
 
 #Preview {
+    let challenge = Challenge.mock
     ChallengeTileView(
-        challenge: .mock,
-        response: nil,
-        onStart: {},
-        onSubmit: { _ in }
+        store: Store(initialState: ChallengeTileFeature.State(id: challenge.id, challenge: challenge),
+                     reducer: { ChallengeTileFeature() })
     )
 }

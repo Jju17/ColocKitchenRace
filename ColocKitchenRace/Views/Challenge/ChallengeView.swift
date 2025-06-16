@@ -13,8 +13,7 @@ struct ChallengeFeature {
     @ObservableState
     struct State {
         var path = StackState<Path.State>()
-        var challenges: IdentifiedArrayOf<Challenge> = []
-        var responsesInProgress: [UUID: ChallengeResponse] = [:] // Track responses by challengeId
+        var challengeTiles: IdentifiedArrayOf<ChallengeTileFeature.State> = []
         var isLoading: Bool = false
         var errorMessage: String?
     }
@@ -22,10 +21,8 @@ struct ChallengeFeature {
     enum Action {
         case path(StackAction<Path.State, Path.Action>)
         case fetchChallenges
+        case challengeTiles(IdentifiedActionOf<ChallengeTileFeature>)
         case challengesLoaded(Result<[Challenge], ChallengesClientError>)
-        case startChallenge(Challenge)
-        case submitResponse(UUID, Data?) // challengeId, imageData (nil if no photo)
-        case responseSubmitted(Result<ChallengeResponse, ChallengeResponseError>)
     }
 
     @Reducer
@@ -59,7 +56,11 @@ struct ChallengeFeature {
                     await send(.challengesLoaded(result))
                 }
                 case .challengesLoaded(.success(let challenges)):
-                state.challenges = IdentifiedArray(uniqueElements: challenges)
+                    state.challengeTiles = IdentifiedArray(
+                        uniqueElements: challenges.map {
+                            ChallengeTileFeature.State(id: $0.id, challenge: $0, response: nil)
+                        }
+                    )
                 state.isLoading = false
                 state.errorMessage = nil
                 return .none
@@ -67,35 +68,8 @@ struct ChallengeFeature {
                 state.isLoading = false
                 state.errorMessage = error.localizedDescription
                 return .none
-            case .startChallenge(let challenge):
-                    if state.responsesInProgress[challenge.id] == nil {
-                    let response = ChallengeResponse(
-                        id: UUID(),
-                        challengeId: challenge.id,
-                        cohouseId: "cohouse_alpha", // Replace with authenticated cohouseId
-                        content: challenge.content.toResponseContent,
-                        status: .waiting,
-                        submissionDate: Date()
-                    )
-                        state.responsesInProgress[challenge.id] = response
-                }
-                return .none
-            case .submitResponse(let challengeId, let imageData):
-                guard let response = state.responsesInProgress[challengeId] else { return .none }
-                state.isLoading = true
-                return .run { send in
-                    let result = await challengeResponseClient.submitResponse(response, imageData)
-                    await send(.responseSubmitted(result))
-                }
-            case .responseSubmitted(.success(let response)):
-                state.isLoading = false
-                state.responsesInProgress.removeValue(forKey: response.challengeId)
-                state.errorMessage = nil
-                return .none
-            case .responseSubmitted(.failure(let error)):
-                state.isLoading = false
-                state.errorMessage = error.localizedDescription
-                return .none
+                case .challengeTiles:
+                    return .none
             }
         }
     }
@@ -116,14 +90,10 @@ struct ChallengeView: View {
                     } else {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: 0) {
-                                ForEach(store.challenges) { challenge in
-                                    ChallengeTileView(
-                                        challenge: challenge,
-                                        response: store.responsesInProgress[challenge.id],
-                                        onStart: { store.send(.startChallenge(challenge)) },
-                                        onSubmit: { imageData in store.send(.submitResponse(challenge.id, imageData)) }
-                                    )
-                                }
+//                                ForEach(
+//                                  store.scope(state: \.challengeTiles, action: \.challengeTiles),
+//                                  content: ChallengeTileView()
+//                                )
                             }
                         }
                         .introspect(.scrollView, on: .iOS(.v16), .iOS(.v17), .iOS(.v18)) {
@@ -149,7 +119,7 @@ struct ChallengeView: View {
 
 #Preview {
     ChallengeView(
-        store: Store(initialState: ChallengeFeature.State(challenges: IdentifiedArray(uniqueElements: Challenge.mockList))) {
+        store: Store(initialState: ChallengeFeature.State(/*challengeTiles: IdentifiedArray(uniqueElements: Challenge.mockList)*/)) {
             ChallengeFeature()
         }
     )
