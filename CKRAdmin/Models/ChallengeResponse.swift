@@ -25,6 +25,26 @@ enum ChallengeResponseContent: Equatable, Codable {
     case noChoice
 }
 
+extension ChallengeResponseContent {
+    static func fromPayload(_ payload: ChallengeSubmitPayload) -> ChallengeResponseContent {
+        switch payload {
+        case .picture:
+            // Valeur temporaire, remplacée après upload Storage par l'URL finale
+            return .picture("")
+        case let .multipleChoice(index):
+            return .multipleChoice([index])
+        case let .singleAnswer(text):
+            return .singleAnswer(text)
+        case .noChoice:
+            return .noChoice
+        }
+    }
+
+    static func fromUploadedURL(_ url: String) -> ChallengeResponseContent {
+        .picture(url)
+    }
+}
+
 enum ChallengeResponseStatus: String, Codable, Equatable {
     case waiting
     case validated

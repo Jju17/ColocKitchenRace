@@ -34,13 +34,11 @@ extension Challenge {
         }
     }
 
-    var isActive: Bool {
-        if self.startDate < Date() && self.endDate > Date() {
-            return true
-        } else {
-            return false
-        }
-    }
+    var hasStarted: Bool { Date() >= startDate }
+
+    var hasEnded: Bool   { Date() >= endDate }
+
+    var isActiveNow: Bool { hasStarted && !hasEnded }
 
     var stateColor: Color {
         switch state {

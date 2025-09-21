@@ -23,7 +23,8 @@ struct ChallengeResponseClient {
     var getAll: @Sendable () async -> Result<[ChallengeResponse], ChallengeResponseError> = { .success([]) }
     var updateStatus: @Sendable (UUID, ChallengeResponseStatus) async -> Result<Void, ChallengeResponseError> = { _, _ in .success(()) }
     var addAllMockChallengeResponses: @Sendable () async -> Result<Void, ChallengeResponseError> = { .success(()) }
-    var submitResponse: @Sendable (ChallengeResponse, Data?) async -> Result<ChallengeResponse, ChallengeResponseError> = { _, _ in .success(ChallengeResponse.mockList[0]) }
+    var submit: @Sendable (_ response: ChallengeResponse) async throws -> ChallengeResponse = { $0 }
+    var watchStatus: @Sendable (_ challengeId: UUID, _ cohouseId: String) -> AsyncStream<ChallengeResponseStatus> = { _,_  in AsyncStream { $0.finish() } }
 }
 
 extension ChallengeResponseClient: DependencyKey {
@@ -90,44 +91,46 @@ extension ChallengeResponseClient: DependencyKey {
                 }
             }
         },
-        submitResponse: { response, imageData in
+        submit: { response in
             do {
                 let db = Firestore.firestore()
-                let storage = Storage.storage().reference()
-                var updatedResponse = response
+                // Scheme A: /challenges/{challengeId}/responses/{cohouseId}
+                let doc = db.collection("challenges")
+                    .document(response.challengeId.uuidString)
+                    .collection("responses")
+                    .document(response.cohouseId)
 
-                if let imageData = imageData, case .picture = response.content {
-                    guard let originalImage = UIImage(data: imageData) else {
-                        return .failure(.unknown("Image data is invalid"))
-                    }
-
-                    guard let finalImageData = ImageProcessing.prepareImageForUpload(image: originalImage) else {
-                        return .failure(.unknown("Failed to compress image"))
-                    }
-
-                    let photoPath = "challenges/\(response.challengeId)/responses/\(response.id).jpg"
-                    let photoRef = storage.child(photoPath)
-
-                    _ = try await photoRef.putDataAsync(finalImageData, metadata: StorageMetadata(dictionary: ["contentType": "image/jpeg"]))
-                    updatedResponse.content = .picture(photoPath)
-                }
-
-                let responseRef = db.collection("challengeResponses").document(response.id.uuidString)
-                try responseRef.setData(from: updatedResponse)
-
-                Logger.challengeResponseLog.log(level: .info, "Successfully submitted response \(response.id)")
-                return .success(updatedResponse)
+                try doc.setData(from: response, merge: true)
+                try await doc.updateData(["serverTS": FieldValue.serverTimestamp()])
+                return response
 
             } catch let error as NSError {
-                Logger.challengeResponseLog.log(level: .fault, "Failed to submit response: \(error.localizedDescription)")
                 switch error.code {
-                case StorageErrorCode.unauthorized.rawValue, FirestoreErrorCode.permissionDenied.rawValue:
-                    return .failure(.permissionDenied)
-                case StorageErrorCode.unknown.rawValue where error.domain == "NSURLErrorDomain", FirestoreErrorCode.unavailable.rawValue:
-                    return .failure(.networkError)
-                default:
-                    return .failure(.unknown(error.localizedDescription))
+                    case FirestoreErrorCode.unavailable.rawValue:
+                        throw ChallengeResponseError.networkError
+                    case FirestoreErrorCode.permissionDenied.rawValue:
+                        throw ChallengeResponseError.permissionDenied
+                    default:
+                        throw ChallengeResponseError.unknown(error.localizedDescription)
                 }
+            }
+        },
+        watchStatus: { challengeId, cohouseId in
+            let db = Firestore.firestore()
+            let doc = db.collection("challenges")
+                .document(challengeId.uuidString)
+                .collection("responses")
+                .document(cohouseId)
+
+            return AsyncStream { continuation in
+                let listener = doc.addSnapshotListener { snap, _ in
+                    guard
+                        let snap,
+                        let resp = try? snap.data(as: ChallengeResponse.self)
+                    else { return }
+                    continuation.yield(resp.status)
+                }
+                continuation.onTermination = { _ in listener.remove() }
             }
         }
     )
@@ -137,7 +140,8 @@ extension ChallengeResponseClient: DependencyKey {
             getAll: { .success(ChallengeResponse.mockList) },
             updateStatus: { _, _ in .success(()) },
             addAllMockChallengeResponses: { .success(()) },
-            submitResponse: { response, _ in .success(response) }
+            submit: { $0 },
+            watchStatus: { _, _ in AsyncStream { $0.finish() } }
         )
     }
 
@@ -146,7 +150,8 @@ extension ChallengeResponseClient: DependencyKey {
             getAll: { .success([]) },
             updateStatus: { _, _ in .success(()) },
             addAllMockChallengeResponses: { .success(()) },
-            submitResponse: { response, _ in .success(response) }
+            submit: { $0 },
+            watchStatus: { _, _ in AsyncStream { $0.finish() } }
         )
     }
 }

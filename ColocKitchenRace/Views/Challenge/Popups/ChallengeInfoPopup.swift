@@ -39,6 +39,37 @@ struct ChallengeInfoPopup: CenterPopup {
     }
 }
 
+extension ChallengeInfoPopup {
+    static func makeChallengeInfoPopup(for challengeType: ChallengeType) -> any CenterPopup {
+      switch challengeType {
+      case .picture:
+        return ChallengeInfoPopup(
+          symbol: "photo.artframe",
+          title: "Picture Challenge",
+          description: "Prends ta plus belle photo. Souris 😄"
+        )
+      case .multipleChoice:
+        return ChallengeInfoPopup(
+          symbol: "square.grid.3x3.bottomleft.filled",
+          title: "Multiple Choice",
+          description: "Choisis la bonne réponse. Une seule tentative 🫣"
+        )
+      case .singleAnswer:
+        return ChallengeInfoPopup(
+          symbol: "bubble.and.pencil",
+          title: "Single Answer",
+          description: "Réponse libre. Joue le jeu, sans tricher 👀"
+        )
+      case .noChoice:
+        return ChallengeInfoPopup(
+          symbol: "checkmark.circle",
+          title: "No Action",
+          description: "Rien à faire ici. Valide quand c’est fait ✅"
+        )
+      }
+    }
+}
+
 #Preview {
     ChallengeInfoPopup(
         symbol: "photo.artframe",

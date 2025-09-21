@@ -37,7 +37,7 @@ struct PictureChoiceFeature {
 }
 
 struct PictureChoiceView: View {
-    @Perception.Bindable var store: StoreOf<PictureChoiceFeature>
+    @Bindable var store: StoreOf<PictureChoiceFeature>
 
     var body: some View {
         VStack {

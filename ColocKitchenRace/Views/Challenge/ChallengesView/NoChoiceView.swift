@@ -4,20 +4,18 @@
 //
 //  Created by Julien Rahier on 22/05/2025.
 //
-
 import SwiftUI
 
 struct NoChoiceView: View {
-    let onSubmit: (Data?) -> Void
+    let onSubmit: () -> Void
 
     var body: some View {
-        Button("SUBMIT") {
-            onSubmit(nil)
-        }
-        .padding()
-        .frame(maxWidth: .infinity)
-        .background(Color.green)
-        .foregroundColor(.white)
-        .cornerRadius(8)
+        Button("SUBMIT", action: onSubmit)
+            .padding()
+            .frame(maxWidth: .infinity)
+            .background(Color.green)
+            .foregroundColor(.white)
+            .cornerRadius(8)
+            .accessibilityLabel("Mark challenge as achieved")
     }
 }

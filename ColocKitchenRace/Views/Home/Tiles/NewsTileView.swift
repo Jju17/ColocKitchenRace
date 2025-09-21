@@ -23,7 +23,7 @@ struct NewsTileView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     HStack {
                         Text("News")
-                            .font(.system(size: 26))
+                            .font(.custom("BaksoSapi", size: 26))
                             .fontWeight(.heavy)
                         Spacer()
                     }

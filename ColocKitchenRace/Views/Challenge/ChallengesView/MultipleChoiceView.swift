@@ -8,31 +8,30 @@
 import SwiftUI
 
 struct MultipleChoiceView: View {
-    @Binding var selectedAnswer: Int?
-    let onSubmit: (Data?) -> Void
+    let choices: [String]
+    @Binding var selectedIndex: Int?
+    let onSubmit: () -> Void
 
     var body: some View {
-        VStack {
-            HStack {
-                ForEach(0..<4, id: \.self) { index in
-                    Button(action: { selectedAnswer = index }) {
-                        Text("Option \(index + 1)")
-                            .padding()
-                            .background(selectedAnswer == index ? Color.blue : Color.gray)
-                            .foregroundColor(.white)
-                            .cornerRadius(8)
-                    }
+        VStack(spacing: 12) {
+            ForEach(Array(choices.enumerated()), id: \.offset) { idx, title in
+                Button {
+                    selectedIndex = idx
+                } label: {
+                    HStack { Text(title).frame(maxWidth: .infinity, alignment: .leading) }
+                        .padding()
+                        .background(selectedIndex == idx ? Color.blue : Color.gray)
+                        .foregroundColor(.white)
+                        .cornerRadius(8)
                 }
             }
-            if selectedAnswer != nil {
-                Button("SUBMIT") {
-                    onSubmit(nil)
-                }
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(Color.green)
-                .foregroundColor(.white)
-                .cornerRadius(8)
+            if selectedIndex != nil {
+                Button("SUBMIT", action: onSubmit)
+                    .padding()
+                    .frame(maxWidth: .infinity)
+                    .background(Color.green)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
             }
         }
     }

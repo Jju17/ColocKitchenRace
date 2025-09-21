@@ -64,7 +64,10 @@ extension ChallengeClient: DependencyKey {
         },
         getAll: {
             do {
-                let querySnapshot = try await Firestore.firestore().collection("challenges").getDocuments()
+                let querySnapshot = try await Firestore.firestore()
+                    .collection("challenges")
+                    .order(by: "startDate", descending: false)
+                    .getDocuments()
                 let documents = querySnapshot.documents
                 let allChallenges = documents.compactMap { document in
                     try? document.data(as: Challenge.self)

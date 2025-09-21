@@ -41,10 +41,9 @@ struct CohouseSelectUserFeature {
 }
 
 struct CohouseSelectUserView: View {
-    @Perception.Bindable var store: StoreOf<CohouseSelectUserFeature>
+    @Bindable var store: StoreOf<CohouseSelectUserFeature>
 
     var body: some View {
-        WithPerceptionTracking {
             List {
                 Picker("Select yourself", selection: self.$store.selectedUser) {
                     ForEach(self.store.cohouse.users, id: \.self) {
@@ -57,7 +56,6 @@ struct CohouseSelectUserView: View {
                     store.send(.addUserButtonTapped)
                 }
             }
-        }
     }
 }
 

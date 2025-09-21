@@ -14,15 +14,17 @@ struct ChallengeFeature {
     struct State {
         var path = StackState<Path.State>()
         var challengeTiles: IdentifiedArrayOf<ChallengeTileFeature.State> = []
-        var isLoading: Bool = false
+        var isLoading = false
         var errorMessage: String?
     }
 
     enum Action {
         case path(StackAction<Path.State, Path.Action>)
-        case fetchChallenges
+        case onAppear
+        case challengesResponse([Challenge])
+        case failed(String)
         case challengeTiles(IdentifiedActionOf<ChallengeTileFeature>)
-        case challengesLoaded(Result<[Challenge], ChallengesClientError>)
+        case goToCohouseTab
     }
 
     @Reducer
@@ -41,85 +43,114 @@ struct ChallengeFeature {
         }
     }
 
+    @Shared(.cohouse) var currentCohouse: Cohouse?
     @Dependency(\.challengesClient) var challengesClient
     @Dependency(\.challengeResponseClient) var challengeResponseClient
 
     var body: some ReducerOf<Self> {
-        Reduce { state, action in
+        Reduce {
+            state,
+            action in
             switch action {
-            case .path:
-                return .none
-            case .fetchChallenges:
-                state.isLoading = true
-                return .run { send in
-                    let result = try await self.challengesClient.getAll()
-                    await send(.challengesLoaded(result))
-                }
-                case .challengesLoaded(.success(let challenges)):
+                case .onAppear:
+                    state.isLoading = true
+                    return .run { send in
+                        do {
+                            let items = try await challengesClient.getAll()
+                            await send(.challengesResponse(items))
+                        } catch {
+                            await send(.failed(error.localizedDescription))
+                        }
+                    }
+                    
+                case let .challengesResponse(challenges):
+                    state.isLoading = false
+                    state.errorMessage = nil
+                    
+                    guard let cohouseId = currentCohouse?.id.uuidString,
+                          !cohouseId.isEmpty else {
+                        state.challengeTiles = []
+                        state.errorMessage = nil
+                        return .none
+                    }
+                    
                     state.challengeTiles = IdentifiedArray(
                         uniqueElements: challenges.map {
-                            ChallengeTileFeature.State(id: $0.id, challenge: $0, response: nil)
-                        }
-                    )
-                state.isLoading = false
-                state.errorMessage = nil
-                return .none
-            case .challengesLoaded(.failure(let error)):
-                state.isLoading = false
-                state.errorMessage = error.localizedDescription
-                return .none
+                            ChallengeTileFeature.State(
+                                id: $0.id,
+                                challenge: $0,
+                                cohouseId: cohouseId,
+                                response: nil
+                            )
+                    })
+                    return .none
+
+                case .failed(let msg):
+                    state.isLoading = false
+                    state.errorMessage = msg
+                    return .none
+
                 case .challengeTiles:
+                    return .none
+
+                case .goToCohouseTab:
+                    return .none
+                case .path:
                     return .none
             }
         }
+        .forEach(\.challengeTiles, action: \.challengeTiles) { ChallengeTileFeature() }
     }
 }
 
 struct ChallengeView: View {
-    @Perception.Bindable var store: StoreOf<ChallengeFeature>
+    @Bindable var store: StoreOf<ChallengeFeature>
 
     var body: some View {
-        WithPerceptionTracking {
-            NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
-                VStack {
-                    if store.isLoading {
-                        ProgressView("Loading challenges...")
-                    } else if let errorMessage = store.errorMessage {
-                        Text(errorMessage)
-                            .foregroundColor(.red)
-                    } else {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: 0) {
-//                                ForEach(
-//                                  store.scope(state: \.challengeTiles, action: \.challengeTiles),
-//                                  content: ChallengeTileView()
-//                                )
+        NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
+            VStack {
+                if store.isLoading {
+                  ProgressView("Loading challenges…")
+                } else if let msg = store.errorMessage {
+                  Text(msg).foregroundStyle(.red)
+                } else if store.challengeTiles.isEmpty {
+                  VStack(spacing: 12) {
+                    Text("Rejoins ou crée une colocation pour participer aux challenges.")
+                      .multilineTextAlignment(.center)
+                      .foregroundStyle(.secondary)
+                    Button("Aller à l’onglet Coloc") { store.send(.goToCohouseTab) }
+                      .buttonStyle(.borderedProminent)
+                  }
+                  .font(.custom("bakso", size: 14))
+                } else {
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 0) {
+                            ForEach(store.scope(state: \.challengeTiles, action: \.challengeTiles)) { tileStore in
+                                ChallengeTileView(store: tileStore)
                             }
                         }
-                        .introspect(.scrollView, on: .iOS(.v16), .iOS(.v17), .iOS(.v18)) {
-                            $0.isPagingEnabled = true
-                        }
                     }
+                    .introspect(.scrollView, on: .iOS(.v15, .v16, .v17, .v18, .v26)) { $0.isPagingEnabled = true }
                 }
-                .navigationTitle("Challenges")
-            } destination: { store in
-                switch store.state {
+            }
+            .navigationTitle("Challenges")
+        } destination: { store in
+            switch store.state {
                 case .profile:
                     if let store = store.scope(state: \.profile, action: \.profile) {
                         UserProfileDetailView(store: store)
                     }
-                }
             }
-            .onAppear {
-                store.send(.fetchChallenges)
-            }
+        }
+        .onAppear {
+            store.send(.onAppear)
         }
     }
 }
 
 #Preview {
     ChallengeView(
-        store: Store(initialState: ChallengeFeature.State(/*challengeTiles: IdentifiedArray(uniqueElements: Challenge.mockList)*/)) {
+        store: Store(initialState: ChallengeFeature.State()) {
             ChallengeFeature()
         }
     )

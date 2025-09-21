@@ -77,6 +77,9 @@
         }
       }
     },
+    "Aller à l’onglet Coloc" : {
+
+    },
     "Allow multiple selections" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -141,9 +144,6 @@
           }
         }
       }
-    },
-    "Challenge completed" : {
-
     },
     "Challenge responses" : {
 
@@ -395,6 +395,9 @@
         }
       }
     },
+    "Ended at %@" : {
+
+    },
     "Enter answer" : {
 
     },
@@ -509,7 +512,7 @@
         }
       }
     },
-    "Loading challenges..." : {
+    "Loading challenges…" : {
 
     },
     "Loading responses..." : {
@@ -534,6 +537,9 @@
           }
         }
       }
+    },
+    "Mark challenge as achieved" : {
+
     },
     "Me" : {
       "localizations" : {
@@ -695,9 +701,6 @@
         }
       }
     },
-    "Option %lld" : {
-
-    },
     "Postcode" : {
       "localizations" : {
         "fr" : {
@@ -727,6 +730,9 @@
           }
         }
       }
+    },
+    "Rejoins ou crée une colocation pour participer aux challenges." : {
+
     },
     "Response: %@" : {
 
@@ -865,6 +871,9 @@
         }
       }
     },
+    "Starts at %@" : {
+
+    },
     "Stats" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -893,7 +902,13 @@
     "SUBMIT" : {
 
     },
+    "SUBMIT PHOTO" : {
+
+    },
     "Submitted on: %@" : {
+
+    },
+    "Submitting…" : {
 
     },
     "Text" : {

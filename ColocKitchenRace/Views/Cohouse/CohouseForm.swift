@@ -68,10 +68,9 @@ struct CohouseFormFeature {
 }
 
 struct CohouseFormView: View {
-    @Perception.Bindable var store: StoreOf<CohouseFormFeature>
+    @Bindable var store: StoreOf<CohouseFormFeature>
 
     var body: some View {
-        WithPerceptionTracking {
             Form {
                 Section {
                     TextField("Cohouse name", text: $store.wipCohouse.name)
@@ -115,7 +114,7 @@ struct CohouseFormView: View {
 //                    }
 //                }
             }
-        }
+
     }
 
     func isActualUserIsAdmin() -> Bool {

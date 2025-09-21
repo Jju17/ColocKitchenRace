@@ -67,67 +67,66 @@ struct UserProfileDetailFeature {
 }
 
 struct UserProfileDetailView: View {
-    @Perception.Bindable var store: StoreOf<UserProfileDetailFeature>
+    @Bindable var store: StoreOf<UserProfileDetailFeature>
 
     var body: some View {
-        WithPerceptionTracking {
-            Form {
-                Section("Basic info") {
-                    Text(store.userInfo?.firstName ?? "")
-                    Text(store.userInfo?.lastName ?? "")
-                    Text(store.userInfo?.email ?? "")
-                    if let phoneNumber = store.userInfo?.phoneNumber {
-                        Text(phoneNumber)
-                    }
-                }
-
-                Section("Food related") {
-                    if let foodIntolerences = store.userInfo?.foodIntolerences, !foodIntolerences.isEmpty {
-                        ForEach(foodIntolerences, id: \.self) { foodIntolerance in
-                            Text(foodIntolerance.rawValue)
-                        }
-                    } else {
-                        Text("No food intolerences")
-                    }
-                }
-
-                Section {
-                    Button {
-                        self.store.send(.signOutButtonTapped)
-                    } label: {
-                        Text("Sign out")
-                            .foregroundStyle(Color.red)
-                    }
-
+        Form {
+            Section("Basic info") {
+                Text(store.userInfo?.firstName ?? "")
+                Text(store.userInfo?.lastName ?? "")
+                Text(store.userInfo?.email ?? "")
+                if let phoneNumber = store.userInfo?.phoneNumber {
+                    Text(phoneNumber)
                 }
             }
-            .navigationBarTitle("Profile")
-            .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button("Edit") {
-                        store.send(.editUserButtonTapped)
+
+            Section("Food related") {
+                if let foodIntolerences = store.userInfo?.foodIntolerences, !foodIntolerences.isEmpty {
+                    ForEach(foodIntolerences, id: \.self) { foodIntolerance in
+                        Text(foodIntolerance.rawValue)
                     }
+                } else {
+                    Text("No food intolerences")
                 }
             }
-            .sheet(item: $store.scope(state: \.destination?.editUser, action: \.destination.editUser)) { editUserStore in
-                NavigationStack {
-                    UserProfileFormView(store: editUserStore)
-                        .navigationTitle("Edit profile")
-                        .toolbar {
-                            ToolbarItem(placement: .cancellationAction) {
-                                Button("Dismiss") {
-                                    store.send(.dismissDestinationButtonTapped)
-                                }
-                            }
-                            ToolbarItem(placement: .confirmationAction) {
-                                Button("Confirm") {
-                                    store.send(.confirmEditUserButtonTapped)
-                                }
-                            }
-                        }
+
+            Section {
+                Button {
+                    self.store.send(.signOutButtonTapped)
+                } label: {
+                    Text("Sign out")
+                        .foregroundStyle(Color.red)
+                }
+
+            }
+        }
+        .navigationBarTitle("Profile")
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button("Edit") {
+                    store.send(.editUserButtonTapped)
                 }
             }
         }
+        .sheet(item: $store.scope(state: \.destination?.editUser, action: \.destination.editUser)) { editUserStore in
+            NavigationStack {
+                UserProfileFormView(store: editUserStore)
+                    .navigationTitle("Edit profile")
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Dismiss") {
+                                store.send(.dismissDestinationButtonTapped)
+                            }
+                        }
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Confirm") {
+                                store.send(.confirmEditUserButtonTapped)
+                            }
+                        }
+                    }
+            }
+        }
+
     }
 }
 

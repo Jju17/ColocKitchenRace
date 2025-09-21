@@ -40,7 +40,7 @@ struct CountdownTileView: View {
                 VStack(alignment: .leading, spacing: 0) {
                     HStack {
                         Text("Next Edition In")
-                            .font(.system(size: 26))
+                            .font(.custom("BaksoSapi", size: 26))
                             .fontWeight(.heavy)
                         Spacer()
                     }
@@ -51,13 +51,12 @@ struct CountdownTileView: View {
                             Text("No next date provided")
                         }
                     }
-                    .font(.system(size: 12))
+                    .font(.custom("BaksoSapi", size: 14))
                     .fontWeight(.light)
                     .textCase(.uppercase)
                 }
                 .frame(maxWidth: .infinity)
                 .foregroundStyle(.white)
-
 
                 VStack {
                     HStack {
@@ -86,7 +85,7 @@ struct CountdownTileView: View {
                 }
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .foregroundColor(.white)
-                .font(.system(size: 26))
+                .font(.custom("BaksoSapi", size: 26))
                 .fontWeight(.heavy)
             }
             .padding()

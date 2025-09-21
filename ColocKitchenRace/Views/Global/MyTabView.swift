@@ -10,6 +10,7 @@ import SwiftUI
 
 @Reducer
 struct TabFeature {
+
     @ObservableState
     struct State {
         var selectedTab: Tab = .home
@@ -38,14 +39,14 @@ struct TabFeature {
 
         Reduce { state, action in
             switch action {
-            case let .tabChanged(tab):
-                state.selectedTab = tab
-                return .none
-            case .home(.switchToCohouseButtonTapped):
-                state.selectedTab = .cohouse
-                return .none
-            case .challenge, .cohouse, .home:
-                return .none
+                case let .tabChanged(tab):
+                    state.selectedTab = tab
+                    return .none
+                case .home(.switchToCohouseButtonTapped):
+                    state.selectedTab = .cohouse
+                    return .none
+                case .challenge, .cohouse, .home:
+                    return .none
             }
         }
     }
@@ -56,44 +57,42 @@ enum Tab {
 }
 
 struct MyTabView: View {
-    @Perception.Bindable var store: StoreOf<TabFeature>
+    @Bindable var store: StoreOf<TabFeature>
 
     var body: some View {
-        WithPerceptionTracking {
-            TabView(selection: $store.selectedTab.sending(\.tabChanged)) {
-                HomeView(
-                    store: self.store.scope(
-                        state: \.home,
-                        action: \.home
-                    )
+        TabView(selection: $store.selectedTab.sending(\.tabChanged)) {
+            HomeView(
+                store: self.store.scope(
+                    state: \.home,
+                    action: \.home
                 )
-                .tabItem {
-                    Label("Home", systemImage: "house.fill")
-                }
-                .tag(Tab.home)
-
-                ChallengeView(
-                    store: self.store.scope(
-                        state: \.challenge,
-                        action: \.challenge
-                    )
-                )
-                .tabItem {
-                    Label("Challenges", systemImage: "star.fill")
-                }
-                .tag(Tab.challenges)
-
-                CohouseView(
-                    store: self.store.scope(
-                        state: \.cohouse,
-                        action: \.cohouse
-                    )
-                )
-                .tabItem {
-                    Label("Cohouse", systemImage: "person.3.fill")
-                }
-                .tag(Tab.cohouse)
+            )
+            .tabItem {
+                Label("Home", systemImage: "house.fill")
             }
+            .tag(Tab.home)
+
+            ChallengeView(
+                store: self.store.scope(
+                    state: \.challenge,
+                    action: \.challenge
+                )
+            )
+            .tabItem {
+                Label("Challenges", systemImage: "star.fill")
+            }
+            .tag(Tab.challenges)
+
+            CohouseView(
+                store: self.store.scope(
+                    state: \.cohouse,
+                    action: \.cohouse
+                )
+            )
+            .tabItem {
+                Label("Cohouse", systemImage: "person.3.fill")
+            }
+            .tag(Tab.cohouse)
         }
     }
 }

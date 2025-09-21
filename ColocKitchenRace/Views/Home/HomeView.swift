@@ -37,15 +37,15 @@ struct HomeFeature {
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .openRegisterLink:
-                guard let cohouse = state.cohouse
-                else { return .none}
-                let _ = self.ckrClient.registerCohouse(cohouse: cohouse)
-                return .none
-            case .path:
-                return .none
-            case .switchToCohouseButtonTapped:
-                return .none
+                case .openRegisterLink:
+                    guard let cohouse = state.cohouse
+                    else { return .none}
+                    let _ = self.ckrClient.registerCohouse(cohouse: cohouse)
+                    return .none
+                case .path:
+                    return .none
+                case .switchToCohouseButtonTapped:
+                    return .none
             }
         }
         .forEach(\.path, action: \.path)
@@ -53,41 +53,39 @@ struct HomeFeature {
 }
 
 struct HomeView: View {
-    @Perception.Bindable var store: StoreOf<HomeFeature>
+    @Bindable var store: StoreOf<HomeFeature>
 
     var body: some View {
-        WithPerceptionTracking {
-            NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
-                ScrollView {
-                    VStack(spacing: 15) {
-                        Button {
-                            store.send(.switchToCohouseButtonTapped)
-                        } label: {
-                            CohouseTileView(name: store.cohouse?.name)
-                        }
+        NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
+            ScrollView {
+                VStack(spacing: 15) {
+                    Button {
+                        store.send(.switchToCohouseButtonTapped)
+                    } label: {
+                        CohouseTileView(name: store.cohouse?.name)
+                    }
 
-                        Button {
-                            self.store.send(.openRegisterLink)
-                        } label: {
-                            CountdownTileView(nextKitchenRace: self.store.ckrGame?.nextGameDate)
-                        }
-                        NewsTileView(allNews: self.store.$news)
+                    Button {
+                        self.store.send(.openRegisterLink)
+                    } label: {
+                        CountdownTileView(nextKitchenRace: self.store.ckrGame?.nextGameDate)
                     }
+                    NewsTileView(allNews: self.store.$news)
                 }
-                .padding(.horizontal)
-                .navigationTitle("Colocs Kitchen Race")
-                .toolbar {
-                    NavigationLink(
-                        state: HomeFeature.Path.State.profile(UserProfileDetailFeature.State())
-                    ) {
-                        Image(systemName: "person.crop.circle.fill")
-                    }
+            }
+            .padding(.horizontal)
+            .navigationTitle("Colocs Kitchen Race")
+            .toolbar {
+                NavigationLink(
+                    state: HomeFeature.Path.State.profile(UserProfileDetailFeature.State())
+                ) {
+                    Image(systemName: "person.crop.circle.fill")
                 }
-            } destination: { store in
-                switch store.case {
+            }
+        } destination: { store in
+            switch store.case {
                 case let .profile(store):
                     UserProfileDetailView(store: store)
-                }
             }
         }
     }

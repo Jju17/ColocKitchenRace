@@ -9,16 +9,18 @@ import SwiftUI
 
 struct SingleAnswerView: View {
     @State private var answer: String = ""
-    let onSubmit: (Data?) -> Void
+    let onSubmit: (String) -> Void
 
     var body: some View {
         VStack {
             TextField("Enter answer", text: $answer)
                 .textFieldStyle(RoundedBorderTextFieldStyle())
                 .padding()
+
             Button("SUBMIT") {
-                onSubmit(nil)
+                onSubmit(answer.trimmingCharacters(in: .whitespacesAndNewlines))
             }
+            .disabled(answer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
             .padding()
             .frame(maxWidth: .infinity)
             .background(Color.green)

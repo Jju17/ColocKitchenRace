@@ -13,7 +13,7 @@ struct CohouseFeature {
 
     @ObservableState
     struct State {
-//        case cohouse(CohouseDetailFeature.State)
+        //        case cohouse(CohouseDetailFeature.State)
         var noCohouse = NoCohouseFeature.State()
         @Shared(.cohouse) var cohouse
     }
@@ -45,37 +45,35 @@ struct CohouseFeature {
 
         Reduce { state, action in
             switch action {
-            case .noCohouse:
-                return .none
+                case .noCohouse:
+                    return .none
             }
         }
     }
 }
 
 struct CohouseView: View {
-    @Perception.Bindable var store: StoreOf<CohouseFeature>
+    @Bindable var store: StoreOf<CohouseFeature>
 
     var body: some View {
-        WithPerceptionTracking {
-            NavigationStack {
-                if let cohouse = Shared(store.state.$cohouse) {
-                    CohouseDetailView(
-                        store: Store(
-                            initialState: CohouseDetailFeature.State(
-                                cohouse: cohouse
-                            )
-                        ) {
-                            CohouseDetailFeature()
-                        }
-                    )
-                } else {
-                    NoCohouseView(
-                        store: self.store.scope(
-                            state: \.noCohouse,
-                            action: \.noCohouse
+        NavigationStack {
+            if let cohouse = Shared(store.state.$cohouse) {
+                CohouseDetailView(
+                    store: Store(
+                        initialState: CohouseDetailFeature.State(
+                            cohouse: cohouse
                         )
+                    ) {
+                        CohouseDetailFeature()
+                    }
+                )
+            } else {
+                NoCohouseView(
+                    store: self.store.scope(
+                        state: \.noCohouse,
+                        action: \.noCohouse
                     )
-                }
+                )
             }
         }
     }

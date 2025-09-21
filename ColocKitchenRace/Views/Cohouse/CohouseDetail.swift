@@ -61,10 +61,9 @@ struct CohouseDetailFeature {
 }
 
 struct CohouseDetailView: View {
-    @Perception.Bindable var store: StoreOf<CohouseDetailFeature>
+    @Bindable var store: StoreOf<CohouseDetailFeature>
 
     var body: some View {
-        WithPerceptionTracking {
             Form {
                 Section("") {
                     Image("defaultColocBackground")
@@ -137,7 +136,7 @@ struct CohouseDetailView: View {
                         }
                 }
             }
-        }
+
     }
 }
 
