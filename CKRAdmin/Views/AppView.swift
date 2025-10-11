@@ -49,13 +49,13 @@ struct AppFeature {
                 return .none
             }
         }
-        .ifCaseLet(/State.tab, action: /Action.tab) {
+        .ifCaseLet(\.tab, action: \.tab) {
             TabFeature()
         }
-        .ifCaseLet(/State.signin, action: /Action.signin) {
+        .ifCaseLet(\.signin, action: \.signin) {
             SigninFeature()
         }
-        .ifCaseLet(/State.splashScreen, action: /Action.splashScreen) {
+        .ifCaseLet(\.splashScreen, action: \.splashScreen) {
             SplashScreenFeature()
         }
     }
@@ -94,5 +94,3 @@ struct AppView: View {
         }
     )
 }
-
-

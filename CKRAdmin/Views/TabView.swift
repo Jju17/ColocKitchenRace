@@ -43,9 +43,9 @@ struct TabFeature {
                 case let .tabChanged(tab):
                     state.selectedTab = tab
                     return .none
-                case .challengeValidation:
-                    return .none
                 case .challenge:
+                    return .none
+                case .challengeValidation:
                     return .none
                 case .home:
                     return .none

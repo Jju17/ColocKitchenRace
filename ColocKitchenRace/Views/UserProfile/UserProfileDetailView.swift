@@ -103,8 +103,10 @@ struct UserProfileDetailView: View {
         .navigationBarTitle("Profile")
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
-                Button("Edit") {
+                Button {
                     store.send(.editUserButtonTapped)
+                } label: {
+                    Image(systemName: "pencil")
                 }
             }
         }

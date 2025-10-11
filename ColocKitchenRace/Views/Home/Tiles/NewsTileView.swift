@@ -49,6 +49,7 @@ struct NewsTileView: View {
                             .cornerRadius(15)
                             .padding()
                         Text("No news at the moment")
+                            .font(.custom("BaksoSapi", size: 14))
                             .foregroundColor(.gray)
                     }
                 }

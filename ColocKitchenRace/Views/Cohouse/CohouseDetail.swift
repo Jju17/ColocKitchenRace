@@ -112,8 +112,10 @@ struct CohouseDetailView: View {
             }
             .navigationBarTitle(store.cohouse.name)
             .toolbar {
-                Button("Edit") {
+                Button {
                     store.send(.editButtonTapped)
+                } label: {
+                    Image(systemName: "pencil")
                 }
             }
             .sheet(

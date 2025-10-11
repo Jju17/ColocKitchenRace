@@ -46,7 +46,7 @@ struct StorageImage: View {
         isLoading = false
     }
 
-    private func errorMessage(for error: StorageError) -> String {
+    private func errorMessage(for error: StorageClientError) -> String {
         switch error {
             case .networkError: return "Network error."
             case .permissionDenied: return "Permission denied."

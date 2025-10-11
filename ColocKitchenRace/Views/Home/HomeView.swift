@@ -29,7 +29,11 @@ struct HomeFeature {
     enum Action {
         case openRegisterLink
         case path(StackActionOf<Path>)
-        case switchToCohouseButtonTapped
+        case delegate(Delegate)
+
+        enum Delegate: Equatable {
+            case switchToCohouseButtonTapped
+        }
     }
 
     @Dependency(\.ckrClient) var ckrClient
@@ -44,7 +48,7 @@ struct HomeFeature {
                     return .none
                 case .path:
                     return .none
-                case .switchToCohouseButtonTapped:
+                case .delegate:
                     return .none
             }
         }
@@ -60,7 +64,7 @@ struct HomeView: View {
             ScrollView {
                 VStack(spacing: 15) {
                     Button {
-                        store.send(.switchToCohouseButtonTapped)
+                        store.send(.delegate(.switchToCohouseButtonTapped))
                     } label: {
                         CohouseTileView(name: store.cohouse?.name)
                     }

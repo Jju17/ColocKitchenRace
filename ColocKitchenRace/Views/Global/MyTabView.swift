@@ -42,9 +42,12 @@ struct TabFeature {
                 case let .tabChanged(tab):
                     state.selectedTab = tab
                     return .none
-                case .home(.switchToCohouseButtonTapped):
+                case .home(.delegate(.switchToCohouseButtonTapped)):
                     state.selectedTab = .cohouse
                     return .none
+                case .challenge(.delegate(.switchToCohouseButtonTapped)):
+                      state.selectedTab = .cohouse
+                      return .none
                 case .challenge, .cohouse, .home:
                     return .none
             }

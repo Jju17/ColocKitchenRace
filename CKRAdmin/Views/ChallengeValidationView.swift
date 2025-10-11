@@ -24,7 +24,7 @@ struct ChallengeValidationFeature {
         case binding(BindingAction<State>)
         case fetchResponses
         case responsesLoaded(Result<[ChallengeResponse], ChallengeResponseError>)
-        case setResponseStatus(UUID, ChallengeResponseStatus)
+        case setResponseStatus(challengeId: UUID, cohouseId: String, status: ChallengeResponseStatus)
         case setFilterStatus(FilterStatus)
     }
 
@@ -69,13 +69,13 @@ struct ChallengeValidationFeature {
                     state.isLoading = false
                     state.errorMessage = error.localizedDescription
                     return .none
-                case .setResponseStatus(let responseId, let status):
+                case let .setResponseStatus(challengeId, cohouseId, status):
                     return .run { [state] send in
-                        let result = await self.challengeResponseClient.updateStatus(responseId, status)
+                        let result = await self.challengeResponseClient.updateStatus(challengeId, cohouseId, status)
                         switch result {
                             case .success:
                                 var updatedResponses = state.responses
-                                if let index = updatedResponses.firstIndex(where: { $0.id == responseId }) {
+                                if let index = updatedResponses.firstIndex(where: { $0.challengeId == challengeId && $0.cohouseId == cohouseId }) {
                                     updatedResponses[index].status = status
                                 }
                                 await send(.responsesLoaded(.success(updatedResponses)))
@@ -120,9 +120,9 @@ struct ChallengeValidationView: View {
                             ForEach(filteredResponses) { response in
                                 HStack {
                                     VStack(alignment: .leading) {
-                                        Text("Challenge ID: \(response.challengeId.uuidString.prefix(8))")
+                                        Text("Challenge: \(response.challengeTitle)")
                                             .font(.headline)
-                                        Text("Cohouse: \(response.cohouseId)")
+                                        Text("Cohouse: \(response.cohouseName)")
                                             .font(.subheadline)
                                         Text("Submitted on: \(response.submissionDate, formatter: dateFormatter)")
                                             .font(.caption)
@@ -151,7 +151,7 @@ struct ChallengeValidationView: View {
                                             color: .green,
                                             isActive: response.status == .validated
                                         ) {
-                                            store.send(.setResponseStatus(response.id, .validated))
+                                            store.send(.setResponseStatus(challengeId: response.challengeId, cohouseId: response.cohouseId, status: .validated))
                                         }
                                         
                                         .disabled(response.status == .validated)
@@ -162,7 +162,7 @@ struct ChallengeValidationView: View {
                                             color: .red,
                                             isActive: response.status == .invalidated
                                         ) {
-                                            store.send(.setResponseStatus(response.id, .invalidated))
+                                            store.send(.setResponseStatus(challengeId: response.challengeId, cohouseId: response.cohouseId, status: .invalidated))
                                         }
                                         .disabled(response.status == .invalidated)
                                         .contentShape(Rectangle())

@@ -24,7 +24,11 @@ struct ChallengeFeature {
         case challengesResponse([Challenge])
         case failed(String)
         case challengeTiles(IdentifiedActionOf<ChallengeTileFeature>)
-        case goToCohouseTab
+        case delegate(Delegate)
+
+        enum Delegate: Equatable {
+            case switchToCohouseButtonTapped
+        }
     }
 
     @Reducer
@@ -93,9 +97,7 @@ struct ChallengeFeature {
                 case .challengeTiles:
                     return .none
 
-                case .goToCohouseTab:
-                    return .none
-                case .path:
+                case .path, .delegate:
                     return .none
             }
         }
@@ -118,10 +120,11 @@ struct ChallengeView: View {
                     Text("Rejoins ou crée une colocation pour participer aux challenges.")
                       .multilineTextAlignment(.center)
                       .foregroundStyle(.secondary)
-                    Button("Aller à l’onglet Coloc") { store.send(.goToCohouseTab) }
+                    Button("Aller à l’onglet Coloc") { store.send(.delegate(.switchToCohouseButtonTapped)) }
                       .buttonStyle(.borderedProminent)
                   }
-                  .font(.custom("bakso", size: 14))
+                  .font(.custom("BaksoSapi", size: 14))
+                  .padding()
                 } else {
                     ScrollView(.horizontal, showsIndicators: false) {
                         HStack(spacing: 0) {

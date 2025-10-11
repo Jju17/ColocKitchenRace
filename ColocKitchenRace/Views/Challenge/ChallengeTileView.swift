@@ -40,6 +40,7 @@ struct ChallengeTileFeature: Reducer {
         case _submitFinished(Result<ChallengeResponse, Error>)
         case _statusUpdated(ChallengeResponseStatus)
 
+        case onDisappear
         case picture(PictureChoiceFeature.Action)
         case delegate(Delegate)
 
@@ -51,6 +52,7 @@ struct ChallengeTileFeature: Reducer {
     enum CancelID { case statusWatcher, submit }
 
     // MARK: - Dependencies
+
     @Dependency(\.challengeResponseClient) var responseClient
     @Dependency(\.storageClient) var storageClient
     @Dependency(\.date) var date
@@ -77,7 +79,7 @@ struct ChallengeTileFeature: Reducer {
                         submissionDate: date.now
                     )
 
-                    // Watch du statut admin
+                    // Watch admin status
                     let challengeId = state.challenge.id
                     let cohouseId = state.cohouseId
                     return .run { send in
@@ -88,21 +90,22 @@ struct ChallengeTileFeature: Reducer {
                     .cancellable(id: CancelID.statusWatcher, cancelInFlight: true)
 
                 case let .submitTapped(payload):
-                    guard var current = state.response else { return .none }
-                    guard state.challenge.isActiveNow else { return .none }       // pas de soumission hors fenêtre
-                    guard current.status != .validated else { return .none }      // verrou si déjà validé
+                    guard var current = state.response,
+                          state.challenge.isActiveNow,                                      // No submission outside of timing window
+                          current.status != .validated && current.status != .invalidated    // Lock if already validated/invalidated
+                    else { return .none }
 
                     state.isSubmitting = true
                     state.submitError = nil
 
                     switch payload {
                         case let .picture(data):
-                            // 1) upload → _uploadFinished → 2) submit Firestore
+                            // 1) upload → _uploadFinished → 2) submit to Firestore
                             let path = "challenges/\(current.challengeId)/responses/\(current.id).jpg"
                             return .run { send in
                                 do {
-                                    let url = try await storageClient.uploadImage(data, path)
-                                    await send(._uploadFinished(.success(url)))
+                                    _ = try await storageClient.uploadImage(data, path)
+                                    await send(._uploadFinished(.success(path)))
                                 } catch {
                                     await send(._uploadFinished(.failure(error)))
                                 }
@@ -124,14 +127,14 @@ struct ChallengeTileFeature: Reducer {
 
                 case let ._uploadFinished(result):
                     switch result {
-                        case let .success(urlString):
+                        case let .success(storagePath):
                             guard var current = state.response else { return .none }
-                            current.content = .picture(urlString)
+                            current.content = .picture(storagePath)
                             return submit(current)
 
                         case let .failure(error):
                             state.isSubmitting = false
-                            state.submitError = error.localizedDescription
+                            state.submitError = userFacingMessage(for: error)
                             return .none
                     }
 
@@ -144,14 +147,31 @@ struct ChallengeTileFeature: Reducer {
                             return .send(.delegate(.responseSubmitted(resp)))
 
                         case let .failure(error):
-                            state.submitError = error.localizedDescription
+                            state.submitError = userFacingMessage(for: error)
                             return .none
                     }
 
                 case let ._statusUpdated(status):
+                    // Always update "live" status
                     state.liveStatus = status
-                    if var r = state.response { r.status = status; state.response = r }
+
+                    // Update if response exists
+                    if var resp = state.response {
+                        resp.status = status
+                        state.response = resp
+                    }
+
+                    // Stop watcher if final decision
+                    if status == .validated || status == .invalidated {
+                        return .cancel(id: CancelID.statusWatcher)
+                    }
                     return .none
+
+                case .onDisappear:
+                    return .merge(
+                      .cancel(id: CancelID.statusWatcher),
+                      .cancel(id: CancelID.submit)
+                    )
 
                 case .picture, .delegate:
                     return .none
@@ -172,7 +192,7 @@ struct ChallengeTileFeature: Reducer {
         .cancellable(id: CancelID.submit, cancelInFlight: true)
     }
 
-    /// ID stable par (challenge, cohouse) pour éviter les doublons serveur
+    /// Stable ID by (challenge, cohouse) to avoid duplicate on server-side
     private func stableResponseId(challengeId: UUID, cohouseId: String) -> UUID {
         let base = "\(challengeId.uuidString)#\(cohouseId)"
         var hasher = Hasher(); hasher.combine(base)
@@ -187,6 +207,21 @@ struct ChallengeTileFeature: Reducer {
             uuidBytes[12], uuidBytes[13], uuidBytes[14], uuidBytes[15]
         ))
     }
+
+    // MARK: - Error mapping (A)
+
+    private func userFacingMessage(for error: Error) -> String {
+        // Very simple to start, we can afterward go more into details with network/HTTP/timeout errors
+        let nsError = error as NSError
+        switch (nsError.domain, nsError.code) {
+        case (NSURLErrorDomain, NSURLErrorNotConnectedToInternet):
+            return "No Internet connection. Check your connection and try again."
+        case (NSURLErrorDomain, NSURLErrorTimedOut):
+            return "The request timed out. Please try again in a moment."
+        default:
+            return "Something went wrong. Please try again."
+        }
+    }
 }
 
 // MARK: - View Hook
@@ -195,6 +230,9 @@ struct ChallengeTileView: View {
     @Bindable var store: StoreOf<ChallengeTileFeature>
 
     var body: some View {
+        let isFinal = store.liveStatus == .validated || store.liveStatus == .invalidated
+        let isEnded = store.challenge.hasEnded
+
         VStack(spacing: 16) {
             HeaderView(
                 title: store.challenge.title,
@@ -205,24 +243,41 @@ struct ChallengeTileView: View {
 
             BodyView(description: store.challenge.body)
 
-            ChallengeContentView(
-                challenge: store.challenge,
-                response: store.response,
-                selectedAnswer: $store.selectedAnswer,
-                pictureStore: store.scope(state: \.picture, action: \.picture),
-                onStart: { store.send(.startTapped) },
-                onSubmit: { payload in store.send(.submitTapped(payload)) }
-            )
+            // Disable submitting after a final decision has been made
+            if isFinal {
+                FinalStatusView(status: store.liveStatus)
+            } else {
+                ChallengeContentView(
+                    challenge: store.challenge,
+                    response: store.response,
+                    selectedAnswer: $store.selectedAnswer,
+                    pictureStore: store.scope(state: \.picture, action: \.picture),
+                    onStart: { store.send(.startTapped) },
+                    onSubmit: { payload in store.send(.submitTapped(payload)) }
+                )
+                .disabled(store.isSubmitting)
+                .opacity(store.isSubmitting ? 0.7 : 1.0)
+            }
 
             if store.isSubmitting { ProgressView("Submitting…") }
-            if let err = store.submitError { Text(err).foregroundStyle(.red) }
-            if let status = store.liveStatus { Text("Status: \(status.rawValue)") }
+            if let err = store.submitError {
+                Text(err)
+                    .foregroundStyle(.red)
+                    .accessibilityLabel(Text("Error: \(err)"))
+                    .accessibilityHint(Text("Please try again in a moment."))
+            }
+            if let status = store.liveStatus {
+                StatusBadge(status: status)
+                    .accessibilityLabel(Text("Response status: \(status.rawValue)"))
+            }
         }
         .padding(16)
         .background(RoundedRectangle(cornerRadius: 20, style: .continuous).fill(Color.CKRRandom))
         .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .padding(.horizontal)
         .frame(width: UIScreen.main.bounds.width)
+        .opacity(isEnded ? 0.9 : 1.0)
+        .onDisappear { store.send(.onDisappear) }
     }
 }
 
@@ -245,6 +300,8 @@ struct HeaderView: View {
                         .imageScale(.large)
                         .foregroundStyle(.black)
                 }
+                .accessibilityLabel(Text("Challenge information"))
+                .accessibilityHint(Text("Shows the rules and tips for this challenge."))
             }
             .padding(.bottom)
             VStack(alignment: .center, spacing: 20) {
@@ -293,20 +350,36 @@ func ChallengeContentView(
     VStack(spacing: 12) {
         if challenge.isActiveNow {
             if response == nil {
-                Button("Start", action: onStart).buttonStyle(.borderedProminent)
+                Button("Start", action: onStart)
+                    .buttonStyle(.borderedProminent)
+                    .accessibilityLabel("Start the challenge")
+                    .accessibilityHint("Begin your participation in this challenge.")
             } else {
                 switch challenge.content {
                     case .picture:
                         PictureChoiceView(store: pictureStore)
+                        if pictureStore.imageData == nil {
+                            Text("Select a photo, then submit.")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
                         if let data = pictureStore.imageData {
                             Button("SUBMIT PHOTO") { onSubmit(.picture(data)) }
                                 .buttonStyle(.borderedProminent)
+                                .accessibilityLabel("Submit photo")
+                                .accessibilityHint("Send your photo for validation.")
                         }
 
                     case let .multipleChoice(mc):
                         MultipleChoiceView(choices: mc.choices, selectedIndex: selectedAnswer) {
                             if let idx = selectedAnswer.wrappedValue { onSubmit(.multipleChoice(idx)) }
                         }
+                        if selectedAnswer.wrappedValue == nil {
+                            Text("Choose an answer, then confirm.")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+
                     case .singleAnswer:
                         SingleAnswerView { text in onSubmit(.singleAnswer(text)) }
 
@@ -315,33 +388,91 @@ func ChallengeContentView(
                 }
             }
         } else if !challenge.hasStarted {
-            Text("Starts at \(challenge.startDate.formatted(.dateTime.day().month().hour().minute()))")
-                .foregroundStyle(.secondary)
+            StartEndBadge(kind: .startsAt, date: challenge.startDate)
         } else {
-            Text("Ended at \(challenge.endDate.formatted(.dateTime.day().month().hour().minute()))")
-                .foregroundStyle(.secondary)
+            StartEndBadge(kind: .endedAt, date: challenge.endDate)
         }
     }
     .padding(.top)
 }
 
+struct FinalStatusView: View {
+    let status: ChallengeResponseStatus?
+
+    var body: some View {
+        VStack(spacing: 8) {
+            if let status {
+                switch status {
+                case .validated:
+                    Text("Response validated ✅")
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.green)
+                case .invalidated:
+                    Text("Response invalidated ❌")
+                        .fontWeight(.semibold)
+                        .foregroundStyle(.red)
+                case .waiting:
+                    EmptyView()
+                }
+            } else {
+                EmptyView()
+            }
+        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text("Final decision for the challenge"))
+    }
+}
+
+struct StatusBadge: View {
+    let status: ChallengeResponseStatus
+
+    var body: some View {
+        let (text, color): (String, Color) = {
+            switch status {
+            case .waiting: return ("Waiting", .yellow)
+            case .validated: return ("Validated", .green)
+            case .invalidated: return ("Invalidated", .red)
+            }
+        }()
+        return Text(text)
+            .font(.caption)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(color.opacity(0.2))
+            .foregroundStyle(color)
+            .clipShape(Capsule())
+    }
+}
+
+struct StartEndBadge: View {
+    enum Kind { case startsAt, endedAt }
+    let kind: Kind
+    let date: Date
+
+    var body: some View {
+        let (text, color): (String, Color) = {
+            switch kind {
+            case .startsAt:
+                return ("Starts at \(date.formatted(.dateTime.day().month().hour().minute()))", .blue)
+            case .endedAt:
+                return ("Ended at \(date.formatted(.dateTime.day().month().hour().minute()))", .gray)
+            }
+        }()
+        return Text(text)
+            .font(.caption)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(color.opacity(0.15))
+            .foregroundStyle(color)
+            .clipShape(Capsule())
+            .accessibilityLabel(Text(text))
+    }
+}
+
 #Preview {
     let challenge = Challenge.mock
     ChallengeTileView(
-        store: Store(initialState: ChallengeTileFeature.State(id: challenge.id, challenge: challenge, cohouseId: ""),
+        store: Store(initialState: ChallengeTileFeature.State(id: challenge.id, challenge: challenge, cohouseId: "cohouse_preview"),
                      reducer: { ChallengeTileFeature() })
     )
-}
-
-public enum ChallengeSubmitPayload: Equatable {
-    case picture(Data)
-    case multipleChoice(Int)
-    case singleAnswer(String)
-    case noChoice
-}
-
-extension ChallengeSubmitPayload {
-    var requiresUpload: Bool {
-        if case .picture = self { return true } else { return false }
-    }
 }

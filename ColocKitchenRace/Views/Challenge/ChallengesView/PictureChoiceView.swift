@@ -10,95 +10,162 @@ import SwiftUI
 
 @Reducer
 struct PictureChoiceFeature {
+  // MARK: - Config
+  static let maxBytes: Int = 3_000_000 // 3 MB
 
-    @ObservableState
-    struct State: Equatable {
-        var imageData: Data? = nil
-        var isImagePickerPresented = false
-    }
+  // MARK: - State
+  @ObservableState
+  struct State: Equatable {
+    var imageData: Data? = nil
+    var isImagePickerPresented = false
+    var isProcessing = false
+    var error: String?
+    var sourceSheetPresented = false
+    var source: Source = .library
 
-    enum Action: BindableAction, Equatable {
-        case binding(BindingAction<State>)
-        case submitTapped
-    }
+    enum Source: Equatable { case camera, library }
+  }
 
-    var body: some ReducerOf<Self> {
-        BindingReducer()
+  // MARK: - Action
+  enum Action: BindableAction, Equatable {
+    case binding(BindingAction<State>)
+    case pickTapped                    // opens the source action sheet
+    case sourceChosen(State.Source)    // choose camera/library
+    case imagePicked(UIImage)          // raw picker output (UIImage)
+    case imageCleared                  // clears current selection
+    case _finishProcessing(Result<Data, ImageProcessError>)
+  }
 
-        Reduce { state, action in
-            switch action {
-            case .binding:
-                return .none
-            case .submitTapped:
-                return .none
+  enum ImageProcessError: Error, Equatable {
+    case compressFailed
+    case tooLarge(Int)
+    case unknown
+  }
+
+  // MARK: - Body
+  var body: some ReducerOf<Self> {
+    BindingReducer()
+
+    Reduce { state, action in
+      switch action {
+      case .binding:
+        return .none
+
+      case .pickTapped:
+        state.sourceSheetPresented = true
+        return .none
+
+      case let .sourceChosen(source):
+        state.sourceSheetPresented = false
+        state.source = source
+        state.isImagePickerPresented = true
+        state.error = nil
+        return .none
+
+      case .imageCleared:
+        state.imageData = nil
+        state.error = nil
+        return .none
+
+      case let .imagePicked(uiImage):
+        state.isProcessing = true
+        state.error = nil
+        // Compression as an async task
+        return .run { send in
+          if let data = ImagePipeline.jpegDataCompressed(from: uiImage, maxDimension: 2000, quality: 0.7) {
+            if data.count > PictureChoiceFeature.maxBytes {
+              await send(._finishProcessing(.failure(.tooLarge(data.count))))
+            } else {
+              await send(._finishProcessing(.success(data)))
             }
+          } else {
+            await send(._finishProcessing(.failure(.compressFailed)))
+          }
         }
+
+      case let ._finishProcessing(result):
+        state.isProcessing = false
+        switch result {
+        case let .success(data):
+          state.imageData = data
+          state.error = nil
+        case let .failure(err):
+          state.imageData = nil
+          switch err {
+          case .compressFailed:
+            state.error = "Unable to compress the image. Please try again."
+          case let .tooLarge(bytes):
+            state.error = "Image is too large (\(ImagePipeline.humanSize(bytes))). Limit: \(ImagePipeline.humanSize(Self.maxBytes))."
+          case .unknown:
+            state.error = "Unknown error."
+          }
+        }
+        return .none
+      }
     }
+  }
 }
 
 struct PictureChoiceView: View {
-    @Bindable var store: StoreOf<PictureChoiceFeature>
+  @Bindable var store: StoreOf<PictureChoiceFeature>
 
-    var body: some View {
-        VStack {
-            Button("UPLOAD YOUR PHOTO") {
-                store.isImagePickerPresented = true
-            }
-            .padding()
-            .frame(maxWidth: .infinity)
-            .background(Color.white)
-            .foregroundColor(.blue)
-            .cornerRadius(8)
+  var body: some View {
+    VStack(spacing: 12) {
+      Button {
+        store.send(.pickTapped)
+      } label: {
+        Text(store.imageData == nil ? "Choose a picture" : "Redo picture")
+          .fontWeight(.semibold)
+          .frame(maxWidth: .infinity)
+          .padding()
+          .background(Color.white)
+          .foregroundStyle(.blue)
+          .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+      }
+      .accessibilityLabel(Text(store.imageData == nil ? "Choose a picture" : "Redo picture"))
 
-            if store.imageData != nil {
-                Button("SUBMIT") {
-                    store.send(.submitTapped)
-                }
-                .padding()
-                .frame(maxWidth: .infinity)
-                .background(Color.green)
-                .foregroundColor(.white)
-                .cornerRadius(8)
-            }
+      // Preview + size
+      if let data = store.imageData, let uiImage = UIImage(data: data) {
+        VStack(spacing: 8) {
+          Image(uiImage: uiImage)
+            .resizable()
+            .scaledToFit()
+            .frame(maxHeight: 260)
+            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .accessibilityLabel(Text("Preview of the selected photo"))
+
+          Text("Size: \(ImagePipeline.humanSize(data.count))")
+            .font(.footnote)
+            .foregroundStyle(.secondary)
         }
-        .sheet(isPresented: $store.isImagePickerPresented) {
-            ImagePicker(selectedImageData: $store.imageData)
-        }
+      }
+
+      if store.isProcessing {
+        ProgressView("Processing image…")
+      }
+
+      if let err = store.error {
+        Text(err)
+          .foregroundStyle(.red)
+          .multilineTextAlignment(.center)
+          .padding(.top, 4)
+      }
     }
-}
-
-struct ImagePicker: UIViewControllerRepresentable {
-    @Binding var selectedImageData: Data?
-
-    func makeUIViewController(context: Context) -> UIImagePickerController {
-        let picker = UIImagePickerController()
-        picker.delegate = context.coordinator
-        picker.sourceType = .photoLibrary
-        return picker
+    .confirmationDialog("Photo source", isPresented: $store.sourceSheetPresented, titleVisibility: .visible) {
+      Button("Camera", systemImage: "camera") {
+        store.send(.sourceChosen(.camera))
+      }
+      .disabled(!UIImagePickerController.isSourceTypeAvailable(.camera))
+      Button("Library", systemImage: "photo.on.rectangle") {
+        store.send(.sourceChosen(.library))
+      }
+      Button("Cancel", role: .cancel) {}
     }
-
-    func updateUIViewController(_ uiViewController: UIImagePickerController, context: Context) {}
-
-    func makeCoordinator() -> Coordinator {
-        Coordinator(self)
+    .sheet(isPresented: $store.isImagePickerPresented) {
+      ImagePicker(
+        selected: { image in store.send(.imagePicked(image)) },
+        source: store.source == .camera ? .camera : .photoLibrary
+      )
     }
-
-    class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-        let parent: ImagePicker
-
-        init(_ parent: ImagePicker) {
-            self.parent = parent
-        }
-
-        func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
-            if let image = info[.originalImage] as? UIImage {
-                parent.selectedImageData = image.jpegData(compressionQuality: 0.1)
-            }
-            picker.dismiss(animated: true)
-        }
-
-        func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-            picker.dismiss(animated: true)
-        }
-    }
+  }
 }

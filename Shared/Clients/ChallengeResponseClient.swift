@@ -21,7 +21,7 @@ enum ChallengeResponseError: Error, Equatable {
 @DependencyClient
 struct ChallengeResponseClient {
     var getAll: @Sendable () async -> Result<[ChallengeResponse], ChallengeResponseError> = { .success([]) }
-    var updateStatus: @Sendable (UUID, ChallengeResponseStatus) async -> Result<Void, ChallengeResponseError> = { _, _ in .success(()) }
+    var updateStatus: @Sendable (_ challengeId: UUID, _ cohouseId: String, _ status: ChallengeResponseStatus) async -> Result<Void, ChallengeResponseError> = { _, _, _ in .success(()) }
     var addAllMockChallengeResponses: @Sendable () async -> Result<Void, ChallengeResponseError> = { .success(()) }
     var submit: @Sendable (_ response: ChallengeResponse) async throws -> ChallengeResponse = { $0 }
     var watchStatus: @Sendable (_ challengeId: UUID, _ cohouseId: String) -> AsyncStream<ChallengeResponseStatus> = { _,_  in AsyncStream { $0.finish() } }
@@ -31,7 +31,10 @@ extension ChallengeResponseClient: DependencyKey {
     static let liveValue = Self(
         getAll: {
             do {
-                let querySnapshot = try await Firestore.firestore().collection("challengeResponses").getDocuments()
+                // New scheme: Read every sub-collections "responses" via collectionGroup
+                let querySnapshot = try await Firestore.firestore()
+                    .collectionGroup("responses")
+                    .getDocuments()
                 let documents = querySnapshot.documents
                 let responses = documents.compactMap { document in
                     try? document.data(as: ChallengeResponse.self)
@@ -49,11 +52,13 @@ extension ChallengeResponseClient: DependencyKey {
                 }
             }
         },
-        updateStatus: { responseId, status in
+        updateStatus: { challengeId, cohouseId, status in
             do {
                 try await Firestore.firestore()
-                    .collection("challengeResponses")
-                    .document(responseId.uuidString)
+                    .collection("challenges")
+                    .document(challengeId.uuidString)
+                    .collection("responses")
+                    .document(cohouseId)
                     .updateData(["status": status.rawValue])
                 return .success(())
             } catch let error as NSError {
@@ -73,8 +78,11 @@ extension ChallengeResponseClient: DependencyKey {
                 let db = Firestore.firestore()
                 let batch = db.batch()
                 for response in ChallengeResponse.mockList {
-                    let responseRef = db.collection("challengeResponses").document(response.id.uuidString)
-                    try batch.setData(from: response, forDocument: responseRef)
+                    let doc = db.collection("challenges")
+                        .document(response.challengeId.uuidString)
+                        .collection("responses")
+                        .document(response.cohouseId)
+                    try batch.setData(from: response, forDocument: doc, merge: true)
                 }
                 try await batch.commit()
                 Logger.challengeResponseLog.log(level: .info, "Successfully added \(ChallengeResponse.mockList.count) mock challenge responses")
@@ -94,7 +102,7 @@ extension ChallengeResponseClient: DependencyKey {
         submit: { response in
             do {
                 let db = Firestore.firestore()
-                // Scheme A: /challenges/{challengeId}/responses/{cohouseId}
+                // New imbricked scheme: /challenges/{challengeId}/responses/{cohouseId}
                 let doc = db.collection("challenges")
                     .document(response.challengeId.uuidString)
                     .collection("responses")
@@ -138,7 +146,7 @@ extension ChallengeResponseClient: DependencyKey {
     static var previewValue: ChallengeResponseClient {
         Self(
             getAll: { .success(ChallengeResponse.mockList) },
-            updateStatus: { _, _ in .success(()) },
+            updateStatus: { _, _, _ in .success(()) },
             addAllMockChallengeResponses: { .success(()) },
             submit: { $0 },
             watchStatus: { _, _ in AsyncStream { $0.finish() } }
@@ -148,7 +156,7 @@ extension ChallengeResponseClient: DependencyKey {
     static var testValue: ChallengeResponseClient {
         Self(
             getAll: { .success([]) },
-            updateStatus: { _, _ in .success(()) },
+            updateStatus: { _, _, _ in .success(()) },
             addAllMockChallengeResponses: { .success(()) },
             submit: { $0 },
             watchStatus: { _, _ in AsyncStream { $0.finish() } }

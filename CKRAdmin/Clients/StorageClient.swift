@@ -29,7 +29,7 @@ extension StorageClient: DependencyKey {
         loadImage: { path in
             do {
                 let ref = Storage.storage().reference(withPath: path)
-                let data = try await ref.data(maxSize: 2 * 1024 * 1024)
+                let data = try await ref.data(maxSize: 4 * 1024 * 1024)
                 guard let uiImage = UIImage(data: data) else { return .failure(.invalidData) }
                 Logger.storageLog.log(level: .info, "Loaded image at \(path)")
                 return .success(uiImage)
@@ -49,7 +49,7 @@ extension StorageClient: DependencyKey {
             _ = try await ref.putDataAsync(data, metadata: metadata)
             let url = try await ref.downloadURL()
             Logger.storageLog.log(level: .info, "Uploaded image to \(path)")
-            return url.absoluteString // <-- on retourne l’URL https exploitable côté UI
+            return url.absoluteString // <-- Sending back usable URL for UI
         }
     )
 
