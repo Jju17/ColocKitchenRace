@@ -21,6 +21,7 @@ enum ChallengeResponseError: Error, Equatable {
 @DependencyClient
 struct ChallengeResponseClient {
     var getAll: @Sendable () async -> Result<[ChallengeResponse], ChallengeResponseError> = { .success([]) }
+    var getAllForCohouse: @Sendable (_ cohouseId: String) async -> Result<[ChallengeResponse], ChallengeResponseError> = { _ in .success([]) }
     var updateStatus: @Sendable (_ challengeId: UUID, _ cohouseId: String, _ status: ChallengeResponseStatus) async -> Result<Void, ChallengeResponseError> = { _, _, _ in .success(()) }
     var addAllMockChallengeResponses: @Sendable () async -> Result<Void, ChallengeResponseError> = { .success(()) }
     var submit: @Sendable (_ response: ChallengeResponse) async throws -> ChallengeResponse = { $0 }
@@ -34,6 +35,30 @@ extension ChallengeResponseClient: DependencyKey {
                 // New scheme: Read every sub-collections "responses" via collectionGroup
                 let querySnapshot = try await Firestore.firestore()
                     .collectionGroup("responses")
+                    .getDocuments()
+                let documents = querySnapshot.documents
+                let responses = documents.compactMap { document in
+                    try? document.data(as: ChallengeResponse.self)
+                }
+                return .success(responses)
+            } catch let error as NSError {
+                Logger.challengeResponseLog.log(level: .fault, "\(error.localizedDescription)")
+                switch error.code {
+                    case FirestoreErrorCode.unavailable.rawValue:
+                        return .failure(.networkError)
+                    case FirestoreErrorCode.permissionDenied.rawValue:
+                        return .failure(.permissionDenied)
+                    default:
+                        return .failure(.unknown(error.localizedDescription))
+                }
+            }
+        },
+        getAllForCohouse: { cohouseId in
+            do {
+                // Filter by cohouseId directly on the collection group
+                let querySnapshot = try await Firestore.firestore()
+                    .collectionGroup("responses")
+                    .whereField("cohouseId", isEqualTo: cohouseId)
                     .getDocuments()
                 let documents = querySnapshot.documents
                 let responses = documents.compactMap { document in
@@ -146,6 +171,9 @@ extension ChallengeResponseClient: DependencyKey {
     static var previewValue: ChallengeResponseClient {
         Self(
             getAll: { .success(ChallengeResponse.mockList) },
+            getAllForCohouse: { cohouseId in
+                .success(ChallengeResponse.mockList.filter { $0.cohouseId == cohouseId })
+            },
             updateStatus: { _, _, _ in .success(()) },
             addAllMockChallengeResponses: { .success(()) },
             submit: { $0 },
@@ -156,6 +184,7 @@ extension ChallengeResponseClient: DependencyKey {
     static var testValue: ChallengeResponseClient {
         Self(
             getAll: { .success([]) },
+            getAllForCohouse: { _ in .success([]) },
             updateStatus: { _, _, _ in .success(()) },
             addAllMockChallengeResponses: { .success(()) },
             submit: { $0 },

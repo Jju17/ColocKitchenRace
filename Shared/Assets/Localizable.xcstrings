@@ -77,9 +77,6 @@
         }
       }
     },
-    "Affiche les règles et conseils pour ce challenge." : {
-
-    },
     "Aller à l’onglet Coloc" : {
 
     },
@@ -104,9 +101,6 @@
         }
       }
     },
-    "Annuler" : {
-
-    },
     "Answer" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -117,9 +111,6 @@
           }
         }
       }
-    },
-    "Aperçu de la photo sélectionnée" : {
-
     },
     "Are you sure you want to delete this challenge ?" : {
 
@@ -134,7 +125,7 @@
         }
       }
     },
-    "Bibliothèque" : {
+    "Begin your participation in this challenge." : {
 
     },
     "Body" : {
@@ -147,7 +138,10 @@
         }
       }
     },
-    "Caméra" : {
+    "Camera" : {
+
+    },
+    "Cancel" : {
 
     },
     "Challenge" : {
@@ -159,6 +153,9 @@
           }
         }
       }
+    },
+    "Challenge information" : {
+
     },
     "Challenge responses" : {
 
@@ -189,10 +186,10 @@
     "Choice: %@" : {
 
     },
-    "Choisis une réponse puis valide." : {
+    "Choose a picture" : {
 
     },
-    "Choose a picture" : {
+    "Choose an answer, then confirm." : {
 
     },
     "City" : {
@@ -291,9 +288,6 @@
         }
       }
     },
-    "Commence ta participation à ce challenge." : {
-
-    },
     "Confirm" : {
       "localizations" : {
         "fr" : {
@@ -353,13 +347,7 @@
         }
       }
     },
-    "Décision finale du challenge" : {
-
-    },
     "Delete" : {
-
-    },
-    "Démarrer le challenge" : {
 
     },
     "Dismiss" : {
@@ -435,19 +423,19 @@
     "Enter answer" : {
 
     },
-    "Envoie ta photo pour validation." : {
-
-    },
-    "Erreur: %@" : {
-
-    },
     "Error" : {
 
     },
     "Error : %@" : {
 
     },
+    "Error: %@" : {
+
+    },
     "Filter responses" : {
+
+    },
+    "Final decision for the challenge" : {
 
     },
     "First name" : {
@@ -526,9 +514,6 @@
     "Image failed to load" : {
 
     },
-    "Informations sur le challenge" : {
-
-    },
     "Invalidate" : {
 
     },
@@ -554,6 +539,9 @@
           }
         }
       }
+    },
+    "Library" : {
+
     },
     "Loading challenges…" : {
 
@@ -744,6 +732,12 @@
         }
       }
     },
+    "Photo source" : {
+
+    },
+    "Please try again in a moment." : {
+
+    },
     "Postcode" : {
       "localizations" : {
         "fr" : {
@@ -753,6 +747,12 @@
           }
         }
       }
+    },
+    "Preview of the selected photo" : {
+
+    },
+    "Processing image…" : {
+
     },
     "Profile" : {
       "localizations" : {
@@ -777,16 +777,16 @@
     "Redo picture" : {
 
     },
-    "Réessaie dans un instant." : {
-
-    },
     "Rejoins ou crée une colocation pour participer aux challenges." : {
 
     },
-    "Réponse invalidée ❌" : {
+    "Response invalidated ❌" : {
 
     },
-    "Réponse validée ✅" : {
+    "Response status: %@" : {
+
+    },
+    "Response validated ✅" : {
 
     },
     "Response: %@" : {
@@ -811,6 +811,9 @@
           }
         }
       }
+    },
+    "Select a photo, then submit." : {
+
     },
     "Select a Picture" : {
       "extractionState" : "stale",
@@ -853,7 +856,7 @@
         }
       }
     },
-    "Sélectionne une photo puis soumets." : {
+    "Send your photo for validation." : {
 
     },
     "Share this code with your cohouse buddies" : {
@@ -865,6 +868,9 @@
           }
         }
       }
+    },
+    "Shows the rules and tips for this challenge." : {
+
     },
     "Shuffle answers" : {
       "localizations" : {
@@ -906,10 +912,7 @@
         }
       }
     },
-    "Soumettre la photo" : {
-
-    },
-    "Source de la photo" : {
+    "Size: %@" : {
 
     },
     "Start" : {
@@ -935,6 +938,9 @@
         }
       }
     },
+    "Start the challenge" : {
+
+    },
     "Starts at %@" : {
 
     },
@@ -952,9 +958,6 @@
     "Status: %@" : {
 
     },
-    "Statut de la réponse: %@" : {
-
-    },
     "Submit" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -969,6 +972,9 @@
     "SUBMIT" : {
 
     },
+    "Submit photo" : {
+
+    },
     "SUBMIT PHOTO" : {
 
     },
@@ -976,9 +982,6 @@
 
     },
     "Submitting…" : {
-
-    },
-    "Taille: %@" : {
 
     },
     "Text" : {
@@ -1002,9 +1005,6 @@
     },
     "Total users :" : {
       "shouldTranslate" : false
-    },
-    "Traitement de l’image…" : {
-
     },
     "Validate" : {
 

@@ -21,7 +21,7 @@ struct ChallengeFeature {
     enum Action {
         case path(StackAction<Path.State, Path.Action>)
         case onAppear
-        case challengesResponse([Challenge])
+        case challengesAndResponsesLoaded(Result<([Challenge], [ChallengeResponse]), Error>)
         case failed(String)
         case challengeTiles(IdentifiedActionOf<ChallengeTileFeature>)
         case delegate(Delegate)
@@ -52,42 +52,88 @@ struct ChallengeFeature {
     @Dependency(\.challengeResponseClient) var challengeResponseClient
 
     var body: some ReducerOf<Self> {
-        Reduce {
-            state,
-            action in
+        Reduce { state, action in
             switch action {
                 case .onAppear:
                     state.isLoading = true
-                    return .run { send in
-                        do {
-                            let items = try await challengesClient.getAll()
-                            await send(.challengesResponse(items))
-                        } catch {
-                            await send(.failed(error.localizedDescription))
-                        }
-                    }
-                    
-                case let .challengesResponse(challenges):
-                    state.isLoading = false
                     state.errorMessage = nil
-                    
+
                     guard let cohouseId = currentCohouse?.id.uuidString,
-                          !cohouseId.isEmpty else {
+                          !cohouseId.isEmpty
+                    else {
+                        state.isLoading = false
                         state.challengeTiles = []
                         state.errorMessage = nil
                         return .none
                     }
-                    
-                    state.challengeTiles = IdentifiedArray(
-                        uniqueElements: challenges.map {
-                            ChallengeTileFeature.State(
-                                id: $0.id,
-                                challenge: $0,
-                                cohouseId: cohouseId,
-                                response: nil
+
+                    return .run { [cohouseId] send in
+                        async let challengesTask: [Challenge] = {
+                            do { return try await challengesClient.getAll() }
+                            catch {
+                                // Propagate the error via the action and exit early
+                                await send(.challengesAndResponsesLoaded(.failure(error)))
+                                return []
+                            }
+                        }()
+
+                        async let responsesTask: Result<[ChallengeResponse], ChallengeResponseError> = challengeResponseClient.getAllForCohouse(cohouseId)
+
+                        // Await results
+                        let challenges = await challengesTask
+                        // If challenges failed, we already sent the failure above; avoid double send
+                        if challenges.isEmpty {
+                            return
+                        }
+
+                        let responsesResult = await responsesTask
+
+                        switch responsesResult {
+                            case .success(let responsesList):
+                                await send(.challengesAndResponsesLoaded(.success((challenges, responsesList))))
+                            case .failure(let err):
+                                await send(.challengesAndResponsesLoaded(.failure(err)))
+                        }
+                    }
+
+                case let .challengesAndResponsesLoaded(result):
+                    state.isLoading = false
+                    switch result {
+                        case let .success((challenges, responses)):
+                            state.errorMessage = nil
+
+                            guard let cohouse = currentCohouse else {
+                                state.challengeTiles = []
+                                return .none
+                            }
+
+                            // Index existing responses by challengeId for quick lookup
+                            let responseByChallengeId = Dictionary(uniqueKeysWithValues: responses.map { ($0.challengeId, $0) })
+
+                            state.challengeTiles = IdentifiedArray(
+                                uniqueElements: challenges.map { challenge in
+                                    let resp = responseByChallengeId[challenge.id]
+                                    return ChallengeTileFeature.State(
+                                        id: challenge.id,
+                                        challenge: challenge,
+                                        cohouseId: cohouse.id.uuidString,
+                                        cohouseName: cohouse.name,
+                                        response: resp,
+                                        selectedAnswer: nil,
+                                        isSubmitting: false,
+                                        submitError: nil,
+                                        picture: .init(),
+                                        liveStatus: resp?.status
+                                    )
+                                }
                             )
-                    })
-                    return .none
+                            return .none
+
+                        case let .failure(error):
+                            state.errorMessage = errorMessage(from: error)
+                            state.challengeTiles = []
+                            return .none
+                    }
 
                 case .failed(let msg):
                     state.isLoading = false
@@ -103,6 +149,25 @@ struct ChallengeFeature {
         }
         .forEach(\.challengeTiles, action: \.challengeTiles) { ChallengeTileFeature() }
     }
+}
+
+// Local helper to map errors to a displayable message
+private func errorMessage(from error: any Error) -> String {
+//    if let err = error as? ChallengesClientError {
+//        switch err {
+//            case .networkError: return "Network error. Please try again."
+//            case .permissionDenied: return "Permission denied."
+//            case .unknown(let msg): return msg
+//        }
+//    }
+    if let err = error as? ChallengeResponseError {
+        switch err {
+            case .networkError: return "Network error. Please try again."
+            case .permissionDenied: return "Permission denied."
+            case .unknown(let msg): return msg
+        }
+    }
+    return error.localizedDescription
 }
 
 struct ChallengeView: View {

@@ -18,6 +18,7 @@ struct ChallengeTileFeature: Reducer {
         let id: UUID
         let challenge: Challenge
         let cohouseId: String
+        let cohouseName: String
 
         var response: ChallengeResponse?
         var selectedAnswer: Int?
@@ -74,6 +75,8 @@ struct ChallengeTileFeature: Reducer {
                         id: stableResponseId(challengeId: state.challenge.id, cohouseId: state.cohouseId),
                         challengeId: state.challenge.id,
                         cohouseId: state.cohouseId,
+                        challengeTitle: state.challenge.title,
+                        cohouseName: state.cohouseName,
                         content: .noChoice,        // Will be replaced when submitting
                         status: .waiting,
                         submissionDate: date.now
@@ -472,7 +475,7 @@ struct StartEndBadge: View {
 #Preview {
     let challenge = Challenge.mock
     ChallengeTileView(
-        store: Store(initialState: ChallengeTileFeature.State(id: challenge.id, challenge: challenge, cohouseId: "cohouse_preview"),
+        store: Store(initialState: ChallengeTileFeature.State(id: challenge.id, challenge: challenge, cohouseId: "cohouse_preview", cohouseName: "Preview House"),
                      reducer: { ChallengeTileFeature() })
     )
 }
