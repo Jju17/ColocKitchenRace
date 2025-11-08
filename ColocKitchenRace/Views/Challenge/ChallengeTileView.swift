@@ -10,7 +10,8 @@ import Dependencies
 import SwiftUI
 import MijickPopups
 
-struct ChallengeTileFeature: Reducer {
+@Reducer
+struct ChallengeTileFeature {
 
     // MARK: - State
     @ObservableState
@@ -231,22 +232,56 @@ struct ChallengeTileFeature: Reducer {
 
 struct ChallengeTileView: View {
     @Bindable var store: StoreOf<ChallengeTileFeature>
+    @Environment(\.colorScheme) var colorScheme
+
+    private var bg: Color { colorScheme == .dark ? Color(white: 0.13) : .white }
+    private var text: Color { colorScheme == .dark ? .white : .black }
 
     var body: some View {
         let isFinal = store.liveStatus == .validated || store.liveStatus == .invalidated
-        let isEnded = store.challenge.hasEnded
 
-        VStack(spacing: 16) {
-            HeaderView(
-                title: store.challenge.title,
-                startTime: store.challenge.startDate,
-                endTime: store.challenge.endDate,
-                challengeType: ChallengeType.fromContent(store.challenge.content)
-            )
+        VStack(spacing: 24) {
+            // Badge + Titre
+            HStack {
+                Spacer()
+                Text("1")
+                    .font(.custom("BaksoSapi", size: 18, relativeTo: .title))
+                    .foregroundColor(.white)
+                    .frame(width: 36, height: 36)
+                    .background(Circle().fill(.green))
+                    .overlay(Circle().stroke(.white, lineWidth: 3))
+                    .shadow(color: .green.opacity(0.5), radius: 10)
+                    .offset(y: -10)
+            }
 
-            BodyView(description: store.challenge.body)
+            VStack(spacing: 16) {
+                Text(store.challenge.title.uppercased())
+                    .font(.custom("BaksoSapi", size: 36, relativeTo: .title))
+                    .fontWeight(.black)
+                    .foregroundColor(text)
+                    .multilineTextAlignment(.center)
+                    .lineLimit(2)
 
-            // Disable submitting after a final decision has been made
+                // Dates
+                HStack(spacing: 40) {
+                    dateLabel("START", store.challenge.startDate, "calendar")
+                    Image(systemName: "arrow.right")
+                        .foregroundColor(.green)
+                        .font(.system(size: 24, weight: .bold))
+                    dateLabel("FIN", store.challenge.endDate, "clock")
+                }
+                .font(.custom("BaksoSapi", size: 14))
+                .foregroundColor(.secondary)
+            }
+
+            // Description
+            Text(store.challenge.body)
+                .font(.custom("BaksoSapi", size: 18))
+                .foregroundColor(text.opacity(0.9))
+                .multilineTextAlignment(.center)
+                .lineSpacing(8)
+
+            // Contenu
             if isFinal {
                 FinalStatusView(status: store.liveStatus)
             } else {
@@ -256,31 +291,52 @@ struct ChallengeTileView: View {
                     selectedAnswer: $store.selectedAnswer,
                     pictureStore: store.scope(state: \.picture, action: \.picture),
                     onStart: { store.send(.startTapped) },
-                    onSubmit: { payload in store.send(.submitTapped(payload)) }
+                    onSubmit: { store.send(.submitTapped($0)) },
+                    isSubmitting: store.isSubmitting
                 )
-                .disabled(store.isSubmitting)
-                .opacity(store.isSubmitting ? 0.7 : 1.0)
             }
 
-            if store.isSubmitting { ProgressView("Submitting…") }
-            if let err = store.submitError {
-                Text(err)
-                    .foregroundStyle(.red)
-                    .accessibilityLabel(Text("Error: \(err)"))
-                    .accessibilityHint(Text("Please try again in a moment."))
+            if store.isSubmitting {
+                ProgressView("Envoi en cours…")
+                    .font(.custom("BaksoSapi", size: 16))
             }
-            if let status = store.liveStatus {
+
+            if let err = store.submitError {
+                Text(err).font(.caption).foregroundColor(.red)
+            }
+
+            if let status = store.liveStatus, !isFinal {
                 StatusBadge(status: status)
-                    .accessibilityLabel(Text("Response status: \(status.rawValue)"))
             }
         }
-        .padding(16)
-        .background(RoundedRectangle(cornerRadius: 20, style: .continuous).fill(Color.CKRRandom))
-        .contentShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .padding(.horizontal)
-        .frame(width: UIScreen.main.bounds.width)
-        .opacity(isEnded ? 0.9 : 1.0)
-        .onDisappear { store.send(.onDisappear) }
+        .padding(32)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 32)
+                .fill(bg)
+                .shadow(color: .black.opacity(colorScheme == .dark ? 0.5 : 0.1), radius: 20, y: 10)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 32)
+                .stroke(Color.green.opacity(0.3), lineWidth: 2)
+        )
+        .padding(.vertical, 20)
+        .onChange(of: store.liveStatus) { _, new in
+            if new == .validated { ConfettiCannon() }
+        }
+    }
+
+    private func dateLabel(_ label: String, _ date: Date, _ icon: String) -> some View {
+        VStack(spacing: 8) {
+            Text(label)
+                .font(.custom("BaksoSapi", size: 12))
+                .foregroundColor(.green)
+            HStack(spacing: 6) {
+                Image(systemName: icon)
+                Text(date.formatted(.dateTime.day().month(.defaultDigits).hour().minute()))
+            }
+            .font(.custom("BaksoSapi", size: 14))
+        }
     }
 }
 
@@ -348,7 +404,8 @@ func ChallengeContentView(
     selectedAnswer: Binding<Int?>,
     pictureStore: StoreOf<PictureChoiceFeature>,
     onStart: @escaping () -> Void,
-    onSubmit: @escaping (ChallengeSubmitPayload) -> Void
+    onSubmit: @escaping (ChallengeSubmitPayload) -> Void,
+    isSubmitting: Bool
 ) -> some View {
     VStack(spacing: 12) {
         if challenge.isActiveNow {
@@ -360,7 +417,11 @@ func ChallengeContentView(
             } else {
                 switch challenge.content {
                     case .picture:
-                        PictureChoiceView(store: pictureStore)
+                        PictureChoiceView(
+                            store: pictureStore,
+                            onSubmit: { onSubmit(.picture($0)) },
+                            isSubmitting: isSubmitting
+                        )
                         if pictureStore.imageData == nil {
                             Text("Select a photo, then submit.")
                                 .font(.footnote)
@@ -374,7 +435,7 @@ func ChallengeContentView(
                         }
 
                     case let .multipleChoice(mc):
-                        MultipleChoiceView(choices: mc.choices, selectedIndex: selectedAnswer) {
+                        MultipleChoiceView(choices: mc.choices, selectedIndex: selectedAnswer, isSubmitting: isSubmitting) {
                             if let idx = selectedAnswer.wrappedValue { onSubmit(.multipleChoice(idx)) }
                         }
                         if selectedAnswer.wrappedValue == nil {
@@ -384,10 +445,10 @@ func ChallengeContentView(
                         }
 
                     case .singleAnswer:
-                        SingleAnswerView { text in onSubmit(.singleAnswer(text)) }
+                        SingleAnswerView(isSubmitting: isSubmitting) { text in onSubmit(.singleAnswer(text)) }
 
                     case .noChoice:
-                        NoChoiceView { onSubmit(.noChoice) }
+                        NoChoiceView(isSubmitting: isSubmitting) { onSubmit(.noChoice) }
                 }
             }
         } else if !challenge.hasStarted {

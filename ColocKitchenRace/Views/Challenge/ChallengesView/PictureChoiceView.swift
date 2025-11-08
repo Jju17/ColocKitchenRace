@@ -107,65 +107,85 @@ struct PictureChoiceFeature {
 }
 
 struct PictureChoiceView: View {
-  @Bindable var store: StoreOf<PictureChoiceFeature>
+    @Bindable var store: StoreOf<PictureChoiceFeature>
+    let onSubmit: (Data) -> Void
+    let isSubmitting: Bool
 
-  var body: some View {
-    VStack(spacing: 12) {
-      Button {
-        store.send(.pickTapped)
-      } label: {
-        Text(store.imageData == nil ? "Choose a picture" : "Redo picture")
-          .fontWeight(.semibold)
-          .frame(maxWidth: .infinity)
-          .padding()
-          .background(Color.white)
-          .foregroundStyle(.blue)
-          .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-      }
-      .accessibilityLabel(Text(store.imageData == nil ? "Choose a picture" : "Redo picture"))
+    var body: some View {
+        VStack(spacing: 20) {
+            Button {
+                store.send(.pickTapped)
+            } label: {
+                HStack {
+                    Image(systemName: store.imageData == nil ? "camera.fill" : "arrow.clockwise")
+                    Text(store.imageData == nil ? "Take or choose a photo" : "Change photo")
+                }
+                .font(.system(size: 17, weight: .semibold))
+                .frame(maxWidth: .infinity)
+                .frame(height: 56)
+                .foregroundColor(.blue)
+                .background(Color.blue.opacity(0.1))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.blue.opacity(0.4), lineWidth: 2)
+                )
+            }
+            .buttonStyle(.plain)
 
-      // Preview + size
-      if let data = store.imageData, let uiImage = UIImage(data: data) {
-        VStack(spacing: 8) {
-          Image(uiImage: uiImage)
-            .resizable()
-            .scaledToFit()
-            .frame(maxHeight: 260)
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .accessibilityLabel(Text("Preview of the selected photo"))
+            if let data = store.imageData, let uiImage = UIImage(data: data) {
+                Image(uiImage: uiImage)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(maxHeight: 300)
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 20)
+                            .stroke(Color.green.opacity(0.5), lineWidth: 4)
+                    )
+                    .shadow(radius: 8)
 
-          Text("Size: \(ImagePipeline.humanSize(data.count))")
-            .font(.footnote)
-            .foregroundStyle(.secondary)
+                HStack {
+                    Image(systemName: "photo")
+                    Text("Ready to submit · \(ImagePipeline.humanSize(data.count))")
+                }
+                .font(.caption)
+                .foregroundColor(.secondary)
+            }
+
+            if store.isProcessing {
+                ProgressView("Processing photo…")
+                    .progressViewStyle(.circular)
+            }
+
+            if let err = store.error {
+                Text(err)
+                    .font(.caption)
+                    .foregroundColor(.red)
+                    .multilineTextAlignment(.center)
+            }
+
+            if store.imageData != nil {
+                Button("SUBMIT PHOTO") {
+                    if let data = store.imageData {
+                        onSubmit(data)
+                    }
+                }
+                .submitButton(isLoading: isSubmitting)
+                .disabled(isSubmitting)
+            }
         }
-      }
-
-      if store.isProcessing {
-        ProgressView("Processing image…")
-      }
-
-      if let err = store.error {
-        Text(err)
-          .foregroundStyle(.red)
-          .multilineTextAlignment(.center)
-          .padding(.top, 4)
-      }
+        .sheet(isPresented: $store.isImagePickerPresented) {
+            ImagePicker(
+                selected: { store.send(.imagePicked($0)) },
+                source: store.source == .camera ? .camera : .photoLibrary
+            )
+        }
+        .confirmationDialog("Photo source", isPresented: $store.sourceSheetPresented) {
+            Button("Camera") { store.send(.sourceChosen(.camera)) }
+                .disabled(!UIImagePickerController.isSourceTypeAvailable(.camera))
+            Button("Library") { store.send(.sourceChosen(.library)) }
+            Button("Cancel", role: .cancel) {}
+        }
     }
-    .confirmationDialog("Photo source", isPresented: $store.sourceSheetPresented, titleVisibility: .visible) {
-      Button("Camera", systemImage: "camera") {
-        store.send(.sourceChosen(.camera))
-      }
-      .disabled(!UIImagePickerController.isSourceTypeAvailable(.camera))
-      Button("Library", systemImage: "photo.on.rectangle") {
-        store.send(.sourceChosen(.library))
-      }
-      Button("Cancel", role: .cancel) {}
-    }
-    .sheet(isPresented: $store.isImagePickerPresented) {
-      ImagePicker(
-        selected: { image in store.send(.imagePicked(image)) },
-        source: store.source == .camera ? .camera : .photoLibrary
-      )
-    }
-  }
 }

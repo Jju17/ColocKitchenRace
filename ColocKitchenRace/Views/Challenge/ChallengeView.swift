@@ -175,33 +175,43 @@ struct ChallengeView: View {
 
     var body: some View {
         NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
-            VStack {
+            ZStack {
+                Color(.systemBackground).ignoresSafeArea()
+
                 if store.isLoading {
-                  ProgressView("Loading challenges…")
-                } else if let msg = store.errorMessage {
-                  Text(msg).foregroundStyle(.red)
-                } else if store.challengeTiles.isEmpty {
-                  VStack(spacing: 12) {
-                    Text("Rejoins ou crée une colocation pour participer aux challenges.")
-                      .multilineTextAlignment(.center)
-                      .foregroundStyle(.secondary)
-                    Button("Aller à l’onglet Coloc") { store.send(.delegate(.switchToCohouseButtonTapped)) }
-                      .buttonStyle(.borderedProminent)
-                  }
-                  .font(.custom("BaksoSapi", size: 14))
-                  .padding()
-                } else {
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 0) {
-                            ForEach(store.scope(state: \.challengeTiles, action: \.challengeTiles)) { tileStore in
-                                ChallengeTileView(store: tileStore)
-                            }
+                    ProgressView("Loading challenges…")
+                        .font(.custom("BaksoSapi", size: 18))
+                }
+                else if let msg = store.errorMessage {
+                    Text(msg).foregroundStyle(.red)
+                        .font(.custom("BaksoSapi", size: 16))
+                }
+                else if store.challengeTiles.isEmpty {
+                    VStack(spacing: 20) {
+                        Text("Rejoins ou crée une colocation\npour participer aux challenges.")
+                            .font(.custom("BaksoSapi", size: 18))
+                            .multilineTextAlignment(.center)
+                            .foregroundStyle(.secondary)
+
+                        Button("Aller à l’onglet Coloc") {
+                            store.send(.delegate(.switchToCohouseButtonTapped))
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .font(.custom("BaksoSapi", size: 16))
+                    }
+                    .padding()
+                }
+                else {
+                    SnapPagingContainer(itemWidth: UIScreen.main.bounds.width * 0.90) {
+                        ForEachStore(store.scope(state: \.challengeTiles, action: \.challengeTiles)) { tileStore in
+                            ChallengeTileView(store: tileStore)
                         }
                     }
-                    .introspect(.scrollView, on: .iOS(.v15, .v16, .v17, .v18, .v26)) { $0.isPagingEnabled = true }
                 }
             }
             .navigationTitle("Challenges")
+            .navigationBarTitleDisplayMode(.large)
+            .font(.custom("BaksoSapi", size: 32)) // Titre principal
         } destination: { store in
             switch store.state {
                 case .profile:
@@ -210,9 +220,7 @@ struct ChallengeView: View {
                     }
             }
         }
-        .onAppear {
-            store.send(.onAppear)
-        }
+        .onAppear { store.send(.onAppear) }
     }
 }
 

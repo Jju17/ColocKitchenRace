@@ -34,6 +34,9 @@
         }
       }
     },
+    "1" : {
+
+    },
     "Active challenges at the moment :" : {
       "localizations" : {
         "fr" : {
@@ -173,6 +176,9 @@
         }
       }
     },
+    "Change photo" : {
+
+    },
     "Choice %lld" : {
       "localizations" : {
         "fr" : {
@@ -184,9 +190,6 @@
       }
     },
     "Choice: %@" : {
-
-    },
-    "Choose a picture" : {
 
     },
     "Choose an answer, then confirm." : {
@@ -420,16 +423,13 @@
     "Ended at %@" : {
 
     },
-    "Enter answer" : {
+    "Envoi en cours…" : {
 
     },
     "Error" : {
 
     },
     "Error : %@" : {
-
-    },
-    "Error: %@" : {
 
     },
     "Filter responses" : {
@@ -511,6 +511,9 @@
         }
       }
     },
+    "I’ve done it!" : {
+
+    },
     "Image failed to load" : {
 
     },
@@ -569,7 +572,7 @@
         }
       }
     },
-    "Mark challenge as achieved" : {
+    "MARK AS DONE" : {
 
     },
     "Me" : {
@@ -735,9 +738,6 @@
     "Photo source" : {
 
     },
-    "Please try again in a moment." : {
-
-    },
     "Postcode" : {
       "localizations" : {
         "fr" : {
@@ -748,10 +748,7 @@
         }
       }
     },
-    "Preview of the selected photo" : {
-
-    },
-    "Processing image…" : {
+    "Processing photo…" : {
 
     },
     "Profile" : {
@@ -774,16 +771,13 @@
         }
       }
     },
-    "Redo picture" : {
+    "Ready to submit · %@" : {
 
     },
-    "Rejoins ou crée une colocation pour participer aux challenges." : {
+    "Rejoins ou crée une colocation\npour participer aux challenges." : {
 
     },
     "Response invalidated ❌" : {
-
-    },
-    "Response status: %@" : {
 
     },
     "Response validated ✅" : {
@@ -912,9 +906,6 @@
         }
       }
     },
-    "Size: %@" : {
-
-    },
     "Start" : {
 
     },
@@ -969,19 +960,22 @@
         }
       }
     },
-    "SUBMIT" : {
-
-    },
     "Submit photo" : {
 
     },
     "SUBMIT PHOTO" : {
 
     },
+    "SUBMIT YOUR ANSWER" : {
+
+    },
+    "SUBMIT YOUR NAME" : {
+
+    },
     "Submitted on: %@" : {
 
     },
-    "Submitting…" : {
+    "Take or choose a photo" : {
 
     },
     "Text" : {
@@ -1005,6 +999,9 @@
     },
     "Total users :" : {
       "shouldTranslate" : false
+    },
+    "Type your creative name here..." : {
+
     },
     "Validate" : {
 

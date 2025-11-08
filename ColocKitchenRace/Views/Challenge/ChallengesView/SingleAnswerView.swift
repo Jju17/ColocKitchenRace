@@ -9,23 +9,30 @@ import SwiftUI
 
 struct SingleAnswerView: View {
     @State private var answer: String = ""
+    let isSubmitting: Bool
     let onSubmit: (String) -> Void
 
-    var body: some View {
-        VStack {
-            TextField("Enter answer", text: $answer)
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-                .padding()
+    var trimmedAnswer: String { answer.trimmingCharacters(in: .whitespacesAndNewlines) }
 
-            Button("SUBMIT") {
-                onSubmit(answer.trimmingCharacters(in: .whitespacesAndNewlines))
+    var body: some View {
+        VStack(spacing: 20) {
+            TextField("Type your creative name here...", text: $answer, axis: .vertical)
+                .textFieldStyle(.plain)
+                .font(.system(size: 17))
+                .lineLimit(3...6)
+                .padding()
+                .background(Color(white: 0.95))
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                )
+
+            Button("SUBMIT YOUR NAME") {
+                onSubmit(trimmedAnswer)
             }
-            .disabled(answer.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
-            .padding()
-            .frame(maxWidth: .infinity)
-            .background(Color.green)
-            .foregroundColor(.white)
-            .cornerRadius(8)
+            .submitButton(isEnabled: !trimmedAnswer.isEmpty, isLoading: isSubmitting)
+            .disabled(trimmedAnswer.isEmpty || isSubmitting)
         }
     }
 }
