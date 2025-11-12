@@ -13,7 +13,7 @@ struct TabFeature {
 
     @ObservableState
     struct State {
-        var selectedTab: Tab = .home
+        var selectedTab: Tab = .challenges
         var challenge = ChallengeFeature.State()
         var cohouse = CohouseFeature.State()
         var home = HomeFeature.State()

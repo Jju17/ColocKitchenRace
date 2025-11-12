@@ -241,47 +241,25 @@ struct ChallengeTileView: View {
         let isFinal = store.liveStatus == .validated || store.liveStatus == .invalidated
 
         VStack(spacing: 24) {
-            // Badge + Titre
-            HStack {
-                Spacer()
-                Text("1")
-                    .font(.custom("BaksoSapi", size: 18, relativeTo: .title))
-                    .foregroundColor(.white)
-                    .frame(width: 36, height: 36)
-                    .background(Circle().fill(.green))
-                    .overlay(Circle().stroke(.white, lineWidth: 3))
-                    .shadow(color: .green.opacity(0.5), radius: 10)
-                    .offset(y: -10)
-            }
+            // === HEADER ===
+            ChallengeHeaderView(
+                title: store.challenge.title,
+                startDate: store.challenge.startDate,
+                endDate: store.challenge.endDate,
+                challengeType: store.challenge.content.type
+            )
 
-            VStack(spacing: 16) {
-                Text(store.challenge.title.uppercased())
-                    .font(.custom("BaksoSapi", size: 36, relativeTo: .title))
-                    .fontWeight(.black)
-                    .foregroundColor(text)
+            // === DESCRIPTION ===
+            ScrollView {
+                Text(store.challenge.body)
+                    .font(.custom("BaksoSapi", size: 14))
+                    .foregroundColor(text.opacity(0.9))
                     .multilineTextAlignment(.center)
-                    .lineLimit(2)
-
-                // Dates
-                HStack(spacing: 40) {
-                    dateLabel("START", store.challenge.startDate, "calendar")
-                    Image(systemName: "arrow.right")
-                        .foregroundColor(.green)
-                        .font(.system(size: 24, weight: .bold))
-                    dateLabel("FIN", store.challenge.endDate, "clock")
-                }
-                .font(.custom("BaksoSapi", size: 14))
-                .foregroundColor(.secondary)
+                    .lineSpacing(6)
+                    .padding(.horizontal, 8)
             }
 
-            // Description
-            Text(store.challenge.body)
-                .font(.custom("BaksoSapi", size: 18))
-                .foregroundColor(text.opacity(0.9))
-                .multilineTextAlignment(.center)
-                .lineSpacing(8)
-
-            // Contenu
+            // === CONTENT ===
             if isFinal {
                 FinalStatusView(status: store.liveStatus)
             } else {
@@ -296,20 +274,28 @@ struct ChallengeTileView: View {
                 )
             }
 
+            // === FEEDBACK ===
             if store.isSubmitting {
                 ProgressView("Envoi en cours…")
                     .font(.custom("BaksoSapi", size: 16))
+                    .padding()
             }
 
             if let err = store.submitError {
-                Text(err).font(.caption).foregroundColor(.red)
+                Text(err)
+                    .font(.caption)
+                    .foregroundColor(.red)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
             }
 
-            if let status = store.liveStatus, !isFinal {
-                StatusBadge(status: status)
-            }
+//            if let status = store.liveStatus, !isFinal {
+//                StatusBadge(status: status)
+//                    .padding(.top, 8)
+//            }
         }
-        .padding(32)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
             RoundedRectangle(cornerRadius: 32)
@@ -320,66 +306,71 @@ struct ChallengeTileView: View {
             RoundedRectangle(cornerRadius: 32)
                 .stroke(Color.green.opacity(0.3), lineWidth: 2)
         )
-        .padding(.vertical, 20)
         .onChange(of: store.liveStatus) { _, new in
-            if new == .validated { ConfettiCannon() }
-        }
-    }
-
-    private func dateLabel(_ label: String, _ date: Date, _ icon: String) -> some View {
-        VStack(spacing: 8) {
-            Text(label)
-                .font(.custom("BaksoSapi", size: 12))
-                .foregroundColor(.green)
-            HStack(spacing: 6) {
-                Image(systemName: icon)
-                Text(date.formatted(.dateTime.day().month(.defaultDigits).hour().minute()))
+            if new == .validated {
+                ConfettiCannon()
             }
-            .font(.custom("BaksoSapi", size: 14))
         }
     }
 }
 
-struct HeaderView: View {
-    var title: String
-    var startTime: Date
-    var endTime: Date
-    var challengeType: ChallengeType
+struct ChallengeHeaderView: View {
+    let title: String
+    let startDate: Date
+    let endDate: Date
+    let challengeType: ChallengeType
+
+    @Environment(\.colorScheme) var colorScheme
+    private var text: Color { colorScheme == .dark ? .white : .black }
 
     var body: some View {
-        VStack(alignment: .center, spacing: 0) {
-            HStack(spacing: 0) {
+        VStack(spacing: 24) {
+            HStack {
+                InfoButton(challengeType: challengeType)
                 Spacer()
-                Button {
-                    Task {
-                        await ChallengeInfoPopup.makeChallengeInfoPopup(for: challengeType).present()
-                    }
-                } label: {
-                    Image(systemName: "info.circle")
-                        .imageScale(.large)
-                        .foregroundStyle(.black)
-                }
-                .accessibilityLabel(Text("Challenge information"))
-                .accessibilityHint(Text("Shows the rules and tips for this challenge."))
             }
-            .padding(.bottom)
-            VStack(alignment: .center, spacing: 20) {
-                Text(title)
-                    .frame(maxWidth: .infinity)
-                    .font(.custom("BaksoSapi", size: 24))
+            .backgroundStyle(.red)
+
+            VStack(spacing: 16) {
+                Text(title.uppercased())
+                    .font(.custom("BaksoSapi", size: 26, relativeTo: .title))
+                    .fontWeight(.black)
+                    .foregroundColor(text)
                     .multilineTextAlignment(.center)
-                HStack(alignment: .center, spacing: 50) {
-                    VStack(spacing: 5) {
-                        Text("START")
-                        Text(startTime.formatted(.dateTime.day().month(.defaultDigits).hour().minute()))
-                    }
-                    VStack(spacing: 5) {
-                        Text("END")
-                        Text(endTime.formatted(.dateTime.day().month(.defaultDigits).hour().minute()))
-                    }
+                    .lineLimit(2)
+
+                HStack(spacing: 40) {
+                    dateItem("START", startDate)
+                    Image(systemName: "arrow.right")
+                        .foregroundColor(.green)
+                        .font(.system(size: 26, weight: .bold))
+                    dateItem("END", endDate)
                 }
-                .font(.custom("BaksoSapi", size: 11))
+                .font(.custom("BaksoSapi", size: 14))
             }
+            .backgroundStyle(.green)
+        }
+    }
+
+    private func dateItem(_ label: String, _ date: Date) -> some View {
+        VStack(spacing: 8) {
+            Text(label)
+                .font(.custom("BaksoSapi", size: 12))
+                .foregroundColor(.green)
+                .fontWeight(.bold)
+
+            VStack {
+                HStack(spacing: 6) {
+                    Image(systemName: "calendar")
+                    Text(date.formatted(.dateTime.day().month(.defaultDigits)))
+                }
+                HStack(spacing: 6) {
+                    Image(systemName: "clock")
+                    Text(date.formatted(.dateTime.hour().minute()))
+                }
+            }
+            .font(.custom("BaksoSapi", size: 14))
+            .foregroundColor(.secondary)
         }
     }
 }
@@ -457,7 +448,35 @@ func ChallengeContentView(
             StartEndBadge(kind: .endedAt, date: challenge.endDate)
         }
     }
-    .padding(.top)
+}
+
+struct InfoButton: View {
+    let challengeType: ChallengeType
+
+    var body: some View {
+        Button {
+            Task {
+                await ChallengeInfoPopup.makeChallengeInfoPopup(for: challengeType).present()
+            }
+        } label: {
+            ZStack {
+                Circle()
+                    .fill(.green)
+                    .frame(width: 30, height: 30)
+                    .shadow(color: .green.opacity(0.6), radius: 12)
+
+                Text("i")
+                    .font(.custom("BaksoSapi", size: 16))
+                    .fontWeight(.bold)
+                    .foregroundColor(.white)
+            }
+            .overlay(
+                Circle()
+                    .stroke(.white, lineWidth: 3)
+            )
+        }
+        .buttonStyle(.plain)
+    }
 }
 
 struct FinalStatusView: View {

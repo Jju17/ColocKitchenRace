@@ -34,8 +34,11 @@ extension AuthentificationClient: DependencyKey {
                 @Shared(.userInfo) var userInfo
 
                 let authDataResult = try await Auth.auth().createUser(withEmail: signupUserData.email, password: signupUserData.password)
-                let authId = authDataResult.user.uid
-                let newUser = signupUserData.createUser(authId: authId)
+                let firUser = authDataResult.user
+
+                try await firUser.sendEmailVerification()
+
+                let newUser = signupUserData.createUser(authId: firUser.uid)
 
                 try Firestore.firestore().collection("users").document(newUser.id.uuidString).setData(from: newUser)
 

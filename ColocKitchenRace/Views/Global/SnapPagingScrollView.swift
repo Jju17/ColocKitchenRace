@@ -26,6 +26,7 @@ struct SnapPagingContainer<Content: View>: View {
                         .frame(width: itemWidth)
                 }
                 .padding(.horizontal, (proxy.size.width - itemWidth) / 2)
+                .padding(.bottom, 16)
                 .scrollTargetLayout()
             }
             .scrollTargetBehavior(.viewAligned)

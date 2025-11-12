@@ -34,6 +34,11 @@ extension Cohouse {
 //        self.users.first { $0.isContactUser }
         return nil
     }
+
+    func isAdmin(id: UUID?) -> Bool {
+        guard let id else { return false }
+        return self.users.contains(where: { $0.userId == id.uuidString && $0.isAdmin })
+    }
 }
 
 extension Cohouse {

@@ -74,11 +74,16 @@ struct CohouseDetailView: View {
                 .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
 
                 Section("") {
-                    VStack(alignment: .leading) {
-                        Text("Code : \(store.cohouse.code)")
-                            .font(Font.system(size: 20, weight: .semibold))
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack {
+                            Text("Code :")
+                            Text(store.cohouse.code)
+                                .textSelection(.enabled)
+                        }
+                        .font(.custom("BaksoSapi", size: 20))
+                        .fontWeight(.semibold)
                         Text("Share this code with your cohouse buddies")
-                            .font(.footnote)
+                            .font(.custom("BaksoSapi", size: 12))
                     }
                 }
                 .foregroundStyle(.white)
@@ -112,10 +117,12 @@ struct CohouseDetailView: View {
             }
             .navigationBarTitle(store.cohouse.name)
             .toolbar {
-                Button {
-                    store.send(.editButtonTapped)
-                } label: {
-                    Image(systemName: "pencil")
+                if store.cohouse.isAdmin(id: store.userInfo?.id) {
+                    Button {
+                        store.send(.editButtonTapped)
+                    } label: {
+                        Image(systemName: "pencil")
+                    }
                 }
             }
             .sheet(

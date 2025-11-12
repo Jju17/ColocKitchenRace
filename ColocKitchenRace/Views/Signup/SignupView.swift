@@ -28,7 +28,7 @@ struct SignupView: View {
                 HStack(spacing: 15) {
                     TextField("", text: $store.signupUserData.firstName)
                         .textFieldStyle(CKRTextFieldStyle(title: "NAME"))
-                        .textContentType(.name)
+                        .textContentType(.givenName)
                         .textInputAutocapitalization(.words)
                         .focused(self.$focusedField, equals: .name)
                         .submitLabel(.next)
@@ -43,7 +43,7 @@ struct SignupView: View {
                         .onSubmit { self.focusNextField() }
                     TextField("", text: $store.signupUserData.lastName)
                         .textFieldStyle(CKRTextFieldStyle(title: "SURNAME"))
-                        .textContentType(.name)
+                        .textContentType(.familyName)
                         .textInputAutocapitalization(.words)
                         .focused(self.$focusedField, equals: .surname)
                         .submitLabel(.next)

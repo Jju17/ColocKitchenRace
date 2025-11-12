@@ -34,9 +34,6 @@
         }
       }
     },
-    "1" : {
-
-    },
     "Active challenges at the moment :" : {
       "localizations" : {
         "fr" : {
@@ -157,9 +154,6 @@
         }
       }
     },
-    "Challenge information" : {
-
-    },
     "Challenge responses" : {
 
     },
@@ -238,7 +232,11 @@
         }
       }
     },
+    "Code :" : {
+
+    },
     "Code : %@" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -401,6 +399,7 @@
       }
     },
     "END" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -510,6 +509,9 @@
           }
         }
       }
+    },
+    "i" : {
+
     },
     "I’ve done it!" : {
 
@@ -862,9 +864,6 @@
           }
         }
       }
-    },
-    "Shows the rules and tips for this challenge." : {
-
     },
     "Shuffle answers" : {
       "localizations" : {

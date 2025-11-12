@@ -32,6 +32,7 @@ struct SubmitButtonStyle: ViewModifier {
                     Image(systemName: "arrow.right")
                 }
                 .padding(.horizontal)
+                .foregroundStyle(.white)
             )
             .opacity(isEnabled ? 1.0 : 0.6)
             .scaleEffect(isLoading ? 0.98 : 1.0)

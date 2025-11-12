@@ -11,15 +11,23 @@
 // -------------------------------------------------------------------------------------
 
 // FIX
-// [] - Fix member admin's selection
-// [] - Cohouse - Make cohouse code copyable for better sharability
-// [] - Challenge - Make 'START' Challenge button bigger
+// [-] - Fix member admin's selection
+// [/] - Cohouse - Make cohouse code copyable for better sharability
+// [-] - Challenge - Make 'START' Challenge button bigger
 
-// New functionnality
-// [] - Leaderboard
-// [] - Check for duplicate cohouse before creating one
-// [] - Check validity of addresses when creating a cohouse
-// [] - Enter an ID card when creating a cohouse
+// NEW FUNCTIONNALITY
+
+// Challenge
+// [-] - Notifications at every : new challenge added / challenge that begins / challenge that will end in xx minutes/hours
+// [-] - Leaderboard
+
+// Cohouse
+// [-] - Check for duplicate cohouse before creating one
+// [-] - Check validity of addresses when creating a cohouse
+// [-] - Enter an ID card when creating a cohouse
+
+
+
 
 
 // -------------------------------------------------------------------------------------
@@ -28,9 +36,10 @@
 // -------------------------------------------------------------------------------------
 
 // FIX
-// [] -
+// [-] - Connection only allowed for admin /!\
+
 
 // New functionnality
-// [] - Add ability to post news
-// [] - Responses -> Sort by ...
-// [] - Respons "No specific response"
+// [-] - Add ability to post news
+// [-] - Responses -> Sort by ...
+// [-] - Respons "No specific response"
