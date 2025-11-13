@@ -60,7 +60,6 @@ struct NoCohouseFeature {
                         do {
                             try await self.cohouseClient.add(newCohouse)
                         } catch {
-                            // TODO: plus tard tu pourras envoyer une action d’erreur/alerte
                             print("Failed to create cohouse:", error)
                         }
                     }

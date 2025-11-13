@@ -10,13 +10,12 @@ import Foundation
 struct PostalAddress: Equatable, Hashable, Codable {
     var street: String = ""
     var city: String = ""
-    var state: String = ""
     var postalCode: String = ""
-    var country: String = ""
+    var country: String = "Belgique"
 }
 
 extension PostalAddress {
     static var mock: PostalAddress {
-        PostalAddress(street: "88 Avenue des Eperviers", city: "Brussels", state: "Brussels", postalCode: "1150", country: "Belgium")
+        PostalAddress(street: "88 Avenue des Eperviers", city: "Brussels", postalCode: "1150", country: "Belgique")
     }
 }

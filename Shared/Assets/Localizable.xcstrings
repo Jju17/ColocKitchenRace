@@ -77,6 +77,18 @@
         }
       }
     },
+    "Adresse introuvable ou non reconnue." : {
+
+    },
+    "Adresse invalide (format incorrect)." : {
+
+    },
+    "Adresse trouvée mais incertaine :" : {
+
+    },
+    "Adresse valide ✅" : {
+
+    },
     "Aller à l’onglet Coloc" : {
 
     },
@@ -1009,6 +1021,9 @@
 
     },
     "Validate" : {
+
+    },
+    "Validate address" : {
 
     },
     "Validate response %@" : {

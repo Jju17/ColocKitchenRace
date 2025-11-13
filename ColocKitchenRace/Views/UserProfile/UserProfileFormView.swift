@@ -59,7 +59,7 @@ struct UserProfileFormView: View {
                 TextField("GSM", text: $store.wipUser.phoneNumber ?? "")
             }
 
-            // TODO: JR: This would be an array of Objects
+            // TODO: This would be an array of Objects
             //                Section("Food related") {
             //                    TextField("Food intolerances", text: $store.wipUser.foodIntolerences)
             //                }
