@@ -57,7 +57,12 @@ struct NoCohouseFeature {
                     state.destination = nil
 
                     return .run { _ in
-                        let _ = try? await self.cohouseClient.add(newCohouse)
+                        do {
+                            try await self.cohouseClient.add(newCohouse)
+                        } catch {
+                            // TODO: plus tard tu pourras envoyer une action d’erreur/alerte
+                            print("Failed to create cohouse:", error)
+                        }
                     }
                 case .confirmJoinCohouseButtonTapped:
                     @Shared(.cohouse) var cohouse
@@ -92,18 +97,32 @@ struct NoCohouseFeature {
                     state.destination = nil
                     return .none
                 case .findExistingCohouseButtonTapped:
-                    return .run { [cohouseCode = state.cohouseCode] send in
-                        guard let cohouseResult = try? await self.cohouseClient.getByCode(cohouseCode) else { return }
-
-                        switch cohouseResult {
-                            case let .success(cohouse):
-                                await send(.setUserToCohouseFound(cohouse))
-                            case let .failure(error):
-                                print(error.localizedDescription)
+                    let code = state.cohouseCode
+                    return .run { send in
+                        do {
+                            let cohouse = try await self.cohouseClient.getByCode(code)
+                            await send(.setUserToCohouseFound(cohouse))
+                        } catch {
+                            if let error = error as? CohouseClientError {
+                                switch error {
+                                case .cohouseNotFound: print("Cohouse not found for code \(code)")
+                                default: print("Cohouse lookup failed:", error)
+                                }
+                            } else {
+                                print("Unknown error during cohouse lookup:", error)
+                            }
                         }
                     }
                 case let .setUserToCohouseFound(cohouse):
                     guard let firstUser = cohouse.users.first else { return .none }
+
+                    if cohouse.users.contains(where: { $0.userId == state.userInfo?.id.uuidString }) {
+                        @Shared(.cohouse) var actualCohouse
+                        $actualCohouse.withLock { $0 = cohouse }
+                        state.destination = nil
+                        return .none
+                    }
+
                     state.destination = .setCohouseUser(
                         CohouseSelectUserFeature.State(cohouse: cohouse, selectedUser: firstUser)
                     )

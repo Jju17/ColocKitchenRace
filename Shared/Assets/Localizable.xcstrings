@@ -266,6 +266,9 @@
         }
       }
     },
+    "Cohouse updated" : {
+
+    },
     "Cohouse: %@" : {
 
     },
@@ -737,6 +740,9 @@
         }
       }
     },
+    "OK" : {
+
+    },
     "Photo source" : {
 
     },
@@ -1009,6 +1015,9 @@
 
     },
     "Validation" : {
+
+    },
+    "You have been removed from this cohouse by admin user." : {
 
     },
     "You need an account ?" : {

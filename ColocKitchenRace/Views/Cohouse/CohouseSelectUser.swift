@@ -31,7 +31,9 @@ struct CohouseSelectUserFeature {
         Reduce { state, action in
             switch action {
             case .addUserButtonTapped:
-                state.cohouse.users.append(CohouseUser(id: .init(), surname: state.newUserName))
+                let newUser = CohouseUser(id: .init(), surname: state.newUserName)
+                state.cohouse.users.append(newUser)
+                state.selectedUser = newUser
                 return .none
             case .binding:
                 return .none

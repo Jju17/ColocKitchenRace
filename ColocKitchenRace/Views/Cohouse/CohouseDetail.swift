@@ -14,6 +14,16 @@ struct CohouseDetailFeature {
     @Reducer
     enum Destination {
         case edit(CohouseFormFeature)
+        case alert(AlertState<Action.Alert>)
+
+        enum Action {
+            case edit(CohouseFormFeature.Action)
+            case alert(Alert)
+
+            enum Alert: Equatable {
+                case okButtonTapped
+            }
+        }
     }
 
     @ObservableState
@@ -28,32 +38,70 @@ struct CohouseDetailFeature {
         case dismissEditCohouseButtonTapped
         case editButtonTapped
         case destination(PresentationAction<Destination.Action>)
+        case refresh
+        case userWasRemovedFromCohouse
     }
+
+    @Dependency(\.cohouseClient) var cohouseClient
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .confirmEditohouseButtonTapped:
-                guard var wipCohouse = state.destination?.edit?.wipCohouse
-                else { return .none}
+                case .destination(.presented(.alert(.okButtonTapped))):
+                    @Shared(.cohouse) var currentCohouse
+                    $currentCohouse.withLock { $0 = nil }
+                    return .none
+                case .confirmEditohouseButtonTapped:
+                    guard var wipCohouse = state.destination?.edit?.wipCohouse
+                    else { return .none}
 
-                wipCohouse.users.removeAll { user in
-                    user.surname.isEmpty && !user.isAdmin
-                }
+                    wipCohouse.users.removeAll { user in
+                        user.surname.isEmpty && !user.isAdmin
+                    }
 
-                state.$cohouse.withLock { $0 = wipCohouse } //TODO: Add firestore set cohouse
-                state.destination = nil
-                return .none
-            case .dismissEditCohouseButtonTapped:
-                state.destination = nil
-                return .none
-            case .destination:
-                return .none
-            case .editButtonTapped:
-                state.destination = .edit(
-                    CohouseFormFeature.State(wipCohouse: state.cohouse)
-                )
-                return .none
+                    state.destination = nil
+                    return .run { [wipCohouse] _ in
+                        let _ = try await self.cohouseClient.set(id: wipCohouse.id.uuidString, newCohouse: wipCohouse)
+                    }
+                case .dismissEditCohouseButtonTapped:
+                    state.destination = nil
+                    return .none
+                case .destination:
+                    return .none
+                case .editButtonTapped:
+                    state.destination = .edit(
+                        CohouseFormFeature.State(wipCohouse: state.cohouse)
+                    )
+                    return .none
+                case .refresh:
+                    let id = state.cohouse.id.uuidString
+                    return .run { send in
+                        do {
+                            _ = try await cohouseClient.get(id)
+                        } catch let error as CohouseClientError {
+                            switch error {
+                                case .userNotInCohouse:
+                                    await send(.userWasRemovedFromCohouse)
+                                default:
+                                    print("Refresh error:", error)
+                            }
+                        } catch {
+                            print("Unknown refresh error:", error)
+                        }
+                    }
+                case .userWasRemovedFromCohouse:
+                    state.destination = .alert(
+                        AlertState {
+                            TextState("Cohouse updated")
+                        } actions: {
+                            ButtonState(role: .none, action: .okButtonTapped) {
+                                TextState("OK")
+                            }
+                        } message: {
+                            TextState("You have been removed from this cohouse by admin user.")
+                        }
+                    )
+                    return .none
             }
         }
         .ifLet(\.$destination, action: \.destination)
@@ -64,87 +112,99 @@ struct CohouseDetailView: View {
     @Bindable var store: StoreOf<CohouseDetailFeature>
 
     var body: some View {
-            Form {
-                Section("") {
-                    Image("defaultColocBackground")
-                        .resizable()
-                        .scaledToFill()
-                        .frame(height: 150)
-                }
-                .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+        Form {
+            Section("") {
+                Image("defaultColocBackground")
+                    .resizable()
+                    .scaledToFill()
+                    .frame(height: 150)
+            }
+            .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
 
-                Section("") {
-                    VStack(alignment: .leading, spacing: 6) {
-                        HStack {
-                            Text("Code :")
-                            Text(store.cohouse.code)
-                                .textSelection(.enabled)
-                        }
-                        .font(.custom("BaksoSapi", size: 20))
-                        .fontWeight(.semibold)
-                        Text("Share this code with your cohouse buddies")
-                            .font(.custom("BaksoSapi", size: 12))
+            Section("") {
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Text("Code :")
+                        Text(store.cohouse.code)
+                            .textSelection(.enabled)
                     }
+                    .font(.custom("BaksoSapi", size: 20))
+                    .fontWeight(.semibold)
+                    Text("Share this code with your cohouse buddies")
+                        .font(.custom("BaksoSapi", size: 12))
                 }
-                .foregroundStyle(.white)
-                .listRowBackground(Color.CKRPurple)
+            }
+            .foregroundStyle(.white)
+            .listRowBackground(Color.CKRPurple)
 
-                Section("LOCATION") {
-                    LabeledContent("Address", value: store.cohouse.address.street)
-                    LabeledContent("ZIP Code", value: store.cohouse.address.postalCode)
-                    LabeledContent("City", value: store.cohouse.address.city)
-                }
+            Section("LOCATION") {
+                LabeledContent("Address", value: store.cohouse.address.street)
+                LabeledContent("ZIP Code", value: store.cohouse.address.postalCode)
+                LabeledContent("City", value: store.cohouse.address.city)
+            }
 
-                Section("MEMBERS (\(store.cohouse.users.count))") {
-                    ForEach(store.cohouse.users) { user in
-                        HStack(alignment: .center) {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(user.surname)
-                                if user.isAdmin {
-                                    Text("Admin")
-                                        .foregroundStyle(.gray)
-                                        .font(.footnote)
-                                }
-                            }
-                            Spacer()
-                            if user.userId == self.store.userInfo?.id.uuidString {
-                                Text("Me")
+            Section("MEMBERS (\(store.cohouse.users.count))") {
+                ForEach(store.cohouse.users) { user in
+                    HStack(alignment: .center) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(user.surname)
+                            if user.isAdmin {
+                                Text("Admin")
                                     .foregroundStyle(.gray)
+                                    .font(.footnote)
                             }
+                        }
+                        Spacer()
+                        if user.userId == self.store.userInfo?.id.uuidString {
+                            Text("Me")
+                                .foregroundStyle(.gray)
                         }
                     }
                 }
             }
-            .navigationBarTitle(store.cohouse.name)
-            .toolbar {
-                if store.cohouse.isAdmin(id: store.userInfo?.id) {
-                    Button {
-                        store.send(.editButtonTapped)
-                    } label: {
-                        Image(systemName: "pencil")
-                    }
+        }
+        .navigationBarTitle(store.cohouse.name)
+        .refreshable {
+            await store.send(.refresh).finish()
+        }
+        .task {
+            await store.send(.refresh).finish()
+        }
+        .toolbar {
+            if store.cohouse.isAdmin(id: store.userInfo?.id) {
+                Button {
+                    store.send(.editButtonTapped)
+                } label: {
+                    Image(systemName: "pencil")
                 }
             }
-            .sheet(
-                item: $store.scope(state: \.destination?.edit, action: \.destination.edit)
-            ) { editCohouseStore in
-                NavigationStack {
-                    CohouseFormView(store: editCohouseStore)
-                        .navigationTitle("Edit cohouse")
-                        .toolbar {
-                            ToolbarItem(placement: .cancellationAction) {
-                                Button("Dismiss") {
-                                    store.send(.dismissEditCohouseButtonTapped)
-                                }
-                            }
-                            ToolbarItem(placement: .confirmationAction) {
-                                Button("Confirm") {
-                                    store.send(.confirmEditohouseButtonTapped)
-                                }
+        }
+        .alert(
+            $store.scope(
+                state: \.destination?.alert,
+                action: \.destination.alert
+            )
+        )
+        .sheet(
+            item: $store.scope(state: \.destination?.edit, action: \.destination.edit)
+        ) { editCohouseStore in
+            NavigationStack {
+                CohouseFormView(store: editCohouseStore)
+                    .navigationTitle("Edit cohouse")
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Dismiss") {
+                                store.send(.dismissEditCohouseButtonTapped)
                             }
                         }
-                }
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Confirm") {
+                                store.send(.confirmEditohouseButtonTapped)
+                            }
+                        }
+                    }
             }
+        }
 
     }
 }
