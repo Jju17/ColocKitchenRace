@@ -35,6 +35,7 @@ struct User: Equatable, Hashable, Identifiable, Codable {
     var foodIntolerences: [FoodIntolerences] = []
     var gender: Gender?
     var fcmToken: String?
+    var cohouseId: String?
 }
 
 extension User {

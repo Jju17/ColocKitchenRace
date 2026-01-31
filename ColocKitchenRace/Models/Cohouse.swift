@@ -21,7 +21,7 @@ extension Cohouse {
         self.users.count
     }
 
-    var toFIRCohouse: FirestoreCohouse  {
+    var toFIRCohouse: FirestoreCohouse {
         FirestoreCohouse(
             id: self.id,
             name: self.name,

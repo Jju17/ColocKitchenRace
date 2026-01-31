@@ -67,12 +67,12 @@
         }
       }
     },
-    "Admin" : {
+    "Address found but uncertain:" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Admin"
+            "value" : "Adresse trouvée mais incertaine :"
           }
         }
       }
@@ -87,42 +87,12 @@
         }
       }
     },
-    "Invalid address (incorrect format)." : {
+    "Admin" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Adresse invalide (format incorrect)."
-          }
-        }
-      }
-    },
-    "Address found but uncertain:" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Adresse trouvée mais incertaine :"
-          }
-        }
-      }
-    },
-    "Valid address ✅" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Adresse valide ✅"
-          }
-        }
-      }
-    },
-    "Go to Cohouse tab" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aller à l'onglet Coloc"
+            "value" : "Admin"
           }
         }
       }
@@ -148,16 +118,6 @@
         }
       }
     },
-    "Cancel" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Annuler"
-          }
-        }
-      }
-    },
     "Answer" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -169,28 +129,8 @@
         }
       }
     },
-    "Tap + to create a news" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Appuie sur + pour créer une news"
-          }
-        }
-      }
-    },
     "Are you sure you want to delete this challenge ?" : {
 
-    },
-    "No news" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Aucune news"
-          }
-        }
-      }
     },
     "Basic info" : {
       "localizations" : {
@@ -218,12 +158,12 @@
     "Camera" : {
 
     },
-    "This action is irreversible." : {
+    "Cancel" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Cette action est irréversible."
+            "value" : "Annuler"
           }
         }
       }
@@ -257,16 +197,6 @@
     "Change photo" : {
 
     },
-    "Loading..." : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chargement..."
-          }
-        }
-      }
-    },
     "Choice %lld" : {
       "localizations" : {
         "fr" : {
@@ -282,16 +212,6 @@
     },
     "Choose an answer, then confirm." : {
 
-    },
-    "Target" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cible"
-          }
-        }
-      }
     },
     "City" : {
       "localizations" : {
@@ -356,6 +276,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Coloc"
+          }
+        }
+      }
+    },
+    "Cohouse ID" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID de la colocation"
           }
         }
       }
@@ -475,6 +405,16 @@
         }
       }
     },
+    "Delete this news?" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer cette news ?"
+          }
+        }
+      }
+    },
     "Dismiss" : {
 
     },
@@ -509,8 +449,28 @@
         }
       }
     },
+    "Edit News" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier News"
+          }
+        }
+      }
+    },
     "Edit profile" : {
 
+    },
+    "Edition ID" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID de l'édition"
+          }
+        }
+      }
     },
     "Email" : {
       "localizations" : {
@@ -546,45 +506,8 @@
     "Ended at %@" : {
 
     },
-    "Save" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Enregistrer"
-          }
-        }
-      }
-    },
-    "Sending…" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Envoi en cours…"
-          }
-        }
-      }
-    },
-    "Send to" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Envoyer à"
-          }
-        }
-      }
-    },
-    "Send notification" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Envoyer la notification"
-          }
-        }
-      }
+    "Envoi en cours…" : {
+
     },
     "Error" : {
 
@@ -627,6 +550,20 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Global"
+          }
+        }
+      }
+    },
+    "Go to cohouse tab" : {
+
+    },
+    "Go to Cohouse tab" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aller à l'onglet Coloc"
           }
         }
       }
@@ -674,31 +611,21 @@
     "i" : {
 
     },
-    "I've done it!" : {
+    "I’ve done it!" : {
 
-    },
-    "Edition ID" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ID de l'édition"
-          }
-        }
-      }
-    },
-    "Cohouse ID" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ID de la colocation"
-          }
-        }
-      }
     },
     "Image failed to load" : {
 
+    },
+    "Invalid address (incorrect format)." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresse invalide (format incorrect)."
+          }
+        }
+      }
     },
     "Invalidate" : {
 
@@ -712,6 +639,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Joindre une coloc existante"
+          }
+        }
+      }
+    },
+    "Join or create a cohouse\nto participate in challenges." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rejoins ou crée une colocation\npour participer aux challenges."
           }
         }
       }
@@ -734,6 +671,16 @@
     },
     "Loading responses..." : {
 
+    },
+    "Loading..." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chargement..."
+          }
+        }
+      }
     },
     "Location" : {
       "localizations" : {
@@ -768,22 +715,22 @@
         }
       }
     },
-    "MEMBERS (%lld)" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MEMBRES (%lld)"
-          }
-        }
-      }
-    },
     "Members" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Membres"
+          }
+        }
+      }
+    },
+    "MEMBERS (%lld)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MEMBRES (%lld)"
           }
         }
       }
@@ -797,16 +744,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Minutes"
-          }
-        }
-      }
-    },
-    "Edit News" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Modifier News"
           }
         }
       }
@@ -858,6 +795,16 @@
         }
       }
     },
+    "New News" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouvelle News"
+          }
+        }
+      }
+    },
     "News" : {
       "localizations" : {
         "fr" : {
@@ -904,6 +851,16 @@
         }
       }
     },
+    "No news" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune news"
+          }
+        }
+      }
+    },
     "No news at the moment" : {
 
     },
@@ -936,16 +893,6 @@
     },
     "Notifs" : {
 
-    },
-    "New News" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nouvelle News"
-          }
-        }
-      }
     },
     "OK" : {
 
@@ -989,16 +936,6 @@
     "Ready to submit · %@" : {
 
     },
-    "Join or create a cohouse\nto participate in challenges." : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Rejoins ou crée une colocation\npour participer aux challenges."
-          }
-        }
-      }
-    },
     "Response invalidated ❌" : {
 
     },
@@ -1014,6 +951,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Résultat"
+          }
+        }
+      }
+    },
+    "Save" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Enregistrer"
           }
         }
       }
@@ -1082,8 +1029,39 @@
         }
       }
     },
+    "Send notification" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoyer la notification"
+          }
+        }
+      }
+    },
+    "Send to" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoyer à"
+          }
+        }
+      }
+    },
     "Send your photo for validation." : {
 
+    },
+    "Sending…" : {
+      "extractionState" : "stale",
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoi en cours…"
+          }
+        }
+      }
     },
     "Share this code with your cohouse buddies" : {
       "localizations" : {
@@ -1204,21 +1182,41 @@
     "Submitted on: %@" : {
 
     },
-    "Delete this news?" : {
+    "Take or choose a photo" : {
+
+    },
+    "Tap + to create a news" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Supprimer cette news ?"
+            "value" : "Appuie sur + pour créer une news"
           }
         }
       }
     },
-    "Take or choose a photo" : {
-
+    "Target" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cible"
+          }
+        }
+      }
     },
     "Text" : {
 
+    },
+    "This action is irreversible." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cette action est irréversible."
+          }
+        }
+      }
     },
     "Title" : {
       "localizations" : {
@@ -1241,6 +1239,16 @@
     },
     "Type your creative name here..." : {
 
+    },
+    "Valid address ✅" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adresse valide ✅"
+          }
+        }
+      }
     },
     "Validate" : {
 

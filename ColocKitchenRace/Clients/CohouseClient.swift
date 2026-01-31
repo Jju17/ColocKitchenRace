@@ -31,6 +31,7 @@ extension CohouseClient: DependencyKey {
     static let liveValue = Self(
         add: { newCohouse in
             @Shared(.cohouse) var currentCohouse
+            @Shared(.userInfo) var userInfo
 
             let db = Firestore.firestore()
             let cohouseRef = db.collection("cohouses").document(newCohouse.id.uuidString)
@@ -41,6 +42,11 @@ extension CohouseClient: DependencyKey {
                 let usersCollectionRef = cohouseRef.collection("users")
                 for user in newCohouse.users {
                     try usersCollectionRef.document(user.id.uuidString).setData(from: user)
+                }
+
+                // Update user's cohouseId in Firestore
+                if let userInfo {
+                    try FirestoreHelpers.updateUserCohouseId(newCohouse.id.uuidString, for: userInfo)
                 }
 
                 $currentCohouse.withLock { $0 = newCohouse }
@@ -60,16 +66,7 @@ extension CohouseClient: DependencyKey {
             let cohouseRef = db.collection("cohouses").document(id)
 
             do {
-                let firCohouse = try await cohouseRef.getDocument(as: FirestoreCohouse.self)
-
-                let userCollectionRef = cohouseRef.collection("users")
-                let querySnapshot = try await userCollectionRef.getDocuments()
-
-                let cohouseUsers = try querySnapshot.documents.map {
-                    try $0.data(as: CohouseUser.self)
-                }
-
-                let cohouse = firCohouse.toCohouseObject(with: cohouseUsers)
+                let cohouse = try await FirestoreHelpers.fetchCohouseWithUsers(from: cohouseRef)
 
                 let currentUserId = userInfo.id.uuidString
                 let isMember = cohouse.users.contains { $0.userId == currentUserId }
@@ -100,18 +97,7 @@ extension CohouseClient: DependencyKey {
                     throw CohouseClientError.cohouseNotFound
                 }
 
-                let cohouseRef = cohouseSnapshot.reference
-                let firCohouse = try await cohouseRef.getDocument(as: FirestoreCohouse.self)
-
-                let userCollectionRef = cohouseRef.collection("users")
-                let cohouseUsersSnapshot = try await userCollectionRef.getDocuments()
-
-                let cohouseUsers = try cohouseUsersSnapshot.documents.map {
-                    try $0.data(as: CohouseUser.self)
-                }
-
-                let cohouse = firCohouse.toCohouseObject(with: cohouseUsers)
-                return cohouse
+                return try await FirestoreHelpers.fetchCohouseWithUsers(from: cohouseSnapshot.reference)
             } catch let error as CohouseClientError {
                 throw error
             } catch {
@@ -160,7 +146,8 @@ extension CohouseClient: DependencyKey {
             @Shared(.userInfo) var userInfo
             @Shared(.cohouse) var cohouse
 
-            let cohouseRef = Firestore.firestore().collection("cohouses").document(cohouseId)
+            let db = Firestore.firestore()
+            let cohouseRef = db.collection("cohouses").document(cohouseId)
             let usersCollectionRef = cohouseRef.collection("users")
 
             guard let userInfo else { return }
@@ -174,6 +161,9 @@ extension CohouseClient: DependencyKey {
                 guard let userId = cohouse?.users.index(id: newUser.id) else { return }
                 cohouse?.users[userId].userId = userInfo.id.uuidString
             }
+
+            // Update user's cohouseId in Firestore
+            try FirestoreHelpers.updateUserCohouseId(cohouseId, for: userInfo)
         },
         quitCohouse: {
             @Shared(.cohouse) var cohouse
@@ -181,13 +171,17 @@ extension CohouseClient: DependencyKey {
 
             guard let cohouse, let userInfo else { return }
 
-            let cohouseRef = Firestore.firestore().collection("cohouses").document(cohouse.id.uuidString)
+            let db = Firestore.firestore()
+            let cohouseRef = db.collection("cohouses").document(cohouse.id.uuidString)
             let usersCollectionRef = cohouseRef.collection("users")
 
             let querySnapshot = try await usersCollectionRef.whereField("userId", isEqualTo: userInfo.id.uuidString).getDocuments()
             guard let document = querySnapshot.documents.first else { return }
 
             try await usersCollectionRef.document(document.documentID).delete()
+
+            // Clear user's cohouseId in Firestore
+            try FirestoreHelpers.updateUserCohouseId(nil, for: userInfo)
 
             $cohouse.withLock { $0 = nil }
         }

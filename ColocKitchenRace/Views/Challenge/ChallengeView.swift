@@ -188,12 +188,12 @@ struct ChallengeView: View {
                 }
                 else if store.challengeTiles.isEmpty {
                     VStack(spacing: 20) {
-                        Text("Rejoins ou crée une colocation\npour participer aux challenges.")
+                        Text("Join or create a cohouse\nto participate in challenges.")
                             .font(.custom("BaksoSapi", size: 18))
                             .multilineTextAlignment(.center)
                             .foregroundStyle(.secondary)
 
-                        Button("Aller à l’onglet Coloc") {
+                        Button("Go to cohouse tab") {
                             store.send(.delegate(.switchToCohouseButtonTapped))
                         }
                         .buttonStyle(.borderedProminent)

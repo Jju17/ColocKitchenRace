@@ -56,12 +56,15 @@ extension AuthentificationClient: DependencyKey {
         signIn: { email, password in
             do {
                 @Shared(.userInfo) var userInfo
+                @Shared(.cohouse) var cohouse
+
+                let db = Firestore.firestore()
 
                 let authDataResult = try await Auth.auth().signIn(withEmail: email, password: password)
-                let querySnapshot = try await Firestore.firestore()
-                                                        .collection("users")
-                                                        .whereField("authId", isEqualTo: authDataResult.user.uid)
-                                                        .getDocuments()
+                let querySnapshot = try await db
+                                                .collection("users")
+                                                .whereField("authId", isEqualTo: authDataResult.user.uid)
+                                                .getDocuments()
 
                 guard let loggedUser = try querySnapshot.documents.first?.data(as: User.self)
                 else { return .failure(.failed)}
@@ -70,6 +73,15 @@ extension AuthentificationClient: DependencyKey {
                 try? await Messaging.messaging().subscribe(toTopic: "all_users")
 
                 $userInfo.withLock { $0 = loggedUser }
+
+                // Auto-load user's cohouse if they have one
+                if let cohouseId = loggedUser.cohouseId {
+                    let cohouseRef = db.collection("cohouses").document(cohouseId)
+                    if let loadedCohouse = try? await FirestoreHelpers.fetchCohouseWithUsers(from: cohouseRef) {
+                        $cohouse.withLock { $0 = loadedCohouse }
+                    }
+                }
+
                 return .success(loggedUser)
             } catch {
                 Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
