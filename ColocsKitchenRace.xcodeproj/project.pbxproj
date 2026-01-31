@@ -25,7 +25,9 @@
 		644F09082E997A2700A9B256 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 644F09072E997A2700A9B256 /* FirebaseFirestore */; };
 		644F090A2E997A2700A9B256 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 644F09092E997A2700A9B256 /* FirebaseStorage */; };
 		6469FA702C1FAD2E002BDBF6 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = 6469FA6F2C1FAD2E002BDBF6 /* SwiftUIIntrospect */; };
+		6478D6BD2F2E2C7500DE69CF /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 6478D6BC2F2E2C7500DE69CF /* FirebaseMessaging */; };
 		64884E552AE43CF40075BB39 /* (null) in Sources */ = {isa = PBXBuildFile; };
+		64A1A5DD2F2E54B800D357E9 /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = 64A1A5DC2F2E54B800D357E9 /* FirebaseFunctions */; };
 		64B66EC62B5D50DB00B8F30B /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 64B66EC52B5D50DB00B8F30B /* ComposableArchitecture */; };
 		64C87C242DEB4D7F00EA27EB /* MijickPopups in Frameworks */ = {isa = PBXBuildFile; productRef = 64C87C232DEB4D7F00EA27EB /* MijickPopups */; };
 		64FBE3762D88682D00D8A89F /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 64FBE3752D88682D00D8A89F /* ComposableArchitecture */; };
@@ -53,6 +55,7 @@
 
 /* Begin PBXFileReference section */
 		6445D40E2EBE580200A5C93C /* TODO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TODO.swift; sourceTree = "<group>"; };
+		6478D6BE2F2E30BA00DE69CF /* ColocsKitchenRace.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ColocsKitchenRace.entitlements; sourceTree = "<group>"; };
 		64F17B2F2AD2A3BC0047F6F3 /* ColocsKitchenRace.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ColocsKitchenRace.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		64F17B3F2AD2A3BE0047F6F3 /* ColocsKitchenRaceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ColocsKitchenRaceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		64F17B492AD2A3BE0047F6F3 /* ColocsKitchenRaceUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ColocsKitchenRaceUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -136,6 +139,7 @@
 				644F08FA2E9957DF00A9B256 /* FirebaseCrashlytics in Frameworks */,
 				64FE3CE72B8D58B800E6AAAE /* Dependencies in Frameworks */,
 				644F08FE2E9957DF00A9B256 /* FirebaseStorage in Frameworks */,
+				6478D6BD2F2E2C7500DE69CF /* FirebaseMessaging in Frameworks */,
 				644F08F82E9957DF00A9B256 /* FirebaseCore in Frameworks */,
 				64C87C242DEB4D7F00EA27EB /* MijickPopups in Frameworks */,
 				644F08F22E9957DF00A9B256 /* FirebaseAnalyticsCore in Frameworks */,
@@ -164,6 +168,7 @@
 				64FBE3762D88682D00D8A89F /* ComposableArchitecture in Frameworks */,
 				644F09042E997A2700A9B256 /* FirebaseCore in Frameworks */,
 				644F09062E997A2700A9B256 /* FirebaseCrashlytics in Frameworks */,
+				64A1A5DD2F2E54B800D357E9 /* FirebaseFunctions in Frameworks */,
 				64FBE3782D88682D00D8A89F /* SwiftUIIntrospect in Frameworks */,
 				644F090A2E997A2700A9B256 /* FirebaseStorage in Frameworks */,
 				644F09022E997A2700A9B256 /* FirebaseAuth in Frameworks */,
@@ -184,6 +189,7 @@
 		64F17B262AD2A3BC0047F6F3 = {
 			isa = PBXGroup;
 			children = (
+				6478D6BE2F2E30BA00DE69CF /* ColocsKitchenRace.entitlements */,
 				6445D40E2EBE580200A5C93C /* TODO.swift */,
 				6405CBC82D886B7400BE8B0D /* Shared */,
 				64FBE2FD2D88665300D8A89F /* ColocKitchenRace */,
@@ -237,6 +243,7 @@
 				644F08F92E9957DF00A9B256 /* FirebaseCrashlytics */,
 				644F08FB2E9957DF00A9B256 /* FirebaseFirestore */,
 				644F08FD2E9957DF00A9B256 /* FirebaseStorage */,
+				6478D6BC2F2E2C7500DE69CF /* FirebaseMessaging */,
 			);
 			productName = colockitchenrace;
 			productReference = 64F17B2F2AD2A3BC0047F6F3 /* ColocsKitchenRace.app */;
@@ -303,6 +310,7 @@
 				644F09052E997A2700A9B256 /* FirebaseCrashlytics */,
 				644F09072E997A2700A9B256 /* FirebaseFirestore */,
 				644F09092E997A2700A9B256 /* FirebaseStorage */,
+				64A1A5DC2F2E54B800D357E9 /* FirebaseFunctions */,
 			);
 			productName = CKRAdmin;
 			productReference = 64FBE0252D8860CC00D8A89F /* CKRAdmin.app */;
@@ -601,6 +609,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ColocsKitchenRace.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -642,6 +651,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = ColocsKitchenRace.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1002,6 +1012,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 6469FA6E2C1FAD2E002BDBF6 /* XCRemoteSwiftPackageReference "swiftui-introspect" */;
 			productName = SwiftUIIntrospect;
+		};
+		6478D6BC2F2E2C7500DE69CF /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 644F08EE2E9957DE00A9B256 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
+		64A1A5DC2F2E54B800D357E9 /* FirebaseFunctions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 644F08EE2E9957DE00A9B256 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFunctions;
 		};
 		64B66EC52B5D50DB00B8F30B /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;

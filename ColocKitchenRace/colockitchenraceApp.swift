@@ -7,14 +7,85 @@
 
 import ComposableArchitecture
 import Firebase
+import FirebaseMessaging
 import SwiftUI
 import MijickPopups
+import UserNotifications
 
-class AppDelegate: NSObject, UIApplicationDelegate {
+class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
+
+    @Dependency(\.notificationClient) var notificationClient
+
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         FirebaseApp.configure()
+
+        // Configure notification center
+        UNUserNotificationCenter.current().delegate = self
+        Messaging.messaging().delegate = self
+
+        // Request notification permission
+        Task {
+            await requestNotificationPermission(application)
+        }
+
         return true
+    }
+
+    private func requestNotificationPermission(_ application: UIApplication) async {
+        do {
+            let granted = try await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound])
+            print("🔔 Notification permission granted: \(granted)")
+            if granted {
+                await MainActor.run {
+                    application.registerForRemoteNotifications()
+                }
+            }
+        } catch {
+            print("🔔 Error requesting notification permission: \(error)")
+        }
+    }
+
+    // MARK: - APNs Token
+
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        Messaging.messaging().apnsToken = deviceToken
+    }
+
+    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print("🔔 Failed to register for remote notifications: \(error)")
+    }
+
+    // MARK: - MessagingDelegate
+
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
+        guard let fcmToken = fcmToken else { return }
+        print("🔔 FCM Token: \(fcmToken)")
+
+        // Store FCM token and subscribe to topic
+        Task {
+            try? await notificationClient.storeFCMToken(fcmToken)
+
+            // Always subscribe to all_users topic when we have a token
+            try? await Messaging.messaging().subscribe(toTopic: "all_users")
+            print("🔔 Subscribed to 'all_users' topic")
+        }
+    }
+
+    // MARK: - UNUserNotificationCenterDelegate
+
+    // Handle notification when app is in foreground
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
+        return [.banner, .badge, .sound]
+    }
+
+    // Handle notification tap
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                didReceive response: UNNotificationResponse) async {
+        let userInfo = response.notification.request.content.userInfo
+        print("🔔 Notification tapped with data: \(userInfo)")
+        // TODO: Handle deep linking based on notification data
     }
 }
 

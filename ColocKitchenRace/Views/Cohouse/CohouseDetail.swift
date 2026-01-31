@@ -155,7 +155,8 @@ struct CohouseDetailView: View {
                             }
                         }
                         Spacer()
-                        if user.userId == self.store.userInfo?.id.uuidString {
+                        if let mainUserId = self.store.userInfo?.id.uuidString,
+                            user.userId == mainUserId {
                             Text("Me")
                                 .foregroundStyle(.gray)
                         }

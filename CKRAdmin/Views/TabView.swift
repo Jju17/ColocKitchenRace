@@ -16,6 +16,8 @@ struct TabFeature {
         var challenge = ChallengeFeature.State()
         var challengeValidation = ChallengeValidationFeature.State()
         var home = HomeFeature.State()
+        var news = NewsFeature.State()
+        var notification = NotificationFeature.State()
     }
 
     enum Action {
@@ -23,6 +25,8 @@ struct TabFeature {
         case challenge(ChallengeFeature.Action)
         case challengeValidation(ChallengeValidationFeature.Action)
         case home(HomeFeature.Action)
+        case news(NewsFeature.Action)
+        case notification(NotificationFeature.Action)
     }
 
     var body: some ReducerOf<Self> {
@@ -38,6 +42,14 @@ struct TabFeature {
             ChallengeValidationFeature()
         }
 
+        Scope(state: \.news, action: \.news) {
+            NewsFeature()
+        }
+
+        Scope(state: \.notification, action: \.notification) {
+            NotificationFeature()
+        }
+
         Reduce { state, action in
             switch action {
                 case let .tabChanged(tab):
@@ -49,6 +61,10 @@ struct TabFeature {
                     return .none
                 case .home:
                     return .none
+                case .news:
+                    return .none
+                case .notification:
+                    return .none
             }
         }
     }
@@ -58,6 +74,8 @@ enum Tab {
     case challenge
     case challengeValidation
     case home
+    case news
+    case notification
 }
 
 struct MyTabView: View {
@@ -95,6 +113,26 @@ struct MyTabView: View {
                 Label("Validation", systemImage: "checklist.checked")
             }
             .tag(Tab.challengeValidation)
+            NewsView(
+                store: self.store.scope(
+                    state: \.news,
+                    action: \.news
+                )
+            )
+            .tabItem {
+                Label("News", systemImage: "newspaper.fill")
+            }
+            .tag(Tab.news)
+            NotificationView(
+                store: self.store.scope(
+                    state: \.notification,
+                    action: \.notification
+                )
+            )
+            .tabItem {
+                Label("Notifs", systemImage: "bell.fill")
+            }
+            .tag(Tab.notification)
         }
     }
 }

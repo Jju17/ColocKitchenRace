@@ -25,7 +25,9 @@ struct CountdownTileView: View {
         }
     }
     private var countDownComponents: DateComponents? {
-        guard let nextKitchenRace = self.nextKitchenRace else { return nil }
+        guard let nextKitchenRace = self.nextKitchenRace,
+              nextKitchenRace > self.nowDate
+        else { return nil }
         return Date.countdownDateComponents(from: self.nowDate, to: nextKitchenRace)
     }
 

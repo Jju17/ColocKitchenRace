@@ -10,6 +10,7 @@ import Dependencies
 import DependenciesMacros
 import FirebaseAuth
 import FirebaseFirestore
+import FirebaseMessaging
 import os
 
 enum AuthError: Error {
@@ -42,6 +43,9 @@ extension AuthentificationClient: DependencyKey {
 
                 try Firestore.firestore().collection("users").document(newUser.id.uuidString).setData(from: newUser)
 
+                // Subscribe to all_users topic for broadcast notifications
+                try? await Messaging.messaging().subscribe(toTopic: "all_users")
+
                 $userInfo.withLock { $0 = newUser }
                 return Result(.success(newUser))
             } catch {
@@ -62,6 +66,9 @@ extension AuthentificationClient: DependencyKey {
                 guard let loggedUser = try querySnapshot.documents.first?.data(as: User.self)
                 else { return .failure(.failed)}
 
+                // Subscribe to all_users topic for broadcast notifications
+                try? await Messaging.messaging().subscribe(toTopic: "all_users")
+
                 $userInfo.withLock { $0 = loggedUser }
                 return .success(loggedUser)
             } catch {
@@ -70,6 +77,9 @@ extension AuthentificationClient: DependencyKey {
             }
         },
         signOut: {
+            // Unsubscribe from notifications before signing out
+            try? await Messaging.messaging().unsubscribe(fromTopic: "all_users")
+
             try Auth.auth().signOut()
             @Shared(.userInfo) var user
             @Shared(.cohouse) var cohouse

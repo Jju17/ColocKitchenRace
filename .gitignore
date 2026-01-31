@@ -12,3 +12,8 @@ DerivedData/
 # Ignore all .env files (environment secrets)
 .env
 *.xcbkptlist
+
+# Node.js
+node_modules/
+functions/lib/
+.claude/

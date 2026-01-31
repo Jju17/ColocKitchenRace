@@ -112,7 +112,7 @@ struct CohouseFormView: View {
                 TextField("Cohouse name", text: $store.wipCohouse.name)
             }
 
-            Section("Localisation") {
+            Section("Location") {
                 TextField(text: $store.wipCohouse.address.street) {
                     Text("Address")
                 }
@@ -126,7 +126,7 @@ struct CohouseFormView: View {
                 self.addressValidationView
             }
 
-            Section("Membres") {
+            Section("Members") {
                 ForEach($store.wipCohouse.users) { $user in
                     TextField("Name", text: $user.surname)
                 }
@@ -180,18 +180,18 @@ struct CohouseFormView: View {
             if let result = store.addressValidationResult {
                 switch result {
                 case .invalidSyntax:
-                    Text("Adresse invalide (format incorrect).")
+                    Text("Invalid address (incorrect format).")
                         .font(.footnote)
                         .foregroundStyle(.red)
 
                 case .notFound:
-                    Text("Adresse introuvable ou non reconnue.")
+                    Text("Address not found or not recognized.")
                         .font(.footnote)
                         .foregroundStyle(.orange)
 
                 case .lowConfidence(let validated):
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Adresse trouvée mais incertaine :")
+                        Text("Address found but uncertain:")
                             .font(.footnote)
                             .foregroundStyle(.orange)
 
@@ -211,7 +211,7 @@ struct CohouseFormView: View {
 
                 case .valid(let validated):
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Adresse valide ✅")
+                        Text("Valid address ✅")
                             .font(.footnote)
                             .foregroundStyle(.green)
                         if let suggestion = formattedSuggestion(from: validated) {
