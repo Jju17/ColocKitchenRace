@@ -12,6 +12,7 @@ import FirebaseFirestore
 @DependencyClient
 struct NewsClient {
     var getLast: @Sendable () async throws -> Result<[News], NewsError>
+    var listenToNews: @Sendable () -> AsyncStream<[News]> = { .never }
 }
 
 enum NewsError: Error {
@@ -24,7 +25,7 @@ extension NewsClient: DependencyKey {
         getLast: {
             do {
                 @Shared(.news) var news
-                
+
                 let querySnapshot = try await Firestore.firestore().collection("news")
                     .order(by: "publicationTimestamp", descending: true)
                     .limit(to: 10)
@@ -39,6 +40,30 @@ extension NewsClient: DependencyKey {
                 return .success(lastNews)
             } catch {
                 return .failure(.firebaseError(error.localizedDescription))
+            }
+        },
+        listenToNews: {
+            AsyncStream { continuation in
+                let listener = Firestore.firestore().collection("news")
+                    .order(by: "publicationTimestamp", descending: true)
+                    .limit(to: 10)
+                    .addSnapshotListener { snapshot, error in
+                        guard let snapshot, error == nil else { return }
+
+                        let news = snapshot.documents.compactMap { document in
+                            try? document.data(as: News.self)
+                        }
+
+                        // Update shared state
+                        @Shared(.news) var sharedNews
+                        $sharedNews.withLock { $0 = news }
+
+                        continuation.yield(news)
+                    }
+
+                continuation.onTermination = { _ in
+                    listener.remove()
+                }
             }
         }
     )

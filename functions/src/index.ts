@@ -1,5 +1,6 @@
 import * as admin from "firebase-admin";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { onDocumentCreated } from "firebase-functions/v2/firestore";
 
 admin.initializeApp();
 
@@ -309,6 +310,62 @@ export const sendNotificationToAll = onCall<SendToAllRequest>(
     } catch (error) {
       console.error("Error sending to all:", error);
       throw new HttpsError("internal", "Failed to send notification");
+    }
+  }
+);
+
+// ============================================
+// Firestore Triggers
+// ============================================
+
+/**
+ * Automatically send a notification to all users when a new news is created
+ *
+ * Triggered when a new document is added to the "news" collection
+ */
+export const onNewsCreated = onDocumentCreated(
+  { document: "news/{newsId}", region: REGION },
+  async (event) => {
+    const newsData = event.data?.data();
+
+    if (!newsData) {
+      console.log("No news data found");
+      return;
+    }
+
+    const title = newsData.title as string;
+    const body = newsData.body as string;
+
+    if (!title || !body) {
+      console.log("News missing title or body");
+      return;
+    }
+
+    try {
+      const message: admin.messaging.Message = {
+        topic: "all_users",
+        notification: {
+          title: `📰 ${title}`,
+          body: body.length > 100 ? body.substring(0, 100) + "..." : body,
+        },
+        data: {
+          type: "news",
+          newsId: event.params.newsId,
+        },
+        apns: {
+          payload: {
+            aps: {
+              sound: "default",
+              badge: 1,
+            },
+          },
+        },
+      };
+
+      const messageId = await messaging.send(message);
+      console.log(`News notification sent, messageId: ${messageId}, newsId: ${event.params.newsId}`);
+    } catch (error) {
+      console.error("Error sending news notification:", error);
     }
   }
 );

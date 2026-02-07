@@ -97,8 +97,11 @@ struct colockitchenraceApp: App {
     @Dependency(\.ckrClient) var ckrClient
     @Dependency(\.newsClient) var newsClient
 
+    private var newsListenerTask: Task<Void, Never>?
+
     init() {
         self.performFetchs()
+        self.startNewsListener()
     }
 
     var body: some Scene {
@@ -128,7 +131,14 @@ struct colockitchenraceApp: App {
     private func performFetchs() {
         Task {
             let _ = try? await self.ckrClient.getLast()
-            let _ = try? await self.newsClient.getLast()
+        }
+    }
+
+    private func startNewsListener() {
+        Task {
+            for await _ in newsClient.listenToNews() {
+                // News are automatically updated in shared state by the listener
+            }
         }
     }
 }
