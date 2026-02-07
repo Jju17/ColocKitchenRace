@@ -23,8 +23,7 @@ extension SignupUser {
              firstName: self.firstName,
              lastName: self.lastName,
              phoneNumber: nil,
-             email: self.email,
-             foodIntolerences: []
+             email: self.email
         )
     }
 }

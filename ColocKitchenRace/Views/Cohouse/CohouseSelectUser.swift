@@ -30,13 +30,16 @@ struct CohouseSelectUserFeature {
 
         Reduce { state, action in
             switch action {
-            case .addUserButtonTapped:
-                let newUser = CohouseUser(id: .init(), surname: state.newUserName)
-                state.cohouse.users.append(newUser)
-                state.selectedUser = newUser
-                return .none
-            case .binding:
-                return .none
+                case .addUserButtonTapped:
+                    guard !state.newUserName.isEmpty else { return .none }
+
+                    let newUser = CohouseUser(id: .init(), surname: state.newUserName)
+                    state.cohouse.users.append(newUser)
+                    state.selectedUser = newUser
+                    state.newUserName = ""
+                    return .none
+                case .binding:
+                    return .none
             }
         }
     }
@@ -46,18 +49,18 @@ struct CohouseSelectUserView: View {
     @Bindable var store: StoreOf<CohouseSelectUserFeature>
 
     var body: some View {
-            List {
-                Picker("Select yourself", selection: self.$store.selectedUser) {
-                    ForEach(self.store.cohouse.users, id: \.self) {
-                        Text($0.surname)
-                    }
-                }
-                .pickerStyle(.inline)
-                TextField("Name", text: self.$store.newUserName)
-                Button("Add user") {
-                    store.send(.addUserButtonTapped)
+        List {
+            Picker("Select yourself", selection: self.$store.selectedUser) {
+                ForEach(self.store.cohouse.users, id: \.self) {
+                    Text($0.surname)
                 }
             }
+            .pickerStyle(.inline)
+            TextField("Name", text: self.$store.newUserName)
+            Button("Add user") {
+                store.send(.addUserButtonTapped)
+            }
+        }
     }
 }
 

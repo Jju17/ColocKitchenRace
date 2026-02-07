@@ -69,6 +69,30 @@ struct UserProfileDetailFeature {
 struct UserProfileDetailView: View {
     @Bindable var store: StoreOf<UserProfileDetailFeature>
 
+    @ViewBuilder
+    private var dietaryPreferencesContent: some View {
+        if let dietaryPreferences = store.userInfo?.dietaryPreferences, !dietaryPreferences.isEmpty {
+            FlowLayout(spacing: 8) {
+                ForEach(dietaryPreferences.sorted(by: { $0.rawValue < $1.rawValue }), id: \.self) { preference in
+                    dietaryPreferenceTag(preference)
+                }
+            }
+        } else {
+            Text("No dietary preferences")
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    private func dietaryPreferenceTag(_ preference: DietaryPreference) -> some View {
+        Text("\(preference.icon) \(preference.displayName)")
+            .font(.caption)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(Color.CKRPurple.opacity(0.2))
+            .foregroundStyle(.black)
+            .clipShape(Capsule())
+    }
+
     var body: some View {
         Form {
             Section("Basic info") {
@@ -80,14 +104,8 @@ struct UserProfileDetailView: View {
                 }
             }
 
-            Section("Food related") {
-                if let foodIntolerences = store.userInfo?.foodIntolerences, !foodIntolerences.isEmpty {
-                    ForEach(foodIntolerences, id: \.self) { foodIntolerance in
-                        Text(foodIntolerance.rawValue)
-                    }
-                } else {
-                    Text("No food intolerences")
-                }
+            Section("Dietary preferences") {
+                self.dietaryPreferencesContent
             }
 
             Section {

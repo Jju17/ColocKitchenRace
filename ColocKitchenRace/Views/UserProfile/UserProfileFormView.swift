@@ -59,10 +59,25 @@ struct UserProfileFormView: View {
                 TextField("GSM", text: $store.wipUser.phoneNumber ?? "")
             }
 
-            // TODO: This would be an array of Objects
-            //                Section("Food related") {
-            //                    TextField("Food intolerances", text: $store.wipUser.foodIntolerences)
-            //                }
+            Section("Dietary preferences") {
+                ForEach(DietaryPreference.allCases) { preference in
+                    Toggle(isOn: Binding(
+                        get: { store.wipUser.dietaryPreferences.contains(preference) },
+                        set: { isSelected in
+                            if isSelected {
+                                store.wipUser.dietaryPreferences.insert(preference)
+                            } else {
+                                store.wipUser.dietaryPreferences.remove(preference)
+                            }
+                        }
+                    )) {
+                        HStack {
+                            Text(preference.icon)
+                            Text(preference.displayName)
+                        }
+                    }
+                }
+            }
 
             Section("CKR") {
                 Toggle(isOn: $store.wipUser.isSubscribeToNews) {

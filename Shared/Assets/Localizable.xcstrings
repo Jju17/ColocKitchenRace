@@ -24,6 +24,16 @@
         }
       }
     },
+    "%@ %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@"
+          }
+        }
+      }
+    },
     "%lld" : {
       "localizations" : {
         "fr" : {
@@ -415,6 +425,9 @@
         }
       }
     },
+    "Dietary preferences" : {
+
+    },
     "Dismiss" : {
 
     },
@@ -532,6 +545,7 @@
       }
     },
     "Food related" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -841,7 +855,11 @@
     "No challenge response at the moment" : {
 
     },
+    "No dietary preferences" : {
+
+    },
     "No food intolerences" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
