@@ -6,8 +6,16 @@
 //
 
 import ComposableArchitecture
-import Dependencies
 import FirebaseFirestore
+
+// MARK: - Error
+
+enum CKRError: Error {
+    case firebaseError(String)
+    case noDocumentAvailable
+}
+
+// MARK: - Client Interface
 
 @DependencyClient
 struct CKRClient {
@@ -15,50 +23,54 @@ struct CKRClient {
     var registerCohouse: (_ cohouse: Cohouse) -> Result<Bool, CKRError> = { _ in .success(true) }
 }
 
-enum CKRError: Error {
-    case firebaseError(String)
-    case noDocumentAvailable
-}
+// MARK: - Implementations
 
 extension CKRClient: DependencyKey {
+
+    // MARK: Live
+
     static let liveValue = Self(
         getLast: {
             do {
                 @Shared(.ckrGame) var ckrGame
 
-                let querySnapshot = try await Firestore.firestore().collection("ckrGames")
+                let snapshot = try await Firestore.firestore()
+                    .collection("ckrGames")
                     .order(by: "publishedTimestamp", descending: true)
                     .limit(to: 1)
                     .getDocuments()
 
-                guard let document = querySnapshot.documents.first
-                else {
+                guard let document = snapshot.documents.first else {
                     $ckrGame.withLock { $0 = nil }
                     return .failure(.noDocumentAvailable)
                 }
 
-                let infos = try? document.data(as: CKRGame.self)
-
-                $ckrGame.withLock { $0 = infos }
-                return .success(ckrGame)
+                let game = try? document.data(as: CKRGame.self)
+                $ckrGame.withLock { $0 = game }
+                return .success(game)
             } catch {
                 return .failure(.firebaseError(error.localizedDescription))
             }
         },
         registerCohouse: { cohouse in
-               return .success(true)
+            // TODO: Implement cohouse registration for CKR game
+            return .success(true)
         }
     )
+
+    // MARK: Test
 
     static let testValue = Self(
         getLast: { .success(nil) },
         registerCohouse: { _ in .success(true) }
     )
 
-    static var previewValue: CKRClient {
-        return .testValue
-    }
+    // MARK: Preview
+
+    static let previewValue: CKRClient = .testValue
 }
+
+// MARK: - Registration
 
 extension DependencyValues {
     var ckrClient: CKRClient {

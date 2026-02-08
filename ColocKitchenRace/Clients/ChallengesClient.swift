@@ -6,30 +6,39 @@
 //
 
 import ComposableArchitecture
-import Dependencies
 import FirebaseFirestore
+
+// MARK: - Error
 
 enum ChallengesClientError: Error {
     case failed
     case failedWithError(String)
 }
 
+// MARK: - Client Interface
+
 @DependencyClient
 struct ChallengesClient {
     var getAll: @Sendable () async throws -> [Challenge]
 }
 
+// MARK: - Implementations
+
 extension ChallengesClient: DependencyKey {
+
+    // MARK: Live
+
     static let liveValue = Self(
         getAll: {
             @Shared(.challenges) var challenges
 
-            let querySnapshot = try await Firestore.firestore().collection("challenges")
-            //  .order(by: "publicationTimestamp", descending: true) //TODO: Sort & order challenges here.
+            let snapshot = try await Firestore.firestore()
+                .collection("challenges")
+                // TODO: Sort & order challenges here
+                // .order(by: "publicationTimestamp", descending: true)
                 .getDocuments()
 
-            let documents = querySnapshot.documents
-            let allChallenges = documents.compactMap { document in
+            let allChallenges = snapshot.documents.compactMap { document in
                 try? document.data(as: Challenge.self)
             }
 
@@ -38,14 +47,18 @@ extension ChallengesClient: DependencyKey {
         }
     )
 
+    // MARK: Test
+
     static let testValue = Self(
         getAll: { [] }
     )
 
-    static var previewValue: ChallengesClient {
-        return .testValue
-    }
+    // MARK: Preview
+
+    static let previewValue: ChallengesClient = .testValue
 }
+
+// MARK: - Registration
 
 extension DependencyValues {
     var challengesClient: ChallengesClient {

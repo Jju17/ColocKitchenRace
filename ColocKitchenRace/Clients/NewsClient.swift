@@ -6,8 +6,16 @@
 //
 
 import ComposableArchitecture
-import Dependencies
 import FirebaseFirestore
+
+// MARK: - Error
+
+enum NewsError: Error {
+    case firebaseError(String)
+    case noNewsAvailable
+}
+
+// MARK: - Client Interface
 
 @DependencyClient
 struct NewsClient {
@@ -15,33 +23,24 @@ struct NewsClient {
     var listenToNews: @Sendable () -> AsyncStream<[News]> = { .never }
 }
 
-enum NewsError: Error {
-    case firebaseError(String)
-    case noNewsAvailable
-}
+// MARK: - Implementations
 
 extension NewsClient: DependencyKey {
-    static let testValue = Self(
-        getLast: { .success([]) },
-        listenToNews: { .never }
-    )
 
-    static var previewValue: NewsClient {
-        return .testValue
-    }
+    // MARK: Live
 
     static let liveValue = Self(
         getLast: {
             do {
                 @Shared(.news) var news
 
-                let querySnapshot = try await Firestore.firestore().collection("news")
+                let snapshot = try await Firestore.firestore()
+                    .collection("news")
                     .order(by: "publicationTimestamp", descending: true)
                     .limit(to: 10)
                     .getDocuments()
 
-                let documents = querySnapshot.documents
-                let lastNews = documents.compactMap { document in
+                let lastNews = snapshot.documents.compactMap { document in
                     try? document.data(as: News.self)
                 }
 
@@ -53,7 +52,8 @@ extension NewsClient: DependencyKey {
         },
         listenToNews: {
             AsyncStream { continuation in
-                let listener = Firestore.firestore().collection("news")
+                let listener = Firestore.firestore()
+                    .collection("news")
                     .order(by: "publicationTimestamp", descending: true)
                     .limit(to: 10)
                     .addSnapshotListener { snapshot, error in
@@ -63,7 +63,6 @@ extension NewsClient: DependencyKey {
                             try? document.data(as: News.self)
                         }
 
-                        // Update shared state
                         @Shared(.news) var sharedNews
                         $sharedNews.withLock { $0 = news }
 
@@ -76,7 +75,20 @@ extension NewsClient: DependencyKey {
             }
         }
     )
+
+    // MARK: Test
+
+    static let testValue = Self(
+        getLast: { .success([]) },
+        listenToNews: { .never }
+    )
+
+    // MARK: Preview
+
+    static let previewValue: NewsClient = .testValue
 }
+
+// MARK: - Registration
 
 extension DependencyValues {
     var newsClient: NewsClient {

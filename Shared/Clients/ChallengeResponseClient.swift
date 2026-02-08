@@ -6,17 +6,30 @@
 //
 
 import ComposableArchitecture
-import Dependencies
-import DependenciesMacros
 import FirebaseFirestore
 import FirebaseStorage
 import os
+
+// MARK: - Error
 
 enum ChallengeResponseError: Error, Equatable {
     case networkError
     case permissionDenied
     case unknown(String)
+
+    init(from nsError: NSError) {
+        switch nsError.code {
+        case FirestoreErrorCode.unavailable.rawValue:
+            self = .networkError
+        case FirestoreErrorCode.permissionDenied.rawValue:
+            self = .permissionDenied
+        default:
+            self = .unknown(nsError.localizedDescription)
+        }
+    }
 }
+
+// MARK: - Client Interface
 
 @DependencyClient
 struct ChallengeResponseClient {
@@ -25,56 +38,41 @@ struct ChallengeResponseClient {
     var updateStatus: @Sendable (_ challengeId: UUID, _ cohouseId: String, _ status: ChallengeResponseStatus) async -> Result<Void, ChallengeResponseError> = { _, _, _ in .success(()) }
     var addAllMockChallengeResponses: @Sendable () async -> Result<Void, ChallengeResponseError> = { .success(()) }
     var submit: @Sendable (_ response: ChallengeResponse) async throws -> ChallengeResponse = { $0 }
-    var watchStatus: @Sendable (_ challengeId: UUID, _ cohouseId: String) -> AsyncStream<ChallengeResponseStatus> = { _,_  in AsyncStream { $0.finish() } }
+    var watchStatus: @Sendable (_ challengeId: UUID, _ cohouseId: String) -> AsyncStream<ChallengeResponseStatus> = { _, _ in AsyncStream { $0.finish() } }
 }
 
+// MARK: - Implementations
+
 extension ChallengeResponseClient: DependencyKey {
+
+    // MARK: Live
+
     static let liveValue = Self(
         getAll: {
             do {
-                // New scheme: Read every sub-collections "responses" via collectionGroup
-                let querySnapshot = try await Firestore.firestore()
+                let snapshot = try await Firestore.firestore()
                     .collectionGroup("responses")
                     .getDocuments()
-                let documents = querySnapshot.documents
-                let responses = documents.compactMap { document in
-                    try? document.data(as: ChallengeResponse.self)
-                }
+
+                let responses = snapshot.documents.compactMap { try? $0.data(as: ChallengeResponse.self) }
                 return .success(responses)
             } catch let error as NSError {
-                Logger.challengeResponseLog.log(level: .fault, "\(error.localizedDescription)")
-                switch error.code {
-                    case FirestoreErrorCode.unavailable.rawValue:
-                        return .failure(.networkError)
-                    case FirestoreErrorCode.permissionDenied.rawValue:
-                        return .failure(.permissionDenied)
-                    default:
-                        return .failure(.unknown(error.localizedDescription))
-                }
+                Logger.challengeResponseLog.log(level: .fault, "getAll failed: \(error.localizedDescription)")
+                return .failure(ChallengeResponseError(from: error))
             }
         },
         getAllForCohouse: { cohouseId in
             do {
-                // Filter by cohouseId directly on the collection group
-                let querySnapshot = try await Firestore.firestore()
+                let snapshot = try await Firestore.firestore()
                     .collectionGroup("responses")
                     .whereField("cohouseId", isEqualTo: cohouseId)
                     .getDocuments()
-                let documents = querySnapshot.documents
-                let responses = documents.compactMap { document in
-                    try? document.data(as: ChallengeResponse.self)
-                }
+
+                let responses = snapshot.documents.compactMap { try? $0.data(as: ChallengeResponse.self) }
                 return .success(responses)
             } catch let error as NSError {
-                Logger.challengeResponseLog.log(level: .fault, "\(error.localizedDescription)")
-                switch error.code {
-                    case FirestoreErrorCode.unavailable.rawValue:
-                        return .failure(.networkError)
-                    case FirestoreErrorCode.permissionDenied.rawValue:
-                        return .failure(.permissionDenied)
-                    default:
-                        return .failure(.unknown(error.localizedDescription))
-                }
+                Logger.challengeResponseLog.log(level: .fault, "getAllForCohouse failed: \(error.localizedDescription)")
+                return .failure(ChallengeResponseError(from: error))
             }
         },
         updateStatus: { challengeId, cohouseId, status in
@@ -87,21 +85,15 @@ extension ChallengeResponseClient: DependencyKey {
                     .updateData(["status": status.rawValue])
                 return .success(())
             } catch let error as NSError {
-                Logger.challengeResponseLog.log(level: .fault, "\(error.localizedDescription)")
-                switch error.code {
-                    case FirestoreErrorCode.unavailable.rawValue:
-                        return .failure(.networkError)
-                    case FirestoreErrorCode.permissionDenied.rawValue:
-                        return .failure(.permissionDenied)
-                    default:
-                        return .failure(.unknown(error.localizedDescription))
-                }
+                Logger.challengeResponseLog.log(level: .fault, "updateStatus failed: \(error.localizedDescription)")
+                return .failure(ChallengeResponseError(from: error))
             }
         },
         addAllMockChallengeResponses: {
             do {
                 let db = Firestore.firestore()
                 let batch = db.batch()
+
                 for response in ChallengeResponse.mockList {
                     let doc = db.collection("challenges")
                         .document(response.challengeId.uuidString)
@@ -109,25 +101,18 @@ extension ChallengeResponseClient: DependencyKey {
                         .document(response.cohouseId)
                     try batch.setData(from: response, forDocument: doc, merge: true)
                 }
+
                 try await batch.commit()
-                Logger.challengeResponseLog.log(level: .info, "Successfully added \(ChallengeResponse.mockList.count) mock challenge responses")
+                Logger.challengeResponseLog.log(level: .info, "Added \(ChallengeResponse.mockList.count) mock responses")
                 return .success(())
             } catch let error as NSError {
-                Logger.challengeResponseLog.log(level: .fault, "Failed to add mock challenge responses: \(error.localizedDescription)")
-                switch error.code {
-                    case FirestoreErrorCode.unavailable.rawValue:
-                        return .failure(.networkError)
-                    case FirestoreErrorCode.permissionDenied.rawValue:
-                        return .failure(.permissionDenied)
-                    default:
-                        return .failure(.unknown(error.localizedDescription))
-                }
+                Logger.challengeResponseLog.log(level: .fault, "addAllMock failed: \(error.localizedDescription)")
+                return .failure(ChallengeResponseError(from: error))
             }
         },
         submit: { response in
             do {
                 let db = Firestore.firestore()
-                // New imbricked scheme: /challenges/{challengeId}/responses/{cohouseId}
                 let doc = db.collection("challenges")
                     .document(response.challengeId.uuidString)
                     .collection("responses")
@@ -136,31 +121,20 @@ extension ChallengeResponseClient: DependencyKey {
                 try doc.setData(from: response, merge: true)
                 try await doc.updateData(["serverTS": FieldValue.serverTimestamp()])
                 return response
-
             } catch let error as NSError {
-                switch error.code {
-                    case FirestoreErrorCode.unavailable.rawValue:
-                        throw ChallengeResponseError.networkError
-                    case FirestoreErrorCode.permissionDenied.rawValue:
-                        throw ChallengeResponseError.permissionDenied
-                    default:
-                        throw ChallengeResponseError.unknown(error.localizedDescription)
-                }
+                throw ChallengeResponseError(from: error)
             }
         },
         watchStatus: { challengeId, cohouseId in
-            let db = Firestore.firestore()
-            let doc = db.collection("challenges")
+            let doc = Firestore.firestore()
+                .collection("challenges")
                 .document(challengeId.uuidString)
                 .collection("responses")
                 .document(cohouseId)
 
             return AsyncStream { continuation in
                 let listener = doc.addSnapshotListener { snap, _ in
-                    guard
-                        let snap,
-                        let resp = try? snap.data(as: ChallengeResponse.self)
-                    else { return }
+                    guard let snap, let resp = try? snap.data(as: ChallengeResponse.self) else { return }
                     continuation.yield(resp.status)
                 }
                 continuation.onTermination = { _ in listener.remove() }
@@ -168,30 +142,32 @@ extension ChallengeResponseClient: DependencyKey {
         }
     )
 
-    static var previewValue: ChallengeResponseClient {
-        Self(
-            getAll: { .success(ChallengeResponse.mockList) },
-            getAllForCohouse: { cohouseId in
-                .success(ChallengeResponse.mockList.filter { $0.cohouseId == cohouseId })
-            },
-            updateStatus: { _, _, _ in .success(()) },
-            addAllMockChallengeResponses: { .success(()) },
-            submit: { $0 },
-            watchStatus: { _, _ in AsyncStream { $0.finish() } }
-        )
-    }
+    // MARK: Test
 
-    static var testValue: ChallengeResponseClient {
-        Self(
-            getAll: { .success([]) },
-            getAllForCohouse: { _ in .success([]) },
-            updateStatus: { _, _, _ in .success(()) },
-            addAllMockChallengeResponses: { .success(()) },
-            submit: { $0 },
-            watchStatus: { _, _ in AsyncStream { $0.finish() } }
-        )
-    }
+    static let testValue = Self(
+        getAll: { .success([]) },
+        getAllForCohouse: { _ in .success([]) },
+        updateStatus: { _, _, _ in .success(()) },
+        addAllMockChallengeResponses: { .success(()) },
+        submit: { $0 },
+        watchStatus: { _, _ in AsyncStream { $0.finish() } }
+    )
+
+    // MARK: Preview
+
+    static let previewValue = Self(
+        getAll: { .success(ChallengeResponse.mockList) },
+        getAllForCohouse: { cohouseId in
+            .success(ChallengeResponse.mockList.filter { $0.cohouseId == cohouseId })
+        },
+        updateStatus: { _, _, _ in .success(()) },
+        addAllMockChallengeResponses: { .success(()) },
+        submit: { $0 },
+        watchStatus: { _, _ in AsyncStream { $0.finish() } }
+    )
 }
+
+// MARK: - Registration
 
 extension DependencyValues {
     var challengeResponseClient: ChallengeResponseClient {
