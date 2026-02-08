@@ -1,5 +1,5 @@
 //
-//  AuthentificationClient.swift
+//  AuthenticationClient.swift
 //  colockitchenrace
 //
 //  Created by Julien Rahier on 21/10/2023.
@@ -30,7 +30,7 @@ enum AuthError: Error, LocalizedError, Equatable {
 // MARK: - Client Interface
 
 @DependencyClient
-struct AuthentificationClient {
+struct AuthenticationClient {
     var signUp: @Sendable (_ signupUserData: SignupUser) async throws -> User
     var signIn: @Sendable (_ email: String, _ password: String) async throws -> User
     var signOut: () async throws -> Void
@@ -41,7 +41,7 @@ struct AuthentificationClient {
 
 // MARK: - Implementations
 
-extension AuthentificationClient: DependencyKey {
+extension AuthenticationClient: DependencyKey {
 
     // MARK: Live
 
@@ -148,14 +148,14 @@ extension AuthentificationClient: DependencyKey {
 
     // MARK: Preview
 
-    static let previewValue: AuthentificationClient = .testValue
+    static let previewValue: AuthenticationClient = .testValue
 }
 
 // MARK: - Registration
 
 extension DependencyValues {
-    var authentificationClient: AuthentificationClient {
-        get { self[AuthentificationClient.self] }
-        set { self[AuthentificationClient.self] = newValue }
+    var authenticationClient: AuthenticationClient {
+        get { self[AuthenticationClient.self] }
+        set { self[AuthenticationClient.self] = newValue }
     }
 }

@@ -13,7 +13,7 @@ import os
 
 // MARK: - Error
 
-public enum StorageClientError: Error, Equatable {
+enum StorageClientError: Error, Equatable {
     case networkError
     case permissionDenied
     case invalidData
@@ -23,9 +23,9 @@ public enum StorageClientError: Error, Equatable {
 // MARK: - Client Interface
 
 @DependencyClient
-public struct StorageClient {
-    public var loadImage: @Sendable (_ path: String) async -> Result<UIImage?, StorageClientError> = { _ in .failure(.networkError) }
-    public var uploadImage: @Sendable (_ data: Data, _ path: String) async throws -> String = { _, _ in "" }
+struct StorageClient {
+    var loadImage: @Sendable (_ path: String) async -> Result<UIImage?, StorageClientError> = { _ in .failure(.networkError) }
+    var uploadImage: @Sendable (_ data: Data, _ path: String) async throws -> String = { _, _ in "" }
 }
 
 // MARK: - Implementations
@@ -34,7 +34,7 @@ extension StorageClient: DependencyKey {
 
     // MARK: Live
 
-    public static let liveValue = Self(
+    static let liveValue = Self(
         loadImage: { path in
             do {
                 let ref = Storage.storage().reference(withPath: path)
@@ -73,14 +73,14 @@ extension StorageClient: DependencyKey {
 
     // MARK: Test
 
-    public static let testValue = Self(
+    static let testValue = Self(
         loadImage: { _ in .success(nil) },
         uploadImage: { _, _ in "https://test.local/image.jpg" }
     )
 
     // MARK: Preview
 
-    public static let previewValue = Self(
+    static let previewValue = Self(
         loadImage: { _ in .success(UIImage(systemName: "photo")) },
         uploadImage: { _, _ in "https://example.com/mock.jpg" }
     )
@@ -88,7 +88,7 @@ extension StorageClient: DependencyKey {
 
 // MARK: - Registration
 
-public extension DependencyValues {
+extension DependencyValues {
     var storageClient: StorageClient {
         get { self[StorageClient.self] }
         set { self[StorageClient.self] = newValue }

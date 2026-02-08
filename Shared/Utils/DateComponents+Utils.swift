@@ -9,26 +9,26 @@ import Foundation
 
 extension DateComponents {
     var formattedSeconds: String {
-        return String(format: "%02d", self.second ?? 00)
+        String(format: "%02d", self.second ?? 0)
     }
 
     var formattedMinutes: String {
-        return String(format: "%02d", self.minute ?? 00)
+        String(format: "%02d", self.minute ?? 0)
     }
 
     var formattedHours: String {
-        return String(format: "%02d", self.hour ?? 00)
+        String(format: "%02d", self.hour ?? 0)
     }
 
     var formattedDays: String {
-        return String(format: "%02d", self.day ?? 00)
+        String(format: "%02d", self.day ?? 0)
     }
 
     var formattedMonths: String {
-        return String(format: "%02d", self.month ?? 00)
+        String(format: "%02d", self.month ?? 0)
     }
 
     var formattedYear: String {
-        return String(format: "%02d", self.year ?? 00)
+        String(format: "%02d", self.year ?? 0)
     }
 }

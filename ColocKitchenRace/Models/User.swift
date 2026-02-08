@@ -27,37 +27,37 @@ struct User: Equatable, Hashable, Identifiable, Codable {
 
 extension User {
     var fullName: String {
-        return "\(self.firstName) \(self.lastName)"
+        "\(firstName) \(lastName)"
     }
 
     func toCohouseUser(isAdmin: Bool = false) -> CohouseUser {
-        return CohouseUser(id: UUID(), isAdmin: isAdmin, surname: self.fullName, userId: self.id.uuidString)
+        CohouseUser(id: UUID(), isAdmin: isAdmin, surname: fullName, userId: id.uuidString)
     }
 }
 
 extension User {
     static var emptyUser: User {
-        return User(id: .init())
+        User(id: .init())
     }
 
     static var mockUser: User {
-        return User(id: UUID(), isSubscribeToNews: true, firstName: "Blob", lastName: "Jr", phoneNumber: "123456789", email: "blob@gmail.com", dietaryPreferences: [.lactoseFree])
+        User(id: UUID(), isSubscribeToNews: true, firstName: "Blob", lastName: "Jr", phoneNumber: "+32 123 45 67 89", email: "blob@example.com", dietaryPreferences: [.lactoseFree])
     }
 
     static var mockUser2: User {
-        return User(id: UUID(), isSubscribeToNews: true, firstName: "Blob", lastName: "Jr", phoneNumber: "+32 479 50 68 41", email: "julien.rahier@gmail.com", dietaryPreferences: [.lactoseFree, .glutenFree])
+        User(id: UUID(), isSubscribeToNews: true, firstName: "Blob", lastName: "Sr", phoneNumber: "+32 123 45 67 90", email: "blob.sr@example.com", dietaryPreferences: [.lactoseFree, .glutenFree])
     }
 
     static var mockUsers: [User] {
-        return [
-            User(id: UUID(), firstName: "Blob", lastName: "JrMartin D'Ursel", phoneNumber: "+32 456 54 36 76", email: "martin@gmail.com", dietaryPreferences: []),
-            User(id: UUID(), firstName: "Blob", lastName: "JrVictoria De Dorlodot", phoneNumber: "", email: "victoria@gmail.com", dietaryPreferences: []),
-            User(id: UUID(), firstName: "Blob", lastName: "JrVerena Subelack", phoneNumber: "‭+32 484 38 39 91‬", email: "verena.sb@icloud.com", dietaryPreferences: [.lactoseFree, .glutenFree]),
-            User(id: UUID(), firstName: "Blob", lastName: "JrJulien Rahier", phoneNumber: "+32 479 50 68 41", email: "julien.rahier@gmail.com", dietaryPreferences: []),
-            User(id: UUID(), firstName: "Blob", lastName: "JrPierre-edouard Guillaume", dietaryPreferences: [.lactoseFree]),
-            User(id: UUID(), firstName: "Blob", lastName: "JrAlexandre Karatzopoulos", phoneNumber: "+32 477 58 68 41", email: "alexandre@gmail.com", dietaryPreferences: [.glutenFree]),
-            User(id: UUID(), firstName: "Blob", lastName: "JrCyril", phoneNumber: "+32 465 50 90 90", dietaryPreferences: [.glutenFree]),
-            User(id: UUID(), firstName: "Blob", lastName: "JrLouis de Potter", email: "louis@gmail.com", dietaryPreferences: []),
+        [
+            User(id: UUID(), firstName: "Alice", lastName: "Dupont", phoneNumber: "+32 400 00 00 01", email: "alice@example.com", dietaryPreferences: []),
+            User(id: UUID(), firstName: "Bob", lastName: "Martin", phoneNumber: "+32 400 00 00 02", email: "bob@example.com", dietaryPreferences: []),
+            User(id: UUID(), firstName: "Charlie", lastName: "Lambert", phoneNumber: "+32 400 00 00 03", email: "charlie@example.com", dietaryPreferences: [.lactoseFree, .glutenFree]),
+            User(id: UUID(), firstName: "Diana", lastName: "Janssen", phoneNumber: "+32 400 00 00 04", email: "diana@example.com", dietaryPreferences: []),
+            User(id: UUID(), firstName: "Eve", lastName: "Peeters", dietaryPreferences: [.lactoseFree]),
+            User(id: UUID(), firstName: "Frank", lastName: "Claes", phoneNumber: "+32 400 00 00 06", email: "frank@example.com", dietaryPreferences: [.glutenFree]),
+            User(id: UUID(), firstName: "Grace", lastName: "Dubois", phoneNumber: "+32 400 00 00 07", dietaryPreferences: [.glutenFree]),
+            User(id: UUID(), firstName: "Hugo", lastName: "Lemaire", email: "hugo@example.com", dietaryPreferences: []),
         ]
     }
 }

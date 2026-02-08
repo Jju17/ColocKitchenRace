@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import os
 import SwiftUI
 
 @Reducer
@@ -34,7 +35,7 @@ struct CohouseDetailFeature {
     }
 
     enum Action {
-        case confirmEditohouseButtonTapped
+        case confirmEditCohouseButtonTapped
         case dismissEditCohouseButtonTapped
         case editButtonTapped
         case destination(PresentationAction<Destination.Action>)
@@ -51,9 +52,9 @@ struct CohouseDetailFeature {
                     @Shared(.cohouse) var currentCohouse
                     $currentCohouse.withLock { $0 = nil }
                     return .none
-                case .confirmEditohouseButtonTapped:
+                case .confirmEditCohouseButtonTapped:
                     guard var wipCohouse = state.destination?.edit?.wipCohouse
-                    else { return .none}
+                    else { return .none }
 
                     wipCohouse.users.removeAll { user in
                         user.surname.isEmpty && !user.isAdmin
@@ -61,7 +62,7 @@ struct CohouseDetailFeature {
 
                     state.destination = nil
                     return .run { [wipCohouse] _ in
-                        let _ = try await self.cohouseClient.set(id: wipCohouse.id.uuidString, newCohouse: wipCohouse)
+                        try await self.cohouseClient.set(id: wipCohouse.id.uuidString, newCohouse: wipCohouse)
                     }
                 case .dismissEditCohouseButtonTapped:
                     state.destination = nil
@@ -83,10 +84,10 @@ struct CohouseDetailFeature {
                                 case .userNotInCohouse:
                                     await send(.userWasRemovedFromCohouse)
                                 default:
-                                    print("Refresh error:", error)
+                                    Logger.cohouseLog.log(level: .error, "Refresh error: \(error)")
                             }
                         } catch {
-                            print("Unknown refresh error:", error)
+                            Logger.cohouseLog.log(level: .error, "Unknown refresh error: \(error)")
                         }
                     }
                 case .userWasRemovedFromCohouse:
@@ -202,7 +203,7 @@ struct CohouseDetailView: View {
                         }
                         ToolbarItem(placement: .confirmationAction) {
                             Button("Confirm") {
-                                store.send(.confirmEditohouseButtonTapped)
+                                store.send(.confirmEditCohouseButtonTapped)
                             }
                         }
                     }

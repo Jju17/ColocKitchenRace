@@ -6,7 +6,6 @@
 //
 
 import ComposableArchitecture
-import FirebaseAuth
 import SwiftUI
 
 @Reducer
@@ -43,8 +42,8 @@ struct HomeFeature {
             switch action {
                 case .openRegisterLink:
                     guard let cohouse = state.cohouse
-                    else { return .none}
-                    let _ = self.ckrClient.registerCohouse(cohouse: cohouse)
+                    else { return .none }
+                    _ = self.ckrClient.registerCohouse(cohouse: cohouse)
                     return .none
                 case .path:
                     return .none

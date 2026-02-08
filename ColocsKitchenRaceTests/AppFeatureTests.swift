@@ -21,7 +21,7 @@ struct AppFeatureTests {
         let store = TestStore(initialState: AppFeature.State.splashScreen(SplashScreenFeature.State())) {
             AppFeature()
         } withDependencies: {
-            $0.authentificationClient.listenAuthState = { AsyncStream { $0.finish() } }
+            $0.authenticationClient.listenAuthState = { AsyncStream { $0.finish() } }
         }
 
         // Simulating Firebase sends a non-nil user (we use the action directly)
@@ -35,7 +35,7 @@ struct AppFeatureTests {
         let store = TestStore(initialState: AppFeature.State.tab(TabFeature.State())) {
             AppFeature()
         } withDependencies: {
-            $0.authentificationClient.listenAuthState = { AsyncStream { $0.finish() } }
+            $0.authenticationClient.listenAuthState = { AsyncStream { $0.finish() } }
         }
 
         await store.send(.newAuthStateTrigger(nil)) {
@@ -50,7 +50,7 @@ struct AppFeatureTests {
         let store = TestStore(initialState: AppFeature.State.signin(SigninFeature.State())) {
             AppFeature()
         } withDependencies: {
-            $0.authentificationClient.listenAuthState = { AsyncStream { $0.finish() } }
+            $0.authenticationClient.listenAuthState = { AsyncStream { $0.finish() } }
         }
 
         await store.send(.signin(.delegate(.switchToSignupButtonTapped))) {
@@ -63,7 +63,7 @@ struct AppFeatureTests {
         let store = TestStore(initialState: AppFeature.State.signup(SignupFeature.State())) {
             AppFeature()
         } withDependencies: {
-            $0.authentificationClient.listenAuthState = { AsyncStream { $0.finish() } }
+            $0.authenticationClient.listenAuthState = { AsyncStream { $0.finish() } }
         }
 
         await store.send(.signup(.delegate(.switchToSigninButtonTapped))) {

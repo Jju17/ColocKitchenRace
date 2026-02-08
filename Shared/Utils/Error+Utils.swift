@@ -9,11 +9,8 @@ import Foundation
 
 extension Error {
     static var standardError: Error {
-        return StandardError()
+        StandardError()
     }
 }
 
-
-struct StandardError: Error {
-
-}
+struct StandardError: Error {}

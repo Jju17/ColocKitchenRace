@@ -16,12 +16,6 @@ class TextFieldDelegate: NSObject, UITextFieldDelegate {
     }
 
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-
-        if let shouldReturn = shouldReturn {
-            return shouldReturn()
-        }
-        else {
-            return true
-        }
+        shouldReturn?() ?? true
     }
 }

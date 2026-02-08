@@ -30,7 +30,7 @@ struct UserProfileDetailFeature {
         case signOutButtonTapped
     }
 
-    @Dependency(\.authentificationClient) var authentificationClient
+    @Dependency(\.authenticationClient) var authenticationClient
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -40,7 +40,7 @@ struct UserProfileDetailFeature {
                     else { return .none }
                     state.destination = nil
                     return .run { _ in
-                        try await authentificationClient.updateUser(editState.wipUser)
+                        try await authenticationClient.updateUser(editState.wipUser)
                     }
                 case .destination:
                     return .none
@@ -55,7 +55,7 @@ struct UserProfileDetailFeature {
                 case .signOutButtonTapped:
                     return .run { _ in
                         do {
-                            try await self.authentificationClient.signOut()
+                            try await self.authenticationClient.signOut()
                         } catch {
                             Logger.authLog.log(level: .fault, "Already logged out")
                         }

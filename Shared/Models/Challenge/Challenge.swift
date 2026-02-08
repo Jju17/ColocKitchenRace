@@ -109,7 +109,6 @@ extension Challenge {
                 content: .multipleChoice(MultipleChoiceContent(
                     choices: ["Titanic", "La La Land", "The Godfather", "Avatar"],
                     correctAnswerIndex: 2,
-                    allowMultipleSelection: false,
                     shuffleAnswers: true
                 ))
             ),

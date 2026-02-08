@@ -6,7 +6,6 @@
 //
 
 import ComposableArchitecture
-import FirebaseAuth
 import SwiftUI
 
 @Reducer
@@ -23,7 +22,6 @@ struct CohouseFormFeature {
 
     enum Action: BindableAction, Equatable {
         case addUserButtonTapped
-        case assignAdminButtonTapped
         case binding(BindingAction<State>)
         case deleteUsers(atOffset: IndexSet)
         case quitCohouseButtonTapped
@@ -38,14 +36,10 @@ struct CohouseFormFeature {
     var body: some ReducerOf<Self> {
         BindingReducer()
 
-        Reduce {
-            state,
-            action in
+        Reduce { state, action in
             switch action {
                 case .addUserButtonTapped:
                     state.wipCohouse.users.append(CohouseUser(id: UUID()))
-                    return .none
-                case .assignAdminButtonTapped:
                     return .none
                 case .binding:
                     state.addressValidationResult = nil
@@ -139,7 +133,7 @@ struct CohouseFormView: View {
                 }
             }
 
-            if !store.isNewCohouse && !self.isActualUserIsAdmin() {
+            if !store.isNewCohouse && !self.isCurrentUserAdmin() {
                 Section {
                     Button("Quit cohouse") {
                         store.send(.quitCohouseButtonTapped)
@@ -148,15 +142,6 @@ struct CohouseFormView: View {
                 }
             }
 
-            //TODO: Handle admin swap
-//            if !store.isNewCohouse && self.isActualUserIsAdmin() {
-//                Section {
-//                    Button("Assign another admin") {
-//                        store.send(.assignAdminButtonTapped)
-//                    }
-//                    .foregroundStyle(.red)
-//                }
-//            }
         }
     }
 
@@ -194,7 +179,6 @@ struct CohouseFormView: View {
                         Text("Address found but uncertain:")
                             .font(.footnote)
                             .foregroundStyle(.orange)
-
 
                         if let suggestion = formattedSuggestion(from: validated) {
                             Button {
@@ -244,7 +228,7 @@ struct CohouseFormView: View {
 
     // MARK: - Helpers
 
-    func isActualUserIsAdmin() -> Bool {
+    func isCurrentUserAdmin() -> Bool {
         let adminUser = store.wipCohouse.users.first { $0.isAdmin }?.userId
         let userInfo = store.userInfo?.id.uuidString
         return adminUser == userInfo
@@ -262,11 +246,4 @@ struct CohouseFormView: View {
             CohouseFormFeature()
         }
     )
-}
-
-#Preview {
-    CohouseFormView(
-        store: Store(initialState: CohouseFormFeature.State(wipCohouse: .mock, isNewCohouse: true)) {
-            CohouseFormFeature()
-        })
 }

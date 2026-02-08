@@ -1,14 +1,11 @@
 //
-//  AuthentificationClient.swift
-//  AdminCKR
+//  UserClient.swift
+//  CKRAdmin
 //
 //  Created by Julien Rahier on 3/15/25.
 //
 
 import ComposableArchitecture
-import Dependencies
-import DependenciesMacros
-import FirebaseAuth
 import FirebaseFirestore
 import os
 

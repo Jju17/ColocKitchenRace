@@ -1,6 +1,6 @@
 //
-//  ChallengesClient.swift
-//  colockitchenrace
+//  CohouseClient.swift
+//  CKRAdmin
 //
 //  Created by Julien Rahier on 3/17/25.
 //

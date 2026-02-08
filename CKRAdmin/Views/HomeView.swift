@@ -6,7 +6,6 @@
 //
 
 import ComposableArchitecture
-import FirebaseAuth
 import SwiftUI
 
 @Reducer
@@ -73,7 +72,7 @@ struct HomeFeature {
             switch action {
                 case .addNewCKRGameButtonTapped:
                     return .run { send in
-                        guard let game = try await self.ckrClient.getGame().get() else {
+                        guard try await self.ckrClient.getGame().get() != nil else {
                             await send(.addNewCKRGameForm)
                             return
                         }
@@ -100,7 +99,7 @@ struct HomeFeature {
                     state.destination = nil
 
                     return .run { _ in
-                        let _ = self.ckrClient.newGame(newGame)
+                        _ = self.ckrClient.newGame(newGame)
                     }
                 case .dismissDestinationButtonTapped:
                     state.destination = nil

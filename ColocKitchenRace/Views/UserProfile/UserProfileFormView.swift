@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import os
 import SwiftUI
 
 @Reducer
@@ -21,7 +22,7 @@ struct UserProfileFormFeature {
         case signOutButtonTapped
     }
 
-    @Dependency(\.authentificationClient) var authentificationClient
+    @Dependency(\.authenticationClient) var authenticationClient
 
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -38,9 +39,9 @@ struct UserProfileFormFeature {
                 case .signOutButtonTapped:
                     return .run { _ in
                         do {
-                            try await self.authentificationClient.signOut()
+                            try await self.authenticationClient.signOut()
                         }
-                        catch { print("already logged out") }
+                        catch { Logger.authLog.log(level: .info, "Already logged out") }
                     }
             }
         }

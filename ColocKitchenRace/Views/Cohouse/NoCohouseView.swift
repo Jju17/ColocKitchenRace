@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import os
 import SwiftUI
 
 @Reducer
@@ -60,7 +61,7 @@ struct NoCohouseFeature {
                         do {
                             try await self.cohouseClient.add(newCohouse)
                         } catch {
-                            print("Failed to create cohouse:", error)
+                            Logger.cohouseLog.log(level: .error, "Failed to create cohouse: \(error)")
                         }
                     }
                 case .confirmJoinCohouseButtonTapped:
@@ -102,13 +103,15 @@ struct NoCohouseFeature {
                             let cohouse = try await self.cohouseClient.getByCode(code)
                             await send(.setUserToCohouseFound(cohouse))
                         } catch {
-                            if let error = error as? CohouseClientError {
-                                switch error {
-                                case .cohouseNotFound: print("Cohouse not found for code \(code)")
-                                default: print("Cohouse lookup failed:", error)
+                            if let cohouseError = error as? CohouseClientError {
+                                switch cohouseError {
+                                case .cohouseNotFound:
+                                    Logger.cohouseLog.log(level: .info, "Cohouse not found for code \(code)")
+                                default:
+                                    Logger.cohouseLog.log(level: .error, "Cohouse lookup failed: \(cohouseError)")
                                 }
                             } else {
-                                print("Unknown error during cohouse lookup:", error)
+                                Logger.cohouseLog.log(level: .error, "Unknown error during cohouse lookup: \(error)")
                             }
                         }
                     }

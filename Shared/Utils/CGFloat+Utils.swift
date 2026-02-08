@@ -8,7 +8,5 @@
 import Foundation
 
 extension CGFloat {
-    static var defaultRadius: CGFloat {
-        return 15
-    }
+    static var defaultRadius: CGFloat { 15 }
 }

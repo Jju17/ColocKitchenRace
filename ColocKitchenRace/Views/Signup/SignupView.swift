@@ -99,7 +99,7 @@ struct SignupView: View {
                             .font(.footnote)
                     }
                     HStack {
-                        Text("Already have an account ?")
+                        Text("Already have an account?")
                         Button("Click here") {
                             self.store.send(.goToSigninButtonTapped)
                         }

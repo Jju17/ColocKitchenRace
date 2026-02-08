@@ -30,7 +30,7 @@ struct SplashScreenView: View {
     
     var body: some View {
         ZStack(alignment: .center) {
-            Color(Color.CKRPurple)
+            Color.CKRPurple
                 .ignoresSafeArea()
             VStack {
                 Image("AdminLogoNoFill")

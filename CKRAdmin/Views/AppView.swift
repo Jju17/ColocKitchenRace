@@ -27,14 +27,14 @@ struct AppFeature {
         case newAuthStateTrigger(FirebaseAuth.User?)
     }
 
-    @Dependency(\.authentificationClient) var authentificationClient
+    @Dependency(\.authenticationClient) var authenticationClient
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case .onTask:
                 return .run { send in
-                    for await user in self.authentificationClient.listenAuthState() {
+                    for await user in self.authenticationClient.listenAuthState() {
                         await send(.newAuthStateTrigger(user))
                     }
                 }

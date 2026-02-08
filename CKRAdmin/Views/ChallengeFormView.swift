@@ -6,7 +6,6 @@
 //
 
 import ComposableArchitecture
-import PhotosUI
 import SwiftUI
 
 @Reducer
@@ -20,7 +19,6 @@ struct ChallengeFormFeature {
         case binding(BindingAction<State>)
         case updateChallengeContent(ChallengeContent)
         case updateMultipleChoiceChoices([String])
-//        case updateMultipleChoiceAllowMultipleSelection(Bool)
         case updateMultipleChoiceShuffleAnswers(Bool)
         case updateMultipleChoiceCorrectAnswerIndex(Int?)
     }
@@ -38,12 +36,6 @@ struct ChallengeFormFeature {
                         state.wipChallenge.content = .multipleChoice(content)
                     }
                     return .none
-//                case .updateMultipleChoiceAllowMultipleSelection(let allow):
-//                    if case .multipleChoice(var content) = state.wipChallenge.content {
-//                        content.allowMultipleSelection = allow
-//                        state.wipChallenge.content = .multipleChoice(content)
-//                    }
-//                    return .none
                 case .updateMultipleChoiceShuffleAnswers(let shuffle):
                     if case .multipleChoice(var content) = state.wipChallenge.content {
                         content.shuffleAnswers = shuffle
@@ -99,12 +91,6 @@ struct ChallengeFormView: View {
                             }
                         ))
                     }
-
-                    // Feature for later
-                    //                Toggle("Allow multiple selections", isOn: Binding(
-                    //                    get: { content.allowMultipleSelection },
-                    //                    set: { store.send(.updateMultipleChoiceAllowMultipleSelection($0)) }
-                    //                ))
 
                     Toggle("Shuffle answers", isOn: Binding(
                         get: { content.shuffleAnswers },

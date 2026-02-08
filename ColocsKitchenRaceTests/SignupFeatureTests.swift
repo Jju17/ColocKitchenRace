@@ -21,7 +21,7 @@ struct SignupFeatureTests {
         let store = TestStore(initialState: SignupFeature.State()) {
             SignupFeature()
         } withDependencies: {
-            $0.authentificationClient.signUp = { _ in .mockUser }
+            $0.authenticationClient.signUp = { _ in .mockUser }
         }
 
         await store.send(.signupButtonTapped)
@@ -39,14 +39,14 @@ struct SignupFeatureTests {
         let store = TestStore(initialState: SignupFeature.State()) {
             SignupFeature()
         } withDependencies: {
-            $0.authentificationClient.signUp = { _ in
+            $0.authenticationClient.signUp = { _ in
                 throw NSError(domain: "auth", code: 1, userInfo: [NSLocalizedDescriptionKey: "Email already in use"])
             }
         }
 
         await store.send(.signupButtonTapped)
 
-        await store.receive(\.signupErrorTrigered) {
+        await store.receive(\.signupErrorTriggered) {
             $0.errorMessage = "Email already in use"
         }
     }
@@ -89,14 +89,14 @@ struct SignupFeatureTests {
         let store = TestStore(initialState: SignupFeature.State(signupUserData: SignupUser())) {
             SignupFeature()
         } withDependencies: {
-            $0.authentificationClient.signUp = { _ in
+            $0.authenticationClient.signUp = { _ in
                 signupCalled = true
                 throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Empty fields"])
             }
         }
 
         await store.send(.signupButtonTapped)
-        await store.receive(\.signupErrorTrigered) {
+        await store.receive(\.signupErrorTriggered) {
             $0.errorMessage = "Empty fields"
         }
 

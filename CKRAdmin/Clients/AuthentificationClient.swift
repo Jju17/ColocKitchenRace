@@ -1,5 +1,5 @@
 //
-//  AuthentificationClient.swift
+//  AuthenticationClient.swift
 //  AdminCKR
 //
 //  Created by Julien Rahier on 3/15/25.
@@ -21,7 +21,7 @@ enum AuthError: Error {
 // MARK: - Client Interface
 
 @DependencyClient
-struct AuthentificationClient {
+struct AuthenticationClient {
     var signIn: @Sendable (_ email: String, _ password: String) async throws -> User
     var signOut: () async throws -> Void
     var listenAuthState: @Sendable () -> AsyncStream<FirebaseAuth.User?> = { .never }
@@ -29,7 +29,7 @@ struct AuthentificationClient {
 
 // MARK: - Implementations
 
-extension AuthentificationClient: DependencyKey {
+extension AuthenticationClient: DependencyKey {
 
     // MARK: Live
 
@@ -64,14 +64,14 @@ extension AuthentificationClient: DependencyKey {
 
     // MARK: Preview
 
-    static let previewValue: AuthentificationClient = .testValue
+    static let previewValue: AuthenticationClient = .testValue
 }
 
 // MARK: - Registration
 
 extension DependencyValues {
-    var authentificationClient: AuthentificationClient {
-        get { self[AuthentificationClient.self] }
-        set { self[AuthentificationClient.self] = newValue }
+    var authenticationClient: AuthenticationClient {
+        get { self[AuthenticationClient.self] }
+        set { self[AuthenticationClient.self] = newValue }
     }
 }

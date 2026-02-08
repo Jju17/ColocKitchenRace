@@ -6,7 +6,6 @@
 //
 
 import ComposableArchitecture
-import Dependencies
 import FirebaseFirestore
 
 enum CKRError: Error, Equatable {
@@ -70,7 +69,7 @@ extension CKRClient: DependencyKey {
                     let snapshot = try await ckrGameRef.getDocuments()
 
                     guard !snapshot.documents.isEmpty else {
-                        return .success(true) // Aucun document à supprimer
+                        return .success(true)
                     }
 
                     let batch = db.batch()

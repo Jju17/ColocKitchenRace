@@ -55,7 +55,7 @@ struct CohouseDetailFeatureTests {
             }
         }
 
-        await store.send(.confirmEditohouseButtonTapped) {
+        await store.send(.confirmEditCohouseButtonTapped) {
             $0.destination = nil
         }
 
@@ -82,7 +82,7 @@ struct CohouseDetailFeatureTests {
             }
         }
 
-        await store.send(.confirmEditohouseButtonTapped) {
+        await store.send(.confirmEditCohouseButtonTapped) {
             $0.destination = nil
         }
         // BUG: Error is thrown but not caught - no user feedback

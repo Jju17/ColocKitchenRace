@@ -1,6 +1,6 @@
 //
-//  ChallengeFormFeature.swift
-//  ColocsKitchenRace
+//  CKRGameFormView.swift
+//  CKRAdmin
 //
 //  Created by Julien Rahier on 20/05/2025.
 //

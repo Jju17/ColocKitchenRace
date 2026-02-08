@@ -119,6 +119,7 @@
       }
     },
     "Already have an account ?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -127,6 +128,9 @@
           }
         }
       }
+    },
+    "Already have an account?" : {
+
     },
     "Answer" : {
       "extractionState" : "stale",
@@ -1284,6 +1288,7 @@
 
     },
     "You need an account ?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -1292,6 +1297,9 @@
           }
         }
       }
+    },
+    "You need an account?" : {
+
     },
     "ZIP Code" : {
       "localizations" : {

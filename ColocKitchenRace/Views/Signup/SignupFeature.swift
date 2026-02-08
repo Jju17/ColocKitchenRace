@@ -24,8 +24,7 @@ struct SignupFeature {
         case goToSigninButtonTapped
         case signupButtonTapped
         case delegate(Delegate)
-        case setFocusedField(SignupField?)
-        case signupErrorTrigered(String)
+        case signupErrorTriggered(String)
 
         @CasePathable
         enum Delegate {
@@ -33,7 +32,7 @@ struct SignupFeature {
         }
     }
 
-    @Dependency(\.authentificationClient) var authentificationClient
+    @Dependency(\.authenticationClient) var authenticationClient
 
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -45,18 +44,15 @@ struct SignupFeature {
                 return .send(.delegate(.switchToSigninButtonTapped))
             case .delegate:
                 return .none
-            case let .setFocusedField(newFocus):
-                state.focusedField = newFocus
-                return .none
             case .signupButtonTapped:
                 state.errorMessage = nil
                 return .run { [signupUserData = state.signupUserData] send in
-                    _ = try await self.authentificationClient.signUp(signupUserData)
+                    _ = try await self.authenticationClient.signUp(signupUserData)
                 } catch: { error, send in
                     Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
-                    await send(.signupErrorTrigered(error.localizedDescription))
+                    await send(.signupErrorTriggered(error.localizedDescription))
                 }
-            case let .signupErrorTrigered(message):
+            case let .signupErrorTriggered(message):
                 state.errorMessage = message
                 return .none
             }

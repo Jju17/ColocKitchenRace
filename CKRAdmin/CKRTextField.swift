@@ -1,6 +1,6 @@
 //
-//  Untitled.swift
-//  AdminCKR
+//  CKRTextField.swift
+//  CKRAdmin
 //
 //  Created by Julien Rahier on 3/15/25.
 //

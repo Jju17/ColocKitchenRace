@@ -6,9 +6,8 @@
 //
 
 import ComposableArchitecture
-import FirebaseAuth
-import SwiftUIIntrospect
 import SwiftUI
+import SwiftUIIntrospect
 import os
 
 @Reducer
@@ -27,7 +26,7 @@ struct SigninFeature {
         case switchToSignupButtonTapped
         case delegate(Delegate)
         case signinButtonTapped
-        case signinErrorTrigered(String)
+        case signinErrorTriggered(String)
 
         @CasePathable
         enum Delegate {
@@ -35,7 +34,7 @@ struct SigninFeature {
         }
     }
 
-    @Dependency(\.authentificationClient) var authentificationClient
+    @Dependency(\.authenticationClient) var authenticationClient
 
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -49,12 +48,12 @@ struct SigninFeature {
                     return .none
                 case .signinButtonTapped:
                     return .run { [state] send in
-                        _ = try await self.authentificationClient.signIn(email: state.email, password: state.password)
+                        _ = try await self.authenticationClient.signIn(email: state.email, password: state.password)
                     } catch: { error, send in
                         Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
-                        await send(.signinErrorTrigered(error.localizedDescription))
+                        await send(.signinErrorTriggered(error.localizedDescription))
                     }
-                case let .signinErrorTrigered(message):
+                case let .signinErrorTriggered(message):
                     state.errorMessage = message
                     return .none
             }
@@ -105,7 +104,7 @@ struct SigninView: View {
                             .font(.footnote)
                     }
                     HStack {
-                        Text("You need an account ?")
+                        Text("You need an account?")
                         Button("Click here") {
                             self.store.send(.switchToSignupButtonTapped)
                         }

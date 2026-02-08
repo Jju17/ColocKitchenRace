@@ -114,7 +114,7 @@ struct UserProfileFormFeatureTests {
         let store = TestStore(initialState: UserProfileFormFeature.State()) {
             UserProfileFormFeature()
         } withDependencies: {
-            $0.authentificationClient.signOut = {
+            $0.authenticationClient.signOut = {
                 signOutCalled = true
             }
         }

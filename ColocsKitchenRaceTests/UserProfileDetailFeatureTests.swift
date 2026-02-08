@@ -39,7 +39,7 @@ struct UserProfileDetailFeatureTests {
         ) {
             UserProfileDetailFeature()
         } withDependencies: {
-            $0.authentificationClient.updateUser = { user in
+            $0.authenticationClient.updateUser = { user in
                 updatedUser = user
             }
         }
@@ -69,7 +69,7 @@ struct UserProfileDetailFeatureTests {
         ) {
             UserProfileDetailFeature()
         } withDependencies: {
-            $0.authentificationClient.updateUser = { _ in
+            $0.authenticationClient.updateUser = { _ in
                 throw NSError(domain: "firebase", code: 1, userInfo: [NSLocalizedDescriptionKey: "Permission denied"])
             }
         }
@@ -108,7 +108,7 @@ struct UserProfileDetailFeatureTests {
         let store = TestStore(initialState: UserProfileDetailFeature.State()) {
             UserProfileDetailFeature()
         } withDependencies: {
-            $0.authentificationClient.signOut = {
+            $0.authenticationClient.signOut = {
                 signOutCalled = true
             }
         }
@@ -123,7 +123,7 @@ struct UserProfileDetailFeatureTests {
         let store = TestStore(initialState: UserProfileDetailFeature.State()) {
             UserProfileDetailFeature()
         } withDependencies: {
-            $0.authentificationClient.signOut = {
+            $0.authenticationClient.signOut = {
                 throw NSError(domain: "auth", code: 1, userInfo: [NSLocalizedDescriptionKey: "Sign out failed"])
             }
         }

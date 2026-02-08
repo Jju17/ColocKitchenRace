@@ -25,10 +25,10 @@ struct SigninFeature {
     enum Action: BindableAction {
         case binding(BindingAction<State>)
         case signinButtonTapped
-        case signinErrorTrigered(Error)
+        case signinErrorTriggered(Error)
     }
 
-    @Dependency(\.authentificationClient) var authentificationClient
+    @Dependency(\.authenticationClient) var authenticationClient
 
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -38,12 +38,12 @@ struct SigninFeature {
                 return .none
             case .signinButtonTapped:
                 return .run { [state] send in
-                    _ = try await self.authentificationClient.signIn(email: state.email, password: state.password)
+                    _ = try await self.authenticationClient.signIn(email: state.email, password: state.password)
                 } catch: { error, send in
                     Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
-                    await send(.signinErrorTrigered(error))
+                    await send(.signinErrorTriggered(error))
                 }
-            case let .signinErrorTrigered(error):
+            case let .signinErrorTriggered(error):
                 state.error = error
                 return .none
             }

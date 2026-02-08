@@ -6,7 +6,6 @@
 //
 
 import ComposableArchitecture
-import FirebaseFirestore
 import SwiftUI
 
 @Reducer
@@ -93,7 +92,7 @@ struct ChallengeValidationFeature {
 
 struct ChallengeValidationView: View {
     @Bindable var store: StoreOf<ChallengeValidationFeature>
-    @State private var selectedImagePath: String?
+    @State private var selectedImagePath: IdentifiableString?
 
     var body: some View {
         NavigationView {
@@ -134,7 +133,7 @@ struct ChallengeValidationView: View {
                                             case .picture(let path):
                                                 StorageImage(path: path)
                                                     .onTapGesture {
-                                                        selectedImagePath = path
+                                                        selectedImagePath = IdentifiableString(path)
                                                     }
                                             case .multipleChoice(let indices):
                                                 Text("Choice: \(indices.map { String($0 + 1) }.joined(separator: ", "))")
@@ -174,8 +173,8 @@ struct ChallengeValidationView: View {
                             }
                         }
                     }
-                    .fullScreenCover(item: $selectedImagePath) { path in
-                        FullScreenImageView(imagePath: path)
+                    .fullScreenCover(item: $selectedImagePath) { wrapper in
+                        FullScreenImageView(imagePath: wrapper.id)
                     }
                 }
             }
@@ -218,8 +217,8 @@ struct ChallengeValidationView: View {
     private func statusLabel(for status: ChallengeResponseStatus) -> String {
         switch status {
             case .waiting: return "Waiting"
-            case .validated: return "Validate"
-            case .invalidated: return "Invalidate"
+            case .validated: return "Validated"
+            case .invalidated: return "Invalidated"
         }
     }
 
@@ -232,8 +231,9 @@ struct ChallengeValidationView: View {
     }
 }
 
-extension String: Identifiable {
-    public var id: String { self }
+struct IdentifiableString: Identifiable {
+    let id: String
+    init(_ value: String) { self.id = value }
 }
 
 #Preview {

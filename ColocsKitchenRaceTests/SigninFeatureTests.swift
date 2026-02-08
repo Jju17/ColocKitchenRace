@@ -20,7 +20,7 @@ struct SigninFeatureTests {
         let store = TestStore(initialState: SigninFeature.State(email: "test@test.com", password: "password123")) {
             SigninFeature()
         } withDependencies: {
-            $0.authentificationClient.signIn = { _, _ in .mockUser }
+            $0.authenticationClient.signIn = { _, _ in .mockUser }
         }
 
         await store.send(.signinButtonTapped)
@@ -33,13 +33,13 @@ struct SigninFeatureTests {
         let store = TestStore(initialState: SigninFeature.State(email: "bad@test.com", password: "wrong")) {
             SigninFeature()
         } withDependencies: {
-            $0.authentificationClient.signIn = { _, _ in
+            $0.authenticationClient.signIn = { _, _ in
                 throw AuthError.failedWithError("Invalid credentials")
             }
         }
 
         await store.send(.signinButtonTapped)
-        await store.receive(\.signinErrorTrigered) {
+        await store.receive(\.signinErrorTriggered) {
             $0.errorMessage = "Invalid credentials"
         }
     }
@@ -82,14 +82,14 @@ struct SigninFeatureTests {
         let store = TestStore(initialState: SigninFeature.State(email: "", password: "")) {
             SigninFeature()
         } withDependencies: {
-            $0.authentificationClient.signIn = { _, _ in
+            $0.authenticationClient.signIn = { _, _ in
                 signinCalled = true
                 throw AuthError.failedWithError("Empty fields")
             }
         }
 
         await store.send(.signinButtonTapped)
-        await store.receive(\.signinErrorTrigered) {
+        await store.receive(\.signinErrorTriggered) {
             $0.errorMessage = "Empty fields"
         }
 
