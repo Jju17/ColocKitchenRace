@@ -6,7 +6,6 @@
 //
 
 import ComposableArchitecture
-import os
 import SwiftUI
 
 @Reducer
@@ -14,15 +13,23 @@ struct UserProfileFormFeature {
 
     @ObservableState
     struct State: Equatable {
+        @Shared(.userInfo) var userInfo
         var wipUser: User = .emptyUser
+
+        init() {
+            if let user = userInfo {
+                wipUser = user
+            }
+        }
+
+        init(wipUser: User) {
+            self.wipUser = wipUser
+        }
     }
     enum Action: BindableAction, Equatable {
         case binding(BindingAction<State>)
         case onAppearTriggered
-        case signOutButtonTapped
     }
-
-    @Dependency(\.authenticationClient) var authenticationClient
 
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -32,17 +39,10 @@ struct UserProfileFormFeature {
                 case .binding:
                     return .none
                 case .onAppearTriggered:
-                    @Shared(.userInfo) var user
-                    guard let user = user else { return .none }
-                    state.wipUser = user
-                    return .none
-                case .signOutButtonTapped:
-                    return .run { _ in
-                        do {
-                            try await self.authenticationClient.signOut()
-                        }
-                        catch { Logger.authLog.log(level: .info, "Already logged out") }
+                    if let user = state.userInfo {
+                        state.wipUser = user
                     }
+                    return .none
             }
         }
     }
@@ -84,16 +84,6 @@ struct UserProfileFormView: View {
                 Toggle(isOn: $store.wipUser.isSubscribeToNews) {
                     Text("Do you want to have news from CKR team ?")
                 }
-            }
-
-            Section {
-                Button {
-                    self.store.send(.signOutButtonTapped)
-                } label: {
-                    Text("Sign out")
-                        .foregroundStyle(Color.red)
-                }
-
             }
         }
         .navigationBarTitle("Profile")

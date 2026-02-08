@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import os
 import SwiftUI
 
 @Reducer
@@ -32,6 +33,7 @@ struct CohouseFormFeature {
 
     @Dependency(\.cohouseClient) var cohouseClient
     @Dependency(\.addressValidatorClient) var addressValidatorClient
+    @Dependency(\.uuid) var uuid
 
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -39,7 +41,7 @@ struct CohouseFormFeature {
         Reduce { state, action in
             switch action {
                 case .addUserButtonTapped:
-                    state.wipCohouse.users.append(CohouseUser(id: UUID()))
+                    state.wipCohouse.users.append(CohouseUser(id: uuid()))
                     return .none
                 case .binding:
                     state.addressValidationResult = nil
@@ -48,18 +50,20 @@ struct CohouseFormFeature {
                     let nonAdminIndexes = indices.filter {
                         !state.wipCohouse.users[$0].isAdmin
                     }
-                    
+
                     for index in nonAdminIndexes.sorted(by: >) {
                         state.wipCohouse.users.remove(at: index)
                     }
-                    
+
                     if state.wipCohouse.users.isEmpty {
-                        state.wipCohouse.users.append(CohouseUser(id: UUID(), isAdmin: true))
+                        state.wipCohouse.users.append(CohouseUser(id: uuid(), isAdmin: true))
                     }
                     return .none
                 case .quitCohouseButtonTapped:
                     return .run { _ in
                         try await self.cohouseClient.quitCohouse()
+                    } catch: { error, _ in
+                        Logger.cohouseLog.log(level: .error, "Failed to quit cohouse: \(error)")
                     }
                 case .validateAddressButtonTapped:
                     state.isValidatingAddress = true

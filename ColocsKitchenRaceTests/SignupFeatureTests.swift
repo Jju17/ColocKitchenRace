@@ -16,27 +16,32 @@ struct SignupFeatureTests {
 
     // MARK: - Successful Sign Up
 
-    @Test("Successful signup breaks without doing anything - BUG: no navigation or feedback")
-    func successfulSignup_noNavigation() async {
-        let store = TestStore(initialState: SignupFeature.State()) {
+    @Test("Successful signup completes without error")
+    func successfulSignup() async {
+        let store = TestStore(
+            initialState: SignupFeature.State(
+                signupUserData: SignupUser(firstName: "Test", lastName: "User", email: "test@test.com", password: "password123")
+            )
+        ) {
             SignupFeature()
         } withDependencies: {
             $0.authenticationClient.signUp = { _ in .mockUser }
         }
 
-        await store.send(.signupButtonTapped)
-        // BUG: On success, the reducer just completes silently.
-        // The user sees no confirmation, no navigation.
-        // The auth state listener in AppFeature should eventually transition,
-        // but there's a race condition: if Firebase hasn't propagated the auth state
-        // change yet, the user is stuck on the signup screen.
+        await store.send(.signupButtonTapped) {
+            $0.errorMessage = nil
+        }
     }
 
     // MARK: - Failed Sign Up
 
     @Test("Failed signup sets error message")
     func failedSignup_setsError() async {
-        let store = TestStore(initialState: SignupFeature.State()) {
+        let store = TestStore(
+            initialState: SignupFeature.State(
+                signupUserData: SignupUser(firstName: "Test", lastName: "User", email: "test@test.com", password: "password123")
+            )
+        ) {
             SignupFeature()
         } withDependencies: {
             $0.authenticationClient.signUp = { _ in
@@ -44,7 +49,9 @@ struct SignupFeatureTests {
             }
         }
 
-        await store.send(.signupButtonTapped)
+        await store.send(.signupButtonTapped) {
+            $0.errorMessage = nil
+        }
 
         await store.receive(\.signupErrorTriggered) {
             $0.errorMessage = "Email already in use"
@@ -65,25 +72,25 @@ struct SignupFeatureTests {
 
     // MARK: - Focused Field
 
-    @Test("Setting focused field updates state")
+    @Test("Setting focused field updates state via binding")
     func setFocusedField() async {
         let store = TestStore(initialState: SignupFeature.State()) {
             SignupFeature()
         }
 
-        await store.send(.setFocusedField(.name)) {
+        await store.send(.binding(.set(\.focusedField, .name))) {
             $0.focusedField = .name
         }
 
-        await store.send(.setFocusedField(nil)) {
+        await store.send(.binding(.set(\.focusedField, nil))) {
             $0.focusedField = nil
         }
     }
 
-    // MARK: - Bug: No form validation
+    // MARK: - Client-side validation
 
-    @Test("BUG: Signup with empty fields still fires network request")
-    func signupWithEmptyFields() async {
+    @Test("Signup with empty fields shows validation error without network call")
+    func signupWithEmptyFields_showsError() async {
         var signupCalled = false
 
         let store = TestStore(initialState: SignupFeature.State(signupUserData: SignupUser())) {
@@ -91,23 +98,22 @@ struct SignupFeatureTests {
         } withDependencies: {
             $0.authenticationClient.signUp = { _ in
                 signupCalled = true
-                throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Empty fields"])
+                return .mockUser
             }
         }
 
-        await store.send(.signupButtonTapped)
-        await store.receive(\.signupErrorTriggered) {
-            $0.errorMessage = "Empty fields"
+        await store.send(.signupButtonTapped) {
+            $0.errorMessage = "Please fill in all required fields."
         }
 
-        // BUG: No client-side validation for required fields
-        #expect(signupCalled == true)
+        // signUp should NOT be called — validation prevents it
+        #expect(signupCalled == false)
     }
 
-    // MARK: - Bug: Phone number lost during signup
+    // MARK: - Phone number preserved
 
-    @Test("BUG: SignupUser.createUser drops phone number")
-    func createUserDropsPhone() {
+    @Test("SignupUser.createUser preserves phone number")
+    func createUserPreservesPhone() {
         let signupData = SignupUser(
             firstName: "Julien",
             lastName: "Rahier",
@@ -118,11 +124,22 @@ struct SignupFeatureTests {
 
         let user = signupData.createUser(authId: "firebase-uid-123")
 
-        // BUG: phoneNumber is hardcoded to nil in createUser
-        // even though the user entered a phone number
-        #expect(user.phoneNumber == nil)
+        #expect(user.phoneNumber == "+32479506841")
         #expect(user.firstName == "Julien")
         #expect(user.lastName == "Rahier")
         #expect(user.email == "julien@test.com")
+    }
+
+    @Test("SignupUser.createUser sets nil phone when empty")
+    func createUserEmptyPhone() {
+        let signupData = SignupUser(
+            firstName: "Test",
+            lastName: "User",
+            email: "test@test.com",
+            password: "password"
+        )
+
+        let user = signupData.createUser(authId: "auth-123")
+        #expect(user.phoneNumber == nil)
     }
 }

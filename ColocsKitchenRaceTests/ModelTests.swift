@@ -124,8 +124,8 @@ struct UserModelTests {
         #expect(regularCohouseUser.isAdmin == false)
     }
 
-    @Test("BUG: SignupUser.createUser drops phone number")
-    func signupUserDropsPhone() {
+    @Test("SignupUser.createUser preserves phone number")
+    func signupUserPreservesPhone() {
         let signupData = SignupUser(
             firstName: "Test",
             lastName: "User",
@@ -135,10 +135,27 @@ struct UserModelTests {
         )
         let user = signupData.createUser(authId: "auth-123")
 
-        // BUG: Phone is dropped
-        #expect(user.phoneNumber == nil)
-        // BUG: isSubscribeToNews is always false, no option during signup
+        #expect(user.phoneNumber == "+32479506841")
+        #expect(user.firstName == "Test")
+        #expect(user.lastName == "User")
+        #expect(user.email == "test@test.com")
+        #expect(user.authId == "auth-123")
+        // isSubscribeToNews defaults to false at signup — user can enable later in profile
         #expect(user.isSubscribeToNews == false)
+    }
+
+    @Test("SignupUser.createUser with empty phone sets nil")
+    func signupUserEmptyPhone() {
+        let signupData = SignupUser(
+            firstName: "Test",
+            lastName: "User",
+            email: "test@test.com",
+            password: "password",
+            phone: ""
+        )
+        let user = signupData.createUser(authId: "auth-123")
+
+        #expect(user.phoneNumber == nil)
     }
 }
 
@@ -220,16 +237,14 @@ struct CohouseModelTests {
         #expect(cohouse.users.count == users.count)
     }
 
-    @Test("BUG: Cohouse code is generated from UUID prefix - only 8 hex chars, not guaranteed unique")
+    @Test("Cohouse code is 8 hex chars from UUID prefix")
     func cohouseCodeFromUUID() {
-        // In NoCohouseFeature.createCohouseButtonTapped:
-        // let code = uuid.uuidString.components(separatedBy: "-").first
-        // This takes the first segment of UUID: "8 hex chars" (e.g., "A1B2C3D4")
-        // Not ideal: only 32 bits of entropy (4 billion possibilities)
-        // Could collide in production
+        // NoCohouseFeature.createCohouseButtonTapped generates code from UUID first segment
         let uuid = UUID()
         let code = uuid.uuidString.components(separatedBy: "-").first!
         #expect(code.count == 8)
+        // All characters should be valid hex
+        #expect(code.allSatisfy { $0.isHexDigit })
     }
 
     @Test("contactUser always returns nil (commented out)")

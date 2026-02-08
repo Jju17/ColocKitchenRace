@@ -30,8 +30,8 @@ extension User {
         "\(firstName) \(lastName)"
     }
 
-    func toCohouseUser(isAdmin: Bool = false) -> CohouseUser {
-        CohouseUser(id: UUID(), isAdmin: isAdmin, surname: fullName, userId: id.uuidString)
+    func toCohouseUser(cohouseUserId: UUID = UUID(), isAdmin: Bool = false) -> CohouseUser {
+        CohouseUser(id: cohouseUserId, isAdmin: isAdmin, surname: fullName, userId: id.uuidString)
     }
 }
 

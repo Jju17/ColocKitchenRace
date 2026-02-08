@@ -46,8 +46,17 @@ struct SignupFeature {
                 return .none
             case .signupButtonTapped:
                 state.errorMessage = nil
-                return .run { [signupUserData = state.signupUserData] send in
-                    _ = try await self.authenticationClient.signUp(signupUserData)
+                let data = state.signupUserData
+                guard !data.firstName.trimmingCharacters(in: .whitespaces).isEmpty,
+                      !data.lastName.trimmingCharacters(in: .whitespaces).isEmpty,
+                      !data.email.trimmingCharacters(in: .whitespaces).isEmpty,
+                      !data.password.isEmpty
+                else {
+                    state.errorMessage = "Please fill in all required fields."
+                    return .none
+                }
+                return .run { send in
+                    _ = try await self.authenticationClient.signUp(data)
                 } catch: { error, send in
                     Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
                     await send(.signupErrorTriggered(error.localizedDescription))

@@ -46,6 +46,7 @@ struct ChallengeTileFeature {
         case picture(PictureChoiceFeature.Action)
         case delegate(Delegate)
 
+        @CasePathable
         enum Delegate: Equatable {
             case responseSubmitted(ChallengeResponse)
         }

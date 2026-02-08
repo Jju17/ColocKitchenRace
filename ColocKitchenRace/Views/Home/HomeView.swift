@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import os
 import SwiftUI
 
 @Reducer
@@ -43,8 +44,12 @@ struct HomeFeature {
                 case .openRegisterLink:
                     guard let cohouse = state.cohouse
                     else { return .none }
-                    _ = self.ckrClient.registerCohouse(cohouse: cohouse)
-                    return .none
+                    return .run { [ckrClient] _ in
+                        let result = ckrClient.registerCohouse(cohouse: cohouse)
+                        if case let .failure(error) = result {
+                            Logger.ckrLog.log(level: .error, "Failed to register cohouse: \(error)")
+                        }
+                    }
                 case .path:
                     return .none
                 case .delegate:

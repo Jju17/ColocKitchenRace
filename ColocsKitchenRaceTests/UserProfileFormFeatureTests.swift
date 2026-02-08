@@ -105,35 +105,24 @@ struct UserProfileFormFeatureTests {
         }
     }
 
-    // MARK: - Sign Out (duplicate action in form)
+    // MARK: - wipUser initialization
 
-    @Test("BUG: signOutButtonTapped exists both in UserProfileDetailFeature AND UserProfileFormFeature")
-    func signOut_duplicateInForm() async {
-        var signOutCalled = false
+    @Test("State initializes wipUser from shared userInfo when available")
+    func wipUserInitFromShared() {
+        @Shared(.userInfo) var userInfo
+        let mockUser = User.mockUser
+        $userInfo.withLock { $0 = mockUser }
 
-        let store = TestStore(initialState: UserProfileFormFeature.State()) {
-            UserProfileFormFeature()
-        } withDependencies: {
-            $0.authenticationClient.signOut = {
-                signOutCalled = true
-            }
-        }
-
-        // BUG: SignOut is callable from the form view while editing
-        // This means you can sign out while in the middle of editing your profile
-        // The edit sheet will dismiss due to auth state change, but the UX is confusing
-        await store.send(.signOutButtonTapped)
-        #expect(signOutCalled == true)
+        let state = UserProfileFormFeature.State()
+        #expect(state.wipUser == mockUser)
     }
 
-    // MARK: - BUG: wipUser starts as emptyUser before onAppear
+    @Test("State initializes wipUser as emptyUser when userInfo is nil")
+    func wipUserInitEmpty() {
+        @Shared(.userInfo) var userInfo
+        $userInfo.withLock { $0 = nil }
 
-    @Test("BUG: Before onAppear, wipUser is empty - form briefly shows empty fields")
-    func wipUserStartsEmpty() {
         let state = UserProfileFormFeature.State()
-
-        // BUG: wipUser is initialized as .emptyUser
-        // If the view renders before onAppear fires, it shows empty fields momentarily
         #expect(state.wipUser.firstName == "")
         #expect(state.wipUser.lastName == "")
     }

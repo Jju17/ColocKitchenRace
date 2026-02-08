@@ -22,7 +22,7 @@ extension SignupUser {
              isSubscribeToNews: false,
              firstName: self.firstName,
              lastName: self.lastName,
-             phoneNumber: nil,
+             phoneNumber: self.phone.isEmpty ? nil : self.phone,
              email: self.email
         )
     }

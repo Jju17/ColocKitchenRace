@@ -20,14 +20,17 @@ struct UserProfileDetailFeature {
     @ObservableState
     struct State: Equatable {
         @Presents var destination: Destination.State?
+        var errorMessage: String?
         @Shared(.userInfo) var userInfo
     }
     enum Action {
         case confirmEditUserButtonTapped
         case destination(PresentationAction<Destination.Action>)
         case dismissDestinationButtonTapped
+        case dismissErrorMessageButtonTapped
         case editUserButtonTapped
         case signOutButtonTapped
+        case signOutFailed(String)
     }
 
     @Dependency(\.authenticationClient) var authenticationClient
@@ -41,11 +44,16 @@ struct UserProfileDetailFeature {
                     state.destination = nil
                     return .run { _ in
                         try await authenticationClient.updateUser(editState.wipUser)
+                    } catch: { error, _ in
+                        Logger.authLog.log(level: .error, "Failed to update user: \(error)")
                     }
                 case .destination:
                     return .none
                 case .dismissDestinationButtonTapped:
                     state.destination = nil
+                    return .none
+                case .dismissErrorMessageButtonTapped:
+                    state.errorMessage = nil
                     return .none
                 case .editUserButtonTapped:
                     state.destination = .editUser(
@@ -53,13 +61,16 @@ struct UserProfileDetailFeature {
                     )
                     return .none
                 case .signOutButtonTapped:
-                    return .run { _ in
-                        do {
-                            try await self.authenticationClient.signOut()
-                        } catch {
-                            Logger.authLog.log(level: .fault, "Already logged out")
-                        }
+                    state.errorMessage = nil
+                    return .run { send in
+                        try await self.authenticationClient.signOut()
+                    } catch: { error, send in
+                        Logger.authLog.log(level: .error, "Sign out failed: \(error)")
+                        await send(.signOutFailed("Sign out failed. Please try again."))
                     }
+                case let .signOutFailed(message):
+                    state.errorMessage = message
+                    return .none
             }
         }
         .ifLet(\.$destination, action: \.destination)
@@ -129,6 +140,14 @@ struct UserProfileDetailView: View {
                     Image(systemName: "pencil")
                 }
             }
+        }
+        .alert("Error", isPresented: Binding(
+            get: { store.errorMessage != nil },
+            set: { if !$0 { store.send(.dismissErrorMessageButtonTapped) } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(store.errorMessage ?? "")
         }
         .sheet(item: $store.scope(state: \.destination?.editUser, action: \.destination.editUser)) { editUserStore in
             NavigationStack {

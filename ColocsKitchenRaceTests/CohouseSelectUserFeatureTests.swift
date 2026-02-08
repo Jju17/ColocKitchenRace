@@ -18,6 +18,7 @@ struct CohouseSelectUserFeatureTests {
 
     @Test("addUserButtonTapped with non-empty name adds user and selects them")
     func addUser() async {
+        let newUserUUID = UUID(0)
         let firstUser = CohouseUser(id: UUID(), isAdmin: true, surname: "Admin")
         let cohouse = Cohouse(id: UUID(), name: "Test", code: "123456", users: [firstUser])
 
@@ -29,13 +30,13 @@ struct CohouseSelectUserFeatureTests {
             )
         ) {
             CohouseSelectUserFeature()
+        } withDependencies: {
+            $0.uuid = .incrementing
         }
 
         await store.send(.addUserButtonTapped) {
-            #expect($0.cohouse.users.count == 2)
-            let addedUser = $0.cohouse.users.last!
-            #expect(addedUser.surname == "Julien")
-            #expect(addedUser.isAdmin == false)
+            let addedUser = CohouseUser(id: newUserUUID, surname: "Julien")
+            $0.cohouse.users.append(addedUser)
             $0.selectedUser = addedUser
             $0.newUserName = ""
         }
@@ -81,9 +82,9 @@ struct CohouseSelectUserFeatureTests {
         }
     }
 
-    // MARK: - BUG: No duplicate name check
+    // MARK: - Duplicate name check
 
-    @Test("BUG: Can add user with same name as existing user (duplicates)")
+    @Test("addUserButtonTapped with duplicate name does nothing")
     func addDuplicateName() async {
         let firstUser = CohouseUser(id: UUID(), isAdmin: true, surname: "Julien")
         let cohouse = Cohouse(id: UUID(), name: "Test", code: "123456", users: [firstUser])
@@ -98,12 +99,25 @@ struct CohouseSelectUserFeatureTests {
             CohouseSelectUserFeature()
         }
 
-        await store.send(.addUserButtonTapped) {
-            // BUG: Duplicate name is allowed
-            #expect($0.cohouse.users.count == 2)
-            #expect($0.cohouse.users.filter({ $0.surname == "Julien" }).count == 2)
-            $0.selectedUser = $0.cohouse.users.last!
-            $0.newUserName = ""
+        // Duplicate name is rejected — no state change
+        await store.send(.addUserButtonTapped)
+    }
+
+    @Test("addUserButtonTapped with duplicate name (case insensitive) does nothing")
+    func addDuplicateNameCaseInsensitive() async {
+        let firstUser = CohouseUser(id: UUID(), isAdmin: true, surname: "Julien")
+        let cohouse = Cohouse(id: UUID(), name: "Test", code: "123456", users: [firstUser])
+
+        let store = TestStore(
+            initialState: CohouseSelectUserFeature.State(
+                cohouse: cohouse,
+                selectedUser: firstUser,
+                newUserName: "julien" // Same name, different case
+            )
+        ) {
+            CohouseSelectUserFeature()
         }
+
+        await store.send(.addUserButtonTapped)
     }
 }

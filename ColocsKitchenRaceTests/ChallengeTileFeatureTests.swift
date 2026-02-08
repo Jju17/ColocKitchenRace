@@ -159,6 +159,8 @@ struct ChallengeTileFeatureTests {
             $0.liveStatus = .waiting
         }
 
+        await store.receive(\.delegate.responseSubmitted)
+
         #expect(submittedResponse?.content == .noChoice)
     }
 
@@ -196,6 +198,8 @@ struct ChallengeTileFeatureTests {
             $0.response = updatedResponse
             $0.liveStatus = .waiting
         }
+
+        await store.receive(\.delegate.responseSubmitted)
     }
 
     // MARK: - Submit SingleAnswer
@@ -229,6 +233,8 @@ struct ChallengeTileFeatureTests {
             $0.response = updatedResponse
             $0.liveStatus = .waiting
         }
+
+        await store.receive(\.delegate.responseSubmitted)
     }
 
     // MARK: - Submit Guards
@@ -416,6 +422,8 @@ struct ChallengeTileFeatureTests {
             $0.response = updatedResponse
             $0.liveStatus = .waiting
         }
+
+        await store.receive(\.delegate.responseSubmitted)
     }
 
     @Test("Upload failure sets error")

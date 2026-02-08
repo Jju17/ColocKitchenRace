@@ -23,6 +23,7 @@ struct NoCohouseFeature {
         @Shared(.userInfo) var userInfo
         @Presents var destination: Destination.State?
         var cohouseCode: String = ""
+        var errorMessage: String?
     }
 
     enum Action: BindableAction {
@@ -33,10 +34,12 @@ struct NoCohouseFeature {
         case destination(PresentationAction<Destination.Action>)
         case dismissDestinationButtonTapped
         case findExistingCohouseButtonTapped
+        case cohouseLookupFailed(String)
         case setUserToCohouseFound(Cohouse)
     }
 
     @Dependency(\.cohouseClient) var cohouseClient
+    @Dependency(\.uuid) var uuid
 
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -81,12 +84,13 @@ struct NoCohouseFeature {
                     }
                 case .createCohouseButtonTapped:
                     guard let userInfo = state.userInfo else { return .none }
-                    let uuid = UUID()
-                    guard let code = uuid.uuidString.components(separatedBy: "-").first else { return .none }
-                    let owner = userInfo.toCohouseUser(isAdmin: true)
+                    let newId = uuid()
+                    guard let code = newId.uuidString.components(separatedBy: "-").first else { return .none }
+                    let ownerUUID = uuid()
+                    let owner = userInfo.toCohouseUser(cohouseUserId: ownerUUID, isAdmin: true)
                     state.destination = .create(
                         CohouseFormFeature.State(
-                            wipCohouse: Cohouse(id: uuid, code: code, users: [owner]),
+                            wipCohouse: Cohouse(id: newId, code: code, users: [owner]),
                             isNewCohouse: true
                         )
                     )
@@ -97,7 +101,12 @@ struct NoCohouseFeature {
                     state.destination = nil
                     return .none
                 case .findExistingCohouseButtonTapped:
-                    let code = state.cohouseCode
+                    let code = state.cohouseCode.trimmingCharacters(in: .whitespaces)
+                    state.errorMessage = nil
+                    guard !code.isEmpty else {
+                        state.errorMessage = "Please enter a cohouse code."
+                        return .none
+                    }
                     return .run { send in
                         do {
                             let cohouse = try await self.cohouseClient.getByCode(code)
@@ -107,14 +116,20 @@ struct NoCohouseFeature {
                                 switch cohouseError {
                                 case .cohouseNotFound:
                                     Logger.cohouseLog.log(level: .info, "Cohouse not found for code \(code)")
+                                    await send(.cohouseLookupFailed("No cohouse found with code \"\(code)\"."))
                                 default:
                                     Logger.cohouseLog.log(level: .error, "Cohouse lookup failed: \(cohouseError)")
+                                    await send(.cohouseLookupFailed("An error occurred. Please try again."))
                                 }
                             } else {
                                 Logger.cohouseLog.log(level: .error, "Unknown error during cohouse lookup: \(error)")
+                                await send(.cohouseLookupFailed("An error occurred. Please try again."))
                             }
                         }
                     }
+                case let .cohouseLookupFailed(message):
+                    state.errorMessage = message
+                    return .none
                 case let .setUserToCohouseFound(cohouse):
                     guard let firstUser = cohouse.users.first else { return .none }
 
@@ -154,6 +169,12 @@ struct NoCohouseView: View {
                 }
                 Button("Join existing cohouse") {
                     self.store.send(.findExistingCohouseButtonTapped)
+                }
+
+                if let errorMessage = store.errorMessage {
+                    Text(errorMessage)
+                        .foregroundStyle(.red)
+                        .font(.footnote)
                 }
             }
 

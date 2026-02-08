@@ -19,22 +19,28 @@ struct NoCohouseFeatureTests {
     @Test("createCohouseButtonTapped opens create sheet with correct initial state")
     func createCohouseButtonTapped() async {
         @Shared(.userInfo) var userInfo
-        $userInfo.withLock { $0 = .mockUser }
+        let mockUser = User.mockUser
+        $userInfo.withLock { $0 = mockUser }
+
+        let cohouseUUID = UUID(0)
+        let ownerUUID = UUID(1)
 
         let store = TestStore(initialState: NoCohouseFeature.State()) {
             NoCohouseFeature()
+        } withDependencies: {
+            $0.uuid = .incrementing
         }
 
+        let expectedCode = cohouseUUID.uuidString.components(separatedBy: "-").first!
+        let owner = mockUser.toCohouseUser(cohouseUserId: ownerUUID, isAdmin: true)
+
         await store.send(.createCohouseButtonTapped) {
-            // Should present the create destination
-            // The UUID is random so we just verify destination is set
-            guard case .create(let formState) = $0.destination else {
-                Issue.record("Expected destination to be .create")
-                return
-            }
-            #expect(formState.isNewCohouse == true)
-            #expect(formState.wipCohouse.users.count == 1)
-            #expect(formState.wipCohouse.users.first?.isAdmin == true)
+            $0.destination = .create(
+                CohouseFormFeature.State(
+                    wipCohouse: Cohouse(id: cohouseUUID, code: expectedCode, users: [owner]),
+                    isNewCohouse: true
+                )
+            )
         }
     }
 
@@ -48,7 +54,6 @@ struct NoCohouseFeatureTests {
         }
 
         await store.send(.createCohouseButtonTapped)
-        // No destination should be set
     }
 
     @Test("confirmCreateCohouseButtonTapped creates cohouse when valid")
@@ -96,7 +101,6 @@ struct NoCohouseFeatureTests {
             NoCohouseFeature()
         }
 
-        // Should be guarded: totalUsers == 0
         await store.send(.confirmCreateCohouseButtonTapped)
     }
 
@@ -113,7 +117,6 @@ struct NoCohouseFeatureTests {
             NoCohouseFeature()
         }
 
-        // Guard: all surnames must be non-empty
         await store.send(.confirmCreateCohouseButtonTapped)
     }
 
@@ -130,38 +133,13 @@ struct NoCohouseFeatureTests {
             NoCohouseFeature()
         }
 
-        // Guard: must have admin
         await store.send(.confirmCreateCohouseButtonTapped)
     }
 
     // MARK: - Join Cohouse Flow
 
-//    @Test("findExistingCohouseButtonTapped with valid code fetches cohouse")
-//    func findExistingCohouse_found() async {
-//        let mockCohouse = Cohouse.mock
-//
-//        let store = TestStore(initialState: NoCohouseFeature.State(cohouseCode: "1234")) {
-//            NoCohouseFeature()
-//        } withDependencies: {
-//            $0.cohouseClient.getByCode = { _ in mockCohouse }
-//        }
-//
-//        await store.send(.findExistingCohouseButtonTapped)
-//        await store.receive(\.setUserToCohouseFound) {
-//            // First user should be pre-selected
-//            $0.destination = .setCohouseUser(
-//                CohouseSelectUserFeature.State(
-//                    cohouse: mockCohouse,
-//                    selectedUser: mockCohouse.users.first!
-//                )
-//            )
-//        }
-//    }
-
-    @Test("BUG: findExistingCohouseButtonTapped with invalid code silently prints error")
-    func findExistingCohouse_notFound_silentError() async {
-        // BUG: When cohouse not found, the error is only printed to console
-        // The user sees no feedback (no error message, no alert)
+    @Test("findExistingCohouseButtonTapped with invalid code shows error to user")
+    func findExistingCohouse_notFound_showsError() async {
         let store = TestStore(initialState: NoCohouseFeature.State(cohouseCode: "INVALID")) {
             NoCohouseFeature()
         } withDependencies: {
@@ -171,7 +149,10 @@ struct NoCohouseFeatureTests {
         }
 
         await store.send(.findExistingCohouseButtonTapped)
-        // No action received = user sees nothing
+
+        await store.receive(\.cohouseLookupFailed) {
+            $0.errorMessage = "No cohouse found with code \"INVALID\"."
+        }
     }
 
     // MARK: - Set User
@@ -191,7 +172,6 @@ struct NoCohouseFeatureTests {
         }
 
         await store.send(.setUserToCohouseFound(cohouse))
-        // Should set shared cohouse directly, no destination sheet
     }
 
     // MARK: - Dismiss
@@ -211,10 +191,10 @@ struct NoCohouseFeatureTests {
         }
     }
 
-    // MARK: - BUG: Code with trailing spaces
+    // MARK: - Code trimming
 
-    @Test("BUG: Cohouse code is not trimmed before lookup")
-    func cohouseCodeNotTrimmed() async {
+    @Test("Cohouse code is trimmed before lookup")
+    func cohouseCodeIsTrimmed() async {
         var receivedCode: String?
 
         let store = TestStore(initialState: NoCohouseFeature.State(cohouseCode: "  1234  ")) {
@@ -228,7 +208,11 @@ struct NoCohouseFeatureTests {
 
         await store.send(.findExistingCohouseButtonTapped)
 
-        // BUG: The code is passed with spaces, which will likely fail the Firestore lookup
-        #expect(receivedCode == "  1234  ")
+        await store.receive(\.cohouseLookupFailed) {
+            $0.errorMessage = "No cohouse found with code \"1234\"."
+        }
+
+        // Code should be trimmed before being sent to the client
+        #expect(receivedCode == "1234")
     }
 }

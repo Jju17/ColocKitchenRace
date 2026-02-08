@@ -24,6 +24,7 @@ struct CohouseSelectUserFeature {
     }
 
     @Dependency(\.cohouseClient) var cohouseClient
+    @Dependency(\.uuid) var uuid
 
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -31,9 +32,11 @@ struct CohouseSelectUserFeature {
         Reduce { state, action in
             switch action {
                 case .addUserButtonTapped:
-                    guard !state.newUserName.isEmpty else { return .none }
+                    let trimmedName = state.newUserName.trimmingCharacters(in: .whitespaces)
+                    guard !trimmedName.isEmpty else { return .none }
+                    guard !state.cohouse.users.contains(where: { $0.surname.lowercased() == trimmedName.lowercased() }) else { return .none }
 
-                    let newUser = CohouseUser(id: .init(), surname: state.newUserName)
+                    let newUser = CohouseUser(id: uuid(), surname: trimmedName)
                     state.cohouse.users.append(newUser)
                     state.selectedUser = newUser
                     state.newUserName = ""

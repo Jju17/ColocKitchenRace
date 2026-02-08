@@ -73,10 +73,10 @@ struct SigninFeatureTests {
         }
     }
 
-    // MARK: - Bug: Empty email/password still triggers signin
+    // MARK: - Client-side validation
 
-    @Test("BUG: Signin with empty fields still fires network request - no client-side validation")
-    func signinWithEmptyFields_stillCallsClient() async {
+    @Test("Signin with empty fields shows validation error without network call")
+    func signinWithEmptyFields_showsError() async {
         var signinCalled = false
 
         let store = TestStore(initialState: SigninFeature.State(email: "", password: "")) {
@@ -84,17 +84,15 @@ struct SigninFeatureTests {
         } withDependencies: {
             $0.authenticationClient.signIn = { _, _ in
                 signinCalled = true
-                throw AuthError.failedWithError("Empty fields")
+                return .mockUser
             }
         }
 
-        await store.send(.signinButtonTapped)
-        await store.receive(\.signinErrorTriggered) {
-            $0.errorMessage = "Empty fields"
+        await store.send(.signinButtonTapped) {
+            $0.errorMessage = "Please fill in all fields."
         }
 
-        // BUG: signIn is called even with empty email/password
-        // There's no client-side validation before making the network call
-        #expect(signinCalled == true)
+        // signIn should NOT be called — validation prevents it
+        #expect(signinCalled == false)
     }
 }

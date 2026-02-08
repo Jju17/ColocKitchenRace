@@ -47,6 +47,12 @@ struct SigninFeature {
                 case .delegate:
                     return .none
                 case .signinButtonTapped:
+                    guard !state.email.trimmingCharacters(in: .whitespaces).isEmpty,
+                          !state.password.isEmpty
+                    else {
+                        state.errorMessage = "Please fill in all fields."
+                        return .none
+                    }
                     return .run { [state] send in
                         _ = try await self.authenticationClient.signIn(email: state.email, password: state.password)
                     } catch: { error, send in

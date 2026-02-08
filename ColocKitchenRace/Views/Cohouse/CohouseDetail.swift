@@ -63,6 +63,8 @@ struct CohouseDetailFeature {
                     state.destination = nil
                     return .run { [wipCohouse] _ in
                         try await self.cohouseClient.set(id: wipCohouse.id.uuidString, newCohouse: wipCohouse)
+                    } catch: { error, _ in
+                        Logger.cohouseLog.log(level: .error, "Failed to save cohouse: \(error)")
                     }
                 case .dismissEditCohouseButtonTapped:
                     state.destination = nil

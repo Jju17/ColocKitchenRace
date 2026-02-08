@@ -18,18 +18,18 @@ struct CohouseFormFeatureTests {
 
     @Test("addUserButtonTapped appends empty user")
     func addUser() async {
+        let newUserUUID = UUID(0)
         var cohouse = Cohouse.mock
         cohouse.users = [CohouseUser(id: UUID(), isAdmin: true, surname: "Admin")]
 
         let store = TestStore(initialState: CohouseFormFeature.State(wipCohouse: cohouse)) {
             CohouseFormFeature()
+        } withDependencies: {
+            $0.uuid = .incrementing
         }
 
         await store.send(.addUserButtonTapped) {
-            // Should have 2 users now
-            #expect($0.wipCohouse.users.count == 2)
-            #expect($0.wipCohouse.users.last?.surname == "")
-            #expect($0.wipCohouse.users.last?.isAdmin == false)
+            $0.wipCohouse.users.append(CohouseUser(id: newUserUUID))
         }
     }
 
@@ -205,8 +205,8 @@ struct CohouseFormFeatureTests {
 
     // MARK: - Quit Cohouse
 
-    @Test("BUG: quitCohouseButtonTapped fires async but has no error handling or completion")
-    func quitCohouse_noErrorHandling() async {
+    @Test("quitCohouseButtonTapped calls quitCohouse")
+    func quitCohouse() async {
         var quitCalled = false
 
         let store = TestStore(initialState: CohouseFormFeature.State(wipCohouse: .mock)) {
@@ -220,12 +220,9 @@ struct CohouseFormFeatureTests {
         await store.send(.quitCohouseButtonTapped)
 
         #expect(quitCalled == true)
-        // BUG: No loading state, no success confirmation, no error handling
-        // If quitCohouse throws, the error is unhandled
-        // The sheet stays open
     }
 
-    @Test("BUG: quitCohouseButtonTapped when network fails silently crashes")
+    @Test("quitCohouseButtonTapped handles network error gracefully")
     func quitCohouse_networkError() async {
         let store = TestStore(initialState: CohouseFormFeature.State(wipCohouse: .mock)) {
             CohouseFormFeature()
@@ -235,8 +232,7 @@ struct CohouseFormFeatureTests {
             }
         }
 
-        // This will throw unhandled in the .run effect
+        // Error is caught and logged, no crash
         await store.send(.quitCohouseButtonTapped)
-        // BUG: Unhandled error in .run effect
     }
 }

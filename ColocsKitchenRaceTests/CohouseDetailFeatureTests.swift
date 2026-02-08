@@ -64,8 +64,8 @@ struct CohouseDetailFeatureTests {
         #expect(savedCohouse?.users.contains(where: { $0.surname.isEmpty }) == false)
     }
 
-    @Test("BUG: confirmEditCohouseButtonTapped does not handle errors from cohouseClient.set")
-    func confirmEdit_noErrorHandling() async {
+    @Test("confirmEditCohouseButtonTapped handles network error gracefully")
+    func confirmEdit_networkError() async {
         var cohouse = Cohouse.mock
         cohouse.users = [CohouseUser(id: UUID(), isAdmin: true, surname: "Admin")]
 
@@ -85,8 +85,7 @@ struct CohouseDetailFeatureTests {
         await store.send(.confirmEditCohouseButtonTapped) {
             $0.destination = nil
         }
-        // BUG: Error is thrown but not caught - no user feedback
-        // The destination is already nil, so user loses their edits
+        // Error is caught and logged, no crash
     }
 
     // MARK: - Dismiss
