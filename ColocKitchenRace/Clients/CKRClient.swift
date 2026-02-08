@@ -49,6 +49,15 @@ extension CKRClient: DependencyKey {
                return .success(true)
         }
     )
+
+    static let testValue = Self(
+        getLast: { .success(nil) },
+        registerCohouse: { _ in .success(true) }
+    )
+
+    static var previewValue: CKRClient {
+        return .testValue
+    }
 }
 
 extension DependencyValues {

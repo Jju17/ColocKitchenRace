@@ -15,9 +15,9 @@ import os
 struct SigninFeature {
 
     @ObservableState
-    struct State {
+    struct State: Equatable {
         var email: String = ""
-        var error: Error?
+        var errorMessage: String?
         var focusedField: SigninField?
         var password: String = ""
     }
@@ -27,8 +27,9 @@ struct SigninFeature {
         case switchToSignupButtonTapped
         case delegate(Delegate)
         case signinButtonTapped
-        case signinErrorTrigered(Error)
+        case signinErrorTrigered(String)
 
+        @CasePathable
         enum Delegate {
             case switchToSignupButtonTapped
         }
@@ -54,11 +55,11 @@ struct SigninFeature {
                                 break
                             case let .failure(error):
                                 Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
-                                await send(.signinErrorTrigered(error))
+                                await send(.signinErrorTrigered(error.localizedDescription))
                         }
                     }
-                case let .signinErrorTrigered(error):
-                    state.error = error
+                case let .signinErrorTrigered(message):
+                    state.errorMessage = message
                     return .none
             }
         }
@@ -102,8 +103,8 @@ struct SigninView: View {
                         self.store.send(.signinButtonTapped)
                     }
                     .frame(height: 50)
-                    if let error = store.error {
-                        Text("\(error.localizedDescription)")
+                    if let errorMessage = store.errorMessage {
+                        Text(errorMessage)
                             .foregroundStyle(.red)
                             .font(.footnote)
                     }

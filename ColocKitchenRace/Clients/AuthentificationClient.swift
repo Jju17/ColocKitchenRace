@@ -13,9 +13,18 @@ import FirebaseFirestore
 import FirebaseMessaging
 import os
 
-enum AuthError: Error {
+enum AuthError: Error, LocalizedError, Equatable {
     case failed
     case failedWithError(String)
+
+    var errorDescription: String? {
+        switch self {
+        case .failed:
+            return "Authentication failed"
+        case .failedWithError(let message):
+            return message
+        }
+    }
 }
 
 @DependencyClient
@@ -122,6 +131,15 @@ extension AuthentificationClient: DependencyKey {
                 }
             }
         }
+    )
+
+    static let testValue = Self(
+        signUp: { _ in .success(.mockUser) },
+        signIn: { _, _ in .success(.mockUser) },
+        signOut: {},
+        deleteAccount: {},
+        updateUser: { _ in },
+        listenAuthState: { AsyncStream { $0.finish() } }
     )
 
     static var previewValue: AuthentificationClient {

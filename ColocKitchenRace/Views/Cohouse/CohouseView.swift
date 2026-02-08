@@ -12,7 +12,7 @@ import SwiftUI
 struct CohouseFeature {
 
     @ObservableState
-    struct State {
+    struct State: Equatable {
         //        case cohouse(CohouseDetailFeature.State)
         var noCohouse = NoCohouseFeature.State()
         @Shared(.cohouse) var cohouse

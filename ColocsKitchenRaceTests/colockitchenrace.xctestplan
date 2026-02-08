@@ -1,0 +1,38 @@
+{
+  "configurations" : [
+    {
+      "id" : "4EE8B044-9570-4077-8595-C1FB566B6A90",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "commandLineArgumentEntries" : [
+      {
+        "argument" : "-FIRDebugEnabled",
+        "enabled" : false
+      },
+      {
+        "argument" : "-FIRDebugDisabled"
+      }
+    ],
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:ColocsKitchenRace.xcodeproj",
+      "identifier" : "64F17B2E2AD2A3BC0047F6F3",
+      "name" : "ColocsKitchenRace"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:ColocsKitchenRace.xcodeproj",
+        "identifier" : "64F17B3E2AD2A3BE0047F6F3",
+        "name" : "ColocsKitchenRaceTests"
+      }
+    }
+  ],
+  "version" : 1
+}

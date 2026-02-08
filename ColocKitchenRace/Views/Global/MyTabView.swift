@@ -12,7 +12,7 @@ import SwiftUI
 struct TabFeature {
 
     @ObservableState
-    struct State {
+    struct State: Equatable {
         var selectedTab: Tab = .home
         var challenge = ChallengeFeature.State()
         var cohouse = CohouseFeature.State()
@@ -55,7 +55,7 @@ struct TabFeature {
     }
 }
 
-enum Tab {
+enum Tab: Equatable {
     case home, challenges, cohouse
 }
 

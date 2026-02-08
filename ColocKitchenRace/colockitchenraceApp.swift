@@ -16,8 +16,14 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
     @Dependency(\.notificationClient) var notificationClient
 
+    private var isTesting: Bool {
+        NSClassFromString("XCTestCase") != nil || ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+    }
+
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
+        guard !isTesting else { return true }
+
         FirebaseApp.configure()
 
         // Configure notification center
@@ -99,7 +105,12 @@ struct colockitchenraceApp: App {
 
     private var newsListenerTask: Task<Void, Never>?
 
+    private var isTesting: Bool {
+        NSClassFromString("XCTestCase") != nil || ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+    }
+
     init() {
+        guard !isTesting else { return }
         self.performFetchs()
         self.startNewsListener()
     }

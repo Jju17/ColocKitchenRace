@@ -18,7 +18,7 @@ struct NoCohouseFeature {
     }
 
     @ObservableState
-    struct State {
+    struct State: Equatable {
         @Shared(.userInfo) var userInfo
         @Presents var destination: Destination.State?
         var cohouseCode: String = ""
@@ -132,6 +132,8 @@ struct NoCohouseFeature {
     }
 
 }
+
+extension NoCohouseFeature.Destination.State: Equatable {}
 
 struct NoCohouseView: View {
     @Bindable var store: StoreOf<NoCohouseFeature>

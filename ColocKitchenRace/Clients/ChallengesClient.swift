@@ -38,6 +38,10 @@ extension ChallengesClient: DependencyKey {
         }
     )
 
+    static let testValue = Self(
+        getAll: { [] }
+    )
+
     static var previewValue: ChallengesClient {
         return .testValue
     }

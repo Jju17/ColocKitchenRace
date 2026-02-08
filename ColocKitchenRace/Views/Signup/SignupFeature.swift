@@ -13,10 +13,10 @@ import os
 struct SignupFeature {
     
     @ObservableState
-    struct State {
+    struct State: Equatable {
         var focusedField: SignupField?
         var signupUserData = SignupUser()
-        var error: Error?
+        var errorMessage: String?
     }
 
     enum Action: BindableAction {
@@ -25,8 +25,9 @@ struct SignupFeature {
         case signupButtonTapped
         case delegate(Delegate)
         case setFocusedField(SignupField?)
-        case signupErrorTrigered(Error)
+        case signupErrorTrigered(String)
 
+        @CasePathable
         enum Delegate {
             case switchToSigninButtonTapped
         }
@@ -48,7 +49,7 @@ struct SignupFeature {
                 state.focusedField = newFocus
                 return .none
             case .signupButtonTapped:
-                state.error = nil
+                state.errorMessage = nil
                 return .run { [signupUserData = state.signupUserData] send in
                     let userDataResult = try await self.authentificationClient.signUp(signupUserData)
                     switch userDataResult {
@@ -56,11 +57,11 @@ struct SignupFeature {
                         break
                     case let .failure(error):
                         Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
-                        await send(.signupErrorTrigered(error))
+                        await send(.signupErrorTrigered(error.localizedDescription))
                     }
                 }
-            case let .signupErrorTrigered(error):
-                state.error = error
+            case let .signupErrorTrigered(message):
+                state.errorMessage = message
                 return .none
             }
         }

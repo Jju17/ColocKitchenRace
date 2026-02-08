@@ -27,7 +27,7 @@ struct CohouseDetailFeature {
     }
 
     @ObservableState
-    struct State {
+    struct State: Equatable {
         @Shared var cohouse: Cohouse
         @Shared(.userInfo) var userInfo
         @Presents var destination: Destination.State?
@@ -107,6 +107,8 @@ struct CohouseDetailFeature {
         .ifLet(\.$destination, action: \.destination)
     }
 }
+
+extension CohouseDetailFeature.Destination.State: Equatable {}
 
 struct CohouseDetailView: View {
     @Bindable var store: StoreOf<CohouseDetailFeature>

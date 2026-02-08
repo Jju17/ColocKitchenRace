@@ -19,6 +19,16 @@ struct NotificationClient: Sendable {
 }
 
 extension NotificationClient: DependencyKey {
+    static let testValue = Self(
+        storeFCMToken: { _ in },
+        subscribeToAllUsers: {},
+        unsubscribeFromAllUsers: {}
+    )
+
+    static var previewValue: NotificationClient {
+        return .testValue
+    }
+
     static let liveValue = Self(
         storeFCMToken: { token in
             @Shared(.userInfo) var userInfo

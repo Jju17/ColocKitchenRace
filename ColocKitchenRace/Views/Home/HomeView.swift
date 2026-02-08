@@ -18,7 +18,7 @@ struct HomeFeature {
     }
 
     @ObservableState
-    struct State {
+    struct State: Equatable {
         var path = StackState<Path.State>()
         @Shared(.cohouse) var cohouse
         @Shared(.ckrGame) var ckrGame
@@ -55,6 +55,8 @@ struct HomeFeature {
         .forEach(\.path, action: \.path)
     }
 }
+
+extension HomeFeature.Path.State: Equatable {}
 
 struct HomeView: View {
     @Bindable var store: StoreOf<HomeFeature>

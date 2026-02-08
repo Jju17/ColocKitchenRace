@@ -12,7 +12,7 @@ import SwiftUI
 struct AppFeature {
     @ObservableState
     @CasePathable
-    enum State {
+    enum State: Equatable {
         case tab(TabFeature.State)
         case signin(SigninFeature.State)
         case signup(SignupFeature.State)

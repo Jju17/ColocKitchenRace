@@ -49,6 +49,10 @@ extension AddressValidatorClient: DependencyKey {
         }
     )
 
+    static let testValue = Self(
+        validate: { _ in .notFound }
+    )
+
     static var previewValue: AddressValidatorClient {
         .init(
             validate: { address in

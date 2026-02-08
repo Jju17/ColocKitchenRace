@@ -12,7 +12,7 @@ import SwiftUI
 struct CohouseSelectUserFeature {
 
     @ObservableState
-    struct State {
+    struct State: Equatable {
         var cohouse: Cohouse
         var selectedUser: CohouseUser
         var newUserName = ""

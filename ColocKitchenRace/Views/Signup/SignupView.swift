@@ -93,8 +93,8 @@ struct SignupView: View {
                         self.store.send(.signupButtonTapped)
                     }
                     .frame(height: 50)
-                    if let error = store.error {
-                        Text("\(error.localizedDescription)")
+                    if let errorMessage = store.errorMessage {
+                        Text(errorMessage)
                             .foregroundStyle(.red)
                             .font(.footnote)
                     }

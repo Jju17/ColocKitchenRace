@@ -10,7 +10,7 @@ import SwiftUI
 
 @Reducer
 struct SplashScreenFeature {
-    struct State {}
+    struct State: Equatable {}
     enum Action {
         case onAppear
     }

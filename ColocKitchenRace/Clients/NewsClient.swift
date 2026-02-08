@@ -21,6 +21,15 @@ enum NewsError: Error {
 }
 
 extension NewsClient: DependencyKey {
+    static let testValue = Self(
+        getLast: { .success([]) },
+        listenToNews: { .never }
+    )
+
+    static var previewValue: NewsClient {
+        return .testValue
+    }
+
     static let liveValue = Self(
         getLast: {
             do {

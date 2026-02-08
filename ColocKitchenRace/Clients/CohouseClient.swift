@@ -187,6 +187,15 @@ extension CohouseClient: DependencyKey {
         }
     )
 
+    static let testValue = Self(
+        add: { _ in },
+        get: { _ in .mock },
+        getByCode: { _ in .mock },
+        set: { _, _ in },
+        setUser: { _, _ in },
+        quitCohouse: {}
+    )
+
     static var previewValue: CohouseClient {
         return .testValue
     }

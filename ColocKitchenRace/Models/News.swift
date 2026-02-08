@@ -8,7 +8,7 @@
 import Foundation
 import FirebaseFirestore
 
-struct News: Codable, Identifiable {
+struct News: Codable, Identifiable, Equatable {
     var id: String
     var title: String
     var body: String

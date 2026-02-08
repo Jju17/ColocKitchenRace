@@ -104,6 +104,13 @@
 			);
 			target = 64F17B2E2AD2A3BC0047F6F3 /* ColocsKitchenRace */;
 		};
+		64BBCE972F38F55400EEB1FE /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				colockitchenrace.xctestplan,
+			);
+			target = 64F17B3E2AD2A3BE0047F6F3 /* ColocsKitchenRaceTests */;
+		};
 		64C87C212DEB401800EA27EB /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -122,6 +129,7 @@
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		6405CBC82D886B7400BE8B0D /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (6405CBCD2D886B7400BE8B0D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
+		64BBCE862F38F53600EEB1FE /* ColocsKitchenRaceTests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (64BBCE972F38F55400EEB1FE /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = ColocsKitchenRaceTests; sourceTree = "<group>"; };
 		64FBE0262D8860CC00D8A89F /* CKRAdmin */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (641196422DDF7CB50075A0C4 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 64C87C212DEB401800EA27EB /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = CKRAdmin; sourceTree = "<group>"; };
 		64FBE2FD2D88665300D8A89F /* ColocKitchenRace */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (64FBE3442D88665300D8A89F /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = ColocKitchenRace; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -196,6 +204,7 @@
 				64FBE0262D8860CC00D8A89F /* CKRAdmin */,
 				64F17B302AD2A3BC0047F6F3 /* Products */,
 				64AD9DDE2B9FB28400790A9F /* Frameworks */,
+				64BBCE862F38F53600EEB1FE /* ColocsKitchenRaceTests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -261,6 +270,9 @@
 			);
 			dependencies = (
 				64F17B412AD2A3BE0047F6F3 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				64BBCE862F38F53600EEB1FE /* ColocsKitchenRaceTests */,
 			);
 			name = ColocsKitchenRaceTests;
 			productName = colockitchenraceTests;
@@ -696,7 +708,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = GWMAWQWUTU;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.julienrahier.colockitchenraceTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -715,7 +727,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = GWMAWQWUTU;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.julienrahier.colockitchenraceTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -731,8 +743,9 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GWMAWQWUTU;
+				DEVELOPMENT_TEAM = YXXNH92P5F;
 				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.julienrahier.colockitchenraceUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -748,8 +761,9 @@
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = GWMAWQWUTU;
+				DEVELOPMENT_TEAM = YXXNH92P5F;
 				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.julienrahier.colockitchenraceUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";

@@ -18,7 +18,7 @@ struct UserProfileDetailFeature {
     }
 
     @ObservableState
-    struct State {
+    struct State: Equatable {
         @Presents var destination: Destination.State?
         @Shared(.userInfo) var userInfo
     }
@@ -65,6 +65,8 @@ struct UserProfileDetailFeature {
         .ifLet(\.$destination, action: \.destination)
     }
 }
+
+extension UserProfileDetailFeature.Destination.State: Equatable {}
 
 struct UserProfileDetailView: View {
     @Bindable var store: StoreOf<UserProfileDetailFeature>
