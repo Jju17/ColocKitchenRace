@@ -6,50 +6,55 @@
 //
 
 import ComposableArchitecture
-import Dependencies
 import DependenciesMacros
 import FirebaseAuth
 import FirebaseFirestore
 import os
+
+// MARK: - Error
 
 enum AuthError: Error {
     case failed
     case failedWithError(String)
 }
 
+// MARK: - Client Interface
+
 @DependencyClient
 struct AuthentificationClient {
-    var signIn: @Sendable (_ email: String, _ password: String) async throws -> Result<User, AuthError>
+    var signIn: @Sendable (_ email: String, _ password: String) async throws -> User
     var signOut: () async throws -> Void
-    var listenAuthState: @Sendable () throws -> AsyncStream<FirebaseAuth.User?>
+    var listenAuthState: @Sendable () -> AsyncStream<FirebaseAuth.User?> = { .never }
 }
 
+// MARK: - Implementations
+
 extension AuthentificationClient: DependencyKey {
+
+    // MARK: Live
+
     static let liveValue = Self(
         signIn: { email, password in
-            do {
-                let authDataResult = try await Auth.auth().signIn(withEmail: email, password: password)
-                let querySnapshot = try await Firestore.firestore()
-                                                        .collection("users")
-                                                        .whereField("authId", isEqualTo: authDataResult.user.uid)
-                                                        .getDocuments()
+            let authResult = try await Auth.auth().signIn(withEmail: email, password: password)
 
-                guard let loggedUser = try querySnapshot.documents.first?.data(as: User.self)
-                else { return .failure(.failed)}
+            let snapshot = try await Firestore.firestore()
+                .collection("users")
+                .whereField("authId", isEqualTo: authResult.user.uid)
+                .getDocuments()
 
-                return .success(loggedUser)
-            } catch {
-                Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
-                return .failure(.failedWithError(error.localizedDescription))
+            guard let loggedUser = try snapshot.documents.first?.data(as: User.self) else {
+                throw AuthError.failed
             }
+
+            return loggedUser
         },
         signOut: {
             try Auth.auth().signOut()
         },
         listenAuthState: {
-            return AsyncStream { continuation in
+            AsyncStream { continuation in
                 DispatchQueue.main.async {
-                    let _ = Auth.auth().addStateDidChangeListener { (auth, user) in
+                    let _ = Auth.auth().addStateDidChangeListener { _, user in
                         continuation.yield(user)
                     }
                 }
@@ -57,10 +62,12 @@ extension AuthentificationClient: DependencyKey {
         }
     )
 
-    static var previewValue: AuthentificationClient {
-        return .testValue
-    }
+    // MARK: Preview
+
+    static let previewValue: AuthentificationClient = .testValue
 }
+
+// MARK: - Registration
 
 extension DependencyValues {
     var authentificationClient: AuthentificationClient {

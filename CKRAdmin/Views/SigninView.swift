@@ -38,14 +38,10 @@ struct SigninFeature {
                 return .none
             case .signinButtonTapped:
                 return .run { [state] send in
-                    let userDataResult = try await self.authentificationClient.signIn(email: state.email, password: state.password)
-                    switch userDataResult {
-                    case .success:
-                        break
-                    case let .failure(error):
-                        Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
-                        await send(.signinErrorTrigered(error))
-                    }
+                    _ = try await self.authentificationClient.signIn(email: state.email, password: state.password)
+                } catch: { error, send in
+                    Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
+                    await send(.signinErrorTrigered(error))
                 }
             case let .signinErrorTrigered(error):
                 state.error = error

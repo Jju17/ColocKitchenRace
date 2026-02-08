@@ -21,13 +21,11 @@ struct SignupFeatureTests {
         let store = TestStore(initialState: SignupFeature.State()) {
             SignupFeature()
         } withDependencies: {
-            $0.authentificationClient.signUp = { _ in
-                .success(User.mockUser)
-            }
+            $0.authentificationClient.signUp = { _ in .mockUser }
         }
 
         await store.send(.signupButtonTapped)
-        // BUG: On success, the reducer just `break`s.
+        // BUG: On success, the reducer just completes silently.
         // The user sees no confirmation, no navigation.
         // The auth state listener in AppFeature should eventually transition,
         // but there's a race condition: if Firebase hasn't propagated the auth state
@@ -42,7 +40,7 @@ struct SignupFeatureTests {
             SignupFeature()
         } withDependencies: {
             $0.authentificationClient.signUp = { _ in
-                .failure(NSError(domain: "auth", code: 1, userInfo: [NSLocalizedDescriptionKey: "Email already in use"]))
+                throw NSError(domain: "auth", code: 1, userInfo: [NSLocalizedDescriptionKey: "Email already in use"])
             }
         }
 
@@ -93,7 +91,7 @@ struct SignupFeatureTests {
         } withDependencies: {
             $0.authentificationClient.signUp = { _ in
                 signupCalled = true
-                return .failure(NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Empty fields"]))
+                throw NSError(domain: "", code: 0, userInfo: [NSLocalizedDescriptionKey: "Empty fields"])
             }
         }
 

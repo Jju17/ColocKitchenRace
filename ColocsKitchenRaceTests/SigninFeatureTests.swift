@@ -20,13 +20,10 @@ struct SigninFeatureTests {
         let store = TestStore(initialState: SigninFeature.State(email: "test@test.com", password: "password123")) {
             SigninFeature()
         } withDependencies: {
-            $0.authentificationClient.signIn = { _, _ in
-                .success(User.mockUser)
-            }
+            $0.authentificationClient.signIn = { _, _ in .mockUser }
         }
 
         await store.send(.signinButtonTapped)
-        // On success, no further action is sent (break in success case)
     }
 
     // MARK: - Failed Sign In
@@ -37,7 +34,7 @@ struct SigninFeatureTests {
             SigninFeature()
         } withDependencies: {
             $0.authentificationClient.signIn = { _, _ in
-                .failure(.failedWithError("Invalid credentials"))
+                throw AuthError.failedWithError("Invalid credentials")
             }
         }
 
@@ -87,7 +84,7 @@ struct SigninFeatureTests {
         } withDependencies: {
             $0.authentificationClient.signIn = { _, _ in
                 signinCalled = true
-                return .failure(.failedWithError("Empty fields"))
+                throw AuthError.failedWithError("Empty fields")
             }
         }
 

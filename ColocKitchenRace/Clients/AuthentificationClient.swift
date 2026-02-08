@@ -31,12 +31,12 @@ enum AuthError: Error, LocalizedError, Equatable {
 
 @DependencyClient
 struct AuthentificationClient {
-    var signUp: @Sendable (_ signupUserData: SignupUser) async throws -> Result<User, Error>
-    var signIn: @Sendable (_ email: String, _ password: String) async throws -> Result<User, AuthError>
+    var signUp: @Sendable (_ signupUserData: SignupUser) async throws -> User
+    var signIn: @Sendable (_ email: String, _ password: String) async throws -> User
     var signOut: () async throws -> Void
     var deleteAccount: () -> Void
     var updateUser: (_ user: User) async throws -> Void
-    var listenAuthState: @Sendable () throws -> AsyncStream<FirebaseAuth.User?>
+    var listenAuthState: @Sendable () -> AsyncStream<FirebaseAuth.User?> = { .never }
 }
 
 // MARK: - Implementations
@@ -47,64 +47,54 @@ extension AuthentificationClient: DependencyKey {
 
     static let liveValue = Self(
         signUp: { signupUserData in
-            do {
-                @Shared(.userInfo) var userInfo
+            @Shared(.userInfo) var userInfo
 
-                let authResult = try await Auth.auth().createUser(
-                    withEmail: signupUserData.email,
-                    password: signupUserData.password
-                )
-                try await authResult.user.sendEmailVerification()
+            let authResult = try await Auth.auth().createUser(
+                withEmail: signupUserData.email,
+                password: signupUserData.password
+            )
+            try await authResult.user.sendEmailVerification()
 
-                let newUser = signupUserData.createUser(authId: authResult.user.uid)
+            let newUser = signupUserData.createUser(authId: authResult.user.uid)
 
-                try Firestore.firestore()
-                    .collection("users")
-                    .document(newUser.id.uuidString)
-                    .setData(from: newUser)
+            try Firestore.firestore()
+                .collection("users")
+                .document(newUser.id.uuidString)
+                .setData(from: newUser)
 
-                try? await Messaging.messaging().subscribe(toTopic: "all_users")
+            try? await Messaging.messaging().subscribe(toTopic: "all_users")
 
-                $userInfo.withLock { $0 = newUser }
-                return .success(newUser)
-            } catch {
-                Logger.authLog.log(level: .fault, "Sign up failed: \(error.localizedDescription)")
-                return .failure(error)
-            }
+            $userInfo.withLock { $0 = newUser }
+            return newUser
         },
         signIn: { email, password in
-            do {
-                @Shared(.userInfo) var userInfo
-                @Shared(.cohouse) var cohouse
+            @Shared(.userInfo) var userInfo
+            @Shared(.cohouse) var cohouse
 
-                let db = Firestore.firestore()
-                let authResult = try await Auth.auth().signIn(withEmail: email, password: password)
+            let db = Firestore.firestore()
+            let authResult = try await Auth.auth().signIn(withEmail: email, password: password)
 
-                let snapshot = try await db
-                    .collection("users")
-                    .whereField("authId", isEqualTo: authResult.user.uid)
-                    .getDocuments()
+            let snapshot = try await db
+                .collection("users")
+                .whereField("authId", isEqualTo: authResult.user.uid)
+                .getDocuments()
 
-                guard let loggedUser = try snapshot.documents.first?.data(as: User.self) else {
-                    return .failure(.failed)
-                }
-
-                try? await Messaging.messaging().subscribe(toTopic: "all_users")
-                $userInfo.withLock { $0 = loggedUser }
-
-                // Auto-load user's cohouse if they have one
-                if let cohouseId = loggedUser.cohouseId {
-                    let cohouseRef = db.collection("cohouses").document(cohouseId)
-                    if let loaded = try? await FirestoreHelpers.fetchCohouseWithUsers(from: cohouseRef) {
-                        $cohouse.withLock { $0 = loaded }
-                    }
-                }
-
-                return .success(loggedUser)
-            } catch {
-                Logger.authLog.log(level: .fault, "Sign in failed: \(error.localizedDescription)")
-                return .failure(.failedWithError(error.localizedDescription))
+            guard let loggedUser = try snapshot.documents.first?.data(as: User.self) else {
+                throw AuthError.failed
             }
+
+            try? await Messaging.messaging().subscribe(toTopic: "all_users")
+            $userInfo.withLock { $0 = loggedUser }
+
+            // Auto-load user's cohouse if they have one
+            if let cohouseId = loggedUser.cohouseId {
+                let cohouseRef = db.collection("cohouses").document(cohouseId)
+                if let loaded = try? await FirestoreHelpers.fetchCohouseWithUsers(from: cohouseRef) {
+                    $cohouse.withLock { $0 = loaded }
+                }
+            }
+
+            return loggedUser
         },
         signOut: {
             try? await Messaging.messaging().unsubscribe(fromTopic: "all_users")
@@ -148,8 +138,8 @@ extension AuthentificationClient: DependencyKey {
     // MARK: Test
 
     static let testValue = Self(
-        signUp: { _ in .success(.mockUser) },
-        signIn: { _, _ in .success(.mockUser) },
+        signUp: { _ in .mockUser },
+        signIn: { _, _ in .mockUser },
         signOut: {},
         deleteAccount: {},
         updateUser: { _ in },

@@ -48,15 +48,11 @@ struct SigninFeature {
                 case .delegate:
                     return .none
                 case .signinButtonTapped:
-                    return .run { [state = state] send in
-                        let userDataResult = try await self.authentificationClient.signIn(email: state.email, password: state.password)
-                        switch userDataResult {
-                            case .success:
-                                break
-                            case let .failure(error):
-                                Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
-                                await send(.signinErrorTrigered(error.localizedDescription))
-                        }
+                    return .run { [state] send in
+                        _ = try await self.authentificationClient.signIn(email: state.email, password: state.password)
+                    } catch: { error, send in
+                        Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
+                        await send(.signinErrorTrigered(error.localizedDescription))
                     }
                 case let .signinErrorTrigered(message):
                     state.errorMessage = message

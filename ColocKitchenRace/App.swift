@@ -36,7 +36,7 @@ struct AppFeature {
             switch action {
             case .onTask:
                 return .run { send in
-                    for await user in try self.authentificationClient.listenAuthState() {
+                    for await user in self.authentificationClient.listenAuthState() {
                         await send(.newAuthStateTrigger(user))
                     }
                 }

@@ -51,14 +51,10 @@ struct SignupFeature {
             case .signupButtonTapped:
                 state.errorMessage = nil
                 return .run { [signupUserData = state.signupUserData] send in
-                    let userDataResult = try await self.authentificationClient.signUp(signupUserData)
-                    switch userDataResult {
-                    case .success:
-                        break
-                    case let .failure(error):
-                        Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
-                        await send(.signupErrorTrigered(error.localizedDescription))
-                    }
+                    _ = try await self.authentificationClient.signUp(signupUserData)
+                } catch: { error, send in
+                    Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
+                    await send(.signupErrorTrigered(error.localizedDescription))
                 }
             case let .signupErrorTrigered(message):
                 state.errorMessage = message
