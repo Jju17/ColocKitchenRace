@@ -7,6 +7,7 @@
 
 import ComposableArchitecture
 import FirebaseFirestore
+import FirebaseFunctions
 
 // MARK: - Error
 
@@ -18,11 +19,20 @@ enum CohouseClientError: Error {
     case cohouseNotFound
 }
 
+// MARK: - Duplicate Check Result
+
+enum CohouseDuplicateResult: Equatable {
+    case noDuplicate
+    case duplicateName
+    case duplicateAddress
+}
+
 // MARK: - Client Interface
 
 @DependencyClient
 struct CohouseClient {
     var add: @Sendable (_ newCohouse: Cohouse) async throws -> Void
+    var checkDuplicate: @Sendable (_ name: String, _ address: PostalAddress) async throws -> CohouseDuplicateResult
     var get: @Sendable (_ id: String) async throws -> Cohouse
     var getByCode: @Sendable (_ code: String) async throws -> Cohouse
     var set: @Sendable (_ id: String, _ newCohouse: Cohouse) async throws -> Void
@@ -60,6 +70,31 @@ extension CohouseClient: DependencyKey {
             } catch {
                 throw CohouseClientError.failedWithError(error.localizedDescription)
             }
+        },
+        checkDuplicate: { name, address in
+            let functions = Functions.functions(region: "europe-west1")
+            let callable = functions.httpsCallable("checkDuplicateCohouse")
+
+            let data: [String: Any] = [
+                "name": name,
+                "street": address.street,
+                "city": address.city,
+            ]
+
+            let result = try await callable.call(data)
+
+            guard let dict = result.data as? [String: Any],
+                  let isDuplicate = dict["isDuplicate"] as? Bool
+            else {
+                throw CohouseClientError.failed
+            }
+
+            if isDuplicate {
+                let reason = dict["reason"] as? String
+                return reason == "name" ? .duplicateName : .duplicateAddress
+            }
+
+            return .noDuplicate
         },
         get: { id in
             @Shared(.cohouse) var currentCohouse
@@ -187,6 +222,7 @@ extension CohouseClient: DependencyKey {
 
     static let testValue = Self(
         add: { _ in },
+        checkDuplicate: { _, _ in .noDuplicate },
         get: { _ in .mock },
         getByCode: { _ in .mock },
         set: { _, _ in },

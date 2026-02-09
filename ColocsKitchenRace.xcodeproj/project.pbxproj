@@ -28,6 +28,7 @@
 		6478D6BD2F2E2C7500DE69CF /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 6478D6BC2F2E2C7500DE69CF /* FirebaseMessaging */; };
 		64884E552AE43CF40075BB39 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		64A1A5DD2F2E54B800D357E9 /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = 64A1A5DC2F2E54B800D357E9 /* FirebaseFunctions */; };
+		64A1A5DF2F2E54B900D357E9 /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = 64A1A5DE2F2E54B900D357E9 /* FirebaseFunctions */; };
 		64B66EC62B5D50DB00B8F30B /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 64B66EC52B5D50DB00B8F30B /* ComposableArchitecture */; };
 		64C87C242DEB4D7F00EA27EB /* MijickPopups in Frameworks */ = {isa = PBXBuildFile; productRef = 64C87C232DEB4D7F00EA27EB /* MijickPopups */; };
 		64FBE3762D88682D00D8A89F /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 64FBE3752D88682D00D8A89F /* ComposableArchitecture */; };
@@ -148,6 +149,7 @@
 				64FE3CE72B8D58B800E6AAAE /* Dependencies in Frameworks */,
 				644F08FE2E9957DF00A9B256 /* FirebaseStorage in Frameworks */,
 				6478D6BD2F2E2C7500DE69CF /* FirebaseMessaging in Frameworks */,
+				64A1A5DF2F2E54B900D357E9 /* FirebaseFunctions in Frameworks */,
 				644F08F82E9957DF00A9B256 /* FirebaseCore in Frameworks */,
 				64C87C242DEB4D7F00EA27EB /* MijickPopups in Frameworks */,
 				644F08F22E9957DF00A9B256 /* FirebaseAnalyticsCore in Frameworks */,
@@ -253,6 +255,7 @@
 				644F08FB2E9957DF00A9B256 /* FirebaseFirestore */,
 				644F08FD2E9957DF00A9B256 /* FirebaseStorage */,
 				6478D6BC2F2E2C7500DE69CF /* FirebaseMessaging */,
+				64A1A5DE2F2E54B900D357E9 /* FirebaseFunctions */,
 			);
 			productName = colockitchenrace;
 			productReference = 64F17B2F2AD2A3BC0047F6F3 /* ColocsKitchenRace.app */;
@@ -1033,6 +1036,11 @@
 			productName = FirebaseMessaging;
 		};
 		64A1A5DC2F2E54B800D357E9 /* FirebaseFunctions */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 644F08EE2E9957DE00A9B256 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFunctions;
+		};
+		64A1A5DE2F2E54B900D357E9 /* FirebaseFunctions */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 644F08EE2E9957DE00A9B256 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFunctions;

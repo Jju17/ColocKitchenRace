@@ -23,9 +23,9 @@
 // [-] - Leaderboard
 
 // Cohouse
-// [-] - Check for duplicate cohouse before creating one
-// [-] - Check validity of addresses when creating a cohouse
-// [-] - Enter an ID card when creating a cohouse
+// [/] - Check for duplicate cohouse before creating one
+// [/] - Check validity of addresses when creating a cohouse
+// [/] - Enter an ID card when creating a cohouse
 
 // -------------------------------------------------------------------------------------
 // TODO for CKRAdmin

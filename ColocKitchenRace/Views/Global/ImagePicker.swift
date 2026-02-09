@@ -9,7 +9,16 @@ import SwiftUI
 
 struct ImagePicker: UIViewControllerRepresentable {
   let selected: (UIImage) -> Void
+  let cancelled: () -> Void
   let source: UIImagePickerController.SourceType
+
+  init(selected: @escaping (UIImage) -> Void,
+       cancelled: @escaping () -> Void = {},
+       source: UIImagePickerController.SourceType) {
+    self.selected = selected
+    self.cancelled = cancelled
+    self.source = source
+  }
 
   func makeUIViewController(context: Context) -> UIImagePickerController {
     let picker = UIImagePickerController()
@@ -31,12 +40,13 @@ struct ImagePicker: UIViewControllerRepresentable {
                                didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
       if let image = (info[.originalImage] ?? info[.editedImage]) as? UIImage {
         parent.selected(image)
+      } else {
+        parent.cancelled()
       }
-      picker.dismiss(animated: true)
     }
 
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
-      picker.dismiss(animated: true)
+      parent.cancelled()
     }
   }
 }

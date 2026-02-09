@@ -25,7 +25,9 @@ extension Cohouse {
         FirestoreCohouse(
             id: self.id,
             name: self.name,
+            nameLower: self.name.trimmingCharacters(in: .whitespaces).lowercased(),
             address: self.address,
+            addressLower: self.address.lowercased,
             code: self.code
         )
     }

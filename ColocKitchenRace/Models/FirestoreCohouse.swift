@@ -11,7 +11,9 @@ import Foundation
 struct FirestoreCohouse: Equatable, Hashable, Codable {
     var id: UUID
     var name: String
+    var nameLower: String?
     var address: PostalAddress
+    var addressLower: PostalAddress?
     var code: String
 }
 
@@ -32,7 +34,9 @@ extension FirestoreCohouse {
         return FirestoreCohouse(
             id: UUID(),
             name: "Zone 88",
+            nameLower: "zone 88",
             address: .mock,
+            addressLower: PostalAddress.mock.lowercased,
             code: "1234"
         )
     }

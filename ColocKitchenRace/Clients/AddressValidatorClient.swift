@@ -6,7 +6,7 @@
 //
 
 import ComposableArchitecture
-import CoreLocation
+import FirebaseFunctions
 
 // MARK: - Result Type
 
@@ -32,19 +32,62 @@ extension AddressValidatorClient: DependencyKey {
 
     static let liveValue = Self(
         validate: { address in
-            // 1. Offline syntax check
-            let syntaxValidator = AddressSyntaxValidator()
-            guard syntaxValidator.isValid(address) else {
+            // Quick offline syntax check
+            let trimmedStreet = address.street.trimmingCharacters(in: .whitespacesAndNewlines)
+            let trimmedCity = address.city.trimmingCharacters(in: .whitespacesAndNewlines)
+
+            guard trimmedStreet.count >= 5, trimmedCity.count >= 2 else {
                 return .invalidSyntax
             }
 
-            // 2. Geocoder validation
-            let geocoderValidator = AddressGeocoderValidator()
+            // Call the validateAddress Cloud Function (Nominatim / OpenStreetMap)
+            let functions = Functions.functions(region: "europe-west1")
+            let callable = functions.httpsCallable("validateAddress")
+
+            let data: [String: Any] = [
+                "street": address.street,
+                "city": address.city,
+                "postalCode": address.postalCode,
+                "country": address.country,
+            ]
 
             do {
-                guard let validated = try await geocoderValidator.validate(address: address) else {
+                let result = try await callable.call(data)
+
+                guard let dict = result.data as? [String: Any],
+                      let isValid = dict["isValid"] as? Bool
+                else {
                     return .notFound
                 }
+
+                guard isValid else {
+                    return .notFound
+                }
+
+                let normalizedStreet = dict["normalizedStreet"] as? String
+                let normalizedCity = dict["normalizedCity"] as? String
+                let normalizedPostalCode = dict["normalizedPostalCode"] as? String
+                let normalizedCountry = dict["normalizedCountry"] as? String
+                let latitude = dict["latitude"] as? Double
+                let longitude = dict["longitude"] as? Double
+
+                let validated = ValidatedAddress(
+                    input: address,
+                    normalizedStreet: normalizedStreet,
+                    normalizedCity: normalizedCity,
+                    normalizedPostalCode: normalizedPostalCode,
+                    normalizedCountry: normalizedCountry,
+                    latitude: latitude,
+                    longitude: longitude,
+                    confidence: computeConfidence(
+                        input: address,
+                        normalizedStreet: normalizedStreet,
+                        normalizedCity: normalizedCity,
+                        normalizedPostalCode: normalizedPostalCode,
+                        normalizedCountry: normalizedCountry
+                    )
+                )
+
                 return validated.confidence >= 0.8
                     ? .valid(validated)
                     : .lowConfidence(validated)
@@ -76,6 +119,47 @@ extension AddressValidatorClient: DependencyKey {
             ))
         }
     )
+
+    // MARK: - Private Helpers
+
+    private static func normalize(_ string: String) -> String {
+        string
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .folding(options: .diacriticInsensitive, locale: .current)
+            .lowercased()
+    }
+
+    private static func computeConfidence(
+        input: PostalAddress,
+        normalizedStreet: String?,
+        normalizedCity: String?,
+        normalizedPostalCode: String?,
+        normalizedCountry: String?
+    ) -> Double {
+        var score = 0.0
+
+        if let pCountry = normalizedCountry,
+           normalize(input.country) == normalize(pCountry) {
+            score += 0.2
+        }
+
+        if let pPostal = normalizedPostalCode,
+           normalize(input.postalCode) == normalize(pPostal) {
+            score += 0.4
+        }
+
+        if let pCity = normalizedCity,
+           normalize(input.city) == normalize(pCity) {
+            score += 0.2
+        }
+
+        if let pStreet = normalizedStreet,
+           normalize(input.street) == normalize(pStreet) {
+            score += 0.2
+        }
+
+        return min(score, 1.0)
+    }
 }
 
 // MARK: - Registration

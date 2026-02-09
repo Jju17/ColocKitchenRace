@@ -15,6 +15,16 @@ struct PostalAddress: Equatable, Hashable, Codable {
 }
 
 extension PostalAddress {
+    /// Returns a copy with all fields trimmed and lowercased (for case-insensitive Firestore queries).
+    var lowercased: PostalAddress {
+        PostalAddress(
+            street: street.trimmingCharacters(in: .whitespaces).lowercased(),
+            city: city.trimmingCharacters(in: .whitespaces).lowercased(),
+            postalCode: postalCode.trimmingCharacters(in: .whitespaces).lowercased(),
+            country: country.trimmingCharacters(in: .whitespaces).lowercased()
+        )
+    }
+
     static var mock: PostalAddress {
         PostalAddress(street: "88 Avenue des Eperviers", city: "Brussels", postalCode: "1150", country: "Belgique")
     }

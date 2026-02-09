@@ -69,19 +69,44 @@ struct NoCohouseFeatureTests {
             users: [owner]
         )
 
+        let validatedAddress = ValidatedAddress(
+            input: PostalAddress.mock,
+            normalizedStreet: "88 Avenue des Eperviers",
+            normalizedCity: "Brussels",
+            normalizedPostalCode: "1150",
+            normalizedCountry: "Belgique",
+            latitude: 50.85,
+            longitude: 4.35,
+            confidence: 0.95
+        )
+
+        let idCardData = Data([0x01, 0x02, 0x03])
+
         let store = TestStore(
             initialState: NoCohouseFeature.State(
-                destination: .create(CohouseFormFeature.State(wipCohouse: wipCohouse, isNewCohouse: true))
+                destination: .create(CohouseFormFeature.State(
+                    wipCohouse: wipCohouse,
+                    isNewCohouse: true,
+                    addressValidationResult: .valid(validatedAddress),
+                    idCardImageData: idCardData
+                ))
             )
         ) {
             NoCohouseFeature()
         } withDependencies: {
+            $0.cohouseClient.checkDuplicate = { _, _ in .noDuplicate }
             $0.cohouseClient.add = { cohouse in
                 addedCohouse = cohouse
             }
+            $0.storageClient.uploadImage = { _, _ in "https://example.com/id_card.jpg" }
         }
 
         await store.send(.confirmCreateCohouseButtonTapped) {
+            $0.isCreating = true
+        }
+
+        await store.receive(\.creationCompleted) {
+            $0.isCreating = false
             $0.destination = nil
         }
 
@@ -89,7 +114,57 @@ struct NoCohouseFeatureTests {
         #expect(addedCohouse?.name == "Test Coloc")
     }
 
-    @Test("confirmCreateCohouseButtonTapped does nothing with empty users")
+    @Test("confirmCreateCohouseButtonTapped fails when duplicate name")
+    func confirmCreateCohouse_duplicateName() async {
+        let owner = User.mockUser.toCohouseUser(isAdmin: true)
+        let wipCohouse = Cohouse(
+            id: UUID(),
+            name: "Existing Coloc",
+            address: .mock,
+            code: "ABC123",
+            users: [owner]
+        )
+
+        let validatedAddress = ValidatedAddress(
+            input: PostalAddress.mock,
+            normalizedStreet: nil, normalizedCity: nil, normalizedPostalCode: nil, normalizedCountry: nil,
+            latitude: nil, longitude: nil, confidence: 0.95
+        )
+
+        let idCardData = Data([0x01])
+
+        let store = TestStore(
+            initialState: NoCohouseFeature.State(
+                destination: .create(CohouseFormFeature.State(
+                    wipCohouse: wipCohouse,
+                    isNewCohouse: true,
+                    addressValidationResult: .valid(validatedAddress),
+                    idCardImageData: idCardData
+                ))
+            )
+        ) {
+            NoCohouseFeature()
+        } withDependencies: {
+            $0.cohouseClient.checkDuplicate = { _, _ in .duplicateName }
+        }
+
+        await store.send(.confirmCreateCohouseButtonTapped) {
+            $0.isCreating = true
+        }
+
+        await store.receive(\.creationFailed) {
+            $0.isCreating = false
+            $0.destination = .create(CohouseFormFeature.State(
+                wipCohouse: wipCohouse,
+                isNewCohouse: true,
+                addressValidationResult: .valid(validatedAddress),
+                creationError: "A cohouse with this name already exists.",
+                idCardImageData: idCardData
+            ))
+        }
+    }
+
+    @Test("confirmCreateCohouseButtonTapped sets error with empty users")
     func confirmCreateCohouse_emptyUsers() async {
         let wipCohouse = Cohouse(id: UUID(), name: "Empty", code: "123456", users: [])
 
@@ -101,10 +176,16 @@ struct NoCohouseFeatureTests {
             NoCohouseFeature()
         }
 
-        await store.send(.confirmCreateCohouseButtonTapped)
+        await store.send(.confirmCreateCohouseButtonTapped) {
+            $0.destination = .create(CohouseFormFeature.State(
+                wipCohouse: wipCohouse,
+                isNewCohouse: true,
+                creationError: "Please fill in all member names."
+            ))
+        }
     }
 
-    @Test("confirmCreateCohouseButtonTapped does nothing with empty surname user")
+    @Test("confirmCreateCohouseButtonTapped sets error with empty surname user")
     func confirmCreateCohouse_emptySurname() async {
         let emptyNameUser = CohouseUser(id: UUID(), isAdmin: true, surname: "")
         let wipCohouse = Cohouse(id: UUID(), name: "Test", code: "123456", users: [emptyNameUser])
@@ -117,10 +198,16 @@ struct NoCohouseFeatureTests {
             NoCohouseFeature()
         }
 
-        await store.send(.confirmCreateCohouseButtonTapped)
+        await store.send(.confirmCreateCohouseButtonTapped) {
+            $0.destination = .create(CohouseFormFeature.State(
+                wipCohouse: wipCohouse,
+                isNewCohouse: true,
+                creationError: "Please fill in all member names."
+            ))
+        }
     }
 
-    @Test("confirmCreateCohouseButtonTapped does nothing without admin")
+    @Test("confirmCreateCohouseButtonTapped sets error without admin")
     func confirmCreateCohouse_noAdmin() async {
         let nonAdminUser = CohouseUser(id: UUID(), isAdmin: false, surname: "Julien")
         let wipCohouse = Cohouse(id: UUID(), name: "Test", code: "123456", users: [nonAdminUser])
@@ -133,7 +220,85 @@ struct NoCohouseFeatureTests {
             NoCohouseFeature()
         }
 
-        await store.send(.confirmCreateCohouseButtonTapped)
+        await store.send(.confirmCreateCohouseButtonTapped) {
+            $0.destination = .create(CohouseFormFeature.State(
+                wipCohouse: wipCohouse,
+                isNewCohouse: true,
+                creationError: "Please fill in all member names."
+            ))
+        }
+    }
+
+    @Test("confirmCreateCohouseButtonTapped requires address validation")
+    func confirmCreateCohouse_noAddressValidation() async {
+        let owner = User.mockUser.toCohouseUser(isAdmin: true)
+        let wipCohouse = Cohouse(
+            id: UUID(),
+            name: "Test Coloc",
+            address: .mock,
+            code: "ABC123",
+            users: [owner]
+        )
+
+        let store = TestStore(
+            initialState: NoCohouseFeature.State(
+                destination: .create(CohouseFormFeature.State(
+                    wipCohouse: wipCohouse,
+                    isNewCohouse: true,
+                    addressValidationResult: nil
+                ))
+            )
+        ) {
+            NoCohouseFeature()
+        }
+
+        await store.send(.confirmCreateCohouseButtonTapped) {
+            $0.destination = .create(CohouseFormFeature.State(
+                wipCohouse: wipCohouse,
+                isNewCohouse: true,
+                creationError: "Please validate your address before creating the cohouse."
+            ))
+        }
+    }
+
+    @Test("confirmCreateCohouseButtonTapped requires ID card photo")
+    func confirmCreateCohouse_noIdCard() async {
+        let owner = User.mockUser.toCohouseUser(isAdmin: true)
+        let wipCohouse = Cohouse(
+            id: UUID(),
+            name: "Test Coloc",
+            address: .mock,
+            code: "ABC123",
+            users: [owner]
+        )
+
+        let validatedAddress = ValidatedAddress(
+            input: PostalAddress.mock,
+            normalizedStreet: nil, normalizedCity: nil, normalizedPostalCode: nil, normalizedCountry: nil,
+            latitude: nil, longitude: nil, confidence: 0.95
+        )
+
+        let store = TestStore(
+            initialState: NoCohouseFeature.State(
+                destination: .create(CohouseFormFeature.State(
+                    wipCohouse: wipCohouse,
+                    isNewCohouse: true,
+                    addressValidationResult: .valid(validatedAddress),
+                    idCardImageData: nil
+                ))
+            )
+        ) {
+            NoCohouseFeature()
+        }
+
+        await store.send(.confirmCreateCohouseButtonTapped) {
+            $0.destination = .create(CohouseFormFeature.State(
+                wipCohouse: wipCohouse,
+                isNewCohouse: true,
+                addressValidationResult: .valid(validatedAddress),
+                creationError: "Please take a photo of your ID card."
+            ))
+        }
     }
 
     // MARK: - Join Cohouse Flow

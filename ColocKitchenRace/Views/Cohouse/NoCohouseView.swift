@@ -24,6 +24,7 @@ struct NoCohouseFeature {
         @Presents var destination: Destination.State?
         var cohouseCode: String = ""
         var errorMessage: String?
+        var isCreating: Bool = false
     }
 
     enum Action: BindableAction {
@@ -31,6 +32,8 @@ struct NoCohouseFeature {
         case confirmCreateCohouseButtonTapped
         case confirmJoinCohouseButtonTapped
         case createCohouseButtonTapped
+        case creationCompleted
+        case creationFailed(String)
         case destination(PresentationAction<Destination.Action>)
         case dismissDestinationButtonTapped
         case findExistingCohouseButtonTapped
@@ -39,6 +42,7 @@ struct NoCohouseFeature {
     }
 
     @Dependency(\.cohouseClient) var cohouseClient
+    @Dependency(\.storageClient) var storageClient
     @Dependency(\.uuid) var uuid
 
     var body: some ReducerOf<Self> {
@@ -48,25 +52,89 @@ struct NoCohouseFeature {
                 case .binding:
                     return .none
                 case .confirmCreateCohouseButtonTapped:
-                    guard case let .some(.create(cohouseFormFeature)) = state.destination
+                    guard case var .create(formState) = state.destination
                     else { return .none }
 
-                    let newCohouse = cohouseFormFeature.wipCohouse
+                    let newCohouse = formState.wipCohouse
+                    let addressValidationResult = formState.addressValidationResult
+                    let idCardImageData = formState.idCardImageData
 
+                    // Basic form validation
                     guard newCohouse.totalUsers > 0,
                           newCohouse.users.allSatisfy({ $0.surname != "" }),
                           newCohouse.users.first(where: { $0.isAdmin }) != nil
-                    else { return .none }
+                    else {
+                        formState.creationError = "Please fill in all member names."
+                        state.destination = .create(formState)
+                        return .none
+                    }
 
-                    state.destination = nil
+                    // Address must have been validated (valid or lowConfidence accepted)
+                    let isAddressAccepted: Bool = {
+                        switch addressValidationResult {
+                        case .valid, .lowConfidence: return true
+                        default: return false
+                        }
+                    }()
 
-                    return .run { _ in
+                    guard isAddressAccepted else {
+                        formState.creationError = "Please validate your address before creating the cohouse."
+                        state.destination = .create(formState)
+                        return .none
+                    }
+
+                    // ID card is required
+                    guard let idCardData = idCardImageData else {
+                        formState.creationError = "Please take a photo of your ID card."
+                        state.destination = .create(formState)
+                        return .none
+                    }
+
+                    state.isCreating = true
+
+                    return .run { [newCohouse, idCardData] send in
                         do {
+                            // 1. Check for duplicate
+                            let duplicateResult = try await self.cohouseClient.checkDuplicate(
+                                newCohouse.name,
+                                newCohouse.address
+                            )
+
+                            switch duplicateResult {
+                            case .duplicateName:
+                                await send(.creationFailed("A cohouse with this name already exists."))
+                                return
+                            case .duplicateAddress:
+                                await send(.creationFailed("A cohouse at this address already exists."))
+                                return
+                            case .noDuplicate:
+                                break
+                            }
+
+                            // 2. Create the cohouse
                             try await self.cohouseClient.add(newCohouse)
+
+                            // 3. Upload ID card
+                            let storagePath = "cohouses/\(newCohouse.id.uuidString)/id_card.jpg"
+                            _ = try await self.storageClient.uploadImage(idCardData, storagePath)
+
+                            await send(.creationCompleted)
                         } catch {
                             Logger.cohouseLog.log(level: .error, "Failed to create cohouse: \(error)")
+                            await send(.creationFailed("An error occurred. Please try again."))
                         }
                     }
+                case .creationCompleted:
+                    state.isCreating = false
+                    state.destination = nil
+                    return .none
+                case let .creationFailed(message):
+                    state.isCreating = false
+                    if case var .create(formState) = state.destination {
+                        formState.creationError = message
+                        state.destination = .create(formState)
+                    }
+                    return .none
                 case .confirmJoinCohouseButtonTapped:
                     @Shared(.cohouse) var cohouse
 
@@ -201,8 +269,12 @@ struct NoCohouseView: View {
                             }
                         }
                         ToolbarItem(placement: .confirmationAction) {
-                            Button("Create") {
-                                store.send(.confirmCreateCohouseButtonTapped)
+                            if store.isCreating {
+                                ProgressView()
+                            } else {
+                                Button("Create") {
+                                    store.send(.confirmCreateCohouseButtonTapped)
+                                }
                             }
                         }
                     }

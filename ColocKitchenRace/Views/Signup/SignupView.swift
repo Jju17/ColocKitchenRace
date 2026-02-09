@@ -27,7 +27,7 @@ struct SignupView: View {
             VStack(spacing: 10) {
                 HStack(spacing: 15) {
                     TextField("", text: $store.signupUserData.firstName)
-                        .textFieldStyle(CKRTextFieldStyle(title: "NAME"))
+                        .textFieldStyle(CKRTextFieldStyle(title: "NAME*"))
                         .textContentType(.givenName)
                         .textInputAutocapitalization(.words)
                         .focused(self.$focusedField, equals: .name)
@@ -42,7 +42,7 @@ struct SignupView: View {
                         }
                         .onSubmit { self.focusNextField() }
                     TextField("", text: $store.signupUserData.lastName)
-                        .textFieldStyle(CKRTextFieldStyle(title: "SURNAME"))
+                        .textFieldStyle(CKRTextFieldStyle(title: "SURNAME*"))
                         .textContentType(.familyName)
                         .textInputAutocapitalization(.words)
                         .focused(self.$focusedField, equals: .surname)
@@ -57,7 +57,7 @@ struct SignupView: View {
                         }
                 }
                 TextField("", text: $store.signupUserData.email)
-                    .textFieldStyle(CKRTextFieldStyle(title: "EMAIL"))
+                    .textFieldStyle(CKRTextFieldStyle(title: "EMAIL*"))
                     .textContentType(.emailAddress)
                     .keyboardType(.emailAddress)
                     .textInputAutocapitalization(.never)
@@ -72,7 +72,7 @@ struct SignupView: View {
                         textField.delegate = emailFieldDelegate
                     }
                 SecureField("", text: $store.signupUserData.password)
-                    .textFieldStyle(CKRTextFieldStyle(title: "PASSWORD"))
+                    .textFieldStyle(CKRTextFieldStyle(title: "PASSWORD*"))
                     .focused(self.$focusedField, equals: .password)
                     .submitLabel(.next)
                     .introspect(.textField, on: .iOS(.v16, .v17)) { textField in

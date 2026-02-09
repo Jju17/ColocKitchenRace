@@ -83,13 +83,13 @@ struct CohouseFormFeatureTests {
         await store.send(.deleteUsers(atOffset: IndexSet(integer: 0)))
     }
 
-    // MARK: - Address Validation
+    // MARK: - Auto Address Validation (debounce)
 
-    @Test("validateAddressButtonTapped sets loading and calls validator")
-    func validateAddress() async {
+    @Test("Address change triggers auto-validation after 600ms debounce")
+    func autoValidateAddress() async {
         let address = PostalAddress(street: "88 Avenue des Eperviers", city: "Woluwe-Saint-Pierre", postalCode: "1150", country: "Belgique")
         var cohouse = Cohouse.mock
-        cohouse.address = address
+        cohouse.address = PostalAddress(street: "", city: "", postalCode: "", country: "")
 
         let validatedAddress = ValidatedAddress(
             input: address,
@@ -102,15 +102,26 @@ struct CohouseFormFeatureTests {
             confidence: 0.95
         )
 
+        let clock = TestClock()
+
         let store = TestStore(initialState: CohouseFormFeature.State(wipCohouse: cohouse)) {
             CohouseFormFeature()
         } withDependencies: {
             $0.addressValidatorClient.validate = { _ in .valid(validatedAddress) }
+            $0.continuousClock = clock
         }
 
-        await store.send(.validateAddressButtonTapped) {
+        // Change address via binding
+        var updatedCohouse = cohouse
+        updatedCohouse.address = address
+
+        await store.send(\.binding.wipCohouse, updatedCohouse) {
+            $0.wipCohouse = updatedCohouse
             $0.isValidatingAddress = true
         }
+
+        // Advance clock by 600ms to trigger debounce
+        await clock.advance(by: .milliseconds(600))
 
         await store.receive(\.addressValidationResponse.success) {
             $0.isValidatingAddress = false
@@ -118,23 +129,101 @@ struct CohouseFormFeatureTests {
         }
     }
 
-    @Test("Address validation returning notFound sets result correctly")
-    func validateAddress_notFound() async {
-        let store = TestStore(initialState: CohouseFormFeature.State(wipCohouse: .mock)) {
+    @Test("Address auto-validation returning notFound")
+    func autoValidateAddress_notFound() async {
+        var cohouse = Cohouse.mock
+        cohouse.address = PostalAddress(street: "", city: "", postalCode: "", country: "")
+
+        let clock = TestClock()
+
+        let store = TestStore(initialState: CohouseFormFeature.State(wipCohouse: cohouse)) {
             CohouseFormFeature()
         } withDependencies: {
             $0.addressValidatorClient.validate = { _ in .notFound }
+            $0.continuousClock = clock
         }
 
-        await store.send(.validateAddressButtonTapped) {
+        // Set an address long enough to trigger validation
+        var updatedCohouse = cohouse
+        updatedCohouse.address = PostalAddress(street: "Some Unknown Street", city: "Nowhere", postalCode: "0000", country: "XX")
+
+        await store.send(\.binding.wipCohouse, updatedCohouse) {
+            $0.wipCohouse = updatedCohouse
             $0.isValidatingAddress = true
         }
+
+        await clock.advance(by: .milliseconds(600))
 
         await store.receive(\.addressValidationResponse.success) {
             $0.isValidatingAddress = false
             $0.addressValidationResult = .notFound
         }
     }
+
+    @Test("Short address does not trigger validation")
+    func shortAddress_noValidation() async {
+        var cohouse = Cohouse.mock
+        cohouse.address = PostalAddress(street: "", city: "", postalCode: "", country: "")
+
+        let clock = TestClock()
+
+        let store = TestStore(initialState: CohouseFormFeature.State(wipCohouse: cohouse)) {
+            CohouseFormFeature()
+        } withDependencies: {
+            $0.continuousClock = clock
+        }
+
+        // Set address with street < 5 chars and city < 2 chars
+        var updatedCohouse = cohouse
+        updatedCohouse.address = PostalAddress(street: "AB", city: "X", postalCode: "", country: "")
+
+        await store.send(\.binding.wipCohouse, updatedCohouse) {
+            $0.wipCohouse = updatedCohouse
+        }
+
+        // No validation should be triggered, clock advance should produce nothing
+        await clock.advance(by: .milliseconds(1000))
+        // No receive expected — test passes if nothing is received
+    }
+
+    @Test("Already validated address does not re-trigger validation")
+    func alreadyValidated_noRetrigger() async {
+        let address = PostalAddress(street: "88 Avenue des Eperviers", city: "Brussels", postalCode: "1150", country: "Belgique")
+        var cohouse = Cohouse.mock
+        cohouse.address = address
+
+        let validatedAddress = ValidatedAddress(
+            input: address,
+            normalizedStreet: "88 Avenue des Eperviers",
+            normalizedCity: "Brussels",
+            normalizedPostalCode: "1150",
+            normalizedCountry: "Belgique",
+            latitude: 50.83,
+            longitude: 4.43,
+            confidence: 0.95
+        )
+
+        let clock = TestClock()
+
+        let store = TestStore(
+            initialState: CohouseFormFeature.State(
+                wipCohouse: cohouse,
+                addressValidationResult: .valid(validatedAddress)
+            )
+        ) {
+            CohouseFormFeature()
+        } withDependencies: {
+            $0.continuousClock = clock
+        }
+
+        // Send same address via binding — should not re-validate
+        await store.send(\.binding.wipCohouse, cohouse)
+
+        await clock.advance(by: .milliseconds(1000))
+        // No receive expected
+    }
+
+    // MARK: - Apply Suggested Address
 
     @Test("applySuggestedAddress updates cohouse address")
     func applySuggested() async {
@@ -166,39 +255,6 @@ struct CohouseFormFeatureTests {
                 postalCode: "1150",
                 country: "Belgium"
             )
-            $0.addressValidationResult = nil
-        }
-    }
-
-    // MARK: - Binding resets validation
-
-    @Test("Any binding change clears address validation result")
-    func bindingClearsValidation() async {
-        let validated = ValidatedAddress(
-            input: .mock,
-            normalizedStreet: nil,
-            normalizedCity: nil,
-            normalizedPostalCode: nil,
-            normalizedCountry: nil,
-            latitude: nil,
-            longitude: nil,
-            confidence: 0.5
-        )
-
-        var updatedCohouse = Cohouse.mock
-        updatedCohouse.name = "New Name"
-
-        let store = TestStore(
-            initialState: CohouseFormFeature.State(
-                wipCohouse: .mock,
-                addressValidationResult: .lowConfidence(validated)
-            )
-        ) {
-            CohouseFormFeature()
-        }
-
-        await store.send(\.binding.wipCohouse, updatedCohouse) {
-            $0.wipCohouse = updatedCohouse
             $0.addressValidationResult = nil
         }
     }

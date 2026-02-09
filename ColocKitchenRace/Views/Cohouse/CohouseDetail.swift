@@ -53,8 +53,26 @@ struct CohouseDetailFeature {
                     $currentCohouse.withLock { $0 = nil }
                     return .none
                 case .confirmEditCohouseButtonTapped:
-                    guard var wipCohouse = state.destination?.edit?.wipCohouse
+                    guard case var .edit(formState) = state.destination
                     else { return .none }
+
+                    var wipCohouse = formState.wipCohouse
+
+                    // If address was changed, require validation
+                    if formState.hasAddressChanged {
+                        let isAddressAccepted: Bool = {
+                            switch formState.addressValidationResult {
+                            case .valid, .lowConfidence: return true
+                            default: return false
+                            }
+                        }()
+
+                        guard isAddressAccepted else {
+                            formState.creationError = "Please wait for address validation before saving."
+                            state.destination = .edit(formState)
+                            return .none
+                        }
+                    }
 
                     wipCohouse.users.removeAll { user in
                         user.surname.isEmpty && !user.isAdmin
@@ -73,7 +91,10 @@ struct CohouseDetailFeature {
                     return .none
                 case .editButtonTapped:
                     state.destination = .edit(
-                        CohouseFormFeature.State(wipCohouse: state.cohouse)
+                        CohouseFormFeature.State(
+                            wipCohouse: state.cohouse,
+                            originalAddress: state.cohouse.address
+                        )
                     )
                     return .none
                 case .refresh:

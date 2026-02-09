@@ -68,6 +68,7 @@ struct PictureChoiceFeature {
         return .none
 
       case let .imagePicked(uiImage):
+        state.isImagePickerPresented = false
         state.isProcessing = true
         state.error = nil
         // Compression as an async task
@@ -175,11 +176,15 @@ struct PictureChoiceView: View {
                 .disabled(isSubmitting)
             }
         }
-        .sheet(isPresented: $store.isImagePickerPresented) {
+        .fullScreenCover(isPresented: $store.isImagePickerPresented) {
             ImagePicker(
                 selected: { store.send(.imagePicked($0)) },
+                cancelled: {
+                    store.send(.binding(.set(\.isImagePickerPresented, false)))
+                },
                 source: store.source == .camera ? .camera : .photoLibrary
             )
+            .ignoresSafeArea()
         }
         .confirmationDialog("Photo source", isPresented: $store.sourceSheetPresented) {
             Button("Camera") { store.send(.sourceChosen(.camera)) }

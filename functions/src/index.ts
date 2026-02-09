@@ -315,6 +315,159 @@ export const sendNotificationToAll = onCall<SendToAllRequest>(
 );
 
 // ============================================
+// Cohouse Validation Functions
+// ============================================
+
+interface CheckDuplicateRequest {
+  name: string;
+  street: string;
+  city: string;
+}
+
+/**
+ * Check if a cohouse with the same name or address already exists
+ */
+export const checkDuplicateCohouse = onCall<CheckDuplicateRequest>(
+  { region: REGION },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Must be authenticated");
+    }
+
+    const { name, street, city } = request.data;
+
+    if (!name || !street || !city) {
+      throw new HttpsError("invalid-argument", "Missing required fields: name, street, city");
+    }
+
+    try {
+      const nameLower = name.trim().toLowerCase();
+      const streetLower = street.trim().toLowerCase();
+      const cityLower = city.trim().toLowerCase();
+
+      // Check by name
+      const nameSnapshot = await db
+        .collection("cohouses")
+        .where("nameLower", "==", nameLower)
+        .limit(1)
+        .get();
+
+      if (!nameSnapshot.empty) {
+        return { isDuplicate: true, reason: "name" };
+      }
+
+      // Check by address (street + city)
+      // Uses the lowercased PostalAddress stored as addressLower
+      const addressSnapshot = await db
+        .collection("cohouses")
+        .where("addressLower.street", "==", streetLower)
+        .where("addressLower.city", "==", cityLower)
+        .limit(1)
+        .get();
+
+      if (!addressSnapshot.empty) {
+        return { isDuplicate: true, reason: "address" };
+      }
+
+      return { isDuplicate: false };
+    } catch (error) {
+      console.error("Error checking duplicate cohouse:", error);
+      throw new HttpsError("internal", "Failed to check for duplicates");
+    }
+  }
+);
+
+interface ValidateAddressRequest {
+  street: string;
+  city: string;
+  postalCode: string;
+  country: string;
+}
+
+/**
+ * Validate an address using Nominatim (OpenStreetMap) geocoding API
+ */
+export const validateAddress = onCall<ValidateAddressRequest>(
+  { region: REGION },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Must be authenticated");
+    }
+
+    const { street, city, postalCode, country } = request.data;
+
+    if (!street || !city) {
+      throw new HttpsError("invalid-argument", "Missing required fields: street, city");
+    }
+
+    try {
+      const params = new URLSearchParams({
+        format: "json",
+        street: street,
+        city: city,
+        postalcode: postalCode || "",
+        country: country || "",
+        limit: "1",
+        addressdetails: "1",
+      });
+
+      const url = `https://nominatim.openstreetmap.org/search?${params.toString()}`;
+
+      const response = await fetch(url, {
+        headers: {
+          "User-Agent": "ColocKitchenRace/1.0",
+          "Accept": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Nominatim returned status ${response.status}`);
+      }
+
+      const results = await response.json() as Array<{
+        display_name?: string;
+        lat?: string;
+        lon?: string;
+        address?: {
+          road?: string;
+          house_number?: string;
+          city?: string;
+          town?: string;
+          village?: string;
+          postcode?: string;
+          country?: string;
+        };
+      }>;
+
+      if (!results || results.length === 0) {
+        return { isValid: false };
+      }
+
+      const result = results[0];
+      const addr = result.address || {};
+
+      const normalizedCity = addr.city || addr.town || addr.village || null;
+      const normalizedStreet = addr.road
+        ? (addr.house_number ? `${addr.road} ${addr.house_number}` : addr.road)
+        : null;
+
+      return {
+        isValid: true,
+        normalizedStreet: normalizedStreet,
+        normalizedCity: normalizedCity,
+        normalizedPostalCode: addr.postcode || null,
+        normalizedCountry: addr.country || null,
+        latitude: result.lat ? parseFloat(result.lat) : null,
+        longitude: result.lon ? parseFloat(result.lon) : null,
+      };
+    } catch (error) {
+      console.error("Error validating address:", error);
+      throw new HttpsError("internal", "Failed to validate address");
+    }
+  }
+);
+
+// ============================================
 // Firestore Triggers
 // ============================================
 

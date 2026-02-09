@@ -29,7 +29,7 @@
       shouldUseLaunchSchemeArgsEnv = "YES">
       <TestPlans>
          <TestPlanReference
-            reference = "container:colockitchenrace.xctestplan"
+            reference = "container:ColocsKitchenRaceTests/colockitchenrace.xctestplan"
             default = "YES">
          </TestPlanReference>
       </TestPlans>
