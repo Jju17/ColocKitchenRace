@@ -10,6 +10,7 @@ import Foundation
 struct User: Equatable, Hashable, Identifiable, Codable {
     var id: UUID
     var authId: String = ""
+    var isAdmin: Bool = false
     var isSubscribeToNews: Bool = false
     var firstName: String = ""
     var lastName: String = ""

@@ -13,9 +13,21 @@ import os
 
 // MARK: - Error
 
-enum AuthError: Error {
+enum AuthError: Error, LocalizedError {
     case failed
     case failedWithError(String)
+    case notAdmin
+
+    var errorDescription: String? {
+        switch self {
+        case .failed:
+            return "Authentication failed."
+        case .failedWithError(let message):
+            return message
+        case .notAdmin:
+            return "Access denied. This app is reserved for administrators."
+        }
+    }
 }
 
 // MARK: - Client Interface
@@ -44,6 +56,11 @@ extension AuthenticationClient: DependencyKey {
 
             guard let loggedUser = try snapshot.documents.first?.data(as: User.self) else {
                 throw AuthError.failed
+            }
+
+            guard loggedUser.isAdmin else {
+                try Auth.auth().signOut()
+                throw AuthError.notAdmin
             }
 
             return loggedUser
