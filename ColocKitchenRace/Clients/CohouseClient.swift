@@ -8,6 +8,7 @@
 import ComposableArchitecture
 import FirebaseFirestore
 import FirebaseFunctions
+import FirebaseStorage
 
 // MARK: - Error
 
@@ -33,6 +34,7 @@ enum CohouseDuplicateResult: Equatable {
 struct CohouseClient {
     var add: @Sendable (_ newCohouse: Cohouse) async throws -> Void
     var checkDuplicate: @Sendable (_ name: String, _ address: PostalAddress) async throws -> CohouseDuplicateResult
+    var uploadIdCard: @Sendable (_ cohouseId: String, _ imageData: Data) async throws -> Void
     var get: @Sendable (_ id: String) async throws -> Cohouse
     var getByCode: @Sendable (_ code: String) async throws -> Cohouse
     var set: @Sendable (_ id: String, _ newCohouse: Cohouse) async throws -> Void
@@ -95,6 +97,14 @@ extension CohouseClient: DependencyKey {
             }
 
             return .noDuplicate
+        },
+        uploadIdCard: { cohouseId, imageData in
+            let path = "cohouses/\(cohouseId)/id_card.jpg"
+            let ref = Storage.storage().reference(withPath: path)
+            let metadata = StorageMetadata()
+            metadata.contentType = "image/jpeg"
+
+            _ = try await ref.putDataAsync(imageData, metadata: metadata)
         },
         get: { id in
             @Shared(.cohouse) var currentCohouse
@@ -223,6 +233,7 @@ extension CohouseClient: DependencyKey {
     static let testValue = Self(
         add: { _ in },
         checkDuplicate: { _, _ in .noDuplicate },
+        uploadIdCard: { _, _ in },
         get: { _ in .mock },
         getByCode: { _ in .mock },
         set: { _, _ in },

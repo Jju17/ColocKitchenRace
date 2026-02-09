@@ -42,7 +42,6 @@ struct NoCohouseFeature {
     }
 
     @Dependency(\.cohouseClient) var cohouseClient
-    @Dependency(\.storageClient) var storageClient
     @Dependency(\.uuid) var uuid
 
     var body: some ReducerOf<Self> {
@@ -115,8 +114,7 @@ struct NoCohouseFeature {
                             try await self.cohouseClient.add(newCohouse)
 
                             // 3. Upload ID card
-                            let storagePath = "cohouses/\(newCohouse.id.uuidString)/id_card.jpg"
-                            _ = try await self.storageClient.uploadImage(idCardData, storagePath)
+                            try await self.cohouseClient.uploadIdCard(newCohouse.id.uuidString, idCardData)
 
                             await send(.creationCompleted)
                         } catch {

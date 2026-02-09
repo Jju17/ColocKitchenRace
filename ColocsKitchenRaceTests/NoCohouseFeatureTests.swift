@@ -98,7 +98,7 @@ struct NoCohouseFeatureTests {
             $0.cohouseClient.add = { cohouse in
                 addedCohouse = cohouse
             }
-            $0.storageClient.uploadImage = { _, _ in "https://example.com/id_card.jpg" }
+            $0.cohouseClient.uploadIdCard = { _, _ in }
         }
 
         await store.send(.confirmCreateCohouseButtonTapped) {
