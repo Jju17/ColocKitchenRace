@@ -54,6 +54,7 @@ struct HomeFeature {
         case destination(PresentationAction<Destination.Action>)
         case dismissDestinationButtonTapped
         case onTask
+        case signOut
         case totalUsersUpdated(Int)
         case totalCohousesUpdated(Int)
         case totalChallengesUpdated(Int)
@@ -66,6 +67,7 @@ struct HomeFeature {
     @Dependency(\.cohouseClient) var cohouseClient
     @Dependency(\.challengeClient) var challengeClient
     @Dependency(\.ckrClient) var ckrClient
+    @Dependency(\.authenticationClient) var authenticationClient
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -127,6 +129,10 @@ struct HomeFeature {
                         if let nextChallengesCount = try? await nextChallenges {
                             await send(.nextChallengesUpdated(nextChallengesCount))
                         }
+                    }
+                case .signOut:
+                    return .run { _ in
+                        try await self.authenticationClient.signOut()
                     }
                 case let .totalUsersUpdated(count):
                     state.users.total = count
@@ -198,6 +204,11 @@ struct HomeView: View {
                     self.store.send(.addNewCKRGameButtonTapped)
                 } label: {
                     Image(systemName: "plus")
+                }
+                Button {
+                    self.store.send(.signOut)
+                } label: {
+                    Image(systemName: "rectangle.portrait.and.arrow.forward")
                 }
             }
         }

@@ -36,6 +36,7 @@ enum AuthError: Error, LocalizedError {
 struct AuthenticationClient {
     var signIn: @Sendable (_ email: String, _ password: String) async throws -> User
     var signOut: () async throws -> Void
+    var verifyAdmin: @Sendable (_ uid: String) async throws -> Bool = { _ in false }
     var listenAuthState: @Sendable () -> AsyncStream<FirebaseAuth.User?> = { .never }
 }
 
@@ -58,7 +59,7 @@ extension AuthenticationClient: DependencyKey {
                 throw AuthError.failed
             }
 
-            guard loggedUser.isAdmin else {
+            guard loggedUser.isAdmin ?? false else {
                 try Auth.auth().signOut()
                 throw AuthError.notAdmin
             }
@@ -67,6 +68,18 @@ extension AuthenticationClient: DependencyKey {
         },
         signOut: {
             try Auth.auth().signOut()
+        },
+        verifyAdmin: { uid in
+            let snapshot = try await Firestore.firestore()
+                .collection("users")
+                .whereField("authId", isEqualTo: uid)
+                .getDocuments()
+
+            guard let user = try snapshot.documents.first?.data(as: User.self) else {
+                return false
+            }
+
+            return user.isAdmin ?? false
         },
         listenAuthState: {
             AsyncStream { continuation in

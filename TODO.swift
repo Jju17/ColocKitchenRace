@@ -33,9 +33,9 @@
 // -------------------------------------------------------------------------------------
 
 // FIX
-// [-] - Connection only allowed for admin /!\
+// [/] - Connection only allowed for admin /!\
 
 // New functionality
-// [-] - Add ability to post news
+// [/] - Add ability to post news
 // [-] - Responses -> Sort by ...
 // [-] - Response "No specific response"

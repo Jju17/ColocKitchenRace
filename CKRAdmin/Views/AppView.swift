@@ -7,6 +7,7 @@
 
 import ComposableArchitecture
 import FirebaseAuth
+import os
 import SwiftUI
 
 @Reducer
@@ -25,6 +26,7 @@ struct AppFeature {
         case signin(SigninFeature.Action)
         case splashScreen(SplashScreenFeature.Action)
         case newAuthStateTrigger(FirebaseAuth.User?)
+        case adminCheckCompleted(isAdmin: Bool)
     }
 
     @Dependency(\.authenticationClient) var authenticationClient
@@ -39,10 +41,33 @@ struct AppFeature {
                     }
                 }
             case let .newAuthStateTrigger(user):
-                if user != nil {
-                    state = AppFeature.State.tab(TabFeature.State())
+                if let user {
+                    state = .splashScreen(SplashScreenFeature.State())
+                    return .run { send in
+                        do {
+                            let isAdmin = try await self.authenticationClient.verifyAdmin(user.uid)
+                            await send(.adminCheckCompleted(isAdmin: isAdmin))
+                        } catch {
+                            Logger.authLog.log(level: .error, "Admin verification failed: \(error)")
+                            await send(.adminCheckCompleted(isAdmin: false))
+                        }
+                    }
                 } else {
-                    state = AppFeature.State.signin(SigninFeature.State())
+                    // Don't overwrite signin screen that already shows an error (after non-admin rejection)
+                    if case let .signin(signinState) = state, signinState.error != nil {
+                        return .none
+                    }
+                    state = .signin(SigninFeature.State())
+                    return .none
+                }
+            case let .adminCheckCompleted(isAdmin):
+                if isAdmin {
+                    state = .tab(TabFeature.State())
+                } else {
+                    state = .signin(SigninFeature.State(error: AuthError.notAdmin))
+                    return .run { _ in
+                        try? await self.authenticationClient.signOut()
+                    }
                 }
                 return .none
             case .tab, .signin, .splashScreen:
