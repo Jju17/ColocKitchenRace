@@ -37,5 +37,4 @@
 
 // New functionality
 // [/] - Add ability to post news
-// [-] - Responses -> Sort by ...
-// [-] - Response "No specific response"
+// [/] - Responses -> Sort by ...

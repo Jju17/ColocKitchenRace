@@ -16,15 +16,16 @@ struct ChallengeValidationFeature {
         var isLoading: Bool = false
         var errorMessage: String?
         var filterStatus: FilterStatus = .all
+        var sortOrder: SortOrder = .dateDesc
     }
 
     enum Action: BindableAction {
-        case addAllMockChallengeResponses
         case binding(BindingAction<State>)
         case fetchResponses
         case responsesLoaded(Result<[ChallengeResponse], ChallengeResponseError>)
         case setResponseStatus(challengeId: UUID, cohouseId: String, status: ChallengeResponseStatus)
         case setFilterStatus(FilterStatus)
+        case setSortOrder(SortOrder)
     }
 
     enum FilterStatus: String, CaseIterable, Identifiable {
@@ -34,23 +35,20 @@ struct ChallengeValidationFeature {
         var id: String { rawValue }
     }
 
+    enum SortOrder: String, CaseIterable, Identifiable {
+        case dateDesc = "Newest first"
+        case dateAsc = "Oldest first"
+        case challenge = "By challenge"
+        case cohouse = "By cohouse"
+        var id: String { rawValue }
+    }
+
     @Dependency(\.challengeResponseClient) var challengeResponseClient
 
     var body: some ReducerOf<Self> {
         BindingReducer()
         Reduce { state, action in
             switch action {
-                case .addAllMockChallengeResponses:
-                    return .run { send in
-                        let result = await challengeResponseClient.addAllMockChallengeResponses()
-                        switch result {
-                            case .success:
-                                let fetchResult = await challengeResponseClient.getAll()
-                                await send(.responsesLoaded(fetchResult))
-                            case .failure(let error):
-                                await send(.responsesLoaded(.failure(error)))
-                        }
-                    }
                 case .binding:
                     return .none
                 case .fetchResponses:
@@ -85,6 +83,9 @@ struct ChallengeValidationFeature {
                 case .setFilterStatus(let filterStatus):
                     state.filterStatus = filterStatus
                     return .none
+                case .setSortOrder(let sortOrder):
+                    state.sortOrder = sortOrder
+                    return .none
             }
         }
     }
@@ -116,7 +117,7 @@ struct ChallengeValidationView: View {
                         .padding(.horizontal)
 
                         List {
-                            ForEach(filteredResponses) { response in
+                            ForEach(sortedResponses) { response in
                                 HStack {
                                     VStack(alignment: .leading) {
                                         Text("Challenge: \(response.challengeTitle)")
@@ -152,7 +153,6 @@ struct ChallengeValidationView: View {
                                         ) {
                                             store.send(.setResponseStatus(challengeId: response.challengeId, cohouseId: response.cohouseId, status: .validated))
                                         }
-                                        
                                         .disabled(response.status == .validated)
                                         .contentShape(Rectangle())
                                         .accessibilityLabel("Validate response \(response.id.uuidString)")
@@ -180,12 +180,22 @@ struct ChallengeValidationView: View {
             }
             .navigationTitle("Challenge responses")
             .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button(action: {
-                        store.send(.addAllMockChallengeResponses)
-                    }) {
-                        Image(systemName: "plus.circle")
-                            .accessibilityLabel("Add test responses")
+                ToolbarItem(placement: .automatic) {
+                    Menu {
+                        ForEach(ChallengeValidationFeature.SortOrder.allCases) { order in
+                            Button {
+                                store.send(.setSortOrder(order))
+                            } label: {
+                                if store.sortOrder == order {
+                                    Label(order.rawValue, systemImage: "checkmark")
+                                } else {
+                                    Text(order.rawValue)
+                                }
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "arrow.up.arrow.down")
+                            .accessibilityLabel("Sort responses")
                     }
                 }
             }
@@ -195,14 +205,26 @@ struct ChallengeValidationView: View {
         }
     }
 
-    private var filteredResponses: [ChallengeResponse] {
+    private var sortedResponses: [ChallengeResponse] {
+        let filtered: [ChallengeResponse]
         switch store.filterStatus {
-            case .all:
-                return store.responses
-            case .waiting:
-                return store.responses.filter { $0.status == .waiting }
-            case .processed:
-                return store.responses.filter { $0.status == .validated || $0.status == .invalidated }
+        case .all:
+            filtered = store.responses
+        case .waiting:
+            filtered = store.responses.filter { $0.status == .waiting }
+        case .processed:
+            filtered = store.responses.filter { $0.status == .validated || $0.status == .invalidated }
+        }
+
+        switch store.sortOrder {
+        case .dateDesc:
+            return filtered.sorted { $0.submissionDate > $1.submissionDate }
+        case .dateAsc:
+            return filtered.sorted { $0.submissionDate < $1.submissionDate }
+        case .challenge:
+            return filtered.sorted { $0.challengeTitle.localizedCompare($1.challengeTitle) == .orderedAscending }
+        case .cohouse:
+            return filtered.sorted { $0.cohouseName.localizedCompare($1.cohouseName) == .orderedAscending }
         }
     }
 
