@@ -61,56 +61,31 @@ struct PictureChoiceFeatureTests {
 
     // MARK: - Image Processing
 
-//    @Test("imagePicked compresses and stores data")
-//    func imagePicked_success() async {
-//        // Create a small test image
-//        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 100, height: 100))
-//        let testImage = renderer.image { ctx in
-//            UIColor.red.setFill()
-//            ctx.fill(CGRect(origin: .zero, size: CGSize(width: 100, height: 100)))
-//        }
-//
-//        let store = TestStore(initialState: PictureChoiceFeature.State()) {
-//            PictureChoiceFeature()
-//        }
-//
-//        await store.send(.imagePicked(testImage)) {
-//            $0.isProcessing = true
-//            $0.error = nil
-//        }
-//
-//        await store.receive(\._finishProcessing.success) {
-//            $0.isProcessing = false
-//            // imageData should be set to compressed JPEG data
-//            #expect($0.imageData != nil)
-//            #expect($0.imageData!.count < PictureChoiceFeature.maxBytes)
-//            $0.error = nil
-//        }
-//    }
-
-    @Test("imagePicked with too large image shows error")
-    func imagePicked_tooLarge() async {
-        // Create a very large image that exceeds 3MB after compression
-        // This is hard to do with a small renderer, so we test the error path directly
-        let store = TestStore(initialState: PictureChoiceFeature.State()) {
+    @Test("finishProcessing with data stores it")
+    func finishProcessing_success() async {
+        let store = TestStore(
+            initialState: PictureChoiceFeature.State(isProcessing: true)
+        ) {
             PictureChoiceFeature()
         }
 
-        let largeBytes = PictureChoiceFeature.maxBytes + 1000
-        await store.send(._finishProcessing(.failure(.tooLarge(largeBytes)))) {
+        let sampleData = Data([0xFF, 0xD8, 0xFF]) // fake JPEG header
+        await store.send(._finishProcessing(sampleData)) {
             $0.isProcessing = false
-            $0.imageData = nil
-            $0.error = "Image is too large (\(ImagePipeline.humanSize(largeBytes))). Limit: \(ImagePipeline.humanSize(PictureChoiceFeature.maxBytes))."
+            $0.imageData = sampleData
+            $0.error = nil
         }
     }
 
-    @Test("Compression failure shows error")
-    func compressionFailed() async {
-        let store = TestStore(initialState: PictureChoiceFeature.State()) {
+    @Test("finishProcessing nil shows compression error")
+    func finishProcessing_failure() async {
+        let store = TestStore(
+            initialState: PictureChoiceFeature.State(isProcessing: true)
+        ) {
             PictureChoiceFeature()
         }
 
-        await store.send(._finishProcessing(.failure(.compressFailed))) {
+        await store.send(._finishProcessing(nil)) {
             $0.isProcessing = false
             $0.imageData = nil
             $0.error = "Unable to compress the image. Please try again."
@@ -133,21 +108,6 @@ struct PictureChoiceFeatureTests {
         await store.send(.imageCleared) {
             $0.imageData = nil
             $0.error = nil
-        }
-    }
-
-    // MARK: - Unknown Error
-
-    @Test("Unknown error shows generic message")
-    func unknownError() async {
-        let store = TestStore(initialState: PictureChoiceFeature.State()) {
-            PictureChoiceFeature()
-        }
-
-        await store.send(._finishProcessing(.failure(.unknown))) {
-            $0.isProcessing = false
-            $0.imageData = nil
-            $0.error = "Unknown error."
         }
     }
 }

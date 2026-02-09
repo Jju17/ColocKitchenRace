@@ -255,7 +255,7 @@ struct CohouseFormView: View {
         .fullScreenCover(isPresented: $store.isIdCardPickerPresented) {
             ImagePicker(
                 selected: { image in
-                    if let data = ImagePipeline.jpegDataCompressed(from: image) {
+                    if let data = ImagePipeline.compress(image: image) {
                         store.send(.idCardPicked(data))
                     } else {
                         store.send(.idCardCleared)

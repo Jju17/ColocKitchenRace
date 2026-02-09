@@ -10,8 +10,6 @@ import SwiftUI
 
 @Reducer
 struct PictureChoiceFeature {
-  // MARK: - Config
-  static let maxBytes: Int = 3_000_000 // 3 MB
 
   // MARK: - State
   @ObservableState
@@ -33,13 +31,7 @@ struct PictureChoiceFeature {
     case sourceChosen(State.Source)    // choose camera/library
     case imagePicked(UIImage)          // raw picker output (UIImage)
     case imageCleared                  // clears current selection
-    case _finishProcessing(Result<Data, ImageProcessError>)
-  }
-
-  enum ImageProcessError: Error, Equatable {
-    case compressFailed
-    case tooLarge(Int)
-    case unknown
+    case _finishProcessing(Data?)
   }
 
   // MARK: - Body
@@ -71,35 +63,19 @@ struct PictureChoiceFeature {
         state.isImagePickerPresented = false
         state.isProcessing = true
         state.error = nil
-        // Compression as an async task
         return .run { send in
-          if let data = ImagePipeline.jpegDataCompressed(from: uiImage, maxDimension: 2000, quality: 0.7) {
-            if data.count > PictureChoiceFeature.maxBytes {
-              await send(._finishProcessing(.failure(.tooLarge(data.count))))
-            } else {
-              await send(._finishProcessing(.success(data)))
-            }
-          } else {
-            await send(._finishProcessing(.failure(.compressFailed)))
-          }
+          let data = ImagePipeline.compress(image: uiImage)
+          await send(._finishProcessing(data))
         }
 
-      case let ._finishProcessing(result):
+      case let ._finishProcessing(data):
         state.isProcessing = false
-        switch result {
-        case let .success(data):
+        if let data {
           state.imageData = data
           state.error = nil
-        case let .failure(err):
+        } else {
           state.imageData = nil
-          switch err {
-          case .compressFailed:
-            state.error = "Unable to compress the image. Please try again."
-          case let .tooLarge(bytes):
-            state.error = "Image is too large (\(ImagePipeline.humanSize(bytes))). Limit: \(ImagePipeline.humanSize(Self.maxBytes))."
-          case .unknown:
-            state.error = "Unknown error."
-          }
+          state.error = "Unable to compress the image. Please try again."
         }
         return .none
       }

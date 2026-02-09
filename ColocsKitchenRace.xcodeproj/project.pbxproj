@@ -88,7 +88,6 @@
 				"Utils/Dictionnary+Utils.swift",
 				"Utils/Error+Utils.swift",
 				Utils/Global.swift,
-				Utils/ImageProcessing.swift,
 				Utils/Introspect/TextFieldDelegate.swift,
 				"Utils/Logger+Utils.swift",
 				"Utils/URL+Utils.swift",
