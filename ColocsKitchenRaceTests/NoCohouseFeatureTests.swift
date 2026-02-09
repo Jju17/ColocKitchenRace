@@ -113,6 +113,8 @@ struct NoCohouseFeatureTests {
 
         #expect(addedCohouse != nil)
         #expect(addedCohouse?.name == "Test Coloc")
+        #expect(addedCohouse?.latitude == 50.85)
+        #expect(addedCohouse?.longitude == 4.35)
     }
 
     @Test("confirmCreateCohouseButtonTapped fails when duplicate name")

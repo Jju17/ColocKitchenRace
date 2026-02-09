@@ -13,6 +13,8 @@ struct Cohouse: Equatable, Hashable, Codable {
     var name: String = ""
     var address: PostalAddress = PostalAddress()
     var code: String
+    var latitude: Double?
+    var longitude: Double?
     var users: IdentifiedArrayOf<CohouseUser> = []
 }
 
@@ -28,7 +30,9 @@ extension Cohouse {
             nameLower: self.name.trimmingCharacters(in: .whitespaces).lowercased(),
             address: self.address,
             addressLower: self.address.lowercased,
-            code: self.code
+            code: self.code,
+            latitude: self.latitude,
+            longitude: self.longitude
         )
     }
 
@@ -49,7 +53,9 @@ extension Cohouse {
             id: UUID(),
             name: "Zone 88",
             address: .mock,
-            code: "1234"
+            code: "1234",
+            latitude: 50.8503,
+            longitude: 4.3517
         )
     }
 }

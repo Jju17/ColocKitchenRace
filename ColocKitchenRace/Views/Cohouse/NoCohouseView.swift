@@ -57,7 +57,7 @@ struct NoCohouseFeature {
                     guard case var .create(formState) = state.destination
                     else { return .none }
 
-                    let newCohouse = formState.wipCohouse
+                    var newCohouse = formState.wipCohouse
                     let addressValidationResult = formState.addressValidationResult
                     let idCardImageData = formState.idCardImageData
 
@@ -83,6 +83,17 @@ struct NoCohouseFeature {
                         formState.creationError = "Please validate your address before creating the cohouse."
                         state.destination = .create(formState)
                         return .none
+                    }
+
+                    // Extract GPS coordinates from validated address
+                    if let validatedAddress: ValidatedAddress = {
+                        switch addressValidationResult {
+                        case .valid(let v), .lowConfidence(let v): return v
+                        default: return nil
+                        }
+                    }() {
+                        newCohouse.latitude = validatedAddress.latitude
+                        newCohouse.longitude = validatedAddress.longitude
                     }
 
                     // ID card is required

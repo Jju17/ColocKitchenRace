@@ -15,6 +15,8 @@ struct FirestoreCohouse: Equatable, Hashable, Codable {
     var address: PostalAddress
     var addressLower: PostalAddress?
     var code: String
+    var latitude: Double?
+    var longitude: Double?
 }
 
 extension FirestoreCohouse {
@@ -24,6 +26,8 @@ extension FirestoreCohouse {
             name: self.name,
             address: self.address,
             code: self.code,
+            latitude: self.latitude,
+            longitude: self.longitude,
             users: IdentifiedArray(uniqueElements: users)
         )
     }
@@ -37,7 +41,9 @@ extension FirestoreCohouse {
             nameLower: "zone 88",
             address: .mock,
             addressLower: PostalAddress.mock.lowercased,
-            code: "1234"
+            code: "1234",
+            latitude: 50.8503,
+            longitude: 4.3517
         )
     }
 }
