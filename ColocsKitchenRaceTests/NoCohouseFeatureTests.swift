@@ -88,7 +88,8 @@ struct NoCohouseFeatureTests {
                     wipCohouse: wipCohouse,
                     isNewCohouse: true,
                     addressValidationResult: .valid(validatedAddress),
-                    idCardImageData: idCardData
+                    idCardImageData: idCardData,
+                    idCardScanResult: .valid(IdCardInfo())
                 ))
             )
         ) {
@@ -139,7 +140,8 @@ struct NoCohouseFeatureTests {
                     wipCohouse: wipCohouse,
                     isNewCohouse: true,
                     addressValidationResult: .valid(validatedAddress),
-                    idCardImageData: idCardData
+                    idCardImageData: idCardData,
+                    idCardScanResult: .valid(IdCardInfo())
                 ))
             )
         ) {
@@ -159,7 +161,8 @@ struct NoCohouseFeatureTests {
                 isNewCohouse: true,
                 addressValidationResult: .valid(validatedAddress),
                 creationError: "A cohouse with this name already exists.",
-                idCardImageData: idCardData
+                idCardImageData: idCardData,
+                idCardScanResult: .valid(IdCardInfo())
             ))
         }
     }
@@ -379,5 +382,112 @@ struct NoCohouseFeatureTests {
 
         // Code should be trimmed before being sent to the client
         #expect(receivedCode == "1234")
+    }
+
+    // MARK: - ID Card Warning
+
+    @Test("Shows warning when ID card scan is not valid, then proceeds on accept")
+    func idCardWarning_showsThenProceeds() async {
+        var addedCohouse: Cohouse?
+
+        let owner = User.mockUser.toCohouseUser(isAdmin: true)
+        let wipCohouse = Cohouse(
+            id: UUID(),
+            name: "Test Coloc",
+            address: .mock,
+            code: "ABC123",
+            users: [owner]
+        )
+
+        let validatedAddress = ValidatedAddress(
+            input: PostalAddress.mock,
+            normalizedStreet: nil, normalizedCity: nil, normalizedPostalCode: nil, normalizedCountry: nil,
+            latitude: nil, longitude: nil, confidence: 0.95
+        )
+
+        let idCardData = Data([0x01])
+
+        let store = TestStore(
+            initialState: NoCohouseFeature.State(
+                destination: .create(CohouseFormFeature.State(
+                    wipCohouse: wipCohouse,
+                    isNewCohouse: true,
+                    addressValidationResult: .valid(validatedAddress),
+                    idCardImageData: idCardData,
+                    idCardScanResult: .notAnIdCard
+                ))
+            )
+        ) {
+            NoCohouseFeature()
+        } withDependencies: {
+            $0.cohouseClient.checkDuplicate = { _, _ in .noDuplicate }
+            $0.cohouseClient.add = { cohouse in
+                addedCohouse = cohouse
+            }
+            $0.cohouseClient.uploadIdCard = { _, _ in }
+        }
+
+        // First tap: warning appears
+        await store.send(.confirmCreateCohouseButtonTapped) {
+            $0.showIdCardWarning = true
+        }
+
+        // User accepts the warning
+        await store.send(.idCardWarningAccepted)
+
+        // Second pass through confirmCreate now proceeds
+        await store.receive(\.confirmCreateCohouseButtonTapped) {
+            $0.isCreating = true
+            $0.showIdCardWarning = false
+        }
+
+        await store.receive(\.creationCompleted) {
+            $0.isCreating = false
+            $0.destination = nil
+        }
+
+        #expect(addedCohouse != nil)
+    }
+
+    @Test("ID card warning dismissed does not create cohouse")
+    func idCardWarning_dismissed() async {
+        let owner = User.mockUser.toCohouseUser(isAdmin: true)
+        let wipCohouse = Cohouse(
+            id: UUID(),
+            name: "Test Coloc",
+            address: .mock,
+            code: "ABC123",
+            users: [owner]
+        )
+
+        let validatedAddress = ValidatedAddress(
+            input: PostalAddress.mock,
+            normalizedStreet: nil, normalizedCity: nil, normalizedPostalCode: nil, normalizedCountry: nil,
+            latitude: nil, longitude: nil, confidence: 0.95
+        )
+
+        let store = TestStore(
+            initialState: NoCohouseFeature.State(
+                destination: .create(CohouseFormFeature.State(
+                    wipCohouse: wipCohouse,
+                    isNewCohouse: true,
+                    addressValidationResult: .valid(validatedAddress),
+                    idCardImageData: Data([0x01]),
+                    idCardScanResult: .poorQuality
+                ))
+            )
+        ) {
+            NoCohouseFeature()
+        }
+
+        // First tap: warning appears
+        await store.send(.confirmCreateCohouseButtonTapped) {
+            $0.showIdCardWarning = true
+        }
+
+        // User dismisses → goes back to form
+        await store.send(.idCardWarningDismissed) {
+            $0.showIdCardWarning = false
+        }
     }
 }

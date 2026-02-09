@@ -26,6 +26,7 @@ struct CohouseFormFeature {
         var idCardImageData: Data?
         var isIdCardPickerPresented: Bool = false
         var isProcessingIdCard: Bool = false
+        var idCardScanResult: IdCardScanResult?
 
         /// Whether the address has been modified from the original (relevant for edit mode).
         var hasAddressChanged: Bool {
@@ -47,12 +48,14 @@ struct CohouseFormFeature {
         case idCardPickTapped
         case idCardPicked(Data)
         case idCardCleared
+        case idCardScanResponse(IdCardScanResult)
     }
 
     private enum CancelID { case addressValidation }
 
     @Dependency(\.cohouseClient) var cohouseClient
     @Dependency(\.addressValidatorClient) var addressValidatorClient
+    @Dependency(\.idCardScannerClient) var idCardScannerClient
     @Dependency(\.continuousClock) var clock
     @Dependency(\.uuid) var uuid
 
@@ -155,9 +158,19 @@ struct CohouseFormFeature {
                     state.idCardImageData = data
                     state.isIdCardPickerPresented = false
                     state.creationError = nil
-                    return .none
+                    state.isProcessingIdCard = true
+                    state.idCardScanResult = nil
+                    return .run { send in
+                        let result = await idCardScannerClient.scanIdCard(data)
+                        await send(.idCardScanResponse(result))
+                    }
                 case .idCardCleared:
                     state.idCardImageData = nil
+                    state.idCardScanResult = nil
+                    return .none
+                case let .idCardScanResponse(result):
+                    state.isProcessingIdCard = false
+                    state.idCardScanResult = result
                     return .none
             }
         }
@@ -271,6 +284,20 @@ struct CohouseFormView: View {
                         .frame(maxHeight: 200)
                         .cornerRadius(8)
 
+                    if store.isProcessingIdCard {
+                        HStack(spacing: 8) {
+                            ProgressView()
+                                .scaleEffect(0.7)
+                            Text("Analyzing ID card...")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    if let scanResult = store.idCardScanResult {
+                        idCardScanResultView(scanResult)
+                    }
+
                     Button(role: .destructive) {
                         store.send(.idCardCleared)
                     } label: {
@@ -289,6 +316,47 @@ struct CohouseFormView: View {
             Text("Required to verify your identity when creating a cohouse.")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
+        }
+    }
+
+    @ViewBuilder
+    private func idCardScanResultView(_ result: IdCardScanResult) -> some View {
+        switch result {
+        case .valid:
+            HStack(spacing: 4) {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
+                Text("ID card detected")
+                    .font(.footnote)
+                    .foregroundStyle(.green)
+            }
+
+        case .notAnIdCard:
+            HStack(spacing: 4) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.orange)
+                Text("This doesn't look like an ID card. Please retake the photo.")
+                    .font(.footnote)
+                    .foregroundStyle(.orange)
+            }
+
+        case .poorQuality:
+            HStack(spacing: 4) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.orange)
+                Text("Image quality is low. Please retake with better lighting.")
+                    .font(.footnote)
+                    .foregroundStyle(.orange)
+            }
+
+        case .error:
+            HStack(spacing: 4) {
+                Image(systemName: "xmark.circle.fill")
+                    .foregroundStyle(.orange)
+                Text("Could not analyze the photo. An admin will verify manually.")
+                    .font(.footnote)
+                    .foregroundStyle(.orange)
+            }
         }
     }
 

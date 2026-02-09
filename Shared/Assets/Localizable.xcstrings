@@ -132,6 +132,9 @@
     "Already have an account?" : {
 
     },
+    "Analyzing ID card..." : {
+
+    },
     "Answer" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -363,6 +366,9 @@
         }
       }
     },
+    "Continue anyway" : {
+
+    },
     "Copied!" : {
 
     },
@@ -375,6 +381,9 @@
           }
         }
       }
+    },
+    "Could not analyze the photo. An admin will verify manually." : {
+
     },
     "Create" : {
       "localizations" : {
@@ -638,7 +647,16 @@
     "ID Card" : {
 
     },
+    "ID card detected" : {
+
+    },
+    "ID card verification" : {
+
+    },
     "Image failed to load" : {
+
+    },
+    "Image quality is low. Please retake with better lighting." : {
 
     },
     "Invalid address (incorrect format)." : {
@@ -992,6 +1010,9 @@
         }
       }
     },
+    "Retake photo" : {
+
+    },
     "Save" : {
       "localizations" : {
         "fr" : {
@@ -1245,6 +1266,9 @@
     "Text" : {
 
     },
+    "The photo doesn't appear to be a valid ID card. Your registration could be cancelled if an admin cannot verify your identity." : {
+
+    },
     "This action is irreversible." : {
       "localizations" : {
         "fr" : {
@@ -1254,6 +1278,9 @@
           }
         }
       }
+    },
+    "This doesn't look like an ID card. Please retake the photo." : {
+
     },
     "Title" : {
       "localizations" : {

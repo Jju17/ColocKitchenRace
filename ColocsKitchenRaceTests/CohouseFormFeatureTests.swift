@@ -291,4 +291,101 @@ struct CohouseFormFeatureTests {
         // Error is caught and logged, no crash
         await store.send(.quitCohouseButtonTapped)
     }
+
+    // MARK: - ID Card Scanning
+
+    @Test("idCardPicked triggers scan and returns valid result")
+    func idCardPicked_valid() async {
+        let mockInfo = IdCardInfo(documentType: "Carte d'identite", nationality: "Belgian")
+        let imageData = Data([0xFF, 0xD8, 0xFF])
+
+        let store = TestStore(
+            initialState: CohouseFormFeature.State(wipCohouse: .mock, isNewCohouse: true)
+        ) {
+            CohouseFormFeature()
+        } withDependencies: {
+            $0.idCardScannerClient.scanIdCard = { _ in .valid(mockInfo) }
+        }
+
+        await store.send(.idCardPicked(imageData)) {
+            $0.idCardImageData = imageData
+            $0.isIdCardPickerPresented = false
+            $0.isProcessingIdCard = true
+            $0.idCardScanResult = nil
+        }
+
+        await store.receive(\.idCardScanResponse) {
+            $0.isProcessingIdCard = false
+            $0.idCardScanResult = .valid(mockInfo)
+        }
+    }
+
+    @Test("idCardPicked triggers scan and returns notAnIdCard")
+    func idCardPicked_notAnIdCard() async {
+        let imageData = Data([0xFF, 0xD8, 0xFF])
+
+        let store = TestStore(
+            initialState: CohouseFormFeature.State(wipCohouse: .mock, isNewCohouse: true)
+        ) {
+            CohouseFormFeature()
+        } withDependencies: {
+            $0.idCardScannerClient.scanIdCard = { _ in .notAnIdCard }
+        }
+
+        await store.send(.idCardPicked(imageData)) {
+            $0.idCardImageData = imageData
+            $0.isIdCardPickerPresented = false
+            $0.isProcessingIdCard = true
+            $0.idCardScanResult = nil
+        }
+
+        await store.receive(\.idCardScanResponse) {
+            $0.isProcessingIdCard = false
+            $0.idCardScanResult = .notAnIdCard
+        }
+    }
+
+    @Test("idCardPicked triggers scan and returns poorQuality")
+    func idCardPicked_poorQuality() async {
+        let imageData = Data([0xFF, 0xD8, 0xFF])
+
+        let store = TestStore(
+            initialState: CohouseFormFeature.State(wipCohouse: .mock, isNewCohouse: true)
+        ) {
+            CohouseFormFeature()
+        } withDependencies: {
+            $0.idCardScannerClient.scanIdCard = { _ in .poorQuality }
+        }
+
+        await store.send(.idCardPicked(imageData)) {
+            $0.idCardImageData = imageData
+            $0.isIdCardPickerPresented = false
+            $0.isProcessingIdCard = true
+            $0.idCardScanResult = nil
+        }
+
+        await store.receive(\.idCardScanResponse) {
+            $0.isProcessingIdCard = false
+            $0.idCardScanResult = .poorQuality
+        }
+    }
+
+    @Test("idCardCleared resets scan result")
+    func idCardCleared_resetsScanResult() async {
+        let store = TestStore(
+            initialState: CohouseFormFeature.State(
+                wipCohouse: .mock,
+                isNewCohouse: true,
+                idCardImageData: Data([0x01]),
+                idCardScanResult: .valid(IdCardInfo())
+            )
+        ) {
+            CohouseFormFeature()
+        }
+
+        await store.send(.idCardCleared) {
+            $0.idCardImageData = nil
+            $0.idCardScanResult = nil
+        }
+    }
 }

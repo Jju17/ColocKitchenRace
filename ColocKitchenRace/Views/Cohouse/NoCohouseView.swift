@@ -25,6 +25,7 @@ struct NoCohouseFeature {
         var cohouseCode: String = ""
         var errorMessage: String?
         var isCreating: Bool = false
+        var showIdCardWarning: Bool = false
     }
 
     enum Action: BindableAction {
@@ -38,6 +39,8 @@ struct NoCohouseFeature {
         case dismissDestinationButtonTapped
         case findExistingCohouseButtonTapped
         case cohouseLookupFailed(String)
+        case idCardWarningAccepted
+        case idCardWarningDismissed
         case setUserToCohouseFound(Cohouse)
     }
 
@@ -89,7 +92,19 @@ struct NoCohouseFeature {
                         return .none
                     }
 
+                    // Warn if ID card scan didn't detect a valid ID
+                    let isIdCardValid: Bool = {
+                        if case .valid = formState.idCardScanResult { return true }
+                        return false
+                    }()
+
+                    if !isIdCardValid && !state.showIdCardWarning {
+                        state.showIdCardWarning = true
+                        return .none
+                    }
+
                     state.isCreating = true
+                    state.showIdCardWarning = false
 
                     return .run { [newCohouse, idCardData] send in
                         do {
@@ -165,6 +180,11 @@ struct NoCohouseFeature {
                     return .none
                 case .dismissDestinationButtonTapped:
                     state.destination = nil
+                    return .none
+                case .idCardWarningAccepted:
+                    return .send(.confirmCreateCohouseButtonTapped)
+                case .idCardWarningDismissed:
+                    state.showIdCardWarning = false
                     return .none
                 case .findExistingCohouseButtonTapped:
                     let code = state.cohouseCode.trimmingCharacters(in: .whitespaces)
@@ -275,6 +295,19 @@ struct NoCohouseView: View {
                                 }
                             }
                         }
+                    }
+                    .alert(
+                        "ID card verification",
+                        isPresented: $store.showIdCardWarning
+                    ) {
+                        Button("Continue anyway") {
+                            store.send(.idCardWarningAccepted)
+                        }
+                        Button("Retake photo", role: .cancel) {
+                            store.send(.idCardWarningDismissed)
+                        }
+                    } message: {
+                        Text("The photo doesn't appear to be a valid ID card. Your registration could be cancelled if an admin cannot verify your identity.")
                     }
             }
         }
