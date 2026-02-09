@@ -23,6 +23,7 @@ struct CohouseFormFeature {
 
     enum Action: BindableAction, Equatable {
         case addUserButtonTapped
+        case assignAdmin(userId: CohouseUser.ID)
         case binding(BindingAction<State>)
         case deleteUsers(atOffset: IndexSet)
         case quitCohouseButtonTapped
@@ -42,6 +43,11 @@ struct CohouseFormFeature {
             switch action {
                 case .addUserButtonTapped:
                     state.wipCohouse.users.append(CohouseUser(id: uuid()))
+                    return .none
+                case let .assignAdmin(userId):
+                    for index in state.wipCohouse.users.indices {
+                        state.wipCohouse.users[index].isAdmin = (state.wipCohouse.users[index].id == userId)
+                    }
                     return .none
                 case .binding:
                     state.addressValidationResult = nil
@@ -126,7 +132,24 @@ struct CohouseFormView: View {
 
             Section("Members") {
                 ForEach($store.wipCohouse.users) { $user in
-                    TextField("Name", text: $user.surname)
+                    HStack {
+                        TextField("Name", text: $user.surname)
+                        if user.isAdmin {
+                            Image(systemName: "star.fill")
+                                .foregroundStyle(.yellow)
+                                .font(.footnote)
+                        }
+                        if !store.isNewCohouse && isCurrentUserAdmin() && !user.isAdmin {
+                            Button {
+                                store.send(.assignAdmin(userId: user.id))
+                            } label: {
+                                Text("Make admin")
+                                    .font(.caption)
+                                    .foregroundStyle(Color.CKRPurple)
+                            }
+                            .buttonStyle(.borderless)
+                        }
+                    }
                 }
                 .onDelete { indices in
                     store.send(.deleteUsers(atOffset: indices))

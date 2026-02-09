@@ -115,6 +115,7 @@ extension CohouseDetailFeature.Destination.State: Equatable {}
 
 struct CohouseDetailView: View {
     @Bindable var store: StoreOf<CohouseDetailFeature>
+    @State private var codeCopied = false
 
     var body: some View {
         Form {
@@ -132,10 +133,23 @@ struct CohouseDetailView: View {
                         Text("Code :")
                         Text(store.cohouse.code)
                             .textSelection(.enabled)
+                        Spacer()
+                        Button {
+                            UIPasteboard.general.string = store.cohouse.code
+                            codeCopied = true
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                                codeCopied = false
+                            }
+                        } label: {
+                            Image(systemName: codeCopied ? "checkmark" : "doc.on.doc")
+                                .font(.system(size: 16))
+                                .foregroundStyle(.white)
+                        }
+                        .buttonStyle(.plain)
                     }
                     .font(.custom("BaksoSapi", size: 20))
                     .fontWeight(.semibold)
-                    Text("Share this code with your cohouse buddies")
+                    Text(codeCopied ? "Copied!" : "Share this code with your cohouse buddies")
                         .font(.custom("BaksoSapi", size: 12))
                 }
             }

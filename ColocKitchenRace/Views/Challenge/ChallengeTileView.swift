@@ -309,7 +309,7 @@ struct ChallengeTileView: View {
         )
         .onChange(of: store.liveStatus) { _, new in
             if new == .validated {
-                ConfettiCannon()
+                _ = ConfettiCannon()
             }
         }
     }
@@ -402,10 +402,23 @@ func ChallengeContentView(
     VStack(spacing: 12) {
         if challenge.isActiveNow {
             if response == nil {
-                Button("Start", action: onStart)
-                    .buttonStyle(.borderedProminent)
-                    .accessibilityLabel("Start the challenge")
-                    .accessibilityHint("Begin your participation in this challenge.")
+                Button(action: onStart) {
+                    HStack {
+                        Image(systemName: "play.fill")
+                        Text("START")
+                    }
+                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 56)
+                    .foregroundColor(.white)
+                    .background(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .fill(Color.CKRPurple)
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Start the challenge")
+                .accessibilityHint("Begin your participation in this challenge.")
             } else {
                 switch challenge.content {
                     case .picture:

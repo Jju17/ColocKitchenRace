@@ -363,6 +363,9 @@
         }
       }
     },
+    "Copied!" : {
+
+    },
     "Correct answer" : {
       "localizations" : {
         "fr" : {
@@ -719,6 +722,9 @@
           }
         }
       }
+    },
+    "Make admin" : {
+
     },
     "MARK AS DONE" : {
 
@@ -1134,9 +1140,6 @@
           }
         }
       }
-    },
-    "Start" : {
-
     },
     "START" : {
       "localizations" : {

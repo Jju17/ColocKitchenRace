@@ -13,8 +13,8 @@
 // FIX
 // [/] - Fix member admin's selection
 // [/] - Cohouse - Make cohouse code copyable for better sharability
-// [-] - Challenge - Make 'START' Challenge button bigger
-// [-] - Challenge - Take a picture crash because no consent was provided
+// [/] - Challenge - Make 'START' Challenge button bigger
+// [/] - Challenge - Take a picture crash because no consent was provided
 
 // NEW FUNCTIONALITY
 
