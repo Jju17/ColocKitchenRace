@@ -15,13 +15,30 @@ struct UserProfileFormFeatureTests {
 
     // MARK: - onAppear
 
-    @Test("onAppearTriggered copies shared user info to wipUser")
+    @Test("onAppearTriggered refreshes wipUser from shared user info")
     func onAppearTriggered() async {
         @Shared(.userInfo) var userInfo
         let mockUser = User.mockUser
         $userInfo.withLock { $0 = mockUser }
 
+        // State() init already sets wipUser from shared, so onAppear is a no-op
         let store = TestStore(initialState: UserProfileFormFeature.State()) {
+            UserProfileFormFeature()
+        }
+
+        await store.send(.onAppearTriggered)
+    }
+
+    @Test("onAppearTriggered updates wipUser when shared changed after init")
+    func onAppearTriggered_updatesAfterChange() async {
+        @Shared(.userInfo) var userInfo
+        let mockUser = User.mockUser
+        $userInfo.withLock { $0 = mockUser }
+
+        // Start with a stale wipUser to simulate reopening the form
+        var staleUser = User.mockUser
+        staleUser.firstName = "OldName"
+        let store = TestStore(initialState: UserProfileFormFeature.State(wipUser: staleUser)) {
             UserProfileFormFeature()
         }
 

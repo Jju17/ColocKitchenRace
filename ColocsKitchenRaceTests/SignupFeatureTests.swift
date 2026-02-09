@@ -28,9 +28,7 @@ struct SignupFeatureTests {
             $0.authenticationClient.signUp = { _ in .mockUser }
         }
 
-        await store.send(.signupButtonTapped) {
-            $0.errorMessage = nil
-        }
+        await store.send(.signupButtonTapped)
     }
 
     // MARK: - Failed Sign Up
@@ -49,9 +47,7 @@ struct SignupFeatureTests {
             }
         }
 
-        await store.send(.signupButtonTapped) {
-            $0.errorMessage = nil
-        }
+        await store.send(.signupButtonTapped)
 
         await store.receive(\.signupErrorTriggered) {
             $0.errorMessage = "Email already in use"
