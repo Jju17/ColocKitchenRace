@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Politique de Confidentialité — ColocKitchenRace</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.7;
+            color: #333;
+            background: #fafafa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+        .subtitle {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 32px;
+        }
+        h2 {
+            font-size: 20px;
+            margin-top: 32px;
+            margin-bottom: 12px;
+            color: #1a1a1a;
+        }
+        p { margin-bottom: 12px; }
+        ul {
+            margin: 8px 0 16px 24px;
+        }
+        li { margin-bottom: 6px; }
+        .contact {
+            background: #f0f4ff;
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-top: 24px;
+        }
+        .contact a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        .contact a:hover { text-decoration: underline; }
+        footer {
+            text-align: center;
+            margin-top: 32px;
+            font-size: 13px;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Politique de Confidentialité</h1>
+        <p class="subtitle">ColocKitchenRace — Dernière mise à jour : 10 février 2026</p>
+
+        <p>
+            ColocKitchenRace est une application mobile qui organise des événements culinaires sociaux
+            entre colocations à Bruxelles. La présente politique de confidentialité décrit les données
+            personnelles que nous collectons, comment nous les utilisons et quels sont vos droits.
+        </p>
+        <p>
+            En utilisant l'application, vous acceptez les pratiques décrites dans cette politique.
+        </p>
+
+        <h2>1. Données personnelles collectées</h2>
+
+        <p><strong>Informations d'identité (lors de l'inscription) :</strong></p>
+        <ul>
+            <li>Prénom et nom</li>
+            <li>Adresse e-mail</li>
+            <li>Numéro de téléphone (optionnel)</li>
+            <li>Genre</li>
+            <li>Mot de passe (stocké de manière chiffrée par Firebase Authentication)</li>
+        </ul>
+
+        <p><strong>Vérification d'identité (lors de la création d'une colocation) :</strong></p>
+        <ul>
+            <li>Photo de la carte d'identité</li>
+            <li>Nom complet, date de naissance et nationalité extraits de la carte d'identité</li>
+        </ul>
+        <p>
+            Le scan de la carte d'identité est traité localement sur votre appareil via la technologie
+            Apple Vision. L'image est ensuite stockée de manière sécurisée sur nos serveurs.
+        </p>
+
+        <p><strong>Données de localisation :</strong></p>
+        <ul>
+            <li>Adresse postale de la colocation (rue, ville, code postal, pays)</li>
+            <li>Coordonnées GPS dérivées de l'adresse (latitude/longitude) pour le matching par proximité</li>
+        </ul>
+
+        <p><strong>Préférences :</strong></p>
+        <ul>
+            <li>Préférences alimentaires (végétarien, végan, sans gluten, sans lactose, sans noix)</li>
+            <li>Inscription à la newsletter (opt-in)</li>
+        </ul>
+
+        <p><strong>Contenu généré :</strong></p>
+        <ul>
+            <li>Réponses aux défis (texte, photos, choix multiples)</li>
+            <li>Dates de soumission</li>
+        </ul>
+
+        <p><strong>Données techniques :</strong></p>
+        <ul>
+            <li>Jeton de notification push (FCM token) pour l'envoi de notifications</li>
+            <li>Identifiant d'authentification Firebase</li>
+        </ul>
+
+        <h2>2. Données que nous ne collectons PAS</h2>
+        <ul>
+            <li>Aucune donnée d'analyse ou de suivi comportemental</li>
+            <li>Aucun identifiant publicitaire</li>
+            <li>Aucun historique de navigation</li>
+            <li>Aucune donnée revendue ou partagée avec des tiers à des fins publicitaires</li>
+        </ul>
+
+        <h2>3. Utilisation des données</h2>
+        <p>Vos données sont utilisées exclusivement pour :</p>
+        <ul>
+            <li>Créer et gérer votre compte utilisateur</li>
+            <li>Vous associer à votre colocation</li>
+            <li>Organiser le matching des colocations par proximité géographique</li>
+            <li>Vérifier l'identité lors de la création d'une colocation</li>
+            <li>Gérer les défis et valider les réponses</li>
+            <li>Vous envoyer des notifications push liées à l'événement</li>
+            <li>Vous envoyer des actualités si vous êtes inscrit à la newsletter</li>
+        </ul>
+
+        <h2>4. Stockage et sécurité</h2>
+        <p>
+            Toutes les données sont stockées sur <strong>Firebase</strong> (Google Cloud Platform),
+            avec des serveurs situés en Europe (région europe-west1).
+        </p>
+        <p>
+            Les mots de passe sont gérés par Firebase Authentication et ne sont jamais stockés en clair.
+            Les communications entre l'application et les serveurs sont chiffrées via HTTPS/TLS.
+        </p>
+        <p>
+            Les photos de cartes d'identité et les images de défis sont stockées sur Firebase Storage
+            avec des règles d'accès restreintes.
+        </p>
+
+        <h2>5. Notifications push</h2>
+        <p>
+            L'application utilise Firebase Cloud Messaging pour vous envoyer des notifications
+            relatives aux événements, défis et actualités. Vous pouvez désactiver les notifications
+            à tout moment dans les réglages de votre appareil iOS.
+        </p>
+
+        <h2>6. Vos droits (RGPD)</h2>
+        <p>
+            Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez
+            des droits suivants :
+        </p>
+        <ul>
+            <li><strong>Droit d'accès :</strong> obtenir une copie de vos données personnelles</li>
+            <li><strong>Droit de rectification :</strong> corriger vos données inexactes</li>
+            <li><strong>Droit à l'effacement :</strong> demander la suppression de vos données</li>
+            <li><strong>Droit à la portabilité :</strong> recevoir vos données dans un format structuré</li>
+            <li><strong>Droit d'opposition :</strong> vous opposer au traitement de vos données</li>
+            <li><strong>Droit de retirer votre consentement :</strong> à tout moment, sans affecter la
+                licéité du traitement effectué avant le retrait</li>
+        </ul>
+        <p>
+            Pour exercer ces droits, contactez-nous à l'adresse ci-dessous.
+        </p>
+
+        <h2>7. Conservation des données</h2>
+        <p>
+            Vos données personnelles sont conservées tant que votre compte est actif. Si vous
+            supprimez votre compte, vos données seront effacées dans un délai de 30 jours.
+        </p>
+
+        <h2>8. Modifications de cette politique</h2>
+        <p>
+            Nous pouvons mettre à jour cette politique de confidentialité. En cas de modification
+            significative, nous vous en informerons via l'application ou par e-mail.
+        </p>
+
+        <div class="contact">
+            <h2>9. Contact</h2>
+            <p>
+                Pour toute question concernant cette politique de confidentialité ou vos données
+                personnelles, contactez-nous :
+            </p>
+            <p>
+                📧 <a href="mailto:julien@rahier.dev">julien@rahier.dev</a>
+            </p>
+            <p>
+                Julien Rahier — Bruxelles, Belgique
+            </p>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 ColocKitchenRace. Tous droits réservés.
+    </footer>
+</body>
+</html>
