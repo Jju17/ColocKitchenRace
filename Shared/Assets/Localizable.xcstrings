@@ -5,7 +5,14 @@
       "shouldTranslate" : false
     },
     "#%lld" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "#%lld"
+          }
+        }
+      }
     },
     "%@" : {
       "localizations" : {
@@ -24,6 +31,12 @@
             "state" : "new",
             "value" : "%1$@ - %2$@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - %2$@"
+          }
         }
       }
     },
@@ -32,6 +45,12 @@
         "en" : {
           "stringUnit" : {
             "state" : "new",
+            "value" : "%1$@ %2$@"
+          }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
             "value" : "%1$@ %2$@"
           }
         }
@@ -54,6 +73,12 @@
             "state" : "new",
             "value" : "%1$lld challenge%2$@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld challenge%2$@"
+          }
         }
       }
     },
@@ -64,17 +89,44 @@
             "state" : "new",
             "value" : "%1$lld challenge%2$@ validated"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld challenge%2$@ validé"
+          }
         }
       }
     },
     "%lld failed" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld échoué(s)"
+          }
+        }
+      }
     },
     "%lld groups of 4" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld groupes de 4"
+          }
+        }
+      }
     },
     "%lld groups of 4 cohouses have been created successfully." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld groupes de 4 colocs ont été créés avec succès."
+          }
+        }
+      }
     },
     "%lld pt%@" : {
       "localizations" : {
@@ -83,14 +135,34 @@
             "state" : "new",
             "value" : "%1$lld pt%2$@"
           }
+        },
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld pt%2$@"
+          }
         }
       }
     },
     "%lld pts" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld pts"
+          }
+        }
+      }
     },
     "%lld sent" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld envoyé(s)"
+          }
+        }
+      }
     },
     "Active challenges at the moment :" : {
       "localizations" : {
@@ -103,7 +175,14 @@
       }
     },
     "Add default challenges" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ajouter les challenges par défaut"
+          }
+        }
+      }
     },
     "Add user" : {
       "localizations" : {
@@ -155,19 +234,7 @@
         }
       }
     },
-    "Allow multiple selections" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Autorise plusieurs réponses"
-          }
-        }
-      }
-    },
-    "Already have an account ?" : {
-      "extractionState" : "stale",
+    "Already have an account?" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -177,31 +244,45 @@
         }
       }
     },
-    "Already have an account?" : {
-
-    },
     "Analyzing ID card..." : {
-
-    },
-    "Answer" : {
-      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Réponse"
+            "value" : "Analyse de la carte d'identité..."
           }
         }
       }
     },
     "Are you sure you want to delete this challenge ?" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es-tu sûr de vouloir supprimer ce challenge ?"
+          }
+        }
+      }
     },
     "Are you sure? This will permanently delete the current CKR Game and all its data (participants, matches, etc.)." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es-tu sûr ? Cela supprimera définitivement le jeu CKR actuel et toutes ses données (participants, matchs, etc.)."
+          }
+        }
+      }
     },
     "Are you sure? This will permanently remove all matched groups from the current game. This action is not reversible." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Es-tu sûr ? Cela supprimera définitivement tous les groupes formés du jeu actuel. Cette action est irréversible."
+          }
+        }
+      }
     },
     "Basic info" : {
       "localizations" : {
@@ -214,10 +295,24 @@
       }
     },
     "Begin your participation in this challenge." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Commence ta participation à ce challenge."
+          }
+        }
+      }
     },
     "Beta Feature" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fonctionnalité bêta"
+          }
+        }
+      }
     },
     "Body" : {
       "localizations" : {
@@ -230,7 +325,14 @@
       }
     },
     "Camera" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appareil photo"
+          }
+        }
+      }
     },
     "Cancel" : {
       "localizations" : {
@@ -243,7 +345,14 @@
       }
     },
     "Cannot delete" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Suppression impossible"
+          }
+        }
+      }
     },
     "Challenge" : {
       "localizations" : {
@@ -256,13 +365,34 @@
       }
     },
     "Challenge responses" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réponses au challenge"
+          }
+        }
+      }
     },
     "Challenge responses will appear here once submitted" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Les réponses au challenge apparaîtront ici une fois soumises"
+          }
+        }
+      }
     },
     "Challenge: %@" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Challenge : %@"
+          }
+        }
+      }
     },
     "Challenges" : {
       "localizations" : {
@@ -275,7 +405,14 @@
       }
     },
     "Change photo" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Changer la photo"
+          }
+        }
+      }
     },
     "Choice %lld" : {
       "localizations" : {
@@ -288,10 +425,24 @@
       }
     },
     "Choice: %@" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choix : %@"
+          }
+        }
+      }
     },
     "Choose an answer, then confirm." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choisis une réponse, puis confirme."
+          }
+        }
+      }
     },
     "City" : {
       "localizations" : {
@@ -314,10 +465,24 @@
       }
     },
     "CKR Countdown start" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Début du compte à rebours CKR"
+          }
+        }
+      }
     },
     "CKR Game already exists" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un jeu CKR existe déjà"
+          }
+        }
+      }
     },
     "Click here" : {
       "localizations" : {
@@ -330,10 +495,24 @@
       }
     },
     "Close" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermer"
+          }
+        }
+      }
     },
     "Closed" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fermé"
+          }
+        }
+      }
     },
     "Code" : {
       "localizations" : {
@@ -346,15 +525,11 @@
       }
     },
     "Code :" : {
-
-    },
-    "Code : %@" : {
-      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Code : %@"
+            "value" : "Code :"
           }
         }
       }
@@ -365,17 +540,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Coloc"
-          }
-        }
-      }
-    },
-    "Cohouse ID" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "ID de la colocation"
           }
         }
       }
@@ -391,10 +555,24 @@
       }
     },
     "Cohouse updated" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coloc mise à jour"
+          }
+        }
+      }
     },
     "Cohouse: %@" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Coloc : %@"
+          }
+        }
+      }
     },
     "Cohouses" : {
       "localizations" : {
@@ -417,7 +595,14 @@
       }
     },
     "Coming Soon" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bientôt disponible"
+          }
+        }
+      }
     },
     "Confirm" : {
       "localizations" : {
@@ -430,7 +615,14 @@
       }
     },
     "Confirm deletion" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Confirmer la suppression"
+          }
+        }
+      }
     },
     "Content" : {
       "localizations" : {
@@ -443,10 +635,24 @@
       }
     },
     "Continue anyway" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuer quand même"
+          }
+        }
+      }
     },
     "Copied!" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Copié !"
+          }
+        }
+      }
     },
     "Correct answer" : {
       "localizations" : {
@@ -459,7 +665,14 @@
       }
     },
     "Could not analyze the photo. An admin will verify manually." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Impossible d'analyser la photo. Un admin vérifiera manuellement."
+          }
+        }
+      }
     },
     "Create" : {
       "localizations" : {
@@ -472,7 +685,14 @@
       }
     },
     "Create new CKR Game" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créer un nouveau jeu CKR"
+          }
+        }
+      }
     },
     "Create new cohouse" : {
       "localizations" : {
@@ -485,13 +705,34 @@
       }
     },
     "Custom Picker" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélecteur personnalisé"
+          }
+        }
+      }
     },
     "Dashboard" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tableau de bord"
+          }
+        }
+      }
     },
     "Dates" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dates"
+          }
+        }
+      }
     },
     "Days" : {
       "localizations" : {
@@ -514,13 +755,34 @@
       }
     },
     "Delete CKR Game" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer le jeu CKR"
+          }
+        }
+      }
     },
     "Delete CKR Game?" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer le jeu CKR ?"
+          }
+        }
+      }
     },
     "Delete failed" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échec de la suppression"
+          }
+        }
+      }
     },
     "Delete this news?" : {
       "localizations" : {
@@ -533,10 +795,24 @@
       }
     },
     "Dietary preferences" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Préférences alimentaires"
+          }
+        }
+      }
     },
     "Dismiss" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ignorer"
+          }
+        }
+      }
     },
     "Do you want to have news from CKR team ?" : {
       "localizations" : {
@@ -559,10 +835,24 @@
       }
     },
     "Edit CKR Game" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le jeu CKR"
+          }
+        }
+      }
     },
     "Edit CKR Game (Beta)" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le jeu CKR (Bêta)"
+          }
+        }
+      }
     },
     "Edit cohouse" : {
       "localizations" : {
@@ -585,16 +875,44 @@
       }
     },
     "Edit profile" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Modifier le profil"
+          }
+        }
+      }
     },
     "Editing a CKR Game is a beta feature. Modifying certain fields while a game is in progress may cause unexpected behavior." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La modification d'un jeu CKR est une fonctionnalité bêta. Modifier certains champs pendant qu'un jeu est en cours peut provoquer un comportement inattendu."
+          }
+        }
+      }
     },
     "Edition" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Édition"
+          }
+        }
+      }
     },
     "Edition #%lld" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Édition #%lld"
+          }
+        }
+      }
     },
     "Edition ID" : {
       "localizations" : {
@@ -616,17 +934,6 @@
         }
       }
     },
-    "END" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "FIN"
-          }
-        }
-      }
-    },
     "End Date" : {
       "localizations" : {
         "fr" : {
@@ -638,22 +945,64 @@
       }
     },
     "Ended at %@" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Terminé le %@"
+          }
+        }
+      }
     },
     "Envoi en cours…" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoi en cours…"
+          }
+        }
+      }
     },
     "Error" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur"
+          }
+        }
+      }
     },
     "Error : %@" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Erreur : %@"
+          }
+        }
+      }
     },
     "Filter responses" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filtrer les réponses"
+          }
+        }
+      }
     },
     "Final decision for the challenge" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Décision finale pour le challenge"
+          }
+        }
+      }
     },
     "First name" : {
       "localizations" : {
@@ -665,22 +1014,35 @@
         }
       }
     },
-    "Food related" : {
-      "extractionState" : "stale",
+    "For now, if you want to delete current game, please check with an Admin." : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : ""
+            "value" : "Pour le moment, si tu veux supprimer le jeu en cours, contacte un Admin."
           }
         }
       }
     },
-    "For now, if you want to delete current game, please check with an Admin." : {
-
+    "Full ranking" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classement complet"
+          }
+        }
+      }
     },
     "Game date" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date du jeu"
+          }
+        }
+      }
     },
     "Global" : {
       "localizations" : {
@@ -693,10 +1055,6 @@
       }
     },
     "Go to cohouse tab" : {
-
-    },
-    "Go to Cohouse tab" : {
-      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -707,7 +1065,14 @@
       }
     },
     "Group" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Groupe"
+          }
+        }
+      }
     },
     "GSM" : {
       "localizations" : {
@@ -730,7 +1095,14 @@
       }
     },
     "History" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Historique"
+          }
+        }
+      }
     },
     "Home" : {
       "localizations" : {
@@ -753,31 +1125,94 @@
       }
     },
     "i" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "i"
+          }
+        }
+      }
     },
     "I understand, continue" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je comprends, continuer"
+          }
+        }
+      }
     },
     "I’ve done it!" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "C'est fait !"
+          }
+        }
+      }
     },
     "ID" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID"
+          }
+        }
+      }
     },
     "ID Card" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carte d'identité"
+          }
+        }
+      }
     },
     "ID card detected" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Carte d'identité détectée"
+          }
+        }
+      }
     },
     "ID card verification" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérification de la carte d'identité"
+          }
+        }
+      }
     },
     "Image failed to load" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échec du chargement de l'image"
+          }
+        }
+      }
     },
     "Image quality is low. Please retake with better lighting." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La qualité de l'image est faible. Reprends la photo avec un meilleur éclairage."
+          }
+        }
+      }
     },
     "Invalid address (incorrect format)." : {
       "localizations" : {
@@ -790,10 +1225,24 @@
       }
     },
     "Invalidate" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalider"
+          }
+        }
+      }
     },
     "Invalidate response %@" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Invalider la réponse %@"
+          }
+        }
+      }
     },
     "Join existing cohouse" : {
       "localizations" : {
@@ -826,25 +1275,74 @@
       }
     },
     "Leaderboard" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Classement"
+          }
+        }
+      }
     },
     "Library" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bibliothèque"
+          }
+        }
+      }
     },
     "Loading challenges…" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chargement des challenges…"
+          }
+        }
+      }
     },
     "Loading cohouses..." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chargement des colocs..."
+          }
+        }
+      }
     },
     "Loading cohouses…" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chargement des colocs…"
+          }
+        }
+      }
     },
     "Loading history…" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chargement de l'historique…"
+          }
+        }
+      }
     },
     "Loading leaderboard…" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chargement du classement…"
+          }
+        }
+      }
     },
     "Loading..." : {
       "localizations" : {
@@ -877,40 +1375,124 @@
       }
     },
     "Make admin" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rendre admin"
+          }
+        }
+      }
     },
     "MARK AS DONE" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "MARQUER COMME FAIT"
+          }
+        }
+      }
     },
     "Match %lld cohouses" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Associer %lld colocs"
+          }
+        }
+      }
     },
     "Match cohouses" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Associer les colocs"
+          }
+        }
+      }
     },
     "Match cohouses?" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Associer les colocs ?"
+          }
+        }
+      }
     },
     "Matched at" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Associé le"
+          }
+        }
+      }
     },
     "Matched groups" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Groupes formés"
+          }
+        }
+      }
     },
     "Matched Groups" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Groupes formés"
+          }
+        }
+      }
     },
     "Matching cohouses..." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Association des colocs..."
+          }
+        }
+      }
     },
     "Matching complete!" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Association terminée !"
+          }
+        }
+      }
     },
     "Matching failed" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échec de l'association"
+          }
+        }
+      }
     },
     "Max participants" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Participants max"
+          }
+        }
+      }
     },
     "Me" : {
       "localizations" : {
@@ -943,7 +1525,14 @@
       }
     },
     "Message" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Message"
+          }
+        }
+      }
     },
     "Minutes" : {
       "localizations" : {
@@ -977,7 +1566,14 @@
       }
     },
     "Never mind" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tant pis"
+          }
+        }
+      }
     },
     "New challenge" : {
       "localizations" : {
@@ -990,7 +1586,14 @@
       }
     },
     "New CKR Game" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nouveau jeu CKR"
+          }
+        }
+      }
     },
     "New cohouse" : {
       "localizations" : {
@@ -1033,10 +1636,24 @@
       }
     },
     "Next CKR Game" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prochain jeu CKR"
+          }
+        }
+      }
     },
     "Next Edition" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prochaine édition"
+          }
+        }
+      }
     },
     "Next Edition In" : {
       "localizations" : {
@@ -1049,30 +1666,54 @@
       }
     },
     "No challenges" : {
-
-    },
-    "No CKR Game planned" : {
-
-    },
-    "No cohouses found" : {
-
-    },
-    "No dietary preferences" : {
-
-    },
-    "No food intolerences" : {
-      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Pas d'intolérance"
+            "value" : "Aucun challenge"
+          }
+        }
+      }
+    },
+    "No CKR Game planned" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun jeu CKR prévu"
+          }
+        }
+      }
+    },
+    "No cohouses found" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune coloc trouvée"
+          }
+        }
+      }
+    },
+    "No dietary preferences" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune préférence alimentaire"
           }
         }
       }
     },
     "No members" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun membre"
+          }
+        }
+      }
     },
     "No news" : {
       "localizations" : {
@@ -1085,7 +1726,14 @@
       }
     },
     "No news at the moment" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune news pour le moment"
+          }
+        }
+      }
     },
     "No next date provided" : {
       "extractionState" : "manual",
@@ -1099,16 +1747,44 @@
       }
     },
     "No notifications sent yet" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune notification envoyée"
+          }
+        }
+      }
     },
     "No responses" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune réponse"
+          }
+        }
+      }
     },
     "No specific response" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucune réponse spécifique"
+          }
+        }
+      }
     },
     "No validated challenges yet" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun challenge validé pour l'instant"
+          }
+        }
+      }
     },
     "None" : {
       "localizations" : {
@@ -1121,22 +1797,74 @@
       }
     },
     "Notifications" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifications"
+          }
+        }
+      }
     },
     "Notifs" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifs"
+          }
+        }
+      }
     },
     "OK" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        }
+      }
     },
     "Open" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ouvert"
+          }
+        }
+      }
     },
     "Participants" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Participants"
+          }
+        }
+      }
     },
     "Photo source" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Source de la photo"
+          }
+        }
+      }
+    },
+    "Points (default: 1)" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Points (par défaut : 1)"
+          }
+        }
+      }
     },
     "Postcode" : {
       "localizations" : {
@@ -1149,7 +1877,14 @@
       }
     },
     "Processing photo…" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Traitement de la photo…"
+          }
+        }
+      }
     },
     "Profile" : {
       "localizations" : {
@@ -1172,37 +1907,114 @@
       }
     },
     "Ready to submit · %@" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prêt à envoyer · %@"
+          }
+        }
+      }
     },
     "Registration deadline" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date limite d'inscription"
+          }
+        }
+      }
     },
     "Remove photo" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer la photo"
+          }
+        }
+      }
     },
     "Required to verify your identity when creating a cohouse." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Requis pour vérifier ton identité lors de la création d'une coloc."
+          }
+        }
+      }
     },
     "Reset" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialiser"
+          }
+        }
+      }
     },
     "Reset all matches?" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialiser toutes les associations ?"
+          }
+        }
+      }
     },
     "Reset failed" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Échec de la réinitialisation"
+          }
+        }
+      }
     },
     "Reset matches" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialiser les associations"
+          }
+        }
+      }
     },
     "Response invalidated ❌" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réponse invalidée ❌"
+          }
+        }
+      }
     },
     "Response validated ✅" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réponse validée ✅"
+          }
+        }
+      }
     },
     "Response: %@" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réponse : %@"
+          }
+        }
+      }
     },
     "Result" : {
       "localizations" : {
@@ -1215,7 +2027,14 @@
       }
     },
     "Retake photo" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reprendre la photo"
+          }
+        }
+      }
     },
     "Save" : {
       "localizations" : {
@@ -1248,18 +2067,21 @@
       }
     },
     "Select a cohouse" : {
-
-    },
-    "Select a photo, then submit." : {
-
-    },
-    "Select a Picture" : {
-      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Photo"
+            "value" : "Sélectionner une coloc"
+          }
+        }
+      }
+    },
+    "Select a photo, then submit." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sélectionne une photo, puis envoie."
           }
         }
       }
@@ -1315,15 +2137,11 @@
       }
     },
     "Send your photo for validation." : {
-
-    },
-    "Sending…" : {
-      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Envoi en cours…"
+            "value" : "Envoie ta photo pour validation."
           }
         }
       }
@@ -1379,7 +2197,14 @@
       }
     },
     "Sort responses" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Trier les réponses"
+          }
+        }
+      }
     },
     "START" : {
       "localizations" : {
@@ -1402,65 +2227,134 @@
       }
     },
     "Start the challenge" : {
-
-    },
-    "Starts at %@" : {
-
-    },
-    "Stats" : {
-      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Stats"
+            "value" : "Commencer le challenge"
+          }
+        }
+      }
+    },
+    "Starts at %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Commence le %@"
           }
         }
       }
     },
     "Status" : {
-
-    },
-    "Status: %@" : {
-
-    },
-    "Stay tuned!" : {
-
-    },
-    "Submit" : {
-      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Envoyer"
+            "value" : "Statut"
+          }
+        }
+      }
+    },
+    "Status: %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statut : %@"
+          }
+        }
+      }
+    },
+    "Stay tuned!" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reste connecté !"
           }
         }
       }
     },
     "Submit photo" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Envoyer la photo"
+          }
+        }
+      }
     },
     "SUBMIT PHOTO" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ENVOYER LA PHOTO"
+          }
+        }
+      }
     },
     "SUBMIT YOUR ANSWER" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ENVOIE TA RÉPONSE"
+          }
+        }
+      }
     },
     "SUBMIT YOUR NAME" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ENVOIE TON NOM"
+          }
+        }
+      }
     },
     "Submitted on: %@" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Soumis le : %@"
+          }
+        }
+      }
     },
     "Take a photo of your ID card" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prends ta carte d'identité en photo"
+          }
+        }
+      }
     },
     "Take or choose a photo" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prends ou choisis une photo"
+          }
+        }
+      }
     },
     "Tap + to create a challenge" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Appuie sur + pour créer un challenge"
+          }
+        }
+      }
     },
     "Tap + to create a news" : {
       "localizations" : {
@@ -1483,13 +2377,34 @@
       }
     },
     "Text" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Texte"
+          }
+        }
+      }
     },
     "The CKR countdown has already started (%@). Contact a system administrator to delete this game." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le compte à rebours CKR a déjà commencé (%@). Contacte un administrateur pour supprimer ce jeu."
+          }
+        }
+      }
     },
     "The photo doesn't appear to be a valid ID card. Your registration could be cancelled if an admin cannot verify your identity." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "La photo ne semble pas être une carte d'identité valide. Ton inscription pourrait être annulée si un admin ne peut pas vérifier ton identité."
+          }
+        }
+      }
     },
     "This action is irreversible." : {
       "localizations" : {
@@ -1502,10 +2417,24 @@
       }
     },
     "This doesn't look like an ID card. Please retake the photo." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cela ne ressemble pas à une carte d'identité. Reprends la photo."
+          }
+        }
+      }
     },
     "This will partition %lld registered cohouses into groups of 4 based on GPS proximity. This action will overwrite any previous matching." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cela regroupera %lld colocs inscrites en groupes de 4 selon la proximité GPS. Cette action écrasera tout regroupement précédent."
+          }
+        }
+      }
     },
     "Title" : {
       "localizations" : {
@@ -1527,7 +2456,14 @@
       "shouldTranslate" : false
     },
     "Type your creative name here..." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tape ton nom créatif ici..."
+          }
+        }
+      }
     },
     "Valid address ✅" : {
       "localizations" : {
@@ -1540,22 +2476,56 @@
       }
     },
     "Validate" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valider"
+          }
+        }
+      }
     },
     "Validate response %@" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valider la réponse %@"
+          }
+        }
+      }
     },
     "Validating address…" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Validation de l'adresse…"
+          }
+        }
+      }
     },
     "Validation" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Validation"
+          }
+        }
+      }
     },
     "You have been removed from this cohouse by admin user." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tu as été retiré de cette coloc par un administrateur."
+          }
+        }
+      }
     },
-    "You need an account ?" : {
-      "extractionState" : "stale",
+    "You need an account?" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -1564,9 +2534,6 @@
           }
         }
       }
-    },
-    "You need an account?" : {
-
     },
     "ZIP Code" : {
       "localizations" : {
