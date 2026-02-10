@@ -78,7 +78,10 @@ struct HomeView: View {
                     Button {
                         self.store.send(.openRegisterLink)
                     } label: {
-                        CountdownTileView(nextKitchenRace: self.store.ckrGame?.nextGameDate)
+                        CountdownTileView(
+                        nextKitchenRace: self.store.ckrGame?.nextGameDate,
+                        countdownStart: self.store.ckrGame?.startCKRCountdown
+                    )
                     }
                     NewsTileView(allNews: self.store.$news)
                 }

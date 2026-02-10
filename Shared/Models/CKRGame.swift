@@ -16,6 +16,7 @@ struct MatchedGroup: Equatable, Hashable, Codable {
 struct CKRGame: Equatable, Hashable, Identifiable, Codable {
     var id: UUID = UUID()
     var editionNumber: Int = 1
+    var startCKRCountdown: Date
     var nextGameDate: Date
     var registrationDeadline: Date
     var maxParticipants: Int = 100
@@ -32,5 +33,10 @@ struct CKRGame: Equatable, Hashable, Identifiable, Codable {
     /// Number of remaining spots.
     var remainingSpots: Int {
         max(0, maxParticipants - participantsID.count)
+    }
+
+    /// Whether the countdown has started (deletion no longer allowed without a real admin).
+    var hasCountdownStarted: Bool {
+        Date() >= startCKRCountdown
     }
 }

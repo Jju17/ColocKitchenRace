@@ -31,6 +31,7 @@ struct ChallengeFeature {
         @Presents var destination: Destination.State?
         var challenges: [Challenge] = []
         var challengeToDelete: Challenge?
+        var isLoading: Bool = false
     }
 
     enum Action: BindableAction {
@@ -73,9 +74,11 @@ struct ChallengeFeature {
                         }
                     }
                 case .responsesLoaded(.success(let challenges)):
+                    state.isLoading = false
                     state.challenges = challenges
                     return .none
                 case .responsesLoaded(.failure): // Next handling of error here
+                    state.isLoading = false
                     return .none
                 case .binding:
                     return .none
@@ -127,6 +130,7 @@ struct ChallengeFeature {
                     state.challengeToDelete = nil
                     return .none
                 case .onTask:
+                    state.isLoading = true
                     return .run { send in
                         let fetchResult = await self.challengeClient.getAll()
                         await send(.responsesLoaded(fetchResult))
@@ -149,32 +153,44 @@ struct ChallengeView: View {
 
     var body: some View {
         NavigationStack {
-            List {
-                ForEach(store.challenges) { challenge in
-                    VStack(alignment: .leading, spacing: 5) {
-                        HStack {
-                            Text(challenge.title)
-                                .fontWeight(.semibold)
-                            Spacer()
-                            Text(challenge.state.rawValue)
-                                .font(.caption)
-                                .foregroundColor(challenge.stateColor)
-                                .padding(.vertical, 4)
-                                .padding(.horizontal, 8)
-                                .background(challenge.stateColor.opacity(0.1))
-                                .clipShape(RoundedRectangle(cornerRadius: 4))
-                        }
-                        Text("\(ChallengeView.dateFormatter.string(from: challenge.startDate)) - \(ChallengeView.dateFormatter.string(from: challenge.endDate))")
-                            .font(.subheadline)
-                            .foregroundColor(.secondary)
-                        Text("\(challenge.body)")
-                            .font(.footnote)
-                    }
-                    .swipeActions(edge: .trailing) {
-                        Button(role: .destructive) {
-                            store.send(.deleteChallenge(challenge))
-                        } label: {
-                            Label("Delete", systemImage: "trash")
+            Group {
+                if store.isLoading && store.challenges.isEmpty {
+                    ProgressView("Loading...")
+                } else if store.challenges.isEmpty {
+                    ContentUnavailableView(
+                        "No challenges",
+                        systemImage: "flag",
+                        description: Text("Tap + to create a challenge")
+                    )
+                } else {
+                    List {
+                        ForEach(store.challenges) { challenge in
+                            VStack(alignment: .leading, spacing: 5) {
+                                HStack {
+                                    Text(challenge.title)
+                                        .fontWeight(.semibold)
+                                    Spacer()
+                                    Text(challenge.state.rawValue)
+                                        .font(.caption)
+                                        .foregroundColor(challenge.stateColor)
+                                        .padding(.vertical, 4)
+                                        .padding(.horizontal, 8)
+                                        .background(challenge.stateColor.opacity(0.1))
+                                        .clipShape(RoundedRectangle(cornerRadius: 4))
+                                }
+                                Text("\(ChallengeView.dateFormatter.string(from: challenge.startDate)) - \(ChallengeView.dateFormatter.string(from: challenge.endDate))")
+                                    .font(.subheadline)
+                                    .foregroundColor(.secondary)
+                                Text("\(challenge.body)")
+                                    .font(.footnote)
+                            }
+                            .swipeActions(edge: .trailing) {
+                                Button(role: .destructive) {
+                                    store.send(.deleteChallenge(challenge))
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
+                            }
                         }
                     }
                 }
@@ -188,12 +204,9 @@ struct ChallengeView: View {
                         Image(systemName: "plus")
                     }
                 }
-                ToolbarItem(placement: .automatic) {
-                    Button {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Add default challenges") {
                         store.send(.addAllMockChallenges)
-                    } label: {
-                        Image(systemName: "plus.circle")
-                            .accessibilityLabel("Add test responses")
                     }
                 }
             }

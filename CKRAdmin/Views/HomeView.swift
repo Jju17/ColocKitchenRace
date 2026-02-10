@@ -28,6 +28,8 @@ struct HomeFeature {
                 case gameAlreadyGenerated
                 case confirmMatchCohouses
                 case confirmResetMatches
+                case confirmDeleteGame
+                case confirmEditGame
             }
         }
     }
@@ -63,6 +65,10 @@ struct HomeFeature {
         case confirmAddCKRGameButtonTapped
         case confirmEditCKRGameButtonTapped
         case confirmMatchCohousesButtonTapped
+        case deleteGameButtonTapped
+        case confirmDeleteGameButtonTapped
+        case deleteGameCompleted
+        case deleteGameFailed(String)
         case destination(PresentationAction<Destination.Action>)
         case dismissDestinationButtonTapped
         case editCKRGameButtonTapped
@@ -136,12 +142,74 @@ struct HomeFeature {
                     return .run { _ in
                         _ = self.ckrClient.updateGame(updatedGame)
                     }
+                case .deleteGameButtonTapped:
+                    guard let game = state.currentGame else { return .none }
+                    if game.hasCountdownStarted {
+                        state.destination = .alert(
+                            AlertState {
+                                TextState("Cannot delete")
+                            } message: {
+                                TextState("The CKR countdown has already started (\(game.startCKRCountdown.formatted(date: .abbreviated, time: .omitted))). Contact a system administrator to delete this game.")
+                            }
+                        )
+                    } else {
+                        state.destination = .alert(
+                            AlertState {
+                                TextState("Delete CKR Game?")
+                            } actions: {
+                                ButtonState(role: .destructive, action: .confirmDeleteGame) {
+                                    TextState("Delete")
+                                }
+                                ButtonState(role: .cancel) {
+                                    TextState("Cancel")
+                                }
+                            } message: {
+                                TextState("Are you sure? This will permanently delete the current CKR Game and all its data (participants, matches, etc.).")
+                            }
+                        )
+                    }
+                    return .none
+                case .confirmDeleteGameButtonTapped:
+                    return .run { send in
+                        let result = await self.ckrClient.deleteGame()
+                        switch result {
+                        case .success:
+                            await send(.deleteGameCompleted)
+                        case .failure(let error):
+                            await send(.deleteGameFailed(error.localizedDescription))
+                        }
+                    }
+                case .deleteGameCompleted:
+                    state.currentGame = nil
+                    return .none
+                case let .deleteGameFailed(errorMessage):
+                    state.destination = .alert(
+                        AlertState {
+                            TextState("Delete failed")
+                        } message: {
+                            TextState(errorMessage)
+                        }
+                    )
+                    return .none
                 case .dismissDestinationButtonTapped:
                     state.destination = nil
                     return .none
                 case .editCKRGameButtonTapped:
-                    guard let game = state.currentGame else { return .none }
-                    state.destination = .editCKRGame(CKRGameFormFeature.State(game: game))
+                    guard state.currentGame != nil else { return .none }
+                    state.destination = .alert(
+                        AlertState {
+                            TextState("Beta Feature")
+                        } actions: {
+                            ButtonState(action: .confirmEditGame) {
+                                TextState("I understand, continue")
+                            }
+                            ButtonState(role: .cancel) {
+                                TextState("Cancel")
+                            }
+                        } message: {
+                            TextState("Editing a CKR Game is a beta feature. Modifying certain fields while a game is in progress may cause unexpected behavior.")
+                        }
+                    )
                     return .none
                 case .confirmMatchCohousesButtonTapped:
                     guard let game = state.currentGame else { return .none }
@@ -300,6 +368,12 @@ struct HomeFeature {
                     return .send(.confirmMatchCohousesButtonTapped)
                 case .destination(.presented(.alert(.confirmResetMatches))):
                     return .send(.confirmResetMatchesButtonTapped)
+                case .destination(.presented(.alert(.confirmDeleteGame))):
+                    return .send(.confirmDeleteGameButtonTapped)
+                case .destination(.presented(.alert(.confirmEditGame))):
+                    guard let game = state.currentGame else { return .none }
+                    state.destination = .editCKRGame(CKRGameFormFeature.State(game: game))
+                    return .none
                 case .destination:
                     return .none
             }
@@ -351,15 +425,38 @@ struct HomeView: View {
             }
             .navigationTitle("Dashboard")
             .toolbar {
-                Button {
-                    self.store.send(.addNewCKRGameButtonTapped)
-                } label: {
-                    Image(systemName: "plus")
-                }
-                Button {
-                    self.store.send(.signOut)
-                } label: {
-                    Image(systemName: "rectangle.portrait.and.arrow.forward")
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        if store.currentGame != nil {
+                            Button {
+                                store.send(.editCKRGameButtonTapped)
+                            } label: {
+                                Label("Edit CKR Game (Beta)", systemImage: "exclamationmark.triangle")
+                            }
+
+                            Button(role: .destructive) {
+                                store.send(.deleteGameButtonTapped)
+                            } label: {
+                                Label("Delete CKR Game", systemImage: "trash")
+                            }
+                        } else {
+                            Button {
+                                store.send(.addNewCKRGameButtonTapped)
+                            } label: {
+                                Label("New CKR Game", systemImage: "plus")
+                            }
+                        }
+
+                        Divider()
+
+                        Button(role: .destructive) {
+                            store.send(.signOut)
+                        } label: {
+                            Label("Sign out", systemImage: "rectangle.portrait.and.arrow.forward")
+                        }
+                    } label: {
+                        Image(systemName: "ellipsis.circle")
+                    }
                 }
             }
         }
@@ -541,8 +638,9 @@ struct HomeView: View {
     private func gameInfoItems(_ game: CKRGame) -> [GameInfoItem] {
         [
             GameInfoItem(label: "Edition", value: "#\(game.editionNumber)"),
-            GameInfoItem(label: "Game date", value: game.nextGameDate.formatted(date: .abbreviated, time: .omitted)),
+            GameInfoItem(label: "Countdown start", value: game.startCKRCountdown.formatted(date: .abbreviated, time: .omitted)),
             GameInfoItem(label: "Registration deadline", value: game.registrationDeadline.formatted(date: .abbreviated, time: .omitted)),
+            GameInfoItem(label: "Game date", value: game.nextGameDate.formatted(date: .abbreviated, time: .omitted)),
             GameInfoItem(label: "Max participants", value: "\(game.maxParticipants)"),
             GameInfoItem(label: "Registered", value: "\(game.participantsID.count) / \(game.maxParticipants)"),
         ]

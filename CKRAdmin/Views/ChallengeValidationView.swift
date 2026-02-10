@@ -98,14 +98,17 @@ struct ChallengeValidationView: View {
     var body: some View {
         NavigationView {
             Group {
-                if store.isLoading {
-                    ProgressView("Loading responses...")
+                if store.isLoading && store.responses.isEmpty {
+                    ProgressView("Loading...")
                 } else if let errorMessage = store.errorMessage {
                     Text("Error : \(errorMessage)")
                         .foregroundColor(.red)
                 } else if store.responses.isEmpty {
-                    Text("No challenge response at the moment")
-                        .foregroundColor(.gray)
+                    ContentUnavailableView(
+                        "No responses",
+                        systemImage: "checkmark.circle",
+                        description: Text("Challenge responses will appear here once submitted")
+                    )
                 } else {
                     VStack {
                         Picker("Filter responses", selection: $store.filterStatus) {

@@ -60,7 +60,7 @@
         }
       }
     },
-    "Add test responses" : {
+    "Add default challenges" : {
 
     },
     "Add user" : {
@@ -155,6 +155,9 @@
     "Are you sure you want to delete this challenge ?" : {
 
     },
+    "Are you sure? This will permanently delete the current CKR Game and all its data (participants, matches, etc.)." : {
+
+    },
     "Are you sure? This will permanently remove all matched groups from the current game. This action is not reversible." : {
 
     },
@@ -169,6 +172,9 @@
       }
     },
     "Begin your participation in this challenge." : {
+
+    },
+    "Beta Feature" : {
 
     },
     "Body" : {
@@ -194,6 +200,9 @@
         }
       }
     },
+    "Cannot delete" : {
+
+    },
     "Challenge" : {
       "localizations" : {
         "fr" : {
@@ -205,6 +214,9 @@
       }
     },
     "Challenge responses" : {
+
+    },
+    "Challenge responses will appear here once submitted" : {
 
     },
     "Challenge: %@" : {
@@ -258,6 +270,9 @@
           }
         }
       }
+    },
+    "CKR Countdown start" : {
+
     },
     "CKR Game already exists" : {
 
@@ -358,6 +373,9 @@
         }
       }
     },
+    "Coming Soon" : {
+
+    },
     "Confirm" : {
       "localizations" : {
         "fr" : {
@@ -452,6 +470,15 @@
         }
       }
     },
+    "Delete CKR Game" : {
+
+    },
+    "Delete CKR Game?" : {
+
+    },
+    "Delete failed" : {
+
+    },
     "Delete this news?" : {
       "localizations" : {
         "fr" : {
@@ -491,6 +518,9 @@
     "Edit CKR Game" : {
 
     },
+    "Edit CKR Game (Beta)" : {
+
+    },
     "Edit cohouse" : {
       "localizations" : {
         "fr" : {
@@ -512,6 +542,9 @@
       }
     },
     "Edit profile" : {
+
+    },
+    "Editing a CKR Game is a beta feature. Modifying certain fields while a game is in progress may cause unexpected behavior." : {
 
     },
     "Edition" : {
@@ -676,6 +709,9 @@
     "i" : {
 
     },
+    "I understand, continue" : {
+
+    },
     "I’ve done it!" : {
 
     },
@@ -750,9 +786,6 @@
 
     },
     "Loading cohouses..." : {
-
-    },
-    "Loading responses..." : {
 
     },
     "Loading..." : {
@@ -944,6 +977,9 @@
     "Next CKR Game" : {
 
     },
+    "Next Edition" : {
+
+    },
     "Next Edition In" : {
       "localizations" : {
         "fr" : {
@@ -954,7 +990,7 @@
         }
       }
     },
-    "No challenge response at the moment" : {
+    "No challenges" : {
 
     },
     "No CKR Game planned" : {
@@ -1000,6 +1036,9 @@
           }
         }
       }
+    },
+    "No responses" : {
+
     },
     "No specific response" : {
 
@@ -1315,6 +1354,9 @@
     "Status: %@" : {
 
     },
+    "Stay tuned!" : {
+
+    },
     "Submit" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -1347,6 +1389,9 @@
     "Take or choose a photo" : {
 
     },
+    "Tap + to create a challenge" : {
+
+    },
     "Tap + to create a news" : {
       "localizations" : {
         "fr" : {
@@ -1368,6 +1413,9 @@
       }
     },
     "Text" : {
+
+    },
+    "The CKR countdown has already started (%@). Contact a system administrator to delete this game." : {
 
     },
     "The photo doesn't appear to be a valid ID card. Your registration could be cancelled if an admin cannot verify your identity." : {
