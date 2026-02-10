@@ -369,9 +369,56 @@ struct CKRGameModelTests {
 
     @Test("CKRGame default values")
     func defaultValues() {
-        let game = CKRGame(nextGameDate: Date())
+        let futureDate = Date().addingTimeInterval(60 * 60 * 24 * 60) // 60 days
+        let deadline = Date().addingTimeInterval(60 * 60 * 24 * 46) // 46 days
+        let game = CKRGame(nextGameDate: futureDate, registrationDeadline: deadline)
         #expect(game.participantsID.isEmpty)
-        #expect(game.id != UUID()) // Random UUID
+        #expect(game.editionNumber == 1)
+        #expect(game.maxParticipants == 100)
+        #expect(game.id != UUID())
+    }
+
+    @Test("isRegistrationOpen returns true when deadline is in the future and spots available")
+    func registrationOpen() {
+        let game = CKRGame(
+            nextGameDate: Date().addingTimeInterval(60 * 60 * 24 * 60),
+            registrationDeadline: Date().addingTimeInterval(60 * 60 * 24 * 46),
+            maxParticipants: 20
+        )
+        #expect(game.isRegistrationOpen == true)
+    }
+
+    @Test("isRegistrationOpen returns false when deadline has passed")
+    func registrationClosedByDeadline() {
+        let game = CKRGame(
+            nextGameDate: Date().addingTimeInterval(60 * 60 * 24 * 7),
+            registrationDeadline: Date().addingTimeInterval(-60 * 60), // 1 hour ago
+            maxParticipants: 20
+        )
+        #expect(game.isRegistrationOpen == false)
+    }
+
+    @Test("isRegistrationOpen returns false when max participants reached")
+    func registrationClosedByCapacity() {
+        var game = CKRGame(
+            nextGameDate: Date().addingTimeInterval(60 * 60 * 24 * 60),
+            registrationDeadline: Date().addingTimeInterval(60 * 60 * 24 * 46),
+            maxParticipants: 4
+        )
+        game.participantsID = ["a", "b", "c", "d"]
+        #expect(game.isRegistrationOpen == false)
+    }
+
+    @Test("remainingSpots computes correctly")
+    func remainingSpots() {
+        var game = CKRGame(
+            nextGameDate: Date().addingTimeInterval(60 * 60 * 24 * 60),
+            registrationDeadline: Date().addingTimeInterval(60 * 60 * 24 * 46),
+            maxParticipants: 20
+        )
+        #expect(game.remainingSpots == 20)
+        game.participantsID = ["a", "b", "c"]
+        #expect(game.remainingSpots == 17)
     }
 }
 

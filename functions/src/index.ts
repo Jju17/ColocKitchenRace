@@ -468,6 +468,290 @@ export const validateAddress = onCall<ValidateAddressRequest>(
 );
 
 // ============================================
+// Cohouse Matching Algorithm
+// ============================================
+
+interface MatchCohousesRequest {
+  gameId: string;
+}
+
+interface CohousePoint {
+  id: string;
+  latitude: number;
+  longitude: number;
+}
+
+/**
+ * Euclidean distance between two GPS points.
+ * Uses a simple equirectangular approximation (valid for short distances like within Belgium).
+ * Returns distance in km.
+ */
+function euclideanDistanceKm(
+  lat1: number, lon1: number,
+  lat2: number, lon2: number
+): number {
+  const R = 6371; // Earth radius in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const avgLat = (lat1 + lat2) / 2 * Math.PI / 180;
+  const dx = dLon * Math.cos(avgLat) * R;
+  const dy = dLat * R;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+/**
+ * Compute cubic distance matrix for all pairs.
+ * Key format: "i,j" where i < j (sorted indices).
+ */
+function computeCubicDistances(points: CohousePoint[]): Map<string, number> {
+  const distances = new Map<string, number>();
+  for (let i = 0; i < points.length; i++) {
+    for (let j = i + 1; j < points.length; j++) {
+      const d = euclideanDistanceKm(
+        points[i].latitude, points[i].longitude,
+        points[j].latitude, points[j].longitude
+      );
+      distances.set(`${i},${j}`, d * d * d); // cubic
+    }
+  }
+  return distances;
+}
+
+/**
+ * Get cubic distance between two point indices.
+ */
+function getCubicDist(dCubic: Map<string, number>, i: number, j: number): number {
+  const key = i < j ? `${i},${j}` : `${j},${i}`;
+  return dCubic.get(key) ?? Infinity;
+}
+
+/**
+ * Greedy Minimum Weight Perfect Matching.
+ * Sorts all edges by weight, greedily picks the lightest edge
+ * whose both endpoints are still unmatched.
+ * Returns pairs of node indices.
+ */
+function greedyMinWeightMatching(
+  nodeCount: number,
+  edges: Array<{ u: number; v: number; weight: number }>
+): Array<[number, number]> {
+  // Sort edges by weight ascending
+  edges.sort((a, b) => a.weight - b.weight);
+
+  const matched = new Set<number>();
+  const pairs: Array<[number, number]> = [];
+
+  for (const edge of edges) {
+    if (matched.has(edge.u) || matched.has(edge.v)) continue;
+    pairs.push([edge.u, edge.v]);
+    matched.add(edge.u);
+    matched.add(edge.v);
+    if (pairs.length * 2 >= nodeCount) break;
+  }
+
+  return pairs;
+}
+
+/**
+ * Double Perfect Matching Heuristic — adapted from coloc_matcher.py
+ *
+ * Phase 1: Match individual cohouses into optimal pairs via greedy MWPM.
+ * Phase 2: Match pairs into groups of 4 via a second greedy MWPM.
+ *
+ * @param points - Array of cohouse points with GPS coordinates
+ * @param dCubic - Precomputed cubic distance matrix
+ * @returns Array of groups, each group is an array of 4 cohouse IDs
+ */
+function doubleMatchingHeuristic(
+  points: CohousePoint[],
+  dCubic: Map<string, number>
+): string[][] {
+  const N = points.length;
+
+  // --- Phase 1: Match individual points into optimal pairs ---
+  const edges1: Array<{ u: number; v: number; weight: number }> = [];
+  for (let i = 0; i < N; i++) {
+    for (let j = i + 1; j < N; j++) {
+      edges1.push({ u: i, v: j, weight: getCubicDist(dCubic, i, j) });
+    }
+  }
+
+  const pairs = greedyMinWeightMatching(N, edges1);
+  console.log(`Phase 1: Found ${pairs.length} optimal pairs.`);
+
+  // --- Phase 2: Match the pairs into optimal groups of 4 ---
+  const numPairs = pairs.length;
+  const edges2: Array<{ u: number; v: number; weight: number }> = [];
+
+  for (let idx1 = 0; idx1 < numPairs; idx1++) {
+    for (let idx2 = idx1 + 1; idx2 < numPairs; idx2++) {
+      const pair1 = pairs[idx1];
+      const pair2 = pairs[idx2];
+
+      // Cost = max of 4 cross-distances (conservative estimate)
+      const cost = Math.max(
+        getCubicDist(dCubic, pair1[0], pair2[0]),
+        getCubicDist(dCubic, pair1[0], pair2[1]),
+        getCubicDist(dCubic, pair1[1], pair2[0]),
+        getCubicDist(dCubic, pair1[1], pair2[1])
+      );
+
+      edges2.push({ u: idx1, v: idx2, weight: cost });
+    }
+  }
+
+  const matchedPairs = greedyMinWeightMatching(numPairs, edges2);
+  console.log(`Phase 2: Matched pairs into ${matchedPairs.length} groups of 4.`);
+
+  // Reconstruct final groups using cohouse IDs
+  const groups: string[][] = [];
+  for (const [pairIdx1, pairIdx2] of matchedPairs) {
+    const group = [
+      points[pairs[pairIdx1][0]].id,
+      points[pairs[pairIdx1][1]].id,
+      points[pairs[pairIdx2][0]].id,
+      points[pairs[pairIdx2][1]].id,
+    ];
+    groups.push(group);
+  }
+
+  return groups;
+}
+
+/**
+ * Match cohouses into groups of 4 based on GPS proximity.
+ *
+ * Uses the Double Perfect Matching Heuristic:
+ * 1. Reads the CKR game to get participating cohouse IDs
+ * 2. Fetches GPS coordinates for each cohouse
+ * 3. Runs a two-phase matching algorithm (cubic distance metric)
+ * 4. Stores the resulting groups back in Firestore
+ *
+ * Requires: N must be a multiple of 4, all cohouses must have GPS coordinates.
+ */
+export const matchCohouses = onCall<MatchCohousesRequest>(
+  { region: REGION, timeoutSeconds: 120 },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Must be authenticated");
+    }
+
+    const { gameId } = request.data;
+
+    if (!gameId) {
+      throw new HttpsError("invalid-argument", "Missing required field: gameId");
+    }
+
+    try {
+      // 1. Fetch the CKR game
+      const gameDoc = await db.collection("ckrGames").doc(gameId).get();
+
+      if (!gameDoc.exists) {
+        throw new HttpsError("not-found", "CKR Game not found");
+      }
+
+      const gameData = gameDoc.data();
+      const participantsIds: string[] = gameData?.participantsID || [];
+
+      if (participantsIds.length === 0) {
+        throw new HttpsError(
+          "failed-precondition",
+          "No cohouses registered for this game"
+        );
+      }
+
+      if (participantsIds.length % 4 !== 0) {
+        throw new HttpsError(
+          "failed-precondition",
+          `Number of participants (${participantsIds.length}) must be a multiple of 4. ` +
+          `Current count leaves ${participantsIds.length % 4} cohouse(s) unmatched.`
+        );
+      }
+
+      if (participantsIds.length < 4) {
+        throw new HttpsError(
+          "failed-precondition",
+          "Need at least 4 cohouses to perform matching"
+        );
+      }
+
+      // 2. Fetch GPS coordinates for all participating cohouses
+      const points: CohousePoint[] = [];
+      const missingCoords: string[] = [];
+
+      // Batch Firestore reads (max 30 per 'in' query)
+      const batches = [];
+      for (let i = 0; i < participantsIds.length; i += 30) {
+        batches.push(participantsIds.slice(i, i + 30));
+      }
+
+      for (const batch of batches) {
+        const snapshot = await db
+          .collection("cohouses")
+          .where("id", "in", batch)
+          .get();
+
+        snapshot.docs.forEach((doc) => {
+          const data = doc.data();
+          const id = data.id as string;
+          const lat = data.latitude as number | undefined;
+          const lon = data.longitude as number | undefined;
+
+          if (lat != null && lon != null) {
+            points.push({ id, latitude: lat, longitude: lon });
+          } else {
+            missingCoords.push(data.name || id);
+          }
+        });
+      }
+
+      if (missingCoords.length > 0) {
+        throw new HttpsError(
+          "failed-precondition",
+          `The following cohouses are missing GPS coordinates: ${missingCoords.join(", ")}. ` +
+          "All cohouses must have valid coordinates for matching."
+        );
+      }
+
+      if (points.length !== participantsIds.length) {
+        const found = points.map((p) => p.id);
+        const missing = participantsIds.filter((id) => !found.includes(id));
+        throw new HttpsError(
+          "not-found",
+          `Could not find cohouse documents for IDs: ${missing.join(", ")}`
+        );
+      }
+
+      console.log(`Starting matching for ${points.length} cohouses...`);
+
+      // 3. Compute cubic distance matrix
+      const dCubic = computeCubicDistances(points);
+
+      // 4. Run double matching heuristic
+      const groups = doubleMatchingHeuristic(points, dCubic);
+
+      console.log(`Matching complete: ${groups.length} groups of 4 created.`);
+
+      // 5. Store results back in Firestore on the game document
+      await db.collection("ckrGames").doc(gameId).update({
+        matchedGroups: groups,
+        matchedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      return {
+        success: true,
+        groupCount: groups.length,
+        groups: groups,
+      };
+    } catch (error) {
+      if (error instanceof HttpsError) throw error;
+      console.error("Error matching cohouses:", error);
+      throw new HttpsError("internal", "Failed to match cohouses");
+    }
+  }
+);
+
+// ============================================
 // Firestore Triggers
 // ============================================
 

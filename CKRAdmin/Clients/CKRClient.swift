@@ -7,6 +7,7 @@
 
 import ComposableArchitecture
 import FirebaseFirestore
+import FirebaseFunctions
 
 enum CKRError: Error, Equatable {
     case networkError
@@ -28,11 +29,19 @@ enum CKRError: Error, Equatable {
     }
 }
 
+struct MatchResult: Equatable {
+    var success: Bool
+    var groupCount: Int
+    var groups: [[String]]
+}
+
 @DependencyClient
 struct CKRClient {
     var newGame: (_ newGame: CKRGame) -> Result<Bool, CKRError> = { _ in .success(true) }
+    var updateGame: (_ game: CKRGame) -> Result<Bool, CKRError> = { _ in .success(true) }
     var getGame: @Sendable () async -> Result<CKRGame?, CKRError> = { .success(nil) }
     var deleteGame: @Sendable () async -> Result<Bool, CKRError> = { .success(true) }
+    var matchCohouses: @Sendable (_ gameId: String) async -> Result<MatchResult, CKRError> = { _ in .success(MatchResult(success: true, groupCount: 0, groups: [])) }
 }
 
 
@@ -42,6 +51,15 @@ extension CKRClient: DependencyKey {
             do {
                 let ckrGameRef = Firestore.firestore().collection("ckrGames").document(newGame.id.uuidString)
                 try ckrGameRef.setData(from: newGame)
+                return .success(true)
+            } catch {
+                return .failure(CKRError.fromFirestoreError(error))
+            }
+        },
+        updateGame: { game in
+            do {
+                let ckrGameRef = Firestore.firestore().collection("ckrGames").document(game.id.uuidString)
+                try ckrGameRef.setData(from: game, merge: true)
                 return .success(true)
             } catch {
                 return .failure(CKRError.fromFirestoreError(error))
@@ -82,22 +100,50 @@ extension CKRClient: DependencyKey {
                 } catch {
                     return .failure(CKRError.fromFirestoreError(error))
                 }
+        },
+        matchCohouses: { gameId in
+            do {
+                let functions = Functions.functions(region: "europe-west1")
+                let result = try await functions.httpsCallable("matchCohouses").call([
+                    "gameId": gameId
+                ])
+
+                guard let data = result.data as? [String: Any] else {
+                    return .failure(.unknown("Invalid response from matchCohouses"))
+                }
+
+                let success = data["success"] as? Bool ?? false
+                let groupCount = data["groupCount"] as? Int ?? 0
+                let groups = (data["groups"] as? [[String]]) ?? []
+
+                return .success(MatchResult(
+                    success: success,
+                    groupCount: groupCount,
+                    groups: groups
+                ))
+            } catch {
+                return .failure(CKRError.fromFirestoreError(error))
+            }
         }
     )
 
     static var previewValue: CKRClient {
         Self(
             newGame: { _ in .success(true) },
+            updateGame: { _ in .success(true) },
             getGame: { .success(nil) },
-            deleteGame: { .success(true) }
+            deleteGame: { .success(true) },
+            matchCohouses: { _ in .success(MatchResult(success: true, groupCount: 0, groups: [])) }
         )
     }
 
     static var testValue: CKRClient {
         Self(
             newGame: { _ in .success(true) },
+            updateGame: { _ in .success(true) },
             getGame: { .success(nil) },
-            deleteGame: { .success(true) }
+            deleteGame: { .success(true) },
+            matchCohouses: { _ in .success(MatchResult(success: true, groupCount: 0, groups: [])) }
         )
     }
 }

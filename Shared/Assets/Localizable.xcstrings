@@ -263,6 +263,9 @@
         }
       }
     },
+    "Closed" : {
+
+    },
     "Code" : {
       "localizations" : {
         "fr" : {
@@ -395,6 +398,9 @@
         }
       }
     },
+    "Create new CKR Game" : {
+
+    },
     "Create new cohouse" : {
       "localizations" : {
         "fr" : {
@@ -409,6 +415,9 @@
 
     },
     "Dashboard" : {
+
+    },
+    "Dates" : {
 
     },
     "Days" : {
@@ -458,7 +467,6 @@
       }
     },
     "Edit" : {
-      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -467,6 +475,9 @@
           }
         }
       }
+    },
+    "Edit CKR Game" : {
+
     },
     "Edit cohouse" : {
       "localizations" : {
@@ -489,6 +500,12 @@
       }
     },
     "Edit profile" : {
+
+    },
+    "Edition" : {
+
+    },
+    "Edition #%lld" : {
 
     },
     "Edition ID" : {
@@ -572,6 +589,9 @@
       }
     },
     "For now, if you want to delete current game, please check with an Admin." : {
+
+    },
+    "Game date" : {
 
     },
     "Global" : {
@@ -750,6 +770,12 @@
     "MARK AS DONE" : {
 
     },
+    "Match cohouses" : {
+
+    },
+    "Max participants" : {
+
+    },
     "Me" : {
       "localizations" : {
         "fr" : {
@@ -886,6 +912,9 @@
     "No challenge response at the moment" : {
 
     },
+    "No CKR Game planned" : {
+
+    },
     "No dietary preferences" : {
 
     },
@@ -946,6 +975,12 @@
     "OK" : {
 
     },
+    "Open" : {
+
+    },
+    "Participants" : {
+
+    },
     "Photo source" : {
 
     },
@@ -983,6 +1018,9 @@
       }
     },
     "Ready to submit · %@" : {
+
+    },
+    "Registration deadline" : {
 
     },
     "Remove photo" : {
@@ -1210,6 +1248,9 @@
           }
         }
       }
+    },
+    "Status" : {
+
     },
     "Status: %@" : {
 

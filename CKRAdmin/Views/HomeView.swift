@@ -14,14 +14,17 @@ struct HomeFeature {
     @Reducer
     enum Destination {
         case addNewCKRGame(CKRGameFormFeature)
+        case editCKRGame(CKRGameFormFeature)
         case alert(AlertState<Action.Alert>)
 
         enum Action {
             case addNewCKRGame(CKRGameFormFeature.Action)
+            case editCKRGame(CKRGameFormFeature.Action)
             case alert(Alert)
 
             enum Alert {
                 case gameAlreadyGenerated
+                case confirmMatchCohouses
             }
         }
     }
@@ -43,6 +46,9 @@ struct HomeFeature {
         var users = UsersState()
         var cohouses = CohousesState()
         var challenges = ChallengesState()
+        var currentGame: CKRGame?
+        var isLoadingGame: Bool = false
+        var isMatchingCohouses: Bool = false
         var error: String?
     }
 
@@ -50,9 +56,16 @@ struct HomeFeature {
         case addNewCKRGameButtonTapped
         case addNewCKRGameForm
         case ckrGameAlreadyExists
+        case ckrGameLoaded(CKRGame?)
         case confirmAddCKRGameButtonTapped
+        case confirmEditCKRGameButtonTapped
+        case confirmMatchCohousesButtonTapped
         case destination(PresentationAction<Destination.Action>)
         case dismissDestinationButtonTapped
+        case editCKRGameButtonTapped
+        case matchCohousesButtonTapped
+        case matchCohousesCompleted(MatchResult)
+        case matchCohouesesFailed(String)
         case onTask
         case signOut
         case totalUsersUpdated(Int)
@@ -73,14 +86,10 @@ struct HomeFeature {
         Reduce { state, action in
             switch action {
                 case .addNewCKRGameButtonTapped:
-                    return .run { send in
-                        guard try await self.ckrClient.getGame().get() != nil else {
-                            await send(.addNewCKRGameForm)
-                            return
-                        }
-
-                        await send(.ckrGameAlreadyExists)
+                    if state.currentGame != nil {
+                        return .send(.ckrGameAlreadyExists)
                     }
+                    return .send(.addNewCKRGameForm)
                 case .addNewCKRGameForm:
                     state.destination = .addNewCKRGame(CKRGameFormFeature.State())
                     return .none
@@ -93,41 +102,117 @@ struct HomeFeature {
                         }
                     )
                     return .none
+                case let .ckrGameLoaded(game):
+                    state.isLoadingGame = false
+                    state.currentGame = game
+                    return .none
                 case .confirmAddCKRGameButtonTapped:
-                    guard case let .some(.addNewCKRGame(ckrGameFormFeature)) = state.destination
+                    guard case let .some(.addNewCKRGame(formState)) = state.destination
                     else { return .none }
 
-                    let newGame = ckrGameFormFeature.wipCKRGame
+                    let newGame = formState.wipCKRGame
                     state.destination = nil
+                    state.currentGame = newGame
 
                     return .run { _ in
                         _ = self.ckrClient.newGame(newGame)
                     }
+                case .confirmEditCKRGameButtonTapped:
+                    guard case let .some(.editCKRGame(formState)) = state.destination
+                    else { return .none }
+
+                    let updatedGame = formState.wipCKRGame
+                    state.destination = nil
+                    state.currentGame = updatedGame
+
+                    return .run { _ in
+                        _ = self.ckrClient.updateGame(updatedGame)
+                    }
                 case .dismissDestinationButtonTapped:
                     state.destination = nil
                     return .none
-                case .onTask:
+                case .editCKRGameButtonTapped:
+                    guard let game = state.currentGame else { return .none }
+                    state.destination = .editCKRGame(CKRGameFormFeature.State(game: game))
+                    return .none
+                case .confirmMatchCohousesButtonTapped:
+                    guard let game = state.currentGame else { return .none }
+                    state.isMatchingCohouses = true
+                    let gameId = game.id.uuidString
                     return .run { send in
-                        async let users = self.userClient.totalUsersCount().get()
-                        async let cohouses = self.cohouseClient.totalCohousesCount().get()
-                        async let totalChallenges = self.challengeClient.totalChallengesCount().get()
-                        async let activeChallenges = self.challengeClient.activeChallengesCount().get()
-                        async let nextChallenges = self.challengeClient.nextChallengesCount().get()
+                        let result = await self.ckrClient.matchCohouses(gameId)
+                        switch result {
+                        case .success(let matchResult):
+                            await send(.matchCohousesCompleted(matchResult))
+                        case .failure(let error):
+                            await send(.matchCohouesesFailed(error.localizedDescription))
+                        }
+                    }
+                case .matchCohousesButtonTapped:
+                    guard let game = state.currentGame else { return .none }
+                    let count = game.participantsID.count
+                    state.destination = .alert(
+                        AlertState {
+                            TextState("Match cohouses?")
+                        } actions: {
+                            ButtonState(action: .confirmMatchCohouses) {
+                                TextState("Match \(count) cohouses")
+                            }
+                            ButtonState(role: .cancel) {
+                                TextState("Cancel")
+                            }
+                        } message: {
+                            TextState("This will partition \(count) registered cohouses into groups of 4 based on GPS proximity. This action will overwrite any previous matching.")
+                        }
+                    )
+                    return .none
+                case let .matchCohousesCompleted(matchResult):
+                    state.isMatchingCohouses = false
+                    state.currentGame?.matchedGroups = matchResult.groups
+                    state.currentGame?.matchedAt = Date()
+                    state.destination = .alert(
+                        AlertState {
+                            TextState("Matching complete!")
+                        } message: {
+                            TextState("\(matchResult.groupCount) groups of 4 cohouses have been created successfully.")
+                        }
+                    )
+                    return .none
+                case let .matchCohouesesFailed(errorMessage):
+                    state.isMatchingCohouses = false
+                    state.destination = .alert(
+                        AlertState {
+                            TextState("Matching failed")
+                        } message: {
+                            TextState(errorMessage)
+                        }
+                    )
+                    return .none
+                case .onTask:
+                    state.isLoadingGame = true
+                    return .run { send in
+                        // Fetch CKR Game
+                        if let game = try? await self.ckrClient.getGame().get() {
+                            await send(.ckrGameLoaded(game))
+                        } else {
+                            await send(.ckrGameLoaded(nil))
+                        }
 
-                        if let usersCount = try? await users {
-                            await send(.totalUsersUpdated(usersCount))
+                        // Fetch stats
+                        if let count = try? await self.userClient.totalUsersCount().get() {
+                            await send(.totalUsersUpdated(count))
                         }
-                        if let cohousesCount = try? await cohouses {
-                            await send(.totalCohousesUpdated(cohousesCount))
+                        if let count = try? await self.cohouseClient.totalCohousesCount().get() {
+                            await send(.totalCohousesUpdated(count))
                         }
-                        if let totalChallengesCount = try? await totalChallenges {
-                            await send(.totalChallengesUpdated(totalChallengesCount))
+                        if let count = try? await self.challengeClient.totalChallengesCount().get() {
+                            await send(.totalChallengesUpdated(count))
                         }
-                        if let activeChallengesCount = try? await activeChallenges {
-                            await send(.activeChallengesUpdated(activeChallengesCount))
+                        if let count = try? await self.challengeClient.activeChallengesCount().get() {
+                            await send(.activeChallengesUpdated(count))
                         }
-                        if let nextChallengesCount = try? await nextChallenges {
-                            await send(.nextChallengesUpdated(nextChallengesCount))
+                        if let count = try? await self.challengeClient.nextChallengesCount().get() {
+                            await send(.nextChallengesUpdated(count))
                         }
                     }
                 case .signOut:
@@ -152,6 +237,8 @@ struct HomeFeature {
                 case let .errorOccurred(error):
                     state.error = error
                     return .none
+                case .destination(.presented(.alert(.confirmMatchCohouses))):
+                    return .send(.confirmMatchCohousesButtonTapped)
                 case .destination:
                     return .none
             }
@@ -166,6 +253,9 @@ struct HomeView: View {
     var body: some View {
         NavigationStack {
             List {
+                // MARK: - Next CKR Game
+                nextGameSection
+
                 Section(header: Text("Global")) {
                     HStack {
                         Text("Total users :")
@@ -218,6 +308,7 @@ struct HomeView: View {
                 action: \.destination.alert
             )
         )
+        // Sheet: Create new CKR Game
         .sheet(
             item: $store.scope(state: \.destination?.addNewCKRGame, action: \.destination.addNewCKRGame)
         ) { addNewCKRGameStore in
@@ -238,9 +329,124 @@ struct HomeView: View {
                     }
             }
         }
+        // Sheet: Edit existing CKR Game
+        .sheet(
+            item: $store.scope(state: \.destination?.editCKRGame, action: \.destination.editCKRGame)
+        ) { editCKRGameStore in
+            NavigationStack {
+                CKRGameFormView(store: editCKRGameStore)
+                    .navigationTitle("Edit CKR Game")
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Dismiss") {
+                                store.send(.dismissDestinationButtonTapped)
+                            }
+                        }
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Save") {
+                                store.send(.confirmEditCKRGameButtonTapped)
+                            }
+                        }
+                    }
+            }
+        }
         .task {
             store.send(.onTask)
         }
+    }
+
+    // MARK: - Next CKR Game Section
+
+    @ViewBuilder
+    private var nextGameSection: some View {
+        Section(header: Text("Next CKR Game")) {
+            if store.isLoadingGame {
+                HStack {
+                    Spacer()
+                    ProgressView()
+                    Spacer()
+                }
+            } else if let game = store.currentGame {
+                ForEach(gameInfoItems(game), id: \.label) { item in
+                    LabeledContent(item.label, value: item.value)
+                        .swipeActions(edge: .trailing) {
+                            Button {
+                                store.send(.editCKRGameButtonTapped)
+                            } label: {
+                                Label("Edit", systemImage: "pencil")
+                            }
+                            .tint(.blue)
+                        }
+                }
+
+                HStack {
+                    Text("Status")
+                    Spacer()
+                    if game.isRegistrationOpen {
+                        Text("Open")
+                            .foregroundStyle(.green)
+                            .fontWeight(.semibold)
+                    } else {
+                        Text("Closed")
+                            .foregroundStyle(.red)
+                            .fontWeight(.semibold)
+                    }
+                }
+                .swipeActions(edge: .trailing) {
+                    Button {
+                        store.send(.editCKRGameButtonTapped)
+                    } label: {
+                        Label("Edit", systemImage: "pencil")
+                    }
+                    .tint(.blue)
+                }
+
+                if let matchedGroups = game.matchedGroups, !matchedGroups.isEmpty {
+                    LabeledContent("Matched groups", value: "\(matchedGroups.count) groups of 4")
+                    if let matchedAt = game.matchedAt {
+                        LabeledContent("Matched at", value: matchedAt.formatted(date: .abbreviated, time: .shortened))
+                    }
+                }
+
+                if store.isMatchingCohouses {
+                    HStack {
+                        Label("Matching cohouses...", systemImage: "arrow.triangle.swap")
+                        Spacer()
+                        ProgressView()
+                    }
+                } else {
+                    Button {
+                        store.send(.matchCohousesButtonTapped)
+                    } label: {
+                        Label("Match cohouses", systemImage: "arrow.triangle.swap")
+                    }
+                    .disabled(game.participantsID.isEmpty)
+                }
+            } else {
+                Text("No CKR Game planned")
+                    .foregroundStyle(.secondary)
+                Button {
+                    store.send(.addNewCKRGameButtonTapped)
+                } label: {
+                    Label("Create new CKR Game", systemImage: "plus.circle")
+                }
+            }
+        }
+    }
+
+    private struct GameInfoItem {
+        let label: String
+        let value: String
+    }
+
+    private func gameInfoItems(_ game: CKRGame) -> [GameInfoItem] {
+        [
+            GameInfoItem(label: "Edition", value: "#\(game.editionNumber)"),
+            GameInfoItem(label: "Game date", value: game.nextGameDate.formatted(date: .abbreviated, time: .omitted)),
+            GameInfoItem(label: "Registration deadline", value: game.registrationDeadline.formatted(date: .abbreviated, time: .omitted)),
+            GameInfoItem(label: "Max participants", value: "\(game.maxParticipants)"),
+            GameInfoItem(label: "Registered", value: "\(game.participantsID.count) / \(game.maxParticipants)"),
+        ]
     }
 }
 
