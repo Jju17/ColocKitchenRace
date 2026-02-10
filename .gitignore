@@ -16,4 +16,9 @@ DerivedData/
 # Node.js
 node_modules/
 functions/lib/
+
+# Firebase
+.firebase/
+
+# Claude
 .claude/

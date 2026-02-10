@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Support — Kitchen Race</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.7;
+            color: #333;
+            background: #fafafa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+        .subtitle {
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 32px;
+        }
+        h2 {
+            font-size: 20px;
+            margin-top: 32px;
+            margin-bottom: 12px;
+            color: #1a1a1a;
+        }
+        p { margin-bottom: 12px; }
+        .contact {
+            background: #f0f4ff;
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-top: 24px;
+        }
+        .contact a {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        .contact a:hover { text-decoration: underline; }
+        footer {
+            text-align: center;
+            margin-top: 32px;
+            font-size: 13px;
+            color: #aaa;
+        }
+        .lang-switcher {
+            text-align: right;
+            margin-bottom: 16px;
+        }
+        .lang-switcher button {
+            background: none;
+            border: 1px solid #ddd;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #555;
+            margin-left: 6px;
+            transition: all 0.2s;
+        }
+        .lang-switcher button:hover {
+            border-color: #2563eb;
+            color: #2563eb;
+        }
+        .lang-switcher button.active {
+            background: #2563eb;
+            color: #fff;
+            border-color: #2563eb;
+        }
+        a.link {
+            color: #2563eb;
+            text-decoration: none;
+        }
+        a.link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="lang-switcher">
+            <button id="btn-fr" class="active" onclick="switchLang('fr')">🇫🇷 Français</button>
+            <button id="btn-en" onclick="switchLang('en')">🇬🇧 English</button>
+        </div>
+
+        <!-- FRENCH VERSION -->
+        <div id="lang-fr">
+            <h1>Support</h1>
+            <p class="subtitle">Kitchen Race — Colocs Kitchen Race</p>
+
+            <p>
+                Besoin d'aide avec l'application Kitchen Race ? Vous trouverez ci-dessous
+                les informations pour nous contacter.
+            </p>
+
+            <h2>Questions fréquentes</h2>
+
+            <p><strong>Comment rejoindre une colocation ?</strong></p>
+            <p>
+                Demandez le code à 6 caractères de votre colocation à un de vos colocataires,
+                puis entrez-le dans l'onglet "Colocation" de l'application.
+            </p>
+
+            <p><strong>Comment créer une colocation ?</strong></p>
+            <p>
+                Dans l'onglet "Colocation", appuyez sur "Créer une colocation". Vous devrez
+                fournir le nom, l'adresse et une photo de votre carte d'identité pour vérification.
+            </p>
+
+            <p><strong>Comment participer aux défis ?</strong></p>
+            <p>
+                Une fois votre colocation rejointe, rendez-vous dans l'onglet "Défis" pour voir
+                les défis disponibles et soumettre vos réponses.
+            </p>
+
+            <p><strong>Comment supprimer mon compte ?</strong></p>
+            <p>
+                Contactez-nous par e-mail à l'adresse ci-dessous et nous supprimerons votre
+                compte et toutes vos données dans un délai de 30 jours.
+            </p>
+
+            <div class="contact">
+                <h2>Nous contacter</h2>
+                <p>
+                    Pour toute question, problème technique ou demande concernant vos données
+                    personnelles, contactez-nous :
+                </p>
+                <p>
+                    📧 <a href="mailto:julien@rahier.dev">julien@rahier.dev</a>
+                </p>
+                <p>
+                    Julien Rahier — Bruxelles, Belgique
+                </p>
+            </div>
+
+            <p style="margin-top: 24px;">
+                <a class="link" href="/privacy-policy.html">Politique de confidentialité</a>
+            </p>
+        </div>
+
+        <!-- ENGLISH VERSION -->
+        <div id="lang-en" style="display: none;">
+            <h1>Support</h1>
+            <p class="subtitle">Kitchen Race — Colocs Kitchen Race</p>
+
+            <p>
+                Need help with the Kitchen Race app? Below you'll find how to reach us.
+            </p>
+
+            <h2>Frequently Asked Questions</h2>
+
+            <p><strong>How do I join a cohouse?</strong></p>
+            <p>
+                Ask one of your roommates for the 6-character cohouse code, then enter it
+                in the "Cohouse" tab of the app.
+            </p>
+
+            <p><strong>How do I create a cohouse?</strong></p>
+            <p>
+                In the "Cohouse" tab, tap "Create a cohouse". You'll need to provide a name,
+                address, and a photo of your ID card for verification.
+            </p>
+
+            <p><strong>How do I participate in challenges?</strong></p>
+            <p>
+                Once you've joined a cohouse, go to the "Challenges" tab to see available
+                challenges and submit your responses.
+            </p>
+
+            <p><strong>How do I delete my account?</strong></p>
+            <p>
+                Contact us by email at the address below and we will delete your account
+                and all your data within 30 days.
+            </p>
+
+            <div class="contact">
+                <h2>Contact Us</h2>
+                <p>
+                    For any questions, technical issues, or requests regarding your personal
+                    data, please contact us:
+                </p>
+                <p>
+                    📧 <a href="mailto:julien@rahier.dev">julien@rahier.dev</a>
+                </p>
+                <p>
+                    Julien Rahier — Brussels, Belgium
+                </p>
+            </div>
+
+            <p style="margin-top: 24px;">
+                <a class="link" href="/privacy-policy.html">Privacy Policy</a>
+            </p>
+        </div>
+    </div>
+
+    <footer>
+        &copy; 2026 Kitchen Race. All rights reserved.
+    </footer>
+
+    <script>
+        function switchLang(lang) {
+            document.getElementById('lang-fr').style.display = lang === 'fr' ? 'block' : 'none';
+            document.getElementById('lang-en').style.display = lang === 'en' ? 'block' : 'none';
+            document.getElementById('btn-fr').classList.toggle('active', lang === 'fr');
+            document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            document.documentElement.lang = lang;
+        }
+    </script>
+</body>
+</html>
