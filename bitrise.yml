@@ -54,6 +54,64 @@ workflows:
         - itunescon_user: "$apple_id_email"
         - password: "$apple_id_password"
         - app_password: "$apple_app_specific"
+  deploy_testflight_admin:
+    summary: Build CKRAdmin and deploy to TestFlight.
+    description: Clones the repo, resolves SPM dependencies, archives CKRAdmin and
+      uploads it to App Store Connect for TestFlight distribution.
+    envs:
+    - BITRISE_SCHEME: CKRAdmin
+    steps:
+    - activate-ssh-key@4: {}
+    - git-clone@8: {}
+    - restore-spm-cache@2: {}
+    - save-spm-cache@1: {}
+    - set-xcode-build-number@2: {}
+    - script@1:
+        title: Restore GoogleService-Info.plist files
+        inputs:
+        - content: |
+            #!/bin/bash
+            set -e
+            echo "$GOOGLE_SERVICE_INFO_PLIST_BASE64" | base64 --decode > "$BITRISE_SOURCE_DIR/ColocKitchenRace/GoogleService-Info.plist"
+            echo "$GOOGLE_SERVICE_INFO_PLIST_ADMIN_BASE64" | base64 --decode > "$BITRISE_SOURCE_DIR/CKRAdmin/GoogleService-Info.plist"
+            echo "GoogleService-Info.plist files restored successfully"
+    - script@1:
+        inputs:
+        - content: defaults write com.apple.dt.Xcode
+            IDESkipPackagePluginFingerprintValidatation -bool YES
+    - script@1:
+        title: Configure code signing for CI
+        inputs:
+        - content: |
+            #!/bin/bash
+            set -e
+            PBXPROJ="$BITRISE_SOURCE_DIR/ColocsKitchenRace.xcodeproj/project.pbxproj"
+
+            # Switch from Automatic to Manual signing (all targets)
+            sed -i '' 's/CODE_SIGN_STYLE = Automatic/CODE_SIGN_STYLE = Manual/g' "$PBXPROJ"
+
+            # Main app target: switch identity and set profile
+            sed -i '' 's/CODE_SIGN_IDENTITY = "Apple Development"/CODE_SIGN_IDENTITY = "Apple Distribution"/g' "$PBXPROJ"
+            sed -i '' 's/PROVISIONING_PROFILE_SPECIFIER = ""/PROVISIONING_PROFILE_SPECIFIER = "CKR"/g' "$PBXPROJ"
+
+            # CKRAdmin target: insert identity and profile (not present in pbxproj)
+            # Uses tabs to match Xcode pbxproj formatting
+            sed -i '' "/PRODUCT_BUNDLE_IDENTIFIER = dev.rahier.ckradmin;/a\\
+            $(printf '\t\t\t\t')CODE_SIGN_IDENTITY = \"Apple Distribution\";\\
+            $(printf '\t\t\t\t')PROVISIONING_PROFILE_SPECIFIER = \"CKRAdmin\";" "$PBXPROJ"
+
+            echo "Code signing configured for CI distribution (CKRAdmin)"
+    - xcode-archive@5:
+        inputs:
+        - xcodebuild_options: "-skipPackagePluginValidation -skipMacroValidation"
+        - distribution_method: app-store
+        - automatic_code_signing: api-key
+    - deploy-to-bitrise-io@2: {}
+    - deploy-to-itunesconnect-application-loader@1:
+        inputs:
+        - itunescon_user: "$apple_id_email"
+        - password: "$apple_id_password"
+        - app_password: "$apple_app_specific"
 meta:
   bitrise.io:
     stack: osx-xcode-latest-stable
