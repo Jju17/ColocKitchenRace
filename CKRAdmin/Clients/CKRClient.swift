@@ -42,6 +42,7 @@ struct CKRClient {
     var getGame: @Sendable () async -> Result<CKRGame?, CKRError> = { .success(nil) }
     var deleteGame: @Sendable () async -> Result<Bool, CKRError> = { .success(true) }
     var matchCohouses: @Sendable (_ gameId: String) async -> Result<MatchResult, CKRError> = { _ in .success(MatchResult(success: true, groupCount: 0, groups: [])) }
+    var resetMatches: @Sendable (_ gameId: String) async -> Result<Bool, CKRError> = { _ in .success(true) }
 }
 
 
@@ -125,6 +126,18 @@ extension CKRClient: DependencyKey {
             } catch {
                 return .failure(CKRError.fromFirestoreError(error))
             }
+        },
+        resetMatches: { gameId in
+            do {
+                let db = Firestore.firestore()
+                try await db.collection("ckrGames").document(gameId).updateData([
+                    "matchedGroups": FieldValue.delete(),
+                    "matchedAt": FieldValue.delete(),
+                ])
+                return .success(true)
+            } catch {
+                return .failure(CKRError.fromFirestoreError(error))
+            }
         }
     )
 
@@ -134,7 +147,8 @@ extension CKRClient: DependencyKey {
             updateGame: { _ in .success(true) },
             getGame: { .success(nil) },
             deleteGame: { .success(true) },
-            matchCohouses: { _ in .success(MatchResult(success: true, groupCount: 0, groups: [])) }
+            matchCohouses: { _ in .success(MatchResult(success: true, groupCount: 0, groups: [])) },
+            resetMatches: { _ in .success(true) }
         )
     }
 
@@ -144,7 +158,8 @@ extension CKRClient: DependencyKey {
             updateGame: { _ in .success(true) },
             getGame: { .success(nil) },
             deleteGame: { .success(true) },
-            matchCohouses: { _ in .success(MatchResult(success: true, groupCount: 0, groups: [])) }
+            matchCohouses: { _ in .success(MatchResult(success: true, groupCount: 0, groups: [])) },
+            resetMatches: { _ in .success(true) }
         )
     }
 }

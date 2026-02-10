@@ -523,24 +523,10 @@ export const matchCohouses = onCall<MatchCohousesRequest>(
         );
       }
 
-      if (participantsIds.length % 4 !== 0) {
-        throw new HttpsError(
-          "failed-precondition",
-          `Number of participants (${participantsIds.length}) must be a multiple of 4. ` +
-          `Current count leaves ${participantsIds.length % 4} cohouse(s) unmatched.`
-        );
-      }
-
-      if (participantsIds.length < 4) {
-        throw new HttpsError(
-          "failed-precondition",
-          "Need at least 4 cohouses to perform matching"
-        );
-      }
-
       // 2. Fetch GPS coordinates for all participating cohouses
       const points: CohousePoint[] = [];
       const missingCoords: string[] = [];
+      const foundIds: string[] = [];
 
       // Batch Firestore reads (max 30 per 'in' query)
       const batches = [];
@@ -557,6 +543,7 @@ export const matchCohouses = onCall<MatchCohousesRequest>(
         snapshot.docs.forEach((doc) => {
           const data = doc.data();
           const id = data.id as string;
+          foundIds.push(id);
           const lat = data.latitude as number | undefined;
           const lon = data.longitude as number | undefined;
 
@@ -568,6 +555,29 @@ export const matchCohouses = onCall<MatchCohousesRequest>(
         });
       }
 
+      // 3. Clean up orphaned IDs (cohouses deleted from Firestore)
+      const orphanedIds = participantsIds.filter((id) => !foundIds.includes(id));
+      let removedCount = 0;
+
+      if (orphanedIds.length > 0) {
+        console.log(
+          `Cleaning up ${orphanedIds.length} orphaned cohouse IDs from participantsID: ${orphanedIds.join(", ")}`
+        );
+
+        const cleanedParticipantsIds = participantsIds.filter(
+          (id) => !orphanedIds.includes(id)
+        );
+
+        // Also clear previous matchedGroups since they reference deleted cohouses
+        await db.collection("ckrGames").doc(gameId).update({
+          participantsID: cleanedParticipantsIds,
+          matchedGroups: admin.firestore.FieldValue.delete(),
+          matchedAt: admin.firestore.FieldValue.delete(),
+        });
+
+        removedCount = orphanedIds.length;
+      }
+
       if (missingCoords.length > 0) {
         throw new HttpsError(
           "failed-precondition",
@@ -576,26 +586,43 @@ export const matchCohouses = onCall<MatchCohousesRequest>(
         );
       }
 
-      if (points.length !== participantsIds.length) {
-        const found = points.map((p) => p.id);
-        const missing = participantsIds.filter((id) => !found.includes(id));
+      // 4. Validate remaining count after cleanup
+      if (points.length === 0) {
         throw new HttpsError(
-          "not-found",
-          `Could not find cohouse documents for IDs: ${missing.join(", ")}`
+          "failed-precondition",
+          "No cohouses remaining after cleanup" +
+          (removedCount > 0 ? ` (${removedCount} orphaned cohouse(s) were removed from participantsID)` : "")
+        );
+      }
+
+      if (points.length < 4) {
+        throw new HttpsError(
+          "failed-precondition",
+          `Need at least 4 cohouses to perform matching, but only ${points.length} remaining` +
+          (removedCount > 0 ? ` (${removedCount} orphaned cohouse(s) were removed from participantsID)` : "")
+        );
+      }
+
+      if (points.length % 4 !== 0) {
+        throw new HttpsError(
+          "failed-precondition",
+          `Number of participants (${points.length}) must be a multiple of 4. ` +
+          `Current count leaves ${points.length % 4} cohouse(s) unmatched.` +
+          (removedCount > 0 ? ` (${removedCount} orphaned cohouse(s) were removed from participantsID)` : "")
         );
       }
 
       console.log(`Starting matching for ${points.length} cohouses...`);
 
-      // 3. Compute cubic distance matrix
+      // 5. Compute cubic distance matrix
       const dCubic = computeCubicDistances(points);
 
-      // 4. Run double matching heuristic
+      // 6. Run double matching heuristic
       const groups = doubleMatchingHeuristic(points, dCubic);
 
       console.log(`Matching complete: ${groups.length} groups of 4 created.`);
 
-      // 5. Store results back in Firestore on the game document
+      // 7. Store results back in Firestore on the game document
       // Firestore does not support nested arrays, so we wrap each group
       // in an object: [["a","b","c","d"]] → [{ cohouseIds: ["a","b","c","d"] }]
       const matchedGroupsForFirestore = groups.map((g) => ({ cohouseIds: g }));
@@ -609,6 +636,7 @@ export const matchCohouses = onCall<MatchCohousesRequest>(
         success: true,
         groupCount: groups.length,
         groups: groups,
+        removedOrphanedIds: orphanedIds,
       };
     } catch (error) {
       if (error instanceof HttpsError) throw error;

@@ -155,6 +155,9 @@
     "Are you sure you want to delete this challenge ?" : {
 
     },
+    "Are you sure? This will permanently remove all matched groups from the current game. This action is not reversible." : {
+
+    },
     "Basic info" : {
       "localizations" : {
         "fr" : {
@@ -1072,6 +1075,18 @@
 
     },
     "Required to verify your identity when creating a cohouse." : {
+
+    },
+    "Reset" : {
+
+    },
+    "Reset all matches?" : {
+
+    },
+    "Reset failed" : {
+
+    },
+    "Reset matches" : {
 
     },
     "Response invalidated ❌" : {

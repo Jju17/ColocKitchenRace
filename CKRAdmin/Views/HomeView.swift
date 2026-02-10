@@ -27,6 +27,7 @@ struct HomeFeature {
             enum Alert {
                 case gameAlreadyGenerated
                 case confirmMatchCohouses
+                case confirmResetMatches
             }
         }
     }
@@ -69,6 +70,10 @@ struct HomeFeature {
         case matchCohousesCompleted(MatchResult)
         case matchCohouesesFailed(String)
         case onTask
+        case resetMatchesButtonTapped
+        case confirmResetMatchesButtonTapped
+        case resetMatchesCompleted
+        case resetMatchesFailed(String)
         case viewMatchedGroupsMapButtonTapped
         case signOut
         case totalUsersUpdated(Int)
@@ -191,6 +196,51 @@ struct HomeFeature {
                         }
                     )
                     return .none
+                case .resetMatchesButtonTapped:
+                    state.destination = .alert(
+                        AlertState {
+                            TextState("Reset all matches?")
+                        } actions: {
+                            ButtonState(role: .destructive, action: .confirmResetMatches) {
+                                TextState("Reset")
+                            }
+                            ButtonState(role: .cancel) {
+                                TextState("Cancel")
+                            }
+                        } message: {
+                            TextState("Are you sure? This will permanently remove all matched groups from the current game. This action is not reversible.")
+                        }
+                    )
+                    return .none
+                case .confirmResetMatchesButtonTapped:
+                    guard let game = state.currentGame else { return .none }
+                    let gameId = game.id.uuidString
+                    return .run { send in
+                        let result = await self.ckrClient.resetMatches(gameId)
+                        switch result {
+                        case .success:
+                            await send(.resetMatchesCompleted)
+                        case .failure(let error):
+                            await send(.resetMatchesFailed(error.localizedDescription))
+                        }
+                    }
+                case .resetMatchesCompleted:
+                    state.currentGame?.matchedGroups = nil
+                    state.currentGame?.matchedAt = nil
+                    return .run { send in
+                        if let game = try? await self.ckrClient.getGame().get() {
+                            await send(.ckrGameLoaded(game))
+                        }
+                    }
+                case let .resetMatchesFailed(errorMessage):
+                    state.destination = .alert(
+                        AlertState {
+                            TextState("Reset failed")
+                        } message: {
+                            TextState(errorMessage)
+                        }
+                    )
+                    return .none
                 case .onTask:
                     state.isLoadingGame = true
                     return .run { send in
@@ -248,6 +298,8 @@ struct HomeFeature {
                     return .none
                 case .destination(.presented(.alert(.confirmMatchCohouses))):
                     return .send(.confirmMatchCohousesButtonTapped)
+                case .destination(.presented(.alert(.confirmResetMatches))):
+                    return .send(.confirmResetMatchesButtonTapped)
                 case .destination:
                     return .none
             }
@@ -460,6 +512,14 @@ struct HomeView: View {
                         Label("Match cohouses", systemImage: "arrow.triangle.swap")
                     }
                     .disabled(game.participantsID.isEmpty)
+                }
+
+                if game.matchedGroups != nil {
+                    Button(role: .destructive) {
+                        store.send(.resetMatchesButtonTapped)
+                    } label: {
+                        Label("Reset matches", systemImage: "arrow.counterclockwise")
+                    }
                 }
             } else {
                 Text("No CKR Game planned")

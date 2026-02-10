@@ -228,7 +228,7 @@ struct NoCohouseFeature {
                     state.errorMessage = message
                     return .none
                 case let .setUserToCohouseFound(cohouse):
-                    guard let firstUser = cohouse.users.first else { return .none }
+                    let firstUser = cohouse.users.first ?? CohouseUser.init(id: UUID())
 
                     if cohouse.users.contains(where: { $0.userId == state.userInfo?.id.uuidString }) {
                         @Shared(.cohouse) var actualCohouse
