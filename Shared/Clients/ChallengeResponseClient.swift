@@ -147,8 +147,16 @@ extension ChallengeResponseClient: DependencyKey {
                 .whereField("status", isEqualTo: ChallengeResponseStatus.validated.rawValue)
 
             return AsyncStream { continuation in
-                let listener = query.addSnapshotListener { snap, _ in
-                    guard let snap else { return }
+                let listener = query.addSnapshotListener { snap, error in
+                    if let error {
+                        Logger.challengeResponseLog.log(level: .error, "watchAllValidatedResponses error: \(error.localizedDescription)")
+                        continuation.yield([])
+                        return
+                    }
+                    guard let snap else {
+                        continuation.yield([])
+                        return
+                    }
                     let responses = snap.documents.compactMap { try? $0.data(as: ChallengeResponse.self) }
                     continuation.yield(responses)
                 }
