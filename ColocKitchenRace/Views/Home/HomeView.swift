@@ -28,6 +28,7 @@ struct HomeFeature {
 
     enum Action {
         case openRegisterLink
+        case refresh
         case path(StackActionOf<Path>)
         case delegate(Delegate)
 
@@ -37,6 +38,7 @@ struct HomeFeature {
     }
 
     @Dependency(\.ckrClient) var ckrClient
+    @Dependency(\.newsClient) var newsClient
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -49,6 +51,11 @@ struct HomeFeature {
                         if case let .failure(error) = result {
                             Logger.ckrLog.log(level: .error, "Failed to register cohouse: \(error)")
                         }
+                    }
+                case .refresh:
+                    return .run { [ckrClient, newsClient] _ in
+                        let _ = try? await ckrClient.getLast()
+                        let _ = try? await newsClient.getLast()
                     }
                 case .path:
                     return .none
@@ -85,6 +92,9 @@ struct HomeView: View {
                     }
                     NewsTileView(allNews: self.store.$news)
                 }
+            }
+            .refreshable {
+                await store.send(.refresh).finish()
             }
             .padding(.horizontal)
             .navigationTitle("Colocs Kitchen Race")
