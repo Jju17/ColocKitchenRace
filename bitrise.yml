@@ -13,7 +13,6 @@ workflows:
     - restore-spm-cache@2: {}
     - save-spm-cache@1: {}
     - set-xcode-build-number@2: {}
-    - certificate-and-profile-installer@1: {}
     - script@1:
         title: Restore GoogleService-Info.plist
         inputs:
@@ -26,6 +25,24 @@ workflows:
         inputs:
         - content: defaults write com.apple.dt.Xcode
             IDESkipPackagePluginFingerprintValidatation -bool YES
+    - script@1:
+        title: Configure code signing for CI
+        inputs:
+        - content: |
+            #!/bin/bash
+            set -e
+            PBXPROJ="$BITRISE_SOURCE_DIR/ColocsKitchenRace.xcodeproj/project.pbxproj"
+
+            # Switch from Automatic to Manual signing (app targets only — no SPM affected)
+            sed -i '' 's/CODE_SIGN_STYLE = Automatic/CODE_SIGN_STYLE = Manual/g' "$PBXPROJ"
+
+            # Switch from Development to Distribution identity (only main app target has this)
+            sed -i '' 's/CODE_SIGN_IDENTITY = "Apple Development"/CODE_SIGN_IDENTITY = "Apple Distribution"/g' "$PBXPROJ"
+
+            # Set provisioning profile to the one uploaded on Bitrise (only main app target has this)
+            sed -i '' 's/PROVISIONING_PROFILE_SPECIFIER = ""/PROVISIONING_PROFILE_SPECIFIER = "CKR"/g' "$PBXPROJ"
+
+            echo "Code signing configured for CI distribution"
     - xcode-archive@5:
         inputs:
         - xcodebuild_options: "-skipPackagePluginValidation -skipMacroValidation"
