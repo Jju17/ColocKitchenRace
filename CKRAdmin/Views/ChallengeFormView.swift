@@ -64,6 +64,8 @@ struct ChallengeFormView: View {
             TextField("Body", text: $store.wipChallenge.body)
             DatePicker("Start Date", selection: $store.wipChallenge.startDate)
             DatePicker("End Date", selection: $store.wipChallenge.endDate)
+            TextField("Points (default: 1)", value: $store.wipChallenge.points, format: .number)
+                .keyboardType(.numberPad)
             Picker("Select Type", selection: Binding(
                 get: { ChallengeType.fromContent(store.wipChallenge.content) },
                 set: { newType in

@@ -16,6 +16,7 @@ struct ChallengeFeature {
         var challengeTiles: IdentifiedArrayOf<ChallengeTileFeature.State> = []
         var isLoading = false
         var errorMessage: String?
+        @Presents var leaderboard: LeaderboardFeature.State?
     }
 
     enum Action {
@@ -24,6 +25,8 @@ struct ChallengeFeature {
         case challengesAndResponsesLoaded(Result<([Challenge], [ChallengeResponse]), Error>)
         case failed(String)
         case challengeTiles(IdentifiedActionOf<ChallengeTileFeature>)
+        case leaderboardButtonTapped
+        case leaderboard(PresentationAction<LeaderboardFeature.Action>)
         case delegate(Delegate)
 
         enum Delegate: Equatable {
@@ -132,12 +135,20 @@ struct ChallengeFeature {
                 state.errorMessage = msg
                 return .none
 
+            // MARK: - Leaderboard
+            case .leaderboardButtonTapped:
+                state.leaderboard = LeaderboardFeature.State(
+                    myCohouseId: currentCohouse?.id.uuidString
+                )
+                return .none
+
             // MARK: - Child / navigation passthrough
-            case .challengeTiles, .path, .delegate:
+            case .challengeTiles, .path, .delegate, .leaderboard:
                 return .none
             }
         }
         .forEach(\.challengeTiles, action: \.challengeTiles) { ChallengeTileFeature() }
+        .ifLet(\.$leaderboard, action: \.leaderboard) { LeaderboardFeature() }
     }
 
     // MARK: - Helpers
@@ -196,6 +207,27 @@ struct ChallengeView: View {
             .navigationTitle("Challenges")
             .navigationBarTitleDisplayMode(.large)
             .font(.custom("BaksoSapi", size: 32)) // Titre principal
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button {
+                        store.send(.leaderboardButtonTapped)
+                    } label: {
+                        Image(systemName: "trophy.fill")
+                    }
+                }
+            }
+            .sheet(item: $store.scope(state: \.leaderboard, action: \.leaderboard)) { leaderboardStore in
+                NavigationStack {
+                    LeaderboardView(store: leaderboardStore)
+                        .toolbar {
+                            ToolbarItem(placement: .cancellationAction) {
+                                Button("Close") {
+                                    store.send(.leaderboard(.dismiss))
+                                }
+                            }
+                        }
+                }
+            }
         } destination: { store in
             switch store.state {
                 case .profile:

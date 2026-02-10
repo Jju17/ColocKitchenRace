@@ -19,8 +19,8 @@
 // NEW FUNCTIONALITY
 
 // Challenge
-// [-] - Notifications at every : new challenge added / challenge that begins / challenge that will end in xx minutes/hours
-// [-] - Leaderboard
+// [/] - Notifications at every : new challenge added / challenge that begins / challenge that will end in xx minutes/hours
+// [/] - Leaderboard
 
 // Cohouse
 // [/] - Check for duplicate cohouse before creating one

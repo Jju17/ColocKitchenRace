@@ -371,7 +371,8 @@ struct CKRGameModelTests {
     func defaultValues() {
         let futureDate = Date().addingTimeInterval(60 * 60 * 24 * 60) // 60 days
         let deadline = Date().addingTimeInterval(60 * 60 * 24 * 46) // 46 days
-        let game = CKRGame(nextGameDate: futureDate, registrationDeadline: deadline)
+        let countdown = Date().addingTimeInterval(60 * 60 * 24 * 30) // 30 days
+        let game = CKRGame(startCKRCountdown: countdown, nextGameDate: futureDate, registrationDeadline: deadline)
         #expect(game.participantsID.isEmpty)
         #expect(game.editionNumber == 1)
         #expect(game.maxParticipants == 100)
@@ -381,6 +382,7 @@ struct CKRGameModelTests {
     @Test("isRegistrationOpen returns true when deadline is in the future and spots available")
     func registrationOpen() {
         let game = CKRGame(
+            startCKRCountdown: Date().addingTimeInterval(60 * 60 * 24 * 30),
             nextGameDate: Date().addingTimeInterval(60 * 60 * 24 * 60),
             registrationDeadline: Date().addingTimeInterval(60 * 60 * 24 * 46),
             maxParticipants: 20
@@ -391,6 +393,7 @@ struct CKRGameModelTests {
     @Test("isRegistrationOpen returns false when deadline has passed")
     func registrationClosedByDeadline() {
         let game = CKRGame(
+            startCKRCountdown: Date().addingTimeInterval(-60 * 60 * 24), // 1 day ago
             nextGameDate: Date().addingTimeInterval(60 * 60 * 24 * 7),
             registrationDeadline: Date().addingTimeInterval(-60 * 60), // 1 hour ago
             maxParticipants: 20
@@ -401,6 +404,7 @@ struct CKRGameModelTests {
     @Test("isRegistrationOpen returns false when max participants reached")
     func registrationClosedByCapacity() {
         var game = CKRGame(
+            startCKRCountdown: Date().addingTimeInterval(60 * 60 * 24 * 30),
             nextGameDate: Date().addingTimeInterval(60 * 60 * 24 * 60),
             registrationDeadline: Date().addingTimeInterval(60 * 60 * 24 * 46),
             maxParticipants: 4
@@ -412,6 +416,7 @@ struct CKRGameModelTests {
     @Test("remainingSpots computes correctly")
     func remainingSpots() {
         var game = CKRGame(
+            startCKRCountdown: Date().addingTimeInterval(60 * 60 * 24 * 30),
             nextGameDate: Date().addingTimeInterval(60 * 60 * 24 * 60),
             registrationDeadline: Date().addingTimeInterval(60 * 60 * 24 * 46),
             maxParticipants: 20

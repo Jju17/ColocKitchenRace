@@ -4,6 +4,9 @@
     "" : {
       "shouldTranslate" : false
     },
+    "#%lld" : {
+
+    },
     "%@" : {
       "localizations" : {
         "fr" : {
@@ -44,6 +47,26 @@
         }
       }
     },
+    "%lld challenge%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld challenge%2$@"
+          }
+        }
+      }
+    },
+    "%lld challenge%@ validated" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld challenge%2$@ validated"
+          }
+        }
+      }
+    },
     "%lld failed" : {
 
     },
@@ -51,6 +74,19 @@
 
     },
     "%lld groups of 4 cohouses have been created successfully." : {
+
+    },
+    "%lld pt%@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld pt%2$@"
+          }
+        }
+      }
+    },
+    "%lld pts" : {
 
     },
     "%lld sent" : {
@@ -789,6 +825,9 @@
         }
       }
     },
+    "Leaderboard" : {
+
+    },
     "Library" : {
 
     },
@@ -802,6 +841,9 @@
 
     },
     "Loading history…" : {
+
+    },
+    "Loading leaderboard…" : {
 
     },
     "Loading..." : {
@@ -1063,6 +1105,9 @@
 
     },
     "No specific response" : {
+
+    },
+    "No validated challenges yet" : {
 
     },
     "None" : {

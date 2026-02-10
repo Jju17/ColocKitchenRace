@@ -21,6 +21,7 @@ struct Challenge: Equatable, Hashable, Codable, Identifiable {
     var endDate: Date
     var body: String
     var content: ChallengeContent
+    var points: Int?
 }
 
 extension Challenge {

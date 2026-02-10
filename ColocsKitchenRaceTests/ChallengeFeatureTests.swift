@@ -154,4 +154,60 @@ struct ChallengeFeatureTests {
             $0.errorMessage = "Something went wrong"
         }
     }
+
+    // MARK: - Leaderboard
+
+    @Test("leaderboardButtonTapped presents leaderboard with cohouseId")
+    func leaderboardButtonTapped_presentsWithCohouseId() async {
+        @Shared(.cohouse) var cohouse
+        let mockCohouse = Cohouse.mock
+        $cohouse.withLock { $0 = mockCohouse }
+
+        let store = TestStore(
+            initialState: ChallengeFeature.State()
+        ) {
+            ChallengeFeature()
+        }
+
+        await store.send(.leaderboardButtonTapped) {
+            $0.leaderboard = LeaderboardFeature.State(
+                myCohouseId: mockCohouse.id.uuidString
+            )
+        }
+    }
+
+    @Test("leaderboardButtonTapped without cohouse sets nil myCohouseId")
+    func leaderboardButtonTapped_noCohouse() async {
+        @Shared(.cohouse) var cohouse
+        $cohouse.withLock { $0 = nil }
+
+        let store = TestStore(
+            initialState: ChallengeFeature.State()
+        ) {
+            ChallengeFeature()
+        }
+
+        await store.send(.leaderboardButtonTapped) {
+            $0.leaderboard = LeaderboardFeature.State(
+                myCohouseId: nil
+            )
+        }
+    }
+
+    @Test("leaderboard dismiss clears leaderboard state")
+    func leaderboard_dismiss() async {
+        let store = TestStore(
+            initialState: ChallengeFeature.State(
+                leaderboard: LeaderboardFeature.State(
+                    myCohouseId: nil
+                )
+            )
+        ) {
+            ChallengeFeature()
+        }
+
+        await store.send(.leaderboard(.dismiss)) {
+            $0.leaderboard = nil
+        }
+    }
 }

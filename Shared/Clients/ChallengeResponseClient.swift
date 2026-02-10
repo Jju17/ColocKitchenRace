@@ -39,6 +39,7 @@ struct ChallengeResponseClient {
     var addAllMockChallengeResponses: @Sendable () async -> Result<Void, ChallengeResponseError> = { .success(()) }
     var submit: @Sendable (_ response: ChallengeResponse) async throws -> ChallengeResponse = { $0 }
     var watchStatus: @Sendable (_ challengeId: UUID, _ cohouseId: String) -> AsyncStream<ChallengeResponseStatus> = { _, _ in AsyncStream { $0.finish() } }
+    var watchAllValidatedResponses: @Sendable () -> AsyncStream<[ChallengeResponse]> = { AsyncStream { $0.finish() } }
 }
 
 // MARK: - Implementations
@@ -139,6 +140,20 @@ extension ChallengeResponseClient: DependencyKey {
                 }
                 continuation.onTermination = { _ in listener.remove() }
             }
+        },
+        watchAllValidatedResponses: {
+            let query = Firestore.firestore()
+                .collectionGroup("responses")
+                .whereField("status", isEqualTo: ChallengeResponseStatus.validated.rawValue)
+
+            return AsyncStream { continuation in
+                let listener = query.addSnapshotListener { snap, _ in
+                    guard let snap else { return }
+                    let responses = snap.documents.compactMap { try? $0.data(as: ChallengeResponse.self) }
+                    continuation.yield(responses)
+                }
+                continuation.onTermination = { _ in listener.remove() }
+            }
         }
     )
 
@@ -150,7 +165,8 @@ extension ChallengeResponseClient: DependencyKey {
         updateStatus: { _, _, _ in .success(()) },
         addAllMockChallengeResponses: { .success(()) },
         submit: { $0 },
-        watchStatus: { _, _ in AsyncStream { $0.finish() } }
+        watchStatus: { _, _ in AsyncStream { $0.finish() } },
+        watchAllValidatedResponses: { AsyncStream { $0.finish() } }
     )
 
     // MARK: Preview
@@ -163,7 +179,13 @@ extension ChallengeResponseClient: DependencyKey {
         updateStatus: { _, _, _ in .success(()) },
         addAllMockChallengeResponses: { .success(()) },
         submit: { $0 },
-        watchStatus: { _, _ in AsyncStream { $0.finish() } }
+        watchStatus: { _, _ in AsyncStream { $0.finish() } },
+        watchAllValidatedResponses: {
+            AsyncStream { continuation in
+                continuation.yield(ChallengeResponse.mockList.filter { $0.status == .validated })
+                continuation.finish()
+            }
+        }
     )
 }
 

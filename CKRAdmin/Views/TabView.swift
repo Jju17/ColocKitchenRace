@@ -16,6 +16,7 @@ struct TabFeature {
         var challenge = ChallengeFeature.State()
         var challengeValidation = ChallengeValidationFeature.State()
         var home = HomeFeature.State()
+        var leaderboard = AdminLeaderboardFeature.State()
         var news = NewsFeature.State()
         var notification = NotificationFeature.State()
     }
@@ -25,6 +26,7 @@ struct TabFeature {
         case challenge(ChallengeFeature.Action)
         case challengeValidation(ChallengeValidationFeature.Action)
         case home(HomeFeature.Action)
+        case leaderboard(AdminLeaderboardFeature.Action)
         case news(NewsFeature.Action)
         case notification(NotificationFeature.Action)
     }
@@ -40,6 +42,10 @@ struct TabFeature {
 
         Scope(state: \.challengeValidation, action: \.challengeValidation) {
             ChallengeValidationFeature()
+        }
+
+        Scope(state: \.leaderboard, action: \.leaderboard) {
+            AdminLeaderboardFeature()
         }
 
         Scope(state: \.news, action: \.news) {
@@ -61,6 +67,8 @@ struct TabFeature {
                     return .none
                 case .home:
                     return .none
+                case .leaderboard:
+                    return .none
                 case .news:
                     return .none
                 case .notification:
@@ -74,6 +82,7 @@ enum Tab {
     case challenge
     case challengeValidation
     case home
+    case leaderboard
     case news
     case notification
 }
@@ -113,6 +122,16 @@ struct MyTabView: View {
                 Label("Validation", systemImage: "checklist.checked")
             }
             .tag(Tab.challengeValidation)
+            AdminLeaderboardView(
+                store: self.store.scope(
+                    state: \.leaderboard,
+                    action: \.leaderboard
+                )
+            )
+            .tabItem {
+                Label("Leaderboard", systemImage: "trophy.fill")
+            }
+            .tag(Tab.leaderboard)
             NewsView(
                 store: self.store.scope(
                     state: \.news,
