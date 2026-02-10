@@ -13,7 +13,6 @@ workflows:
     - restore-spm-cache@2: {}
     - save-spm-cache@1: {}
     - set-xcode-build-number@2: {}
-    - certificate-and-profile-installer@1: {}
     - script@1:
         title: Restore GoogleService-Info.plist
         inputs:
@@ -31,12 +30,9 @@ workflows:
         - xcodebuild_options: "-skipPackagePluginValidation -skipMacroValidation"
         - distribution_method: app-store
         - automatic_code_signing: api-key
+        - register_test_devices: "no"
         - xcconfig_content: |-
             COMPILER_INDEX_STORE_ENABLE = NO
-            CODE_SIGN_STYLE = Manual
-            CODE_SIGN_IDENTITY = Apple Distribution
-            PROVISIONING_PROFILE_SPECIFIER = CKR
-            DEVELOPMENT_TEAM = YXXNH92P5F
     - deploy-to-bitrise-io@2: {}
     - deploy-to-itunesconnect-application-loader@1:
         inputs:
