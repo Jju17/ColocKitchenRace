@@ -7,63 +7,43 @@
 
 import SwiftUI
 
-struct CKRTextField<Content: View>: View {
+struct CKRTextField: View {
+    var title: String
     @Binding var value: String
-    var frame: CGFloat = 80
     var isSecure: Bool = false
 
-    @ViewBuilder var content: () -> Content
-    
+    @FocusState private var isFocused: Bool
+
     var body: some View {
         VStack(alignment: .leading, spacing: 5) {
-            self.content()
+            Text(title)
                 .foregroundStyle(.gray)
                 .font(.system(size: 14))
             ZStack(alignment: .leading) {
                 RoundedRectangle(cornerRadius: 15)
                     .fill(Color.white)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                 if isSecure {
                     SecureField("", text: $value)
                         .padding(.horizontal)
+                        .focused($isFocused)
                 } else {
-                    TextField("", text: self.$value)
+                    TextField("", text: $value)
                         .padding(.horizontal)
+                        .focused($isFocused)
                 }
             }
+            .frame(maxHeight: .infinity)
+            .contentShape(Rectangle())
+            .onTapGesture { isFocused = true }
         }
-        .frame(height: self.frame)
+        .frame(height: 80)
     }
 }
 
 #Preview {
     ZStack {
-        CKRTextField(value: .constant("Julien"), frame: 80) {
-            Text("Name")
-        }
+        CKRTextField(title: "Name", value: .constant("Julien"))
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
     .background { Color.CKRBlue.ignoresSafeArea() }
-}
-
-
-struct CKRTextFieldStyle: TextFieldStyle {
-    var title: String
-    var frame: CGFloat = 80
-
-    func _body(configuration: TextField<Self._Label>) -> some View {
-        VStack(alignment: .leading, spacing: 5) {
-            Text(self.title)
-                .foregroundStyle(.gray)
-                .font(.system(size: 14))
-            ZStack(alignment: .leading) {
-                RoundedRectangle(cornerRadius: 15)
-                    .fill(Color.white)
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                configuration
-                    .padding(.horizontal)
-            }
-        }
-        .frame(height: self.frame)
-    }
 }

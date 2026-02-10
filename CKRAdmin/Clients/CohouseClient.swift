@@ -27,15 +27,23 @@ struct CohouseMapItem: Equatable, Identifiable {
     var userNames: [String]
 }
 
+/// Minimal cohouse info for pickers / lists (CKRAdmin only).
+struct CohouseListItem: Equatable, Identifiable, Hashable {
+    var id: String
+    var name: String
+}
+
 @DependencyClient
 struct CohouseClient {
     var totalCohousesCount: @Sendable () async -> Result<Int, CohouseError> = { .success(0) }
     var getCohouses: @Sendable (_ ids: [String]) async -> Result<[CohouseMapItem], CohouseError> = { _ in .success([]) }
+    var getAllCohouses: @Sendable () async -> Result<[CohouseListItem], CohouseError> = { .success([]) }
 }
 
 extension CohouseClient: DependencyKey {
     static let liveValue = Self(
         totalCohousesCount: {
+
             do {
                 let db = Firestore.firestore()
                 let collectionRef = db.collection("cohouses")
@@ -88,6 +96,31 @@ extension CohouseClient: DependencyKey {
                 Logger.cohouseLog.log(level: .fault, "getCohouses: \(error.localizedDescription)")
                 return .failure(.unknown(error.localizedDescription))
             }
+        },
+        getAllCohouses: {
+            do {
+                let db = Firestore.firestore()
+                let snapshot = try await db.collection("cohouses").getDocuments()
+
+                let items = snapshot.documents.compactMap { doc -> CohouseListItem? in
+                    let data = doc.data()
+                    guard let name = data["name"] as? String else { return nil }
+                    return CohouseListItem(id: doc.documentID, name: name)
+                }
+                .sorted { $0.name.localizedCaseInsensitiveCompare($1.name) == .orderedAscending }
+
+                return .success(items)
+            } catch let error as NSError {
+                Logger.cohouseLog.log(level: .fault, "getAllCohouses: \(error.localizedDescription)")
+                switch error.code {
+                case FirestoreErrorCode.unavailable.rawValue:
+                    return .failure(.networkError)
+                case FirestoreErrorCode.permissionDenied.rawValue:
+                    return .failure(.permissionDenied)
+                default:
+                    return .failure(.unknown(error.localizedDescription))
+                }
+            }
         }
     )
 
@@ -104,6 +137,13 @@ extension CohouseClient: DependencyKey {
                         userNames: ["Alice", "Bob"]
                     )
                 })
+            },
+            getAllCohouses: {
+                .success([
+                    CohouseListItem(id: "1", name: "La Maison du Peuple"),
+                    CohouseListItem(id: "2", name: "Les Colocs de Bruxelles"),
+                    CohouseListItem(id: "3", name: "Chez Nous"),
+                ])
             }
         )
     }
@@ -111,7 +151,8 @@ extension CohouseClient: DependencyKey {
     static var testValue: CohouseClient {
         Self(
             totalCohousesCount: { .success(0) },
-            getCohouses: { _ in .success([]) }
+            getCohouses: { _ in .success([]) },
+            getAllCohouses: { .success([]) }
         )
     }
 }

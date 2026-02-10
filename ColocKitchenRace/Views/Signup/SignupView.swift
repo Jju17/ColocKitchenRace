@@ -26,8 +26,7 @@ struct SignupView: View {
 
             VStack(spacing: 10) {
                 HStack(spacing: 15) {
-                    TextField("", text: $store.signupUserData.firstName)
-                        .textFieldStyle(CKRTextFieldStyle(title: "NAME*"))
+                    CKRTextField(title: "NAME*", value: $store.signupUserData.firstName)
                         .textContentType(.givenName)
                         .textInputAutocapitalization(.words)
                         .focused(self.$focusedField, equals: .name)
@@ -41,8 +40,7 @@ struct SignupView: View {
                             textField.delegate = nameFieldDelegate
                         }
                         .onSubmit { self.focusNextField() }
-                    TextField("", text: $store.signupUserData.lastName)
-                        .textFieldStyle(CKRTextFieldStyle(title: "SURNAME*"))
+                    CKRTextField(title: "SURNAME*", value: $store.signupUserData.lastName)
                         .textContentType(.familyName)
                         .textInputAutocapitalization(.words)
                         .focused(self.$focusedField, equals: .surname)
@@ -56,8 +54,7 @@ struct SignupView: View {
                             textField.delegate = surnameFieldDelegate
                         }
                 }
-                TextField("", text: $store.signupUserData.email)
-                    .textFieldStyle(CKRTextFieldStyle(title: "EMAIL*"))
+                CKRTextField(title: "EMAIL*", value: $store.signupUserData.email)
                     .textContentType(.emailAddress)
                     .keyboardType(.emailAddress)
                     .textInputAutocapitalization(.never)
@@ -71,8 +68,8 @@ struct SignupView: View {
 
                         textField.delegate = emailFieldDelegate
                     }
-                SecureField("", text: $store.signupUserData.password)
-                    .textFieldStyle(CKRTextFieldStyle(title: "PASSWORD*"))
+                CKRTextField(title: "PASSWORD*", value: $store.signupUserData.password, isSecure: true)
+                    .textContentType(.newPassword)
                     .focused(self.$focusedField, equals: .password)
                     .submitLabel(.next)
                     .introspect(.textField, on: .iOS(.v16, .v17)) { textField in
@@ -83,8 +80,7 @@ struct SignupView: View {
 
                         textField.delegate = passwordFieldDelegate
                     }
-                TextField("", text: $store.signupUserData.phone)
-                    .textFieldStyle(CKRTextFieldStyle(title: "PHONE"))
+                CKRTextField(title: "PHONE", value: $store.signupUserData.phone)
                     .textContentType(.telephoneNumber)
                     .focused(self.$focusedField, equals: .phone)
                     .submitLabel(.done)

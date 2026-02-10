@@ -80,8 +80,7 @@ struct SigninView: View {
                 .frame(width: 150, height: 150, alignment: .center)
 
             VStack(spacing: 10) {
-                TextField("", text: $store.email)
-                    .textFieldStyle(CKRTextFieldStyle(title: "EMAIL"))
+                CKRTextField(title: "EMAIL", value: $store.email)
                     .textContentType(.emailAddress)
                     .keyboardType(.emailAddress)
                     .textInputAutocapitalization(.never)
@@ -95,8 +94,8 @@ struct SigninView: View {
 
                         textField.delegate = emailFieldDelegate
                     }
-                SecureField("", text: $store.password)
-                    .textFieldStyle(CKRTextFieldStyle(title: "PASSWORD"))
+                CKRTextField(title: "PASSWORD", value: $store.password, isSecure: true)
+                    .textContentType(.password)
                     .focused(self.$focusedField, equals: .password)
                     .submitLabel(.done)
                 VStack(spacing: 12) {

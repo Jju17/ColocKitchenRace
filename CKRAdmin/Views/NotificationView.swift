@@ -20,6 +20,15 @@ struct NotificationFeature {
         var isLoading: Bool = false
         var resultMessage: String?
         var isSuccess: Bool?
+
+        // Cohouse picker
+        var cohouses: [CohouseListItem] = []
+        var isLoadingCohouses: Bool = false
+        var selectedCohouseId: String?
+
+        // History
+        var history: [NotificationHistoryItem] = []
+        var isLoadingHistory: Bool = false
     }
 
     enum NotificationTarget: String, CaseIterable, Equatable {
@@ -30,6 +39,11 @@ struct NotificationFeature {
 
     enum Action: BindableAction {
         case binding(BindingAction<State>)
+        case onAppear
+        case cohousesLoaded([CohouseListItem])
+        case cohousesLoadFailed
+        case historyLoaded([NotificationHistoryItem])
+        case historyLoadFailed
         case sendNotificationButtonTapped
         case notificationSent(NotificationResult)
         case notificationFailed(String)
@@ -37,12 +51,66 @@ struct NotificationFeature {
     }
 
     @Dependency(\.notificationClient) var notificationClient
+    @Dependency(\.cohouseClient) var cohouseClient
 
     var body: some ReducerOf<Self> {
         BindingReducer()
         Reduce { state, action in
             switch action {
+            case .binding(\.selectedTarget):
+                // Reset cohouse selection when switching targets
+                if state.selectedTarget != .cohouse {
+                    state.selectedCohouseId = nil
+                }
+                return .none
+
             case .binding:
+                return .none
+
+            case .onAppear:
+                var effects: [Effect<Action>] = []
+
+                if state.cohouses.isEmpty {
+                    state.isLoadingCohouses = true
+                    effects.append(.run { send in
+                        let result = await cohouseClient.getAllCohouses()
+                        switch result {
+                        case let .success(cohouses):
+                            await send(.cohousesLoaded(cohouses))
+                        case .failure:
+                            await send(.cohousesLoadFailed)
+                        }
+                    })
+                }
+
+                state.isLoadingHistory = true
+                effects.append(.run { send in
+                    do {
+                        let items = try await notificationClient.getHistory()
+                        await send(.historyLoaded(items))
+                    } catch {
+                        await send(.historyLoadFailed)
+                    }
+                })
+
+                return .merge(effects)
+
+            case let .cohousesLoaded(cohouses):
+                state.cohouses = cohouses
+                state.isLoadingCohouses = false
+                return .none
+
+            case .cohousesLoadFailed:
+                state.isLoadingCohouses = false
+                return .none
+
+            case let .historyLoaded(items):
+                state.history = items
+                state.isLoadingHistory = false
+                return .none
+
+            case .historyLoadFailed:
+                state.isLoadingHistory = false
                 return .none
 
             case .sendNotificationButtonTapped:
@@ -52,8 +120,14 @@ struct NotificationFeature {
                     return .none
                 }
 
-                if state.selectedTarget != .all && state.targetId.isEmpty {
-                    state.resultMessage = "ID is required"
+                if state.selectedTarget == .cohouse && state.selectedCohouseId == nil {
+                    state.resultMessage = "Please select a cohouse"
+                    state.isSuccess = false
+                    return .none
+                }
+
+                if state.selectedTarget == .edition && state.targetId.isEmpty {
+                    state.resultMessage = "Edition ID is required"
                     state.isSuccess = false
                     return .none
                 }
@@ -64,6 +138,7 @@ struct NotificationFeature {
                 let title = state.title
                 let body = state.body
                 let target = state.selectedTarget
+                let cohouseId = state.selectedCohouseId
                 let targetId = state.targetId
 
                 return .run { send in
@@ -73,7 +148,7 @@ struct NotificationFeature {
                         case .all:
                             result = try await notificationClient.sendToAll(title, body)
                         case .cohouse:
-                            result = try await notificationClient.sendToCohouse(targetId, title, body)
+                            result = try await notificationClient.sendToCohouse(cohouseId ?? "", title, body)
                         case .edition:
                             result = try await notificationClient.sendToEdition(targetId, title, body)
                         }
@@ -89,23 +164,33 @@ struct NotificationFeature {
 
                 if result.success {
                     if let sent = result.sent {
-                        state.resultMessage = "✅ Notification sent to \(sent) user(s)"
+                        state.resultMessage = "Notification sent to \(sent) user(s)"
                     } else {
-                        state.resultMessage = "✅ Notification sent successfully"
+                        state.resultMessage = "Notification sent successfully"
                     }
                     // Clear form on success
                     state.title = ""
                     state.body = ""
                     state.targetId = ""
+                    state.selectedCohouseId = nil
                 } else {
-                    state.resultMessage = "❌ Failed to send: \(result.message ?? "Unknown error")"
+                    state.resultMessage = "Failed to send: \(result.message ?? "Unknown error")"
                 }
-                return .none
+
+                // Refresh history after send
+                return .run { send in
+                    do {
+                        let items = try await notificationClient.getHistory()
+                        await send(.historyLoaded(items))
+                    } catch {
+                        await send(.historyLoadFailed)
+                    }
+                }
 
             case let .notificationFailed(error):
                 state.isLoading = false
                 state.isSuccess = false
-                state.resultMessage = "❌ Error: \(error)"
+                state.resultMessage = "Error: \(error)"
                 return .none
 
             case .clearResult:
@@ -132,9 +217,25 @@ struct NotificationView: View {
                     .pickerStyle(.segmented)
 
                     if store.selectedTarget == .cohouse {
-                        TextField("Cohouse ID", text: $store.targetId)
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled()
+                        if store.isLoadingCohouses {
+                            HStack {
+                                ProgressView()
+                                Text("Loading cohouses…")
+                                    .foregroundStyle(.secondary)
+                            }
+                        } else if store.cohouses.isEmpty {
+                            Text("No cohouses found")
+                                .foregroundStyle(.secondary)
+                        } else {
+                            Picker("Cohouse", selection: $store.selectedCohouseId) {
+                                Text("Select a cohouse")
+                                    .tag(nil as String?)
+                                ForEach(store.cohouses) { cohouse in
+                                    Text(cohouse.name)
+                                        .tag(cohouse.id as String?)
+                                }
+                            }
+                        }
                     } else if store.selectedTarget == .edition {
                         TextField("Edition ID", text: $store.targetId)
                             .textInputAutocapitalization(.never)
@@ -163,18 +264,103 @@ struct NotificationView: View {
                             Spacer()
                         }
                     }
-                    .disabled(store.isLoading || store.title.isEmpty || store.body.isEmpty)
+                    .disabled(
+                        store.isLoading
+                        || store.title.isEmpty
+                        || store.body.isEmpty
+                        || (store.selectedTarget == .cohouse && store.selectedCohouseId == nil)
+                        || (store.selectedTarget == .edition && store.targetId.isEmpty)
+                    )
                 }
 
                 if let resultMessage = store.resultMessage {
                     Section(header: Text("Result")) {
-                        Text(resultMessage)
-                            .foregroundColor(store.isSuccess == true ? .green : .red)
+                        Label(
+                            resultMessage,
+                            systemImage: store.isSuccess == true ? "checkmark.circle.fill" : "xmark.circle.fill"
+                        )
+                        .foregroundColor(store.isSuccess == true ? .green : .red)
+                    }
+                }
+
+                // History
+                Section(header: Text("History")) {
+                    if store.isLoadingHistory && store.history.isEmpty {
+                        HStack {
+                            ProgressView()
+                            Text("Loading history…")
+                                .foregroundStyle(.secondary)
+                        }
+                    } else if store.history.isEmpty {
+                        Text("No notifications sent yet")
+                            .foregroundStyle(.secondary)
+                    } else {
+                        ForEach(store.history) { item in
+                            historyRow(item)
+                        }
                     }
                 }
             }
             .navigationTitle("Notifications")
+            .onAppear { store.send(.onAppear) }
         }
+    }
+
+    @ViewBuilder
+    private func historyRow(_ item: NotificationHistoryItem) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                targetBadge(item.target)
+                Spacer()
+                if let sentAt = item.sentAt {
+                    Text(sentAt, style: .relative)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
+            Text(item.title)
+                .font(.subheadline)
+                .fontWeight(.medium)
+
+            Text(item.body)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+                .lineLimit(2)
+
+            if item.target != "all" {
+                HStack(spacing: 12) {
+                    Label("\(item.sent) sent", systemImage: "arrow.up.circle")
+                        .font(.caption2)
+                        .foregroundStyle(.green)
+                    if item.failed > 0 {
+                        Label("\(item.failed) failed", systemImage: "exclamationmark.triangle")
+                            .font(.caption2)
+                            .foregroundStyle(.red)
+                    }
+                }
+            }
+        }
+        .padding(.vertical, 2)
+    }
+
+    @ViewBuilder
+    private func targetBadge(_ target: String) -> some View {
+        let (label, color): (String, Color) = switch target {
+        case "all": ("All users", .blue)
+        case "cohouse": ("Cohouse", .orange)
+        case "edition": ("Edition", .purple)
+        default: (target, .gray)
+        }
+
+        Text(label)
+            .font(.caption2)
+            .fontWeight(.semibold)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 2)
+            .background(color.opacity(0.15))
+            .foregroundStyle(color)
+            .clipShape(Capsule())
     }
 }
 

@@ -125,6 +125,33 @@ async function sendToTokens(
 }
 
 // ============================================
+// Notification History
+// ============================================
+
+interface NotificationHistoryEntry {
+  target: "all" | "cohouse" | "edition";
+  targetId?: string;
+  title: string;
+  body: string;
+  sent: number;
+  failed: number;
+  sentBy: string;
+  sentAt: FirebaseFirestore.FieldValue;
+}
+
+/**
+ * Save a notification to the history collection for audit/tracking
+ */
+async function saveNotificationHistory(entry: NotificationHistoryEntry): Promise<void> {
+  try {
+    await db.collection("notificationHistory").add(entry);
+  } catch (error) {
+    // Don't fail the notification if history save fails
+    console.error("Failed to save notification history:", error);
+  }
+}
+
+// ============================================
 // Cloud Functions
 // ============================================
 
@@ -168,6 +195,17 @@ export const sendNotificationToCohouse = onCall<SendToCohouseRequest>(
       const result = await sendToTokens(tokens, notification);
 
       console.log(`Sent to cohouse ${cohouseId}: ${result.success} success, ${result.failure} failure`);
+
+      await saveNotificationHistory({
+        target: "cohouse",
+        targetId: cohouseId,
+        title: notification.title,
+        body: notification.body,
+        sent: result.success,
+        failed: result.failure,
+        sentBy: request.auth.uid,
+        sentAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
 
       return {
         success: true,
@@ -246,6 +284,17 @@ export const sendNotificationToEdition = onCall<SendToEditionRequest>(
 
       console.log(`Sent to edition ${editionId}: ${result.success} success, ${result.failure} failure`);
 
+      await saveNotificationHistory({
+        target: "edition",
+        targetId: editionId,
+        title: notification.title,
+        body: notification.body,
+        sent: result.success,
+        failed: result.failure,
+        sentBy: request.auth.uid,
+        sentAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
       return {
         success: true,
         sent: result.success,
@@ -302,6 +351,16 @@ export const sendNotificationToAll = onCall<SendToAllRequest>(
       const messageId = await messaging.send(message);
 
       console.log(`Sent to all users via topic, messageId: ${messageId}`);
+
+      await saveNotificationHistory({
+        target: "all",
+        title: notification.title,
+        body: notification.body,
+        sent: 0,  // Topic-based, exact count unknown
+        failed: 0,
+        sentBy: request.auth.uid,
+        sentAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
 
       return {
         success: true,

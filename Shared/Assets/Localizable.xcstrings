@@ -44,10 +44,16 @@
         }
       }
     },
+    "%lld failed" : {
+
+    },
     "%lld groups of 4" : {
 
     },
     "%lld groups of 4 cohouses have been created successfully." : {
+
+    },
+    "%lld sent" : {
 
     },
     "Active challenges at the moment :" : {
@@ -328,6 +334,7 @@
       }
     },
     "Cohouse ID" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -686,6 +693,9 @@
         }
       }
     },
+    "History" : {
+
+    },
     "Home" : {
       "localizations" : {
         "fr" : {
@@ -786,6 +796,12 @@
 
     },
     "Loading cohouses..." : {
+
+    },
+    "Loading cohouses…" : {
+
+    },
+    "Loading history…" : {
 
     },
     "Loading..." : {
@@ -996,6 +1012,9 @@
     "No CKR Game planned" : {
 
     },
+    "No cohouses found" : {
+
+    },
     "No dietary preferences" : {
 
     },
@@ -1036,6 +1055,9 @@
           }
         }
       }
+    },
+    "No notifications sent yet" : {
+
     },
     "No responses" : {
 
@@ -1179,6 +1201,9 @@
           }
         }
       }
+    },
+    "Select a cohouse" : {
+
     },
     "Select a photo, then submit." : {
 
