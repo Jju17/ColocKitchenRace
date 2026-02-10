@@ -74,73 +74,75 @@ struct SigninView: View {
     let passwordFieldDelegate = TextFieldDelegate()
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 10) {
-                Image("logo")
-                    .resizable()
-                    .frame(width: 150, height: 150, alignment: .center)
-
+        GeometryReader { geo in
+            ScrollView {
                 VStack(spacing: 10) {
-                    CKRTextField(title: "EMAIL", value: $store.email)
-                        .textContentType(.emailAddress)
-                        .keyboardType(.emailAddress)
-                        .textInputAutocapitalization(.never)
-                        .focused(self.$focusedField, equals: .email)
-                        .submitLabel(.next)
-                        .introspect(.textField, on: .iOS(.v16, .v17)) { textField in
-                            emailFieldDelegate.shouldReturn = {
-                                self.focusNextField()
-                                return false
-                            }
+                    Image("logo")
+                        .resizable()
+                        .frame(width: 150, height: 150, alignment: .center)
 
-                            textField.delegate = emailFieldDelegate
+                    VStack(spacing: 10) {
+                        CKRTextField(title: "EMAIL", value: $store.email)
+                            .textContentType(.emailAddress)
+                            .keyboardType(.emailAddress)
+                            .textInputAutocapitalization(.never)
+                            .focused(self.$focusedField, equals: .email)
+                            .submitLabel(.next)
+                            .introspect(.textField, on: .iOS(.v16, .v17)) { textField in
+                                emailFieldDelegate.shouldReturn = {
+                                    self.focusNextField()
+                                    return false
+                                }
+
+                                textField.delegate = emailFieldDelegate
+                            }
+                        CKRTextField(title: "PASSWORD", value: $store.password, isSecure: true)
+                            .textContentType(.password)
+                            .focused(self.$focusedField, equals: .password)
+                            .submitLabel(.done)
+                        VStack(spacing: 12) {
+                            CKRButton("Sign in") {
+                                self.store.send(.signinButtonTapped)
+                            }
+                            .frame(height: 50)
+                            if let errorMessage = store.errorMessage {
+                                Text(errorMessage)
+                                    .foregroundStyle(.red)
+                                    .font(.footnote)
+                            }
+                            HStack {
+                                Text("You need an account?")
+                                Button("Click here") {
+                                    self.store.send(.switchToSignupButtonTapped)
+                                }
+                            }
+                            .font(.system(size: 14))
                         }
-                    CKRTextField(title: "PASSWORD", value: $store.password, isSecure: true)
-                        .textContentType(.password)
-                        .focused(self.$focusedField, equals: .password)
-                        .submitLabel(.done)
-                    VStack(spacing: 12) {
-                        CKRButton("Sign in") {
-                            self.store.send(.signinButtonTapped)
-                        }
-                        .frame(height: 50)
-                        if let errorMessage = store.errorMessage {
-                            Text(errorMessage)
-                                .foregroundStyle(.red)
-                                .font(.footnote)
-                        }
-                        HStack {
-                            Text("You need an account?")
-                            Button("Click here") {
-                                self.store.send(.switchToSignupButtonTapped)
+                        .padding(.top)
+                    }
+                    .bind($store.focusedField, to: self.$focusedField)
+                    .padding(.horizontal)
+                    .toolbar {
+                        ToolbarItem(placement: .keyboard) {
+                            Button(action: self.focusPreviousField) {
+                                Image(systemName: "chevron.up")
                             }
                         }
-                        .font(.system(size: 14))
-                    }
-                    .padding(.top)
-                }
-                .bind($store.focusedField, to: self.$focusedField)
-                .padding(.horizontal)
-                .toolbar {
-                    ToolbarItem(placement: .keyboard) {
-                        Button(action: self.focusPreviousField) {
-                            Image(systemName: "chevron.up")
+                        ToolbarItem(placement: .keyboard) {
+                            Button(action: self.focusNextField) {
+                                Image(systemName: "chevron.down")
+                            }
+                        }
+                        ToolbarItem(placement: .keyboard) {
+                            Spacer()
                         }
                     }
-                    ToolbarItem(placement: .keyboard) {
-                        Button(action: self.focusNextField) {
-                            Image(systemName: "chevron.down")
-                        }
-                    }
-                    ToolbarItem(placement: .keyboard) {
-                        Spacer()
-                    }
                 }
+                .frame(maxWidth: .infinity, minHeight: geo.size.height)
             }
-            .frame(maxWidth: .infinity, minHeight: UIScreen.main.bounds.height)
+            .scrollDismissesKeyboard(.interactively)
+            .background { Color.CKRGreen.ignoresSafeArea() }
         }
-        .scrollDismissesKeyboard(.interactively)
-        .background { Color.CKRGreen.ignoresSafeArea() }
     }
 }
 

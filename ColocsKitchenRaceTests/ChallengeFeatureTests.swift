@@ -25,7 +25,7 @@ struct ChallengeFeatureTests {
             ChallengeFeature()
         }
 
-        // Pas de cohouse → on vide les tiles, pas de loading, pas d'effect
+        // No cohouse → hasCohouse stays false, We empty tiles, no loading, no effect
         await store.send(.onAppear)
     }
 
@@ -57,6 +57,7 @@ struct ChallengeFeatureTests {
         }
 
         await store.send(.onAppear) {
+            $0.hasCohouse = true
             $0.isLoading = true
             $0.errorMessage = nil
         }
@@ -93,6 +94,7 @@ struct ChallengeFeatureTests {
         }
 
         await store.send(.onAppear) {
+            $0.hasCohouse = true
             $0.isLoading = true
             $0.errorMessage = nil
         }
@@ -106,7 +108,7 @@ struct ChallengeFeatureTests {
 
     // MARK: - Empty challenges (was a bug, now fixed)
 
-    @Test("onAppear with 0 challenges shows empty state correctly")
+    @Test("onAppear with cohouse but 0 challenges sets hasCohouse true and empty tiles")
     func onAppear_emptyChallenges() async {
         @Shared(.cohouse) var cohouse
         $cohouse.withLock { $0 = .mock }
@@ -119,11 +121,11 @@ struct ChallengeFeatureTests {
         }
 
         await store.send(.onAppear) {
+            $0.hasCohouse = true
             $0.isLoading = true
             $0.errorMessage = nil
         }
 
-        // Le refactor corrige le bug : on reçoit bien le résultat même si 0 challenges
         await store.receive(\.challengesAndResponsesLoaded) {
             $0.isLoading = false
             $0.challengeTiles = []
@@ -209,5 +211,52 @@ struct ChallengeFeatureTests {
         await store.send(.leaderboard(.dismiss)) {
             $0.leaderboard = nil
         }
+    }
+
+    // MARK: - hasCohouse distinction
+
+    @Test("onAppear with cohouse but no challenges → hasCohouse true, tiles empty, shows 'No challenges'")
+    func onAppear_cohouseButNoChallenges_showsNoChallenges() async {
+        @Shared(.cohouse) var cohouse
+        $cohouse.withLock { $0 = .mock }
+
+        let store = TestStore(initialState: ChallengeFeature.State()) {
+            ChallengeFeature()
+        } withDependencies: {
+            $0.challengesClient.getAll = { [] }
+            $0.challengeResponseClient.getAllForCohouse = { _ in .success([]) }
+        }
+
+        await store.send(.onAppear) {
+            $0.hasCohouse = true
+            $0.isLoading = true
+            $0.errorMessage = nil
+        }
+
+        await store.receive(\.challengesAndResponsesLoaded) {
+            $0.isLoading = false
+            $0.challengeTiles = []
+        }
+
+        // After this: hasCohouse == true && challengeTiles.isEmpty → view shows "No challenges"
+        // NOT the "Join or create a cohouse" message
+        #expect(store.state.hasCohouse == true)
+        #expect(store.state.challengeTiles.isEmpty)
+    }
+
+    @Test("onAppear without cohouse → hasCohouse false, tiles empty, shows 'Join a cohouse'")
+    func onAppear_noCohouse_showsJoinCohouse() async {
+        @Shared(.cohouse) var cohouse
+        $cohouse.withLock { $0 = nil }
+
+        let store = TestStore(initialState: ChallengeFeature.State()) {
+            ChallengeFeature()
+        }
+
+        await store.send(.onAppear)
+
+        // hasCohouse == false && challengeTiles.isEmpty → view shows "Join or create a cohouse"
+        #expect(store.state.hasCohouse == false)
+        #expect(store.state.challengeTiles.isEmpty)
     }
 }

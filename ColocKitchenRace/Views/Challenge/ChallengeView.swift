@@ -14,6 +14,7 @@ struct ChallengeFeature {
     struct State: Equatable {
         var path = StackState<Path.State>()
         var challengeTiles: IdentifiedArrayOf<ChallengeTileFeature.State> = []
+        var hasCohouse = false
         var isLoading = false
         var errorMessage: String?
         @Presents var leaderboard: LeaderboardFeature.State?
@@ -60,6 +61,8 @@ struct ChallengeFeature {
 
             // MARK: - onAppear
             case .onAppear:
+                state.hasCohouse = currentCohouse != nil
+
                 // No cohouse -> We empty the tiles, nothing to load
                 guard let cohouseId = currentCohouse?.id.uuidString,
                       !cohouseId.isEmpty
@@ -181,7 +184,7 @@ struct ChallengeView: View {
                     Text(msg).foregroundStyle(.red)
                         .font(.custom("BaksoSapi", size: 16))
                 }
-                else if store.challengeTiles.isEmpty {
+                else if !store.hasCohouse {
                     VStack(spacing: 20) {
                         Text("Join or create a cohouse\nto participate in challenges.")
                             .font(.custom("BaksoSapi", size: 18))
@@ -195,6 +198,19 @@ struct ChallengeView: View {
                         .font(.custom("BaksoSapi", size: 16))
                     }
                     .padding()
+                }
+                else if store.challengeTiles.isEmpty {
+                    VStack(spacing: 12) {
+                        Image(systemName: "flag")
+                            .font(.system(size: 40))
+                            .foregroundStyle(.secondary)
+                        Text("No challenges")
+                            .font(.custom("BaksoSapi", size: 20))
+                            .foregroundStyle(.secondary)
+                        Text("Stay tuned!")
+                            .font(.custom("BaksoSapi", size: 16))
+                            .foregroundStyle(.tertiary)
+                    }
                 }
                 else {
                     SnapPagingContainer(itemWidth: UIScreen.main.bounds.width * 0.90) {
