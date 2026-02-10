@@ -44,6 +44,9 @@
         }
       }
     },
+    "%lld groups of 4 cohouses have been created successfully." : {
+
+    },
     "Active challenges at the moment :" : {
       "localizations" : {
         "fr" : {
@@ -770,7 +773,28 @@
     "MARK AS DONE" : {
 
     },
+    "Match %lld cohouses" : {
+
+    },
     "Match cohouses" : {
+
+    },
+    "Match cohouses?" : {
+
+    },
+    "Matched at" : {
+
+    },
+    "Matched groups" : {
+
+    },
+    "Matching cohouses..." : {
+
+    },
+    "Matching complete!" : {
+
+    },
+    "Matching failed" : {
 
     },
     "Max participants" : {
@@ -1324,6 +1348,9 @@
       }
     },
     "This doesn't look like an ID card. Please retake the photo." : {
+
+    },
+    "This will partition %lld registered cohouses into groups of 4 based on GPS proximity. This action will overwrite any previous matching." : {
 
     },
     "Title" : {

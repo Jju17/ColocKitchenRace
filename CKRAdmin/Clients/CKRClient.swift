@@ -32,7 +32,7 @@ enum CKRError: Error, Equatable {
 struct MatchResult: Equatable {
     var success: Bool
     var groupCount: Int
-    var groups: [[String]]
+    var groups: [MatchedGroup]
 }
 
 @DependencyClient
@@ -114,7 +114,8 @@ extension CKRClient: DependencyKey {
 
                 let success = data["success"] as? Bool ?? false
                 let groupCount = data["groupCount"] as? Int ?? 0
-                let groups = (data["groups"] as? [[String]]) ?? []
+                let rawGroups = (data["groups"] as? [[String]]) ?? []
+                let groups = rawGroups.map { MatchedGroup(cohouseIds: $0) }
 
                 return .success(MatchResult(
                     success: success,
