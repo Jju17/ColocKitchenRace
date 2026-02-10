@@ -8,6 +8,7 @@
 import ComposableArchitecture
 import os
 import SwiftUI
+import UIKit
 
 @Reducer
 struct CohouseDetailFeature {
@@ -32,10 +33,16 @@ struct CohouseDetailFeature {
         @Shared var cohouse: Cohouse
         @Shared(.userInfo) var userInfo
         @Presents var destination: Destination.State?
+        var coverImageData: Data?
+
+        var coverImage: UIImage? {
+            coverImageData.flatMap { UIImage(data: $0) }
+        }
     }
 
     enum Action {
         case confirmEditCohouseButtonTapped
+        case coverImageLoaded(Data?)
         case dismissEditCohouseButtonTapped
         case editButtonTapped
         case destination(PresentationAction<Destination.Action>)
@@ -78,14 +85,28 @@ struct CohouseDetailFeature {
                         user.surname.isEmpty && !user.isAdmin
                     }
 
+                    let coverImageData = formState.coverImageData
                     state.destination = nil
-                    return .run { [wipCohouse] _ in
-                        try await self.cohouseClient.set(id: wipCohouse.id.uuidString, newCohouse: wipCohouse)
+                    return .run { [wipCohouse, coverImageData] send in
+                        var updatedCohouse = wipCohouse
+                        // Upload new cover image if provided
+                        if let coverData = coverImageData {
+                            let path = try await self.cohouseClient.uploadCoverImage(updatedCohouse.id.uuidString, coverData)
+                            updatedCohouse.coverImagePath = path
+                        }
+                        try await self.cohouseClient.set(id: updatedCohouse.id.uuidString, newCohouse: updatedCohouse)
+                        // Use form data directly — no re-download needed
+                        if let coverData = coverImageData {
+                            await send(.coverImageLoaded(coverData))
+                        }
                     } catch: { error, _ in
                         Logger.cohouseLog.log(level: .error, "Failed to save cohouse: \(error)")
                     }
                 case .dismissEditCohouseButtonTapped:
                     state.destination = nil
+                    return .none
+                case let .coverImageLoaded(data):
+                    state.coverImageData = data
                     return .none
                 case .destination:
                     return .none
@@ -101,7 +122,14 @@ struct CohouseDetailFeature {
                     let id = state.cohouse.id.uuidString
                     return .run { send in
                         do {
-                            _ = try await cohouseClient.get(id)
+                            let cohouse = try await cohouseClient.get(id)
+                            // Load cover image if path exists
+                            if let path = cohouse.coverImagePath {
+                                let data = try? await cohouseClient.loadCoverImage(path)
+                                await send(.coverImageLoaded(data))
+                            } else {
+                                await send(.coverImageLoaded(nil))
+                            }
                         } catch let error as CohouseClientError {
                             switch error {
                                 case .userNotInCohouse:
@@ -141,10 +169,18 @@ struct CohouseDetailView: View {
     var body: some View {
         Form {
             Section("") {
-                Image("defaultColocBackground")
-                    .resizable()
-                    .scaledToFill()
-                    .frame(height: 150)
+                if let coverImage = store.coverImage {
+                    Image(uiImage: coverImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(height: 150)
+                        .clipped()
+                } else {
+                    Image("defaultColocBackground")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(height: 150)
+                }
             }
             .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
 

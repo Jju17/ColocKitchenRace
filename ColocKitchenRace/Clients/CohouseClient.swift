@@ -9,6 +9,7 @@ import ComposableArchitecture
 import FirebaseFirestore
 import FirebaseFunctions
 import FirebaseStorage
+import UIKit
 
 // MARK: - Error
 
@@ -35,6 +36,8 @@ struct CohouseClient {
     var add: @Sendable (_ newCohouse: Cohouse) async throws -> Void
     var checkDuplicate: @Sendable (_ name: String, _ address: PostalAddress) async throws -> CohouseDuplicateResult
     var uploadIdCard: @Sendable (_ cohouseId: String, _ imageData: Data) async throws -> Void
+    var uploadCoverImage: @Sendable (_ cohouseId: String, _ imageData: Data) async throws -> String
+    var loadCoverImage: @Sendable (_ path: String) async throws -> Data
     var get: @Sendable (_ id: String) async throws -> Cohouse
     var getByCode: @Sendable (_ code: String) async throws -> Cohouse
     var set: @Sendable (_ id: String, _ newCohouse: Cohouse) async throws -> Void
@@ -105,6 +108,18 @@ extension CohouseClient: DependencyKey {
             metadata.contentType = "image/jpeg"
 
             _ = try await ref.putDataAsync(imageData, metadata: metadata)
+        },
+        uploadCoverImage: { cohouseId, imageData in
+            let path = "cohouses/\(cohouseId)/cover_image.jpg"
+            let ref = Storage.storage().reference(withPath: path)
+            let metadata = StorageMetadata()
+            metadata.contentType = "image/jpeg"
+            _ = try await ref.putDataAsync(imageData, metadata: metadata)
+            return path
+        },
+        loadCoverImage: { path in
+            let ref = Storage.storage().reference(withPath: path)
+            return try await ref.data(maxSize: 4 * 1024 * 1024)
         },
         get: { id in
             @Shared(.cohouse) var currentCohouse
@@ -234,6 +249,8 @@ extension CohouseClient: DependencyKey {
         add: { _ in },
         checkDuplicate: { _, _ in .noDuplicate },
         uploadIdCard: { _, _ in },
+        uploadCoverImage: { _, _ in "" },
+        loadCoverImage: { _ in Data() },
         get: { _ in .mock },
         getByCode: { _ in .mock },
         set: { _, _ in },

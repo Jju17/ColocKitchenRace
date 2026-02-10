@@ -22,6 +22,14 @@ struct CohouseFormFeature {
         var isValidatingAddress: Bool = false
         var creationError: String?
 
+        // Cover image
+        var coverImageData: Data?
+        var isCoverImagePickerPresented: Bool = false
+        var coverImageSourceSheet: Bool = false
+        var coverImageSource: CoverImageSource = .library
+
+        enum CoverImageSource: Equatable { case camera, library }
+
         // ID card
         var idCardImageData: Data?
         var isIdCardPickerPresented: Bool = false
@@ -43,6 +51,12 @@ struct CohouseFormFeature {
         case quitCohouseButtonTapped
         case addressValidationResponse(TaskResult<AddressValidationResult>)
         case applySuggestedAddress(ValidatedAddress)
+
+        // Cover image
+        case coverImagePickTapped
+        case coverImageSourceChosen(State.CoverImageSource)
+        case coverImagePicked(Data)
+        case coverImageCleared
 
         // ID card
         case idCardPickTapped
@@ -150,6 +164,23 @@ struct CohouseFormFeature {
                     state.addressValidationResult = nil
                     return .none
 
+                // Cover image
+                case .coverImagePickTapped:
+                    state.coverImageSourceSheet = true
+                    return .none
+                case let .coverImageSourceChosen(source):
+                    state.coverImageSourceSheet = false
+                    state.coverImageSource = source
+                    state.isCoverImagePickerPresented = true
+                    return .none
+                case let .coverImagePicked(data):
+                    state.coverImageData = data
+                    state.isCoverImagePickerPresented = false
+                    return .none
+                case .coverImageCleared:
+                    state.coverImageData = nil
+                    return .none
+
                 // ID card
                 case .idCardPickTapped:
                     state.isIdCardPickerPresented = true
@@ -193,6 +224,8 @@ struct CohouseFormView: View {
             Section {
                 TextField("Cohouse name", text: $store.wipCohouse.name)
             }
+
+            self.coverImageSection
 
             Section("Location") {
                 TextField(text: $store.wipCohouse.address.street) {
@@ -267,6 +300,60 @@ struct CohouseFormView: View {
                 source: .camera
             )
             .ignoresSafeArea()
+        }
+        .fullScreenCover(isPresented: $store.isCoverImagePickerPresented) {
+            ImagePicker(
+                selected: { image in
+                    if let data = ImagePipeline.compress(image: image) {
+                        store.send(.coverImagePicked(data))
+                    }
+                },
+                cancelled: {
+                    store.send(.binding(.set(\.isCoverImagePickerPresented, false)))
+                },
+                source: store.coverImageSource == .camera ? .camera : .photoLibrary
+            )
+            .ignoresSafeArea()
+        }
+        .confirmationDialog("Photo source", isPresented: $store.coverImageSourceSheet) {
+            Button("Camera") { store.send(.coverImageSourceChosen(.camera)) }
+            Button("Photo Library") { store.send(.coverImageSourceChosen(.library)) }
+        }
+    }
+
+    // MARK: - Cover Image section
+
+    @ViewBuilder
+    private var coverImageSection: some View {
+        Section("Cover photo") {
+            if let imageData = store.coverImageData,
+               let uiImage = UIImage(data: imageData) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(height: 150)
+                        .clipped()
+                        .cornerRadius(8)
+
+                    Button(role: .destructive) {
+                        store.send(.coverImageCleared)
+                    } label: {
+                        Label("Remove photo", systemImage: "trash")
+                            .font(.footnote)
+                    }
+                }
+            } else {
+                Button {
+                    store.send(.coverImagePickTapped)
+                } label: {
+                    Label("Choose a cover photo", systemImage: "photo.on.rectangle")
+                }
+            }
+
+            Text("Optional — personalize your cohouse page.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
         }
     }
 

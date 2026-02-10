@@ -65,7 +65,7 @@ struct HomeFeatureTests {
 
     // MARK: - Refresh
 
-    @Test("refresh re-fetches CKR game and news")
+    @Test("refresh re-fetches CKR game, news, and cover image")
     func refresh() async {
         var ckrCalled = false
         var newsCalled = false
@@ -84,9 +84,33 @@ struct HomeFeatureTests {
         }
 
         await store.send(.refresh)
+        await store.receive(\.coverImageLoaded)
 
         #expect(ckrCalled)
         #expect(newsCalled)
+    }
+
+    @Test("refresh loads cover image when cohouse has coverImagePath")
+    func refresh_loadsCoverImage() async {
+        let fakeImageData = Data([0xFF, 0xD8, 0xFF])
+        var cohouse = Cohouse.mock
+        cohouse.coverImagePath = "cohouses/test/cover_image.jpg"
+
+        @Shared(.cohouse) var sharedCohouse
+        $sharedCohouse.withLock { $0 = cohouse }
+
+        let store = TestStore(initialState: HomeFeature.State()) {
+            HomeFeature()
+        } withDependencies: {
+            $0.ckrClient.getLast = { .success(nil) }
+            $0.newsClient.getLast = { .success([]) }
+            $0.cohouseClient.loadCoverImage = { _ in fakeImageData }
+        }
+
+        await store.send(.refresh)
+        await store.receive(\.coverImageLoaded) {
+            $0.coverImageData = fakeImageData
+        }
     }
 
     // MARK: - Delegate

@@ -8,6 +8,7 @@
 import ComposableArchitecture
 import os
 import SwiftUI
+import UIKit
 
 @Reducer
 struct HomeFeature {
@@ -24,9 +25,15 @@ struct HomeFeature {
         @Shared(.ckrGame) var ckrGame
         @Shared(.news) var news
         @Shared(.userInfo) var userInfo
+        var coverImageData: Data?
+
+        var coverImage: UIImage? {
+            coverImageData.flatMap { UIImage(data: $0) }
+        }
     }
 
     enum Action {
+        case coverImageLoaded(Data?)
         case openRegisterLink
         case refresh
         case path(StackActionOf<Path>)
@@ -38,11 +45,15 @@ struct HomeFeature {
     }
 
     @Dependency(\.ckrClient) var ckrClient
+    @Dependency(\.cohouseClient) var cohouseClient
     @Dependency(\.newsClient) var newsClient
 
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
+                case let .coverImageLoaded(data):
+                    state.coverImageData = data
+                    return .none
                 case .openRegisterLink:
                     guard let cohouse = state.cohouse
                     else { return .none }
@@ -53,9 +64,16 @@ struct HomeFeature {
                         }
                     }
                 case .refresh:
-                    return .run { [ckrClient, newsClient] _ in
+                    let coverImagePath = state.cohouse?.coverImagePath
+                    return .run { [ckrClient, newsClient, cohouseClient] send in
                         let _ = try? await ckrClient.getLast()
                         let _ = try? await newsClient.getLast()
+                        if let path = coverImagePath {
+                            let data = try? await cohouseClient.loadCoverImage(path)
+                            await send(.coverImageLoaded(data))
+                        } else {
+                            await send(.coverImageLoaded(nil))
+                        }
                     }
                 case .path:
                     return .none
@@ -79,7 +97,7 @@ struct HomeView: View {
                     Button {
                         store.send(.delegate(.switchToCohouseButtonTapped))
                     } label: {
-                        CohouseTileView(name: store.cohouse?.name)
+                        CohouseTileView(name: store.cohouse?.name, coverImage: store.coverImage)
                     }
 
                     Button {
@@ -94,6 +112,9 @@ struct HomeView: View {
                 }
             }
             .refreshable {
+                await store.send(.refresh).finish()
+            }
+            .task {
                 await store.send(.refresh).finish()
             }
             .padding(.horizontal)

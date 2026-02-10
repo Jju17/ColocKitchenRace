@@ -242,6 +242,7 @@ struct CohouseDetailFeatureTests {
         }
 
         await store.send(.refresh)
+        await store.receive(\.coverImageLoaded)
     }
 
     @Test("Refresh when user removed from cohouse shows alert")
@@ -272,6 +273,45 @@ struct CohouseDetailFeatureTests {
                 }
             )
         }
+    }
+
+    @Test("confirmEditCohouseButtonTapped with cover image uploads and displays immediately")
+    func confirmEdit_withCoverImage() async {
+        let imageData = Data([0xFF, 0xD8, 0xFF])
+        var uploadCalled = false
+
+        var wipCohouse = Cohouse.mock
+        wipCohouse.users = [CohouseUser(id: UUID(), isAdmin: true, surname: "Admin")]
+
+        let store = TestStore(
+            initialState: CohouseDetailFeature.State(
+                cohouse: Shared(value: Cohouse.mock),
+                destination: .edit(
+                    CohouseFormFeature.State(
+                        wipCohouse: wipCohouse,
+                        originalAddress: Cohouse.mock.address,
+                        coverImageData: imageData
+                    )
+                )
+            )
+        ) {
+            CohouseDetailFeature()
+        } withDependencies: {
+            $0.cohouseClient.uploadCoverImage = { _, _ in
+                uploadCalled = true
+                return "cohouses/test/cover_image.jpg"
+            }
+            $0.cohouseClient.set = { _, _ in }
+        }
+
+        await store.send(.confirmEditCohouseButtonTapped) {
+            $0.destination = nil
+        }
+        await store.receive(\.coverImageLoaded) {
+            $0.coverImageData = imageData
+        }
+
+        #expect(uploadCalled)
     }
 
     @Test("Alert OK button clears shared cohouse")

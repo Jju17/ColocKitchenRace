@@ -17,6 +17,7 @@ struct FirestoreCohouse: Equatable, Hashable, Codable {
     var code: String
     var latitude: Double?
     var longitude: Double?
+    var coverImagePath: String?
 }
 
 extension FirestoreCohouse {
@@ -28,7 +29,8 @@ extension FirestoreCohouse {
             code: self.code,
             latitude: self.latitude,
             longitude: self.longitude,
-            users: IdentifiedArray(uniqueElements: users)
+            users: IdentifiedArray(uniqueElements: users),
+            coverImagePath: self.coverImagePath
         )
     }
 }
@@ -43,7 +45,8 @@ extension FirestoreCohouse {
             addressLower: PostalAddress.mock.lowercased,
             code: "1234",
             latitude: 50.8503,
-            longitude: 4.3517
+            longitude: 4.3517,
+            coverImagePath: nil
         )
     }
 }

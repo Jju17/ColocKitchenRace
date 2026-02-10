@@ -6,16 +6,24 @@
 //
 
 import SwiftUI
+import UIKit
 
 struct CohouseTileView: View {
 
     let name: String?
+    var coverImage: UIImage? = nil
 
     var body: some View {
         ZStack {
-            Image("defaultColocBackground")
-                .resizable()
-                .scaledToFill()
+            if let coverImage {
+                Image(uiImage: coverImage)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                Image("defaultColocBackground")
+                    .resizable()
+                    .scaledToFill()
+            }
             Rectangle()
                 .foregroundColor(.clear)
                 .background(

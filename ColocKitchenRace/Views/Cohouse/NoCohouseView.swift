@@ -114,10 +114,12 @@ struct NoCohouseFeature {
                         return .none
                     }
 
+                    let coverImageData = formState.coverImageData
+
                     state.isCreating = true
                     state.showIdCardWarning = false
 
-                    return .run { [newCohouse, idCardData] send in
+                    return .run { [newCohouse, idCardData, coverImageData] send in
                         do {
                             // 1. Check for duplicate
                             let duplicateResult = try await self.cohouseClient.checkDuplicate(
@@ -141,6 +143,14 @@ struct NoCohouseFeature {
 
                             // 3. Upload ID card
                             try await self.cohouseClient.uploadIdCard(newCohouse.id.uuidString, idCardData)
+
+                            // 4. Upload cover image (optional)
+                            if let coverData = coverImageData {
+                                let path = try await self.cohouseClient.uploadCoverImage(newCohouse.id.uuidString, coverData)
+                                var updatedCohouse = newCohouse
+                                updatedCohouse.coverImagePath = path
+                                try await self.cohouseClient.set(updatedCohouse.id.uuidString, updatedCohouse)
+                            }
 
                             await send(.creationCompleted)
                         } catch {
