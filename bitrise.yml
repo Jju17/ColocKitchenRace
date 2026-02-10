@@ -1,0 +1,59 @@
+---
+format_version: '13'
+default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
+project_type: ios
+workflows:
+  deploy_testflight:
+    summary: Build the app and deploy to TestFlight.
+    description: Clones the repo, resolves SPM dependencies, archives the app and
+      uploads it to App Store Connect for TestFlight distribution.
+    steps:
+    - activate-ssh-key@4: {}
+    - git-clone@8: {}
+    - restore-spm-cache@2: {}
+    - save-spm-cache@1: {}
+    - set-xcode-build-number@2: {}
+    - certificate-and-profile-installer@1: {}
+    - script@1:
+        title: Restore GoogleService-Info.plist
+        inputs:
+        - content: |
+            #!/bin/bash
+            set -e
+            echo "$GOOGLE_SERVICE_INFO_PLIST_BASE64" | base64 --decode > "$BITRISE_SOURCE_DIR/ColocKitchenRace/GoogleService-Info.plist"
+            echo "GoogleService-Info.plist restored successfully"
+    - script@1:
+        inputs:
+        - content: defaults write com.apple.dt.Xcode
+            IDESkipPackagePluginFingerprintValidatation -bool YES
+    - xcode-archive@5:
+        inputs:
+        - xcodebuild_options: "-skipPackagePluginValidation -skipMacroValidation"
+        - distribution_method: app-store
+        - automatic_code_signing: api-key
+    - deploy-to-bitrise-io@2: {}
+    - deploy-to-itunesconnect-application-loader@1:
+        inputs:
+        - itunescon_user: "$apple_id_email"
+        - password: "$apple_id_password"
+        - app_password: "$apple_app_specific"
+meta:
+  bitrise.io:
+    stack: osx-xcode-edge
+    machine_type_id: g2.mac.medium
+app:
+  envs:
+  - opts:
+      is_expand: false
+    BITRISE_PROJECT_PATH: ColocsKitchenRace.xcodeproj
+  - opts:
+      is_expand: false
+    BITRISE_SCHEME: colockitchenrace
+  - opts:
+      is_expand: false
+    BITRISE_DISTRIBUTION_METHOD: app-store
+trigger_map:
+- push_branch: main
+  enabled: false
+  type: push
+  workflow: deploy_testflight
