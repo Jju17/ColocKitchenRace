@@ -85,6 +85,7 @@ import {
   checkDuplicateCohouse,
   validateAddress,
   matchCohouses,
+  getCohousesForMap,
 } from "../index";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────────
@@ -334,5 +335,70 @@ describe("matchCohouses", () => {
     // All 8 IDs present
     const allIds = result.groups.flat().sort();
     expect(allIds).toEqual(["c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8"]);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// getCohousesForMap
+// ═══════════════════════════════════════════════════════════════════════════════
+
+describe("getCohousesForMap", () => {
+  it("throws invalid-argument when cohouseIds missing", async () => {
+    await expect(
+      callWith(getCohousesForMap, { cohouseIds: [] })
+    ).rejects.toThrow(/invalid-argument|missing/i);
+  });
+
+  it("returns cohouse data with user names", async () => {
+    firestoreData = {
+      cohouses: {
+        c1: { id: "c1", name: "Les Fous", latitude: 50.850, longitude: 4.350 },
+        c2: { id: "c2", name: "Zone 88", latitude: 50.852, longitude: 4.352 },
+      },
+    };
+    firestoreSubcollections = {
+      cohouses: {
+        c1: { users: [{ firstName: "Alice", lastName: "Dupont" }, { firstName: "Bob", lastName: "Martin" }] },
+        c2: { users: [{ firstName: "Charlie", lastName: "Leclerc" }] },
+      },
+    };
+
+    const result = await callWith(getCohousesForMap, { cohouseIds: ["c1", "c2"] });
+
+    expect(result.success).toBe(true);
+    expect(result.cohouses).toHaveLength(2);
+
+    const c1 = result.cohouses.find((c: any) => c.id === "c1");
+    expect(c1).toBeDefined();
+    expect(c1.name).toBe("Les Fous");
+    expect(c1.latitude).toBe(50.850);
+    expect(c1.longitude).toBe(4.350);
+    expect(c1.userNames).toEqual(["Alice Dupont", "Bob Martin"]);
+
+    const c2 = result.cohouses.find((c: any) => c.id === "c2");
+    expect(c2).toBeDefined();
+    expect(c2.name).toBe("Zone 88");
+    expect(c2.userNames).toEqual(["Charlie Leclerc"]);
+  });
+
+  it("skips cohouses without GPS coordinates", async () => {
+    firestoreData = {
+      cohouses: {
+        c1: { id: "c1", name: "Has GPS", latitude: 50.850, longitude: 4.350 },
+        c2: { id: "c2", name: "No GPS" },
+      },
+    };
+    firestoreSubcollections = {
+      cohouses: {
+        c1: { users: [] },
+        c2: { users: [] },
+      },
+    };
+
+    const result = await callWith(getCohousesForMap, { cohouseIds: ["c1", "c2"] });
+
+    expect(result.success).toBe(true);
+    expect(result.cohouses).toHaveLength(1);
+    expect(result.cohouses[0].id).toBe("c1");
   });
 });

@@ -619,6 +619,94 @@ export const matchCohouses = onCall<MatchCohousesRequest>(
 );
 
 // ============================================
+// Cohouse Data for Map
+// ============================================
+
+interface GetCohousesForMapRequest {
+  cohouseIds: string[];
+}
+
+interface CohouseMapData {
+  id: string;
+  name: string;
+  latitude: number;
+  longitude: number;
+  userNames: string[];
+}
+
+/**
+ * Batch-fetch lightweight cohouse data for map display.
+ *
+ * Returns name, GPS coordinates, and member names for each cohouse ID.
+ * This avoids N individual Firestore calls from the client.
+ */
+export const getCohousesForMap = onCall<GetCohousesForMapRequest>(
+  { region: REGION },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Must be authenticated");
+    }
+
+    const { cohouseIds } = request.data;
+
+    if (!cohouseIds || !Array.isArray(cohouseIds) || cohouseIds.length === 0) {
+      throw new HttpsError("invalid-argument", "Missing required field: cohouseIds (non-empty array)");
+    }
+
+    try {
+      const results: CohouseMapData[] = [];
+
+      // Fetch cohouse docs in batches of 30 (Firestore 'in' limit)
+      const batches = [];
+      for (let i = 0; i < cohouseIds.length; i += 30) {
+        batches.push(cohouseIds.slice(i, i + 30));
+      }
+
+      for (const batch of batches) {
+        const snapshot = await db
+          .collection("cohouses")
+          .where("id", "in", batch)
+          .get();
+
+        // For each cohouse doc, also fetch its users subcollection
+        for (const doc of snapshot.docs) {
+          const data = doc.data();
+          const id = data.id as string;
+          const name = (data.name as string) || "Unknown";
+          const latitude = data.latitude as number | undefined;
+          const longitude = data.longitude as number | undefined;
+
+          if (latitude == null || longitude == null) continue;
+
+          // Fetch users subcollection
+          const usersSnapshot = await db
+            .collection("cohouses")
+            .doc(doc.id)
+            .collection("users")
+            .get();
+
+          const userNames = usersSnapshot.docs
+            .map((userDoc) => {
+              const userData = userDoc.data();
+              const first = (userData.firstName as string) || "";
+              const last = (userData.lastName as string) || "";
+              return `${first} ${last}`.trim();
+            })
+            .filter((name) => name.length > 0);
+
+          results.push({ id, name, latitude, longitude, userNames });
+        }
+      }
+
+      return { success: true, cohouses: results };
+    } catch (error) {
+      console.error("Error fetching cohouses for map:", error);
+      throw new HttpsError("internal", "Failed to fetch cohouse data");
+    }
+  }
+);
+
+// ============================================
 // Firestore Triggers
 // ============================================
 

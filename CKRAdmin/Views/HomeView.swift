@@ -15,11 +15,13 @@ struct HomeFeature {
     enum Destination {
         case addNewCKRGame(CKRGameFormFeature)
         case editCKRGame(CKRGameFormFeature)
+        case matchedGroupsMap(MatchedGroupsMapFeature)
         case alert(AlertState<Action.Alert>)
 
         enum Action {
             case addNewCKRGame(CKRGameFormFeature.Action)
             case editCKRGame(CKRGameFormFeature.Action)
+            case matchedGroupsMap(MatchedGroupsMapFeature.Action)
             case alert(Alert)
 
             enum Alert {
@@ -67,6 +69,7 @@ struct HomeFeature {
         case matchCohousesCompleted(MatchResult)
         case matchCohouesesFailed(String)
         case onTask
+        case viewMatchedGroupsMapButtonTapped
         case signOut
         case totalUsersUpdated(Int)
         case totalCohousesUpdated(Int)
@@ -237,6 +240,12 @@ struct HomeFeature {
                 case let .errorOccurred(error):
                     state.error = error
                     return .none
+                case .viewMatchedGroupsMapButtonTapped:
+                    guard let groups = state.currentGame?.matchedGroups else { return .none }
+                    state.destination = .matchedGroupsMap(
+                        MatchedGroupsMapFeature.State(matchedGroups: groups)
+                    )
+                    return .none
                 case .destination(.presented(.alert(.confirmMatchCohouses))):
                     return .send(.confirmMatchCohousesButtonTapped)
                 case .destination:
@@ -350,6 +359,24 @@ struct HomeView: View {
                     }
             }
         }
+        // Sheet: Matched Groups Map
+        .sheet(
+            item: $store.scope(state: \.destination?.matchedGroupsMap, action: \.destination.matchedGroupsMap)
+        ) { mapStore in
+            NavigationStack {
+                MatchedGroupsMapView(store: mapStore)
+                    .navigationTitle("Matched Groups")
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button {
+                                store.send(.dismissDestinationButtonTapped)
+                            } label: {
+                                Label("Close", systemImage: "xmark")
+                            }
+                        }
+                    }
+            }
+        }
         .task {
             store.send(.onTask)
         }
@@ -402,7 +429,19 @@ struct HomeView: View {
                 }
 
                 if let matchedGroups = game.matchedGroups, !matchedGroups.isEmpty {
-                    LabeledContent("Matched groups", value: "\(matchedGroups.count) groups of 4")
+                    Button {
+                        store.send(.viewMatchedGroupsMapButtonTapped)
+                    } label: {
+                        HStack {
+                            Text("Matched groups")
+                            Spacer()
+                            Text("\(matchedGroups.count) groups of 4")
+                                .foregroundStyle(.secondary)
+                            Image(systemName: "map")
+                                .foregroundStyle(.blue)
+                        }
+                    }
+                    .foregroundStyle(.primary)
                     if let matchedAt = game.matchedAt {
                         LabeledContent("Matched at", value: matchedAt.formatted(date: .abbreviated, time: .shortened))
                     }

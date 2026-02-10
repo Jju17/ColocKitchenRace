@@ -44,6 +44,9 @@
         }
       }
     },
+    "%lld groups of 4" : {
+
+    },
     "%lld groups of 4 cohouses have been created successfully." : {
 
     },
@@ -265,6 +268,9 @@
           }
         }
       }
+    },
+    "Close" : {
+
     },
     "Closed" : {
 
@@ -621,6 +627,9 @@
         }
       }
     },
+    "Group" : {
+
+    },
     "GSM" : {
       "localizations" : {
         "fr" : {
@@ -665,6 +674,9 @@
 
     },
     "I’ve done it!" : {
+
+    },
+    "ID" : {
 
     },
     "ID Card" : {
@@ -734,6 +746,9 @@
     "Loading challenges…" : {
 
     },
+    "Loading cohouses..." : {
+
+    },
     "Loading responses..." : {
 
     },
@@ -786,6 +801,9 @@
 
     },
     "Matched groups" : {
+
+    },
+    "Matched Groups" : {
 
     },
     "Matching cohouses..." : {
@@ -952,6 +970,9 @@
           }
         }
       }
+    },
+    "No members" : {
+
     },
     "No news" : {
       "localizations" : {
