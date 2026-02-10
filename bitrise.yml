@@ -39,8 +39,8 @@ workflows:
         - app_password: "$apple_app_specific"
 meta:
   bitrise.io:
-    stack: osx-xcode-edge
-    machine_type_id: g2.mac.medium
+    stack: osx-xcode-latest-stable
+    machine_type_id: g2.mac.large
 app:
   envs:
   - opts:
