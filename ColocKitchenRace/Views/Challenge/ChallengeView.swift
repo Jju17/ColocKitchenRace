@@ -213,7 +213,7 @@ struct ChallengeView: View {
                     }
                 }
                 else {
-                    SnapPagingContainer(itemWidth: UIScreen.main.bounds.width * 0.90) {
+                    SnapPagingContainer(itemWidth: UIScreen.main.bounds.width - 32) {
                         ForEachStore(store.scope(state: \.challengeTiles, action: \.challengeTiles)) { tileStore in
                             ChallengeTileView(store: tileStore)
                         }

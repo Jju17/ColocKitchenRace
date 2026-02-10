@@ -16,7 +16,7 @@ struct NewsTileView: View {
 
     var body: some View {
         ZStack(alignment: .leading) {
-            RoundedRectangle(cornerRadius: 15)
+            RoundedRectangle(cornerRadius: 20)
                 .fill(Color.CKRBlue)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             VStack(spacing: 0) {
@@ -40,13 +40,13 @@ struct NewsTileView: View {
                         }
                     }
                     .listStyle(.inset)
-                    .cornerRadius(15)
+                    .cornerRadius(20)
                     .padding()
                 } else {
                     ZStack {
                         Rectangle()
                             .fill(.white)
-                            .cornerRadius(15)
+                            .cornerRadius(20)
                             .padding()
                         Text("No news at the moment")
                             .font(.custom("BaksoSapi", size: 14))

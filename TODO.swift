@@ -11,6 +11,7 @@
 // -------------------------------------------------------------------------------------
 
 // FIX
+
 // [/] - Fix member admin's selection
 // [/] - Cohouse - Make cohouse code copyable for better sharability
 // [/] - Challenge - Make 'START' Challenge button bigger

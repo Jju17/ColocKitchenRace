@@ -42,7 +42,7 @@ struct CountdownTileView: View {
 
     var body: some View {
         ZStack(alignment: .leading) {
-            RoundedRectangle(cornerRadius: 15)
+            RoundedRectangle(cornerRadius: 20)
                 .fill(Color.CKRPurple)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 

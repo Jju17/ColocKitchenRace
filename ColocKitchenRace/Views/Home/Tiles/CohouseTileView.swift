@@ -42,7 +42,7 @@ struct CohouseTileView: View {
         }
         .frame(height: 150)
         .clipped()
-        .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 }
 

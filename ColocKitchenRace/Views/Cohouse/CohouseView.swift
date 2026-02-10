@@ -13,12 +13,14 @@ struct CohouseFeature {
 
     @ObservableState
     struct State: Equatable {
-        //        case cohouse(CohouseDetailFeature.State)
+        var cohouseDetail: CohouseDetailFeature.State?
         var noCohouse = NoCohouseFeature.State()
         @Shared(.cohouse) var cohouse
     }
 
     enum Action {
+        case cohouseDetail(CohouseDetailFeature.Action)
+        case cohouseChanged
         case noCohouse(NoCohouseFeature.Action)
     }
 
@@ -45,9 +47,23 @@ struct CohouseFeature {
 
         Reduce { state, action in
             switch action {
+                case .cohouseChanged:
+                    if let cohouse = Shared(state.$cohouse) {
+                        if state.cohouseDetail == nil {
+                            state.cohouseDetail = CohouseDetailFeature.State(cohouse: cohouse)
+                        }
+                    } else {
+                        state.cohouseDetail = nil
+                    }
+                    return .none
+                case .cohouseDetail:
+                    return .none
                 case .noCohouse:
                     return .none
             }
+        }
+        .ifLet(\.cohouseDetail, action: \.cohouseDetail) {
+            CohouseDetailFeature()
         }
     }
 }
@@ -57,16 +73,8 @@ struct CohouseView: View {
 
     var body: some View {
         NavigationStack {
-            if let cohouse = Shared(store.state.$cohouse) {
-                CohouseDetailView(
-                    store: Store(
-                        initialState: CohouseDetailFeature.State(
-                            cohouse: cohouse
-                        )
-                    ) {
-                        CohouseDetailFeature()
-                    }
-                )
+            if let detailStore = store.scope(state: \.cohouseDetail, action: \.cohouseDetail) {
+                CohouseDetailView(store: detailStore)
             } else {
                 NoCohouseView(
                     store: self.store.scope(
@@ -75,6 +83,12 @@ struct CohouseView: View {
                     )
                 )
             }
+        }
+        .onAppear {
+            store.send(.cohouseChanged)
+        }
+        .onChange(of: store.cohouse) { _, _ in
+            store.send(.cohouseChanged)
         }
     }
 }

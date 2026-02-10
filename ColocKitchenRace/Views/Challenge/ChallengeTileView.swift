@@ -299,12 +299,12 @@ struct ChallengeTileView: View {
         .padding(.vertical, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(
-            RoundedRectangle(cornerRadius: 32)
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .fill(bg)
                 .shadow(color: .black.opacity(colorScheme == .dark ? 0.5 : 0.1), radius: 20, y: 10)
         )
         .overlay(
-            RoundedRectangle(cornerRadius: 32)
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .stroke(Color.green.opacity(0.3), lineWidth: 2)
         )
         .onChange(of: store.liveStatus) { _, new in

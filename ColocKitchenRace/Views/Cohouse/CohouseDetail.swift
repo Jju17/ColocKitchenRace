@@ -166,25 +166,39 @@ struct CohouseDetailView: View {
     @Bindable var store: StoreOf<CohouseDetailFeature>
     @State private var codeCopied = false
 
-    var body: some View {
-        Form {
-            Section("") {
-                if let coverImage = store.coverImage {
-                    Image(uiImage: coverImage)
-                        .resizable()
-                        .scaledToFill()
-                        .frame(height: 150)
-                        .clipped()
-                } else {
-                    Image("defaultColocBackground")
-                        .resizable()
-                        .scaledToFill()
-                        .frame(height: 150)
-                }
-            }
-            .listRowInsets(.init(top: 0, leading: 0, bottom: 0, trailing: 0))
+    private let cardShape = RoundedRectangle(cornerRadius: 20, style: .continuous)
 
-            Section("") {
+    private func cardRow(label: String, value: String) -> some View {
+        HStack {
+            Text(label)
+            Spacer()
+            Text(value)
+                .foregroundStyle(.secondary)
+        }
+        .padding(.horizontal)
+        .padding(.vertical, 12)
+    }
+
+    var body: some View {
+        ScrollView {
+            VStack(spacing: 15) {
+                // Cover image
+                Group {
+                    if let coverImage = store.coverImage {
+                        Image(uiImage: coverImage)
+                            .resizable()
+                            .scaledToFill()
+                    } else {
+                        Image("defaultColocBackground")
+                            .resizable()
+                            .scaledToFill()
+                    }
+                }
+                .frame(height: 150)
+                .clipped()
+                .clipShape(cardShape)
+
+                // Code
                 VStack(alignment: .leading, spacing: 6) {
                     HStack {
                         Text("Code :")
@@ -209,37 +223,71 @@ struct CohouseDetailView: View {
                     Text(codeCopied ? "Copied!" : "Share this code with your cohouse buddies")
                         .font(.custom("BaksoSapi", size: 12))
                 }
-            }
-            .foregroundStyle(.white)
-            .listRowBackground(Color.CKRPurple)
+                .foregroundStyle(.white)
+                .padding()
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .background(Color.CKRPurple)
+                .clipShape(cardShape)
 
-            Section("LOCATION") {
-                LabeledContent("Address", value: store.cohouse.address.street)
-                LabeledContent("ZIP Code", value: store.cohouse.address.postalCode)
-                LabeledContent("City", value: store.cohouse.address.city)
-            }
+                // Location
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("LOCATION")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal)
+                        .padding(.bottom, 8)
 
-            Section("MEMBERS (\(store.cohouse.users.count))") {
-                ForEach(store.cohouse.users) { user in
-                    HStack(alignment: .center) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(user.surname)
-                            if user.isAdmin {
-                                Text("Admin")
-                                    .foregroundStyle(.gray)
-                                    .font(.footnote)
+                    VStack(spacing: 0) {
+                        cardRow(label: "Address", value: store.cohouse.address.street)
+                        Divider().padding(.leading)
+                        cardRow(label: "ZIP Code", value: store.cohouse.address.postalCode)
+                        Divider().padding(.leading)
+                        cardRow(label: "City", value: store.cohouse.address.city)
+                    }
+                    .background(Color(.secondarySystemGroupedBackground))
+                    .clipShape(cardShape)
+                }
+
+                // Members
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("MEMBERS (\(store.cohouse.users.count))")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal)
+                        .padding(.bottom, 8)
+
+                    VStack(spacing: 0) {
+                        ForEach(Array(store.cohouse.users.enumerated()), id: \.element.id) { index, user in
+                            if index > 0 {
+                                Divider().padding(.leading)
                             }
-                        }
-                        Spacer()
-                        if let mainUserId = self.store.userInfo?.id.uuidString,
-                            user.userId == mainUserId {
-                            Text("Me")
-                                .foregroundStyle(.gray)
+                            HStack(alignment: .center) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(user.surname)
+                                    if user.isAdmin {
+                                        Text("Admin")
+                                            .foregroundStyle(.gray)
+                                            .font(.footnote)
+                                    }
+                                }
+                                Spacer()
+                                if let mainUserId = self.store.userInfo?.id.uuidString,
+                                    user.userId == mainUserId {
+                                    Text("Me")
+                                        .foregroundStyle(.gray)
+                                }
+                            }
+                            .padding(.horizontal)
+                            .padding(.vertical, 12)
                         }
                     }
+                    .background(Color(.secondarySystemGroupedBackground))
+                    .clipShape(cardShape)
                 }
             }
+            .padding(.horizontal)
         }
+        .background(Color(.systemGroupedBackground))
         .navigationBarTitle(store.cohouse.name)
         .refreshable {
             await store.send(.refresh).finish()
