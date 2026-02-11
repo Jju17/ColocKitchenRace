@@ -34,6 +34,7 @@ struct NotificationHistoryItem: Equatable, Identifiable {
     var body: String
     var sent: Int
     var failed: Int
+    var message: String?
     var sentAt: Date?
 }
 
@@ -74,7 +75,8 @@ extension NotificationClient: DependencyKey {
             return NotificationResult(
                 success: data["success"] as? Bool ?? false,
                 sent: data["sent"] as? Int,
-                failed: data["failed"] as? Int
+                failed: data["failed"] as? Int,
+                message: data["message"] as? String
             )
         },
         sendToEdition: { editionId, title, body in
@@ -94,7 +96,8 @@ extension NotificationClient: DependencyKey {
             return NotificationResult(
                 success: data["success"] as? Bool ?? false,
                 sent: data["sent"] as? Int,
-                failed: data["failed"] as? Int
+                failed: data["failed"] as? Int,
+                message: data["message"] as? String
             )
         },
         getHistory: {
@@ -122,6 +125,7 @@ extension NotificationClient: DependencyKey {
                     body: body,
                     sent: data["sent"] as? Int ?? 0,
                     failed: data["failed"] as? Int ?? 0,
+                    message: data["message"] as? String,
                     sentAt: sentAt
                 )
             }

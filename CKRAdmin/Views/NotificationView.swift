@@ -204,6 +204,7 @@ struct NotificationFeature {
 
 struct NotificationView: View {
     @Bindable var store: StoreOf<NotificationFeature>
+    @State private var selectedHistoryItem: NotificationHistoryItem?
 
     var body: some View {
         NavigationStack {
@@ -296,13 +297,21 @@ struct NotificationView: View {
                             .foregroundStyle(.secondary)
                     } else {
                         ForEach(store.history) { item in
-                            historyRow(item)
+                            Button {
+                                selectedHistoryItem = item
+                            } label: {
+                                historyRow(item)
+                            }
+                            .tint(.primary)
                         }
                     }
                 }
             }
             .navigationTitle("Notifications")
             .onAppear { store.send(.onAppear) }
+            .sheet(item: $selectedHistoryItem) { item in
+                notificationDetailView(item)
+            }
         }
     }
 
@@ -342,6 +351,84 @@ struct NotificationView: View {
             }
         }
         .padding(.vertical, 2)
+    }
+
+    @ViewBuilder
+    private func notificationDetailView(_ item: NotificationHistoryItem) -> some View {
+        NavigationStack {
+            Form {
+                Section(header: Text("Status")) {
+                    HStack {
+                        Text("Target")
+                        Spacer()
+                        targetBadge(item.target)
+                    }
+
+                    if let targetId = item.targetId {
+                        HStack {
+                            Text("Target ID")
+                            Spacer()
+                            Text(targetId)
+                                .foregroundStyle(.secondary)
+                                .font(.caption)
+                                .lineLimit(1)
+                        }
+                    }
+
+                    if let sentAt = item.sentAt {
+                        HStack {
+                            Text("Sent at")
+                            Spacer()
+                            Text(sentAt.formatted(date: .abbreviated, time: .shortened))
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    if item.target != "all" {
+                        HStack {
+                            Text("Sent")
+                            Spacer()
+                            Text("\(item.sent)")
+                                .foregroundStyle(item.sent > 0 ? .green : .secondary)
+                        }
+
+                        HStack {
+                            Text("Failed")
+                            Spacer()
+                            Text("\(item.failed)")
+                                .foregroundStyle(item.failed > 0 ? .red : .secondary)
+                        }
+                    }
+                }
+
+                Section(header: Text("Content")) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text(item.title)
+                            .font(.headline)
+                        Text(item.body)
+                            .font(.body)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                if let message = item.message {
+                    Section(header: Text("Error")) {
+                        Label(message, systemImage: "exclamationmark.triangle.fill")
+                            .foregroundStyle(.red)
+                            .font(.subheadline)
+                    }
+                }
+            }
+            .navigationTitle("Notification detail")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") {
+                        selectedHistoryItem = nil
+                    }
+                }
+            }
+        }
     }
 
     @ViewBuilder

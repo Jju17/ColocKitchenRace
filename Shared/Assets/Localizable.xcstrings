@@ -237,6 +237,16 @@
         }
       }
     },
+    "After validation, you will no longer be able to change the number of participants or the cohouse type." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Après validation, tu ne pourras plus modifier le nombre de participants ni le type de coloc."
+          }
+        }
+      }
+    },
     "Already have an account?" : {
       "localizations" : {
         "fr" : {
@@ -253,26 +263,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Analyse de la carte d'identité..."
-          }
-        }
-      }
-    },
-    "After validation, you will no longer be able to change the number of participants or the cohouse type." : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Après validation, tu ne pourras plus modifier le nombre de participants ni le type de coloc."
-          }
-        }
-      }
-    },
-    "Average age" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Moyenne d'âge"
           }
         }
       }
@@ -303,6 +293,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Es-tu sûr ? Cela supprimera définitivement tous les groupes formés du jeu actuel. Cette action est irréversible."
+          }
+        }
+      }
+    },
+    "Average age" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moyenne d'âge"
           }
         }
       }
@@ -510,22 +510,22 @@
         }
       }
     },
-    "CKR Registration" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inscription CKR"
-          }
-        }
-      }
-    },
     "CKR Game already exists" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Un jeu CKR existe déjà"
+          }
+        }
+      }
+    },
+    "CKR Registration" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inscription CKR"
           }
         }
       }
@@ -600,6 +600,16 @@
         }
       }
     },
+    "Cohouse type" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type de coloc"
+          }
+        }
+      }
+    },
     "Cohouse updated" : {
       "localizations" : {
         "fr" : {
@@ -616,16 +626,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Coloc : %@"
-          }
-        }
-      }
-    },
-    "Cohouse type" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Type de coloc"
           }
         }
       }
@@ -893,6 +893,9 @@
         }
       }
     },
+    "Done" : {
+
+    },
     "Edit" : {
       "localizations" : {
         "fr" : {
@@ -1052,6 +1055,9 @@
           }
         }
       }
+    },
+    "Failed" : {
+
     },
     "Filter responses" : {
       "localizations" : {
@@ -1905,6 +1911,9 @@
         }
       }
     },
+    "Notification detail" : {
+
+    },
     "Notifications" : {
       "localizations" : {
         "fr" : {
@@ -2051,16 +2060,6 @@
         }
       }
     },
-    "Registration deadline" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Date limite d'inscription"
-          }
-        }
-      }
-    },
     "Register before %@" : {
       "localizations" : {
         "fr" : {
@@ -2087,6 +2086,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Inscrit !"
+          }
+        }
+      }
+    },
+    "Registration deadline" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Date limite d'inscription"
           }
         }
       }
@@ -2321,6 +2330,12 @@
         }
       }
     },
+    "Sent" : {
+
+    },
+    "Sent at" : {
+
+    },
     "Share this code with your cohouse buddies" : {
       "localizations" : {
         "fr" : {
@@ -2550,6 +2565,9 @@
           }
         }
       }
+    },
+    "Target ID" : {
+
     },
     "Text" : {
       "localizations" : {

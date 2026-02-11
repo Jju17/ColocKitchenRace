@@ -56,7 +56,7 @@ async function getFCMTokensForUsers(userIds: string[]): Promise<string[]> {
   for (const batch of batches) {
     const snapshot = await db
       .collection("users")
-      .where("id", "in", batch)
+      .where(admin.firestore.FieldPath.documentId(), "in", batch)
       .get();
 
     snapshot.docs.forEach((doc) => {
@@ -136,6 +136,7 @@ interface NotificationHistoryEntry {
   body: string;
   sent: number;
   failed: number;
+  message?: string;
   sentBy: string;
   sentAt: FirebaseFirestore.FieldValue;
 }
@@ -195,7 +196,17 @@ export const sendNotificationToCohouse = onCall<SendToCohouseRequest>(
       // Send notifications
       const result = await sendToTokens(tokens, notification);
 
-      console.log(`Sent to cohouse ${cohouseId}: ${result.success} success, ${result.failure} failure`);
+      console.log(`Sent to cohouse ${cohouseId}: ${result.success} success, ${result.failure} failure (${userIds.length} users, ${tokens.length} tokens)`);
+
+      const noUsers = cohouseUsersSnapshot.empty;
+      const noTokens = tokens.length === 0;
+      const message = noUsers
+        ? "No users found in this cohouse"
+        : noTokens
+          ? `${userIds.length} user(s) found but none have push notifications enabled`
+          : result.failure > 0
+            ? `${result.failure} delivery failure(s) out of ${tokens.length} token(s)`
+            : undefined;
 
       await saveNotificationHistory({
         target: "cohouse",
@@ -204,19 +215,21 @@ export const sendNotificationToCohouse = onCall<SendToCohouseRequest>(
         body: notification.body,
         sent: result.success,
         failed: result.failure,
+        ...(message && { message }),
         sentBy: request.auth.uid,
         sentAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
       return {
-        success: true,
+        success: !noUsers && !noTokens && result.failure === 0,
         sent: result.success,
         failed: result.failure,
         totalUsers: userIds.length,
+        message: message ?? null,
       };
     } catch (error) {
       console.error("Error sending to cohouse:", error);
-      throw new HttpsError("internal", "Failed to send notifications");
+      throw new HttpsError("internal", `Failed to send notifications: ${error}`);
     }
   }
 );
@@ -251,12 +264,19 @@ export const sendNotificationToEdition = onCall<SendToEditionRequest>(
       const participantsIds: string[] = editionDoc.data()?.participantsID || [];
 
       if (participantsIds.length === 0) {
-        return {
-          success: true,
+        const message = "No participants in this edition";
+        await saveNotificationHistory({
+          target: "edition",
+          targetId: editionId,
+          title: notification.title,
+          body: notification.body,
           sent: 0,
           failed: 0,
-          message: "No participants in this edition",
-        };
+          message,
+          sentBy: request.auth.uid,
+          sentAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+        return { success: false, sent: 0, failed: 0, message };
       }
 
       // Collect all user IDs from all participating cohouses
@@ -285,6 +305,13 @@ export const sendNotificationToEdition = onCall<SendToEditionRequest>(
 
       console.log(`Sent to edition ${editionId}: ${result.success} success, ${result.failure} failure`);
 
+      const noTokens = tokens.length === 0;
+      const message = noTokens
+        ? `${allUserIds.length} user(s) found but none have push notifications enabled`
+        : result.failure > 0
+          ? `${result.failure} delivery failure(s) out of ${tokens.length} token(s)`
+          : undefined;
+
       await saveNotificationHistory({
         target: "edition",
         targetId: editionId,
@@ -292,16 +319,18 @@ export const sendNotificationToEdition = onCall<SendToEditionRequest>(
         body: notification.body,
         sent: result.success,
         failed: result.failure,
+        ...(message && { message }),
         sentBy: request.auth.uid,
         sentAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
       return {
-        success: true,
+        success: !noTokens && result.failure === 0,
         sent: result.success,
         failed: result.failure,
         totalCohouses: participantsIds.length,
         totalUsers: allUserIds.length,
+        message: message ?? null,
       };
     } catch (error) {
       console.error("Error sending to edition:", error);

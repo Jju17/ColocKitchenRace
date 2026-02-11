@@ -29,6 +29,7 @@ function makeDocRef(collection: string, docId: string) {
       get: jest.fn().mockImplementation(async () => {
         const docs = firestoreSubcollections[collection]?.[docId]?.[subName] || [];
         return {
+          empty: docs.length === 0,
           docs: docs.map((d: any, i: number) => ({ data: () => d, id: `sub_${i}` })),
         };
       }),
@@ -65,7 +66,10 @@ jest.mock("firebase-admin", () => ({
     jest.fn(() => ({
       collection: jest.fn().mockImplementation((name: string) => makeCollection(name)),
     })),
-    { FieldValue: { serverTimestamp: jest.fn(() => "SERVER_TIMESTAMP"), delete: jest.fn(() => "FIELD_DELETE") } }
+    {
+      FieldValue: { serverTimestamp: jest.fn(() => "SERVER_TIMESTAMP"), delete: jest.fn(() => "FIELD_DELETE") },
+      FieldPath: { documentId: jest.fn(() => "__doc_id__") },
+    }
   ),
   messaging: jest.fn(() => ({
     sendEachForMulticast: mockSendEachForMulticast,
@@ -142,7 +146,7 @@ describe("sendNotificationToCohouse", () => {
     expect(result.totalUsers).toBe(2);
   });
 
-  it("handles cohouse with no users gracefully", async () => {
+  it("returns success false with message when cohouse has no users", async () => {
     firestoreSubcollections = { cohouses: { c1: { users: [] } } };
 
     const result = await callWith(
@@ -150,9 +154,59 @@ describe("sendNotificationToCohouse", () => {
       { cohouseId: "c1", notification: { title: "Hi", body: "Msg" } }
     );
 
-    expect(result.success).toBe(true);
+    expect(result.success).toBe(false);
     expect(result.totalUsers).toBe(0);
     expect(result.sent).toBe(0);
+    expect(result.message).toMatch(/no users found/i);
+  });
+
+  it("returns success false with message when FCM delivery fails", async () => {
+    firestoreSubcollections = {
+      cohouses: { c1: { users: [{ userId: "u1" }] } },
+    };
+    firestoreData = {
+      users: {
+        u1: { id: "u1", fcmToken: "tok1" },
+      },
+    };
+
+    mockSendEachForMulticast.mockResolvedValueOnce({
+      successCount: 0,
+      failureCount: 1,
+      responses: [{ success: false, error: { code: "messaging/invalid-registration-token" } }],
+    });
+
+    const result = await callWith(
+      sendNotificationToCohouse,
+      { cohouseId: "c1", notification: { title: "Hi", body: "Msg" } }
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.sent).toBe(0);
+    expect(result.failed).toBe(1);
+    expect(result.message).toMatch(/delivery failure/i);
+  });
+
+  it("returns success false with message when users have no FCM tokens", async () => {
+    firestoreSubcollections = {
+      cohouses: { c1: { users: [{ userId: "u1" }, { userId: "u2" }] } },
+    };
+    firestoreData = {
+      users: {
+        u1: { id: "u1" },
+        u2: { id: "u2" },
+      },
+    };
+
+    const result = await callWith(
+      sendNotificationToCohouse,
+      { cohouseId: "c1", notification: { title: "Hi", body: "Msg" } }
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.totalUsers).toBe(2);
+    expect(result.sent).toBe(0);
+    expect(result.message).toMatch(/push notifications enabled/i);
   });
 });
 
@@ -167,7 +221,7 @@ describe("sendNotificationToEdition", () => {
     ).rejects.toThrow(/invalid-argument|missing/i);
   });
 
-  it("returns success with 0 sent when no participants", async () => {
+  it("returns success false with message when no participants", async () => {
     firestoreData = { ckrGames: { e1: { participantsID: [] } } };
 
     const result = await callWith(
@@ -175,7 +229,7 @@ describe("sendNotificationToEdition", () => {
       { editionId: "e1", notification: { title: "T", body: "B" } }
     );
 
-    expect(result.success).toBe(true);
+    expect(result.success).toBe(false);
     expect(result.sent).toBe(0);
     expect(result.message).toMatch(/no participants/i);
   });

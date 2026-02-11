@@ -11,7 +11,6 @@
 		642701AC2AE12F9300850684 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		64325AF52AF698D400038EA5 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		64325AFA2AF69B4C00038EA5 /* (null) in Sources */ = {isa = PBXBuildFile; };
-		6445D40F2EBE580500A5C93C /* TODO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6445D40E2EBE580200A5C93C /* TODO.swift */; };
 		644F08F02E9957DF00A9B256 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 644F08EF2E9957DF00A9B256 /* FirebaseAnalytics */; };
 		644F08F22E9957DF00A9B256 /* FirebaseAnalyticsCore in Frameworks */ = {isa = PBXBuildFile; productRef = 644F08F12E9957DF00A9B256 /* FirebaseAnalyticsCore */; };
 		644F08F62E9957DF00A9B256 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 644F08F52E9957DF00A9B256 /* FirebaseAuth */; };
@@ -55,7 +54,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		6445D40E2EBE580200A5C93C /* TODO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TODO.swift; sourceTree = "<group>"; };
 		6478D6BE2F2E30BA00DE69CF /* ColocsKitchenRace.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ColocsKitchenRace.entitlements; sourceTree = "<group>"; };
 		64F17B2F2AD2A3BC0047F6F3 /* ColocsKitchenRace.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ColocsKitchenRace.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		64F17B3F2AD2A3BE0047F6F3 /* ColocsKitchenRaceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ColocsKitchenRaceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -199,7 +197,6 @@
 			isa = PBXGroup;
 			children = (
 				6478D6BE2F2E30BA00DE69CF /* ColocsKitchenRace.entitlements */,
-				6445D40E2EBE580200A5C93C /* TODO.swift */,
 				6405CBC82D886B7400BE8B0D /* Shared */,
 				64FBE2FD2D88665300D8A89F /* ColocKitchenRace */,
 				64FBE0262D8860CC00D8A89F /* CKRAdmin */,
@@ -475,7 +472,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6445D40F2EBE580500A5C93C /* TODO.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
