@@ -17,6 +17,7 @@ struct Cohouse: Equatable, Hashable, Codable {
     var longitude: Double?
     var users: IdentifiedArrayOf<CohouseUser> = []
     var coverImagePath: String?
+    var cohouseType: CohouseType?
 }
 
 extension Cohouse {
@@ -34,7 +35,8 @@ extension Cohouse {
             code: self.code,
             latitude: self.latitude,
             longitude: self.longitude,
-            coverImagePath: self.coverImagePath
+            coverImagePath: self.coverImagePath,
+            cohouseType: self.cohouseType
         )
     }
 

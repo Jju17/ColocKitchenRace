@@ -26,17 +26,28 @@ struct HomeFeature {
         @Shared(.news) var news
         @Shared(.userInfo) var userInfo
         var coverImageData: Data?
+        @Presents var registrationForm: CKRRegistrationFormFeature.State?
 
         var coverImage: UIImage? {
             coverImageData.flatMap { UIImage(data: $0) }
+        }
+
+        var isRegistrationOpen: Bool {
+            ckrGame?.isRegistrationOpen ?? false
+        }
+
+        var isAlreadyRegistered: Bool {
+            guard let game = ckrGame, let cohouse else { return false }
+            return game.participantsID.contains(cohouse.id.uuidString)
         }
     }
 
     enum Action {
         case coverImageLoaded(Data?)
-        case openRegisterLink
+        case openRegisterForm
         case refresh
         case path(StackActionOf<Path>)
+        case registrationForm(PresentationAction<CKRRegistrationFormFeature.Action>)
         case delegate(Delegate)
 
         enum Delegate: Equatable {
@@ -54,15 +65,19 @@ struct HomeFeature {
                 case let .coverImageLoaded(data):
                     state.coverImageData = data
                     return .none
-                case .openRegisterLink:
-                    guard let cohouse = state.cohouse
+                case .openRegisterForm:
+                    guard let cohouse = state.cohouse,
+                          let game = state.ckrGame,
+                          game.isRegistrationOpen,
+                          !state.isAlreadyRegistered
                     else { return .none }
-                    return .run { [ckrClient] _ in
-                        let result = ckrClient.registerCohouse(cohouse: cohouse)
-                        if case let .failure(error) = result {
-                            Logger.ckrLog.log(level: .error, "Failed to register cohouse: \(error)")
-                        }
-                    }
+
+                    state.registrationForm = CKRRegistrationFormFeature.State(
+                        cohouse: cohouse,
+                        gameId: game.id.uuidString,
+                        cohouseType: cohouse.cohouseType ?? .mixed
+                    )
+                    return .none
                 case .refresh:
                     let coverImagePath = state.cohouse?.coverImagePath
                     return .run { [ckrClient, newsClient, cohouseClient] send in
@@ -75,6 +90,11 @@ struct HomeFeature {
                             await send(.coverImageLoaded(nil))
                         }
                     }
+                case .registrationForm(.presented(.delegate(.registrationSucceeded))):
+                    state.registrationForm = nil
+                    return .send(.refresh)
+                case .registrationForm:
+                    return .none
                 case .path:
                     return .none
                 case .delegate:
@@ -82,6 +102,9 @@ struct HomeFeature {
             }
         }
         .forEach(\.path, action: \.path)
+        .ifLet(\.$registrationForm, action: \.registrationForm) {
+            CKRRegistrationFormFeature()
+        }
     }
 }
 
@@ -101,12 +124,14 @@ struct HomeView: View {
                     }
 
                     Button {
-                        self.store.send(.openRegisterLink)
+                        self.store.send(.openRegisterForm)
                     } label: {
                         CountdownTileView(
-                        nextKitchenRace: self.store.ckrGame?.nextGameDate,
-                        countdownStart: self.store.ckrGame?.startCKRCountdown
-                    )
+                            nextKitchenRace: self.store.ckrGame?.nextGameDate,
+                            countdownStart: self.store.ckrGame?.startCKRCountdown,
+                            isRegistrationOpen: store.isRegistrationOpen,
+                            isAlreadyRegistered: store.isAlreadyRegistered
+                        )
                     }
                     NewsTileView(allNews: self.store.$news)
                 }
@@ -124,6 +149,20 @@ struct HomeView: View {
                     state: HomeFeature.Path.State.profile(UserProfileDetailFeature.State())
                 ) {
                     Image(systemName: "person.crop.circle.fill")
+                }
+            }
+            .sheet(item: $store.scope(state: \.registrationForm, action: \.registrationForm)) { formStore in
+                NavigationStack {
+                    CKRRegistrationFormView(store: formStore)
+                        .navigationTitle("Inscription CKR")
+                        .navigationBarTitleDisplayMode(.inline)
+                        .toolbar {
+                            ToolbarItem(placement: .cancellationAction) {
+                                Button("Fermer") {
+                                    store.send(.registrationForm(.dismiss))
+                                }
+                            }
+                        }
                 }
             }
         } destination: { store in

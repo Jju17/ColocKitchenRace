@@ -17,6 +17,8 @@ struct CountdownTileView: View {
 
     let nextKitchenRace: Date?
     let countdownStart: Date?
+    var isRegistrationOpen: Bool = false
+    var isAlreadyRegistered: Bool = false
 
     // MARK: - Private properties
 
@@ -61,7 +63,7 @@ struct CountdownTileView: View {
     // MARK: - Countdown (visible after startCKRCountdown)
 
     private var countdownContent: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 8) {
             VStack(alignment: .leading, spacing: 0) {
                 HStack {
                     Text("Next Edition In")
@@ -108,10 +110,30 @@ struct CountdownTileView: View {
                     Text("\(self.countDownComponents?.formattedSeconds ?? "00")")
                 }
             }
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .frame(maxWidth: .infinity)
             .foregroundColor(.white)
-            .font(.custom("BaksoSapi", size: 26))
+            .font(.custom("BaksoSapi", size: 22))
             .fontWeight(.heavy)
+
+            if isAlreadyRegistered {
+                Text("Inscrit !")
+                    .font(.custom("BaksoSapi", size: 20))
+                    .fontWeight(.heavy)
+                    .foregroundStyle(.green)
+                    .padding(.top, 4)
+            } else if isRegistrationOpen {
+                Text("Inscris ta coloc !")
+                    .font(.custom("BaksoSapi", size: 20))
+                    .fontWeight(.heavy)
+                    .foregroundStyle(
+                        LinearGradient(
+                            colors: [.yellow, .orange],
+                            startPoint: .leading,
+                            endPoint: .trailing
+                        )
+                    )
+                    .padding(.top, 4)
+            }
         }
         .padding()
     }
@@ -141,6 +163,23 @@ struct CountdownTileView: View {
     CountdownTileView(
         nextKitchenRace: Date.from(year: 2026, month: 09, day: 23, hour: 18),
         countdownStart: Date.from(year: 2025, month: 01, day: 01, hour: 0)
+    )
+}
+
+#Preview("Registration open") {
+    CountdownTileView(
+        nextKitchenRace: Date.from(year: 2026, month: 09, day: 23, hour: 18),
+        countdownStart: Date.from(year: 2025, month: 01, day: 01, hour: 0),
+        isRegistrationOpen: true
+    )
+}
+
+#Preview("Already registered") {
+    CountdownTileView(
+        nextKitchenRace: Date.from(year: 2026, month: 09, day: 23, hour: 18),
+        countdownStart: Date.from(year: 2025, month: 01, day: 01, hour: 0),
+        isRegistrationOpen: true,
+        isAlreadyRegistered: true
     )
 }
 

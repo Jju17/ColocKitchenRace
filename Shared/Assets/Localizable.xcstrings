@@ -164,6 +164,9 @@
         }
       }
     },
+    "25" : {
+
+    },
     "Active challenges at the moment :" : {
       "localizations" : {
         "fr" : {
@@ -253,6 +256,9 @@
           }
         }
       }
+    },
+    "Après validation, tu ne pourras plus modifier le nombre de participants ni le type de coloc." : {
+
     },
     "Are you sure you want to delete this challenge ?" : {
       "localizations" : {
@@ -990,6 +996,9 @@
         }
       }
     },
+    "Fermer" : {
+
+    },
     "Filter responses" : {
       "localizations" : {
         "fr" : {
@@ -1220,6 +1229,21 @@
         }
       }
     },
+    "Important" : {
+
+    },
+    "Infos" : {
+
+    },
+    "Inscription CKR" : {
+
+    },
+    "Inscris ta coloc !" : {
+
+    },
+    "Inscrit !" : {
+
+    },
     "Invalid address (incorrect format)." : {
       "localizations" : {
         "fr" : {
@@ -1279,6 +1303,9 @@
           }
         }
       }
+    },
+    "Le paiement sera ajouté prochainement." : {
+
     },
     "Leaderboard" : {
       "localizations" : {
@@ -1560,6 +1587,9 @@
           }
         }
       }
+    },
+    "Moyenne d'âge" : {
+
     },
     "Name" : {
       "localizations" : {
@@ -1843,6 +1873,9 @@
       }
     },
     "Optional — personalize your cohouse page." : {
+
+    },
+    "Paiement" : {
 
     },
     "Participants" : {
@@ -2467,6 +2500,9 @@
     "Total users :" : {
       "shouldTranslate" : false
     },
+    "Type de coloc" : {
+
+    },
     "Type your creative name here..." : {
       "localizations" : {
         "fr" : {
@@ -2526,6 +2562,9 @@
           }
         }
       }
+    },
+    "Valider l'inscription" : {
+
     },
     "You have been removed from this cohouse by admin user." : {
       "localizations" : {

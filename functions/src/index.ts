@@ -531,6 +531,145 @@ export const validateAddress = onCall<ValidateAddressRequest>(
 // Cohouse Matching
 // ============================================
 
+interface RegisterForGameRequest {
+  gameId: string;
+  cohouseId: string;
+  attendingUserIds: string[];
+  averageAge: number;
+  cohouseType: string;
+}
+
+/**
+ * Register a cohouse for a CKR Game edition.
+ *
+ * Server-side validations:
+ * - Registration deadline not passed
+ * - Capacity not reached
+ * - Cohouse not already registered
+ * - Cohouse exists
+ *
+ * Stores registration metadata in ckrGames/{gameId}/registrations/{cohouseId}
+ * and adds the cohouseId to the game's participantsID array.
+ */
+export const registerForGame = onCall<RegisterForGameRequest>(
+  { region: REGION },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Must be authenticated");
+    }
+
+    const { gameId, cohouseId, attendingUserIds, averageAge, cohouseType } =
+      request.data;
+
+    if (!gameId || !cohouseId || !attendingUserIds || !averageAge || !cohouseType) {
+      throw new HttpsError(
+        "invalid-argument",
+        "Missing required fields: gameId, cohouseId, attendingUserIds, averageAge, cohouseType"
+      );
+    }
+
+    if (!Array.isArray(attendingUserIds) || attendingUserIds.length === 0) {
+      throw new HttpsError(
+        "invalid-argument",
+        "attendingUserIds must be a non-empty array"
+      );
+    }
+
+    try {
+      // 1. Fetch the CKR game
+      const gameDoc = await db.collection("ckrGames").doc(gameId).get();
+
+      if (!gameDoc.exists) {
+        throw new HttpsError("not-found", "CKR Game not found");
+      }
+
+      const gameData = gameDoc.data()!;
+      const participantsIds: string[] = gameData.participantsID || [];
+      const maxParticipants: number = gameData.maxParticipants || 100;
+
+      // 2. Check registration deadline
+      const registrationDeadline = (
+        gameData.registrationDeadline as admin.firestore.Timestamp
+      ).toDate();
+
+      if (new Date() >= registrationDeadline) {
+        throw new HttpsError(
+          "failed-precondition",
+          "Registration deadline has passed"
+        );
+      }
+
+      // 3. Check capacity
+      if (participantsIds.length >= maxParticipants) {
+        throw new HttpsError(
+          "failed-precondition",
+          "Maximum number of participants reached"
+        );
+      }
+
+      // 4. Check duplicate
+      if (participantsIds.includes(cohouseId)) {
+        throw new HttpsError(
+          "already-exists",
+          "This cohouse is already registered for this game"
+        );
+      }
+
+      // 5. Verify cohouse exists
+      const cohouseSnapshot = await db
+        .collection("cohouses")
+        .where("id", "==", cohouseId)
+        .limit(1)
+        .get();
+
+      if (cohouseSnapshot.empty) {
+        throw new HttpsError("not-found", "Cohouse not found");
+      }
+
+      const cohouseDocRef = cohouseSnapshot.docs[0].ref;
+
+      // 6. Add cohouseId to game's participantsID
+      await db.collection("ckrGames").doc(gameId).update({
+        participantsID: admin.firestore.FieldValue.arrayUnion(cohouseId),
+      });
+
+      // 7. Store registration metadata
+      await db
+        .collection("ckrGames")
+        .doc(gameId)
+        .collection("registrations")
+        .doc(cohouseId)
+        .set({
+          cohouseId,
+          attendingUserIds,
+          averageAge,
+          cohouseType,
+          registeredAt: admin.firestore.FieldValue.serverTimestamp(),
+          registeredBy: request.auth.uid,
+        });
+
+      // 8. Update cohouse with cohouseType
+      await cohouseDocRef.update({ cohouseType });
+
+      const remainingSpots = maxParticipants - (participantsIds.length + 1);
+
+      console.log(
+        `Cohouse ${cohouseId} registered for game ${gameId}. Remaining spots: ${remainingSpots}`
+      );
+
+      return { success: true, remainingSpots };
+    } catch (error) {
+      if (error instanceof HttpsError) throw error;
+      console.error("Error registering for game:", error);
+      throw new HttpsError("internal", "Failed to register for game");
+    }
+  }
+);
+
+// ============================================
+// Cohouse Matching
+// ============================================
+
 import {
   CohousePoint,
   computeCubicDistances,

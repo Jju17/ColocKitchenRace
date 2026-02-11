@@ -18,6 +18,7 @@ struct FirestoreCohouse: Equatable, Hashable, Codable {
     var latitude: Double?
     var longitude: Double?
     var coverImagePath: String?
+    var cohouseType: CohouseType?
 }
 
 extension FirestoreCohouse {
@@ -30,7 +31,8 @@ extension FirestoreCohouse {
             latitude: self.latitude,
             longitude: self.longitude,
             users: IdentifiedArray(uniqueElements: users),
-            coverImagePath: self.coverImagePath
+            coverImagePath: self.coverImagePath,
+            cohouseType: self.cohouseType
         )
     }
 }

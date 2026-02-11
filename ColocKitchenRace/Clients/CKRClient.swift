@@ -7,6 +7,7 @@
 
 import ComposableArchitecture
 import FirebaseFirestore
+import FirebaseFunctions
 
 // MARK: - Error
 
@@ -20,7 +21,13 @@ enum CKRError: Error {
 @DependencyClient
 struct CKRClient {
     var getLast: @Sendable () async throws -> Result<CKRGame?, CKRError>
-    var registerCohouse: (_ cohouse: Cohouse) -> Result<Bool, CKRError> = { _ in .success(true) }
+    var registerForGame: @Sendable (
+        _ gameId: String,
+        _ cohouseId: String,
+        _ attendingUserIds: [String],
+        _ averageAge: Int,
+        _ cohouseType: String
+    ) async throws -> Void
 }
 
 // MARK: - Implementations
@@ -52,18 +59,32 @@ extension CKRClient: DependencyKey {
                 return .failure(.firebaseError(error.localizedDescription))
             }
         },
-        registerCohouse: { cohouse in
-            // TODO: Implement cohouse registration for CKR game
-            return .success(true)
+        registerForGame: { gameId, cohouseId, attendingUserIds, averageAge, cohouseType in
+            let functions = Functions.functions(region: "europe-west1")
+            let callable = functions.httpsCallable("registerForGame")
+
+            let data: [String: Any] = [
+                "gameId": gameId,
+                "cohouseId": cohouseId,
+                "attendingUserIds": attendingUserIds,
+                "averageAge": averageAge,
+                "cohouseType": cohouseType
+            ]
+
+            _ = try await callable.call(data)
+
+            // Refresh local ckrGame to reflect updated participantsID
+            @Shared(.ckrGame) var ckrGame
+            if var game = ckrGame {
+                game.participantsID.append(cohouseId)
+                $ckrGame.withLock { $0 = game }
+            }
         }
     )
 
     // MARK: Test
 
-    static let testValue = Self(
-        getLast: { .success(nil) },
-        registerCohouse: { _ in .success(true) }
-    )
+    static let testValue = Self()
 
     // MARK: Preview
 
