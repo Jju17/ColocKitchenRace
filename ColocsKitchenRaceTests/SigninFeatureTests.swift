@@ -95,4 +95,46 @@ struct SigninFeatureTests {
         // signIn should NOT be called — validation prevents it
         #expect(signinCalled == false)
     }
+
+    @Test("Signin with whitespace-only email shows validation error")
+    func signinWithWhitespaceEmail_showsError() async {
+        var signinCalled = false
+
+        let store = TestStore(initialState: SigninFeature.State(email: "   ", password: "password123")) {
+            SigninFeature()
+        } withDependencies: {
+            $0.authenticationClient.signIn = { _, _ in
+                signinCalled = true
+                return .mockUser
+            }
+        }
+
+        await store.send(.signinButtonTapped) {
+            $0.errorMessage = "Please fill in all fields."
+        }
+
+        #expect(signinCalled == false)
+    }
+
+    @Test("Signin with email but empty password shows validation error")
+    func signinWithEmptyPassword_showsError() async {
+        let store = TestStore(initialState: SigninFeature.State(email: "test@test.com", password: "")) {
+            SigninFeature()
+        }
+
+        await store.send(.signinButtonTapped) {
+            $0.errorMessage = "Please fill in all fields."
+        }
+    }
+
+    @Test("signinErrorTriggered sets error message")
+    func signinErrorTriggered_setsMessage() async {
+        let store = TestStore(initialState: SigninFeature.State()) {
+            SigninFeature()
+        }
+
+        await store.send(.signinErrorTriggered("Network timeout")) {
+            $0.errorMessage = "Network timeout"
+        }
+    }
 }

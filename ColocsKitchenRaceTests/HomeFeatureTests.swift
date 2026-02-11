@@ -15,31 +15,38 @@ import Testing
 @MainActor
 struct HomeFeatureTests {
 
-    // MARK: - Register Link
+    // MARK: - Registration Form
 
-    @Test("openRegisterLink calls registerCohouse in a .run effect")
-    func openRegisterLink() async {
-        var registerCalled = false
+    @Test("openRegisterForm presents form when conditions are met")
+    func openRegisterForm() async {
+        let mockCohouse = Cohouse.mock
+        let mockGame = CKRGame(
+            startCKRCountdown: Date.distantPast,
+            nextGameDate: Date.distantFuture,
+            registrationDeadline: Date.distantFuture,
+            participantsID: []
+        )
+
+        @Shared(.cohouse) var cohouse
+        @Shared(.ckrGame) var ckrGame
+        $cohouse.withLock { $0 = mockCohouse }
+        $ckrGame.withLock { $0 = mockGame }
 
         let store = TestStore(initialState: HomeFeature.State()) {
             HomeFeature()
-        } withDependencies: {
-            $0.ckrClient.registerCohouse = { _ in
-                registerCalled = true
-                return .success(true)
-            }
         }
 
-        @Shared(.cohouse) var cohouse
-        $cohouse.withLock { $0 = .mock }
-
-        await store.send(.openRegisterLink)
-
-        #expect(registerCalled == true)
+        await store.send(.openRegisterForm) {
+            $0.registrationForm = CKRRegistrationFormFeature.State(
+                cohouse: mockCohouse,
+                gameId: mockGame.id.uuidString,
+                cohouseType: .mixed
+            )
+        }
     }
 
-    @Test("openRegisterLink does nothing when cohouse is nil")
-    func openRegisterLink_withoutCohouse() async {
+    @Test("openRegisterForm does nothing when cohouse is nil")
+    func openRegisterForm_withoutCohouse() async {
         let store = TestStore(initialState: HomeFeature.State()) {
             HomeFeature()
         }
@@ -47,22 +54,65 @@ struct HomeFeatureTests {
         @Shared(.cohouse) var cohouse
         $cohouse.withLock { $0 = nil }
 
-        await store.send(.openRegisterLink)
+        await store.send(.openRegisterForm)
     }
 
-    @Test("openRegisterLink handles failure gracefully")
-    func openRegisterLink_failure() async {
-        let store = TestStore(initialState: HomeFeature.State()) {
-            HomeFeature()
-        } withDependencies: {
-            $0.ckrClient.registerCohouse = { _ in .failure(.firebaseError("Network unavailable")) }
-        }
+    @Test("openRegisterForm does nothing when already registered")
+    func openRegisterForm_alreadyRegistered() async {
+        let mockCohouse = Cohouse.mock
+        let mockGame = CKRGame(
+            startCKRCountdown: Date.distantPast,
+            nextGameDate: Date.distantFuture,
+            registrationDeadline: Date.distantFuture,
+            participantsID: [mockCohouse.id.uuidString]
+        )
 
         @Shared(.cohouse) var cohouse
-        $cohouse.withLock { $0 = .mock }
+        @Shared(.ckrGame) var ckrGame
+        $cohouse.withLock { $0 = mockCohouse }
+        $ckrGame.withLock { $0 = mockGame }
 
-        // Error is logged, no crash
-        await store.send(.openRegisterLink)
+        let store = TestStore(initialState: HomeFeature.State()) {
+            HomeFeature()
+        }
+
+        await store.send(.openRegisterForm)
+    }
+
+    @Test("registration success dismisses form and refreshes")
+    func registrationSuccess() async {
+        let mockCohouse = Cohouse.mock
+        let mockGame = CKRGame(
+            startCKRCountdown: Date.distantPast,
+            nextGameDate: Date.distantFuture,
+            registrationDeadline: Date.distantFuture,
+            participantsID: []
+        )
+
+        @Shared(.cohouse) var cohouse
+        @Shared(.ckrGame) var ckrGame
+        $cohouse.withLock { $0 = mockCohouse }
+        $ckrGame.withLock { $0 = mockGame }
+
+        var initialState = HomeFeature.State()
+        initialState.registrationForm = CKRRegistrationFormFeature.State(
+            cohouse: mockCohouse,
+            gameId: mockGame.id.uuidString
+        )
+
+        let store = TestStore(initialState: initialState) {
+            HomeFeature()
+        } withDependencies: {
+            $0.ckrClient.getLast = { .success(nil) }
+            $0.newsClient.getLast = { .success([]) }
+        }
+
+        await store.send(.registrationForm(.presented(.delegate(.registrationSucceeded)))) {
+            $0.registrationForm = nil
+        }
+
+        await store.receive(\.refresh)
+        await store.receive(\.coverImageLoaded)
     }
 
     // MARK: - Refresh
@@ -112,6 +162,80 @@ struct HomeFeatureTests {
         await store.send(.refresh)
         await store.receive(\.coverImageLoaded) {
             $0.coverImageData = fakeImageData
+        }
+    }
+
+    // MARK: - Edge Cases
+
+    @Test("openRegisterForm does nothing when ckrGame is nil")
+    func openRegisterForm_noGame() async {
+        @Shared(.cohouse) var cohouse
+        @Shared(.ckrGame) var ckrGame
+        $cohouse.withLock { $0 = .mock }
+        $ckrGame.withLock { $0 = nil }
+
+        let store = TestStore(initialState: HomeFeature.State()) {
+            HomeFeature()
+        }
+
+        await store.send(.openRegisterForm)
+    }
+
+    @Test("openRegisterForm does nothing when registration deadline passed")
+    func openRegisterForm_registrationClosed() async {
+        let mockCohouse = Cohouse.mock
+        let mockGame = CKRGame(
+            startCKRCountdown: Date.distantPast,
+            nextGameDate: Date.distantFuture,
+            registrationDeadline: Date.distantPast,
+            participantsID: []
+        )
+
+        @Shared(.cohouse) var cohouse
+        @Shared(.ckrGame) var ckrGame
+        $cohouse.withLock { $0 = mockCohouse }
+        $ckrGame.withLock { $0 = mockGame }
+
+        let store = TestStore(initialState: HomeFeature.State()) {
+            HomeFeature()
+        }
+
+        await store.send(.openRegisterForm)
+    }
+
+    @Test("refresh with cover image load failure sends nil data")
+    func refresh_coverImageLoadFailure() async {
+        var cohouse = Cohouse.mock
+        cohouse.coverImagePath = "cohouses/test/cover_image.jpg"
+
+        @Shared(.cohouse) var sharedCohouse
+        $sharedCohouse.withLock { $0 = cohouse }
+
+        let store = TestStore(initialState: HomeFeature.State()) {
+            HomeFeature()
+        } withDependencies: {
+            $0.ckrClient.getLast = { .success(nil) }
+            $0.newsClient.getLast = { .success([]) }
+            $0.cohouseClient.loadCoverImage = { _ in
+                throw CKRError.firebaseError("Storage unavailable")
+            }
+        }
+
+        await store.send(.refresh)
+        await store.receive(\.coverImageLoaded)
+    }
+
+    @Test("coverImageLoaded with nil clears existing data")
+    func coverImageLoaded_nil_clearsData() async {
+        var initialState = HomeFeature.State()
+        initialState.coverImageData = Data([0xFF, 0xD8, 0xFF])
+
+        let store = TestStore(initialState: initialState) {
+            HomeFeature()
+        }
+
+        await store.send(.coverImageLoaded(nil)) {
+            $0.coverImageData = nil
         }
     }
 

@@ -60,6 +60,50 @@ struct TabFeatureTests {
         }
     }
 
+    // MARK: - Multiple Tab Switches
+
+    @Test("Multiple tab switches update state correctly each time")
+    func multipleTabSwitches() async {
+        let store = TestStore(initialState: TabFeature.State()) {
+            TabFeature()
+        }
+
+        #expect(store.state.selectedTab == .home)
+
+        await store.send(.tabChanged(.challenges)) {
+            $0.selectedTab = .challenges
+        }
+
+        await store.send(.tabChanged(.cohouse)) {
+            $0.selectedTab = .cohouse
+        }
+
+        await store.send(.tabChanged(.home)) {
+            $0.selectedTab = .home
+        }
+
+        await store.send(.tabChanged(.challenges)) {
+            $0.selectedTab = .challenges
+        }
+    }
+
+    @Test("Child feature actions do not change selected tab")
+    func childActions_doNotChangeTab() async {
+        let store = TestStore(initialState: TabFeature.State()) {
+            TabFeature()
+        } withDependencies: {
+            $0.ckrClient.getLast = { .success(nil) }
+            $0.newsClient.getLast = { .success([]) }
+        }
+
+        #expect(store.state.selectedTab == .home)
+
+        await store.send(.home(.refresh))
+        await store.receive(\.home.coverImageLoaded)
+
+        #expect(store.state.selectedTab == .home)
+    }
+
     // MARK: - Default State
 
     @Test("Default tab is home")
