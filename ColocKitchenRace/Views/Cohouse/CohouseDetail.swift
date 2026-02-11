@@ -226,7 +226,7 @@ struct CohouseDetailView: View {
                 .foregroundStyle(.white)
                 .padding()
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .background(Color.CKRPurple)
+                .background(Color.ckrLavender)
                 .clipShape(cardShape)
 
                 // Location

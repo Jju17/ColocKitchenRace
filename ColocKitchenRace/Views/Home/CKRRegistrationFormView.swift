@@ -120,7 +120,7 @@ struct CKRRegistrationFormView: View {
                                   ? "checkmark.circle.fill"
                                   : "circle")
                                 .foregroundStyle(store.attendingUserIds.contains(user.id.uuidString)
-                                                 ? Color.CKRPurple
+                                                 ? Color.ckrLavender
                                                  : .secondary)
                             Text(user.surname)
                                 .foregroundStyle(.primary)
@@ -131,7 +131,7 @@ struct CKRRegistrationFormView: View {
 
             Section("Infos") {
                 HStack {
-                    Text("Moyenne d'âge")
+                    Text("Average age")
                     Spacer()
                     TextField("25", value: $store.averageAge, format: .number)
                         .keyboardType(.numberPad)
@@ -139,7 +139,7 @@ struct CKRRegistrationFormView: View {
                         .frame(width: 60)
                 }
 
-                Picker("Type de coloc", selection: $store.cohouseType) {
+                Picker("Cohouse type", selection: $store.cohouseType) {
                     ForEach(CohouseType.allCases) { type in
                         Text(type.displayName).tag(type)
                     }
@@ -148,15 +148,15 @@ struct CKRRegistrationFormView: View {
             }
 
             Section {
-                Text("Après validation, tu ne pourras plus modifier le nombre de participants ni le type de coloc.")
+                Text("After validation, you will no longer be able to change the number of participants or the cohouse type.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             } header: {
                 Text("Important")
             }
 
-            Section("Paiement") {
-                Text("Le paiement sera ajouté prochainement.")
+            Section("Payment") {
+                Text("Payment will be added soon.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
             }
@@ -170,7 +170,7 @@ struct CKRRegistrationFormView: View {
                         ProgressView()
                             .tint(.white)
                     } else {
-                        Text("Valider l'inscription")
+                        Text("Confirm registration")
                             .font(.custom("BaksoSapi", size: 18))
                     }
                 }
@@ -179,7 +179,7 @@ struct CKRRegistrationFormView: View {
                 .background(
                     store.attendingUserIds.isEmpty || store.isSubmitting
                         ? Color.gray
-                        : Color.CKRPurple
+                        : Color.ckrLavender
                 )
                 .foregroundStyle(.white)
                 .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
@@ -203,6 +203,6 @@ struct CKRRegistrationFormView: View {
                 CKRRegistrationFormFeature()
             }
         )
-        .navigationTitle("Inscription CKR")
+        .navigationTitle("CKR Registration")
     }
 }

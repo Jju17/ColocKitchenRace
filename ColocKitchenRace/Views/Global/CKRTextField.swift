@@ -45,5 +45,5 @@ struct CKRTextField: View {
         CKRTextField(title: "Name", value: .constant("Julien"))
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background { Color.CKRBlue.ignoresSafeArea() }
+    .background { Color.ckrSkyLight.ignoresSafeArea() }
 }

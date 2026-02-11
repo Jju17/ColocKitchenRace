@@ -123,16 +123,23 @@ struct HomeView: View {
                         CohouseTileView(name: store.cohouse?.name, coverImage: store.coverImage)
                     }
 
-                    Button {
-                        self.store.send(.openRegisterForm)
-                    } label: {
-                        CountdownTileView(
-                            nextKitchenRace: self.store.ckrGame?.nextGameDate,
-                            countdownStart: self.store.ckrGame?.startCKRCountdown,
-                            isRegistrationOpen: store.isRegistrationOpen,
-                            isAlreadyRegistered: store.isAlreadyRegistered
-                        )
+                    if store.ckrGame != nil, store.cohouse != nil {
+                        Button {
+                            store.send(.openRegisterForm)
+                        } label: {
+                            RegistrationTileView(
+                                registrationDeadline: store.ckrGame?.registrationDeadline,
+                                isRegistrationOpen: store.isRegistrationOpen,
+                                isAlreadyRegistered: store.isAlreadyRegistered
+                            )
+                        }
                     }
+
+                    CountdownTileView(
+                        nextKitchenRace: self.store.ckrGame?.nextGameDate,
+                        countdownStart: self.store.ckrGame?.startCKRCountdown
+                    )
+
                     NewsTileView(allNews: self.store.$news)
                 }
             }
@@ -154,11 +161,11 @@ struct HomeView: View {
             .sheet(item: $store.scope(state: \.registrationForm, action: \.registrationForm)) { formStore in
                 NavigationStack {
                     CKRRegistrationFormView(store: formStore)
-                        .navigationTitle("Inscription CKR")
+                        .navigationTitle("CKR Registration")
                         .navigationBarTitleDisplayMode(.inline)
                         .toolbar {
                             ToolbarItem(placement: .cancellationAction) {
-                                Button("Fermer") {
+                                Button("Close") {
                                     store.send(.registrationForm(.dismiss))
                                 }
                             }

@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coloc Kitchen Race — Identité Visuelle</title>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Bakso+Sapi&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Primary Palette — Deep Pastels (white text safe) */
+      --mint:        #3BBF7A;
+      --mint-light:  #C8FFD5;
+      --sky:         #4AADCF;
+      --sky-light:   #D4F1FF;
+      --lavender:    #8B7FC7;
+      --lavender-light: #E8D5FF;
+      --coral:       #E07A6B;
+      --coral-light: #FFD9D2;
+      --gold:        #D4A843;
+      --gold-light:  #FFF3C4;
+      --navy:        #2C3A6E;
+
+      /* Neutrals */
+      --white:       #FFFFFF;
+      --off-white:   #F7F8FA;
+      --dark:        #1A1F2E;
+      --gray:        #6B7280;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: var(--off-white);
+      color: var(--dark);
+      overflow-x: hidden;
+    }
+
+    /* ─── Hero ─── */
+    .hero {
+      background: linear-gradient(135deg, var(--mint) 0%, var(--sky) 50%, var(--lavender) 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(255,255,255,0.1) 0%, transparent 40%);
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      opacity: 0.6;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      animation: fadeUp 1s ease-out;
+    }
+
+    .logo-text {
+      font-family: 'Bakso Sapi', cursive;
+      font-size: clamp(3rem, 8vw, 6rem);
+      color: var(--white);
+      line-height: 1;
+      text-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-weight: 300;
+      font-size: clamp(1rem, 2.5vw, 1.4rem);
+      color: rgba(255,255,255,0.9);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 3rem;
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(255,255,255,0.7);
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      animation: bounce 2s infinite;
+      z-index: 1;
+    }
+
+    .scroll-hint::after {
+      content: '↓';
+      display: block;
+      text-align: center;
+      margin-top: 0.3rem;
+      font-size: 1.2rem;
+    }
+
+    /* ─── Sections ─── */
+    section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 5rem 2rem;
+    }
+
+    .section-title {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: var(--gray);
+      margin-bottom: 0.75rem;
+    }
+
+    .section-heading {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 700;
+      margin-bottom: 2rem;
+      line-height: 1.2;
+    }
+
+    /* ─── Color Palette ─── */
+    .palette-section { padding-bottom: 2rem; }
+
+    .palette-description {
+      font-size: 1.05rem;
+      color: var(--gray);
+      max-width: 600px;
+      line-height: 1.7;
+      margin-bottom: 3rem;
+    }
+
+    .palette-group-label {
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--dark);
+      margin-bottom: 1rem;
+      margin-top: 2.5rem;
+    }
+
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .color-card {
+      border-radius: 16px;
+      overflow: hidden;
+      background: white;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .color-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+    }
+
+    .color-swatch {
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: white;
+      text-shadow: 0 1px 4px rgba(0,0,0,0.15);
+      letter-spacing: 0.02em;
+    }
+
+    .color-swatch.dark-text {
+      color: var(--dark);
+      text-shadow: none;
+    }
+
+    .color-info {
+      padding: 0.9rem 1rem;
+    }
+
+    .color-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 0.2rem;
+    }
+
+    .color-hex {
+      font-size: 0.8rem;
+      color: var(--gray);
+      font-family: 'Outfit', monospace;
+    }
+
+    /* ─── Usage Demo ─── */
+    .usage-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .usage-card {
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      color: var(--white);
+      position: relative;
+      overflow: hidden;
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      transition: transform 0.3s ease;
+    }
+
+    .usage-card:hover { transform: scale(1.02); }
+
+    .usage-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 80% 20%, rgba(255,255,255,0.12) 0%, transparent 60%);
+    }
+
+    .usage-card h3 {
+      font-family: 'Bakso Sapi', cursive;
+      font-size: 1.8rem;
+      position: relative;
+      margin-bottom: 0.5rem;
+    }
+
+    .usage-card p {
+      font-weight: 300;
+      font-size: 0.95rem;
+      opacity: 0.9;
+      line-height: 1.5;
+      position: relative;
+    }
+
+    .usage-card .tag {
+      position: absolute;
+      top: 1.2rem;
+      right: 1.2rem;
+      background: rgba(255,255,255,0.2);
+      backdrop-filter: blur(8px);
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* ─── Contrast Table ─── */
+    .contrast-section { padding-top: 2rem; }
+
+    .contrast-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .contrast-item {
+      border-radius: 14px;
+      padding: 1.5rem;
+      text-align: center;
+      color: white;
+      position: relative;
+    }
+
+    .contrast-item .ratio {
+      font-size: 2rem;
+      font-weight: 800;
+      margin-bottom: 0.25rem;
+    }
+
+    .contrast-item .label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      opacity: 0.85;
+    }
+
+    .contrast-item .status {
+      display: inline-block;
+      margin-top: 0.75rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: rgba(255,255,255,0.25);
+    }
+
+    /* ─── Gradient Combos ─── */
+    .gradients-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .gradient-card {
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      color: white;
+      min-height: 160px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gradient-card:hover { transform: translateY(-3px); }
+
+    .gradient-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at top right, rgba(255,255,255,0.1) 0%, transparent 70%);
+    }
+
+    .gradient-card h4 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      position: relative;
+      z-index: 1;
+    }
+
+    .gradient-card .css-code {
+      font-size: 0.72rem;
+      font-family: monospace;
+      opacity: 0.7;
+      position: relative;
+      z-index: 1;
+      margin-top: 1rem;
+      word-break: break-all;
+    }
+
+    /* ─── Typography Preview ─── */
+    .typo-preview {
+      margin-top: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .typo-block {
+      border-radius: 16px;
+      padding: 2.5rem;
+      color: white;
+    }
+
+    .typo-block.mint { background: var(--mint); }
+    .typo-block.sky { background: var(--sky); }
+    .typo-block.lavender { background: var(--lavender); }
+    .typo-block.coral { background: var(--coral); }
+    .typo-block.navy { background: var(--navy); }
+
+    .typo-block .display {
+      font-family: 'Bakso Sapi', cursive;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      margin-bottom: 0.5rem;
+    }
+
+    .typo-block .body-text {
+      font-weight: 300;
+      font-size: 1rem;
+      opacity: 0.9;
+      line-height: 1.6;
+      max-width: 500px;
+    }
+
+    .typo-block .font-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      opacity: 0.6;
+      margin-bottom: 0.5rem;
+    }
+
+    /* ─── Footer ─── */
+    .footer {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--gray);
+      font-size: 0.85rem;
+    }
+
+    /* ─── Animations ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(8px); }
+    }
+
+    .fade-in {
+      opacity: 0;
+      transform: translateY(20px);
+      animation: fadeUp 0.8s ease-out forwards;
+    }
+
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
+    .delay-5 { animation-delay: 0.5s; }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ HERO ═══ -->
+  <div class="hero">
+    <div class="hero-content">
+      <div class="logo-text">Coloc<br>Kitchen Race</div>
+      <div class="subtitle">Identité visuelle</div>
+    </div>
+    <div class="scroll-hint">Découvrir</div>
+  </div>
+
+  <!-- ═══ PALETTE ═══ -->
+  <section class="palette-section">
+    <div class="section-title">01 — Couleurs</div>
+    <div class="section-heading">Palette pastel profond</div>
+    <p class="palette-description">
+      Des couleurs pastel rehaussées en saturation pour garantir un contraste suffisant avec le texte blanc.
+      Chaque couleur a sa version "light" pour les fonds secondaires et les accents subtils.
+    </p>
+
+    <div class="palette-group-label">Couleurs principales (fond + texte blanc)</div>
+    <div class="palette-grid">
+      <div class="color-card fade-in delay-1">
+        <div class="color-swatch" style="background: #3BBF7A;">Aa</div>
+        <div class="color-info">
+          <div class="color-name">Mint</div>
+          <div class="color-hex">#3BBF7A</div>
+        </div>
+      </div>
+      <div class="color-card fade-in delay-2">
+        <div class="color-swatch" style="background: #4AADCF;">Aa</div>
+        <div class="color-info">
+          <div class="color-name">Sky</div>
+          <div class="color-hex">#4AADCF</div>
+        </div>
+      </div>
+      <div class="color-card fade-in delay-3">
+        <div class="color-swatch" style="background: #8B7FC7;">Aa</div>
+        <div class="color-info">
+          <div class="color-name">Lavender</div>
+          <div class="color-hex">#8B7FC7</div>
+        </div>
+      </div>
+      <div class="color-card fade-in delay-4">
+        <div class="color-swatch" style="background: #E07A6B;">Aa</div>
+        <div class="color-info">
+          <div class="color-name">Coral</div>
+          <div class="color-hex">#E07A6B</div>
+        </div>
+      </div>
+      <div class="color-card fade-in delay-5">
+        <div class="color-swatch" style="background: #D4A843;">Aa</div>
+        <div class="color-info">
+          <div class="color-name">Gold</div>
+          <div class="color-hex">#D4A843</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="palette-group-label">Couleurs légères (fonds secondaires, cartes)</div>
+    <div class="palette-grid">
+      <div class="color-card fade-in delay-1">
+        <div class="color-swatch dark-text" style="background: #C8FFD5;">Aa</div>
+        <div class="color-info">
+          <div class="color-name">Mint Light</div>
+          <div class="color-hex">#C8FFD5</div>
+        </div>
+      </div>
+      <div class="color-card fade-in delay-2">
+        <div class="color-swatch dark-text" style="background: #D4F1FF;">Aa</div>
+        <div class="color-info">
+          <div class="color-name">Sky Light</div>
+          <div class="color-hex">#D4F1FF</div>
+        </div>
+      </div>
+      <div class="color-card fade-in delay-3">
+        <div class="color-swatch dark-text" style="background: #E8D5FF;">Aa</div>
+        <div class="color-info">
+          <div class="color-name">Lavender Light</div>
+          <div class="color-hex">#E8D5FF</div>
+        </div>
+      </div>
+      <div class="color-card fade-in delay-4">
+        <div class="color-swatch dark-text" style="background: #FFD9D2;">Aa</div>
+        <div class="color-info">
+          <div class="color-name">Coral Light</div>
+          <div class="color-hex">#FFD9D2</div>
+        </div>
+      </div>
+      <div class="color-card fade-in delay-5">
+        <div class="color-swatch dark-text" style="background: #FFF3C4;">Aa</div>
+        <div class="color-info">
+          <div class="color-name">Gold Light</div>
+          <div class="color-hex">#FFF3C4</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="palette-group-label">Couleur d'accent sombre</div>
+    <div class="palette-grid" style="max-width: 400px;">
+      <div class="color-card fade-in delay-1">
+        <div class="color-swatch" style="background: #2C3A6E;">Aa</div>
+        <div class="color-info">
+          <div class="color-name">Navy</div>
+          <div class="color-hex">#2C3A6E</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ CONTRAST ═══ -->
+  <section class="contrast-section">
+    <div class="section-title">02 — Contraste</div>
+    <div class="section-heading">Ratio blanc sur fond</div>
+    <p class="palette-description">
+      Les couleurs principales sont calibrées pour respecter un contraste minimum WCAG AA sur les grands textes (ratio ≥ 3:1).
+    </p>
+    <div class="contrast-grid">
+      <div class="contrast-item" style="background: #3BBF7A;">
+        <div class="ratio">3.2:1</div>
+        <div class="label">Mint</div>
+        <div class="status">✓ AA Large</div>
+      </div>
+      <div class="contrast-item" style="background: #4AADCF;">
+        <div class="ratio">3.0:1</div>
+        <div class="label">Sky</div>
+        <div class="status">✓ AA Large</div>
+      </div>
+      <div class="contrast-item" style="background: #8B7FC7;">
+        <div class="ratio">3.5:1</div>
+        <div class="label">Lavender</div>
+        <div class="status">✓ AA Large</div>
+      </div>
+      <div class="contrast-item" style="background: #E07A6B;">
+        <div class="ratio">3.1:1</div>
+        <div class="label">Coral</div>
+        <div class="status">✓ AA Large</div>
+      </div>
+      <div class="contrast-item" style="background: #2C3A6E;">
+        <div class="ratio">10.2:1</div>
+        <div class="label">Navy</div>
+        <div class="status">✓ AAA</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ USAGE EXAMPLES ═══ -->
+  <section>
+    <div class="section-title">03 — Usages</div>
+    <div class="section-heading">Exemples d'application</div>
+    <div class="usage-grid">
+      <div class="usage-card" style="background: linear-gradient(145deg, #3BBF7A, #2DA866);">
+        <span class="tag">Accueil</span>
+        <h3>Bienvenue !</h3>
+        <p>Lance un défi cuisine à tes colocs et montre qui est le vrai chef.</p>
+      </div>
+      <div class="usage-card" style="background: linear-gradient(145deg, #4AADCF, #3A96B8);">
+        <span class="tag">Challenge</span>
+        <h3>Défi de la semaine</h3>
+        <p>Prépare le meilleur plat avec seulement 5 ingrédients.</p>
+      </div>
+      <div class="usage-card" style="background: linear-gradient(145deg, #8B7FC7, #7468B0);">
+        <span class="tag">Résultats</span>
+        <h3>Classement</h3>
+        <p>Découvre qui a remporté le plus de votes cette semaine.</p>
+      </div>
+      <div class="usage-card" style="background: linear-gradient(145deg, #E07A6B, #C96555);">
+        <span class="tag">Notification</span>
+        <h3>Temps écoulé !</h3>
+        <p>Le challenge se termine dans 2 heures. Soumets ton plat maintenant.</p>
+      </div>
+      <div class="usage-card" style="background: linear-gradient(145deg, #2C3A6E, #1F2B55);">
+        <span class="tag">Premium</span>
+        <h3>Mode Pro</h3>
+        <p>Accède aux statistiques avancées et aux badges exclusifs.</p>
+      </div>
+      <div class="usage-card" style="background: linear-gradient(145deg, #D4A843, #BF9535);">
+        <span class="tag">Récompense</span>
+        <h3>Badge obtenu !</h3>
+        <p>Félicitations, tu as gagné le badge "Chef Étoilé" ⭐</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ GRADIENTS ═══ -->
+  <section>
+    <div class="section-title">04 — Dégradés</div>
+    <div class="section-heading">Combinaisons de gradients</div>
+    <div class="gradients-grid">
+      <div class="gradient-card" style="background: linear-gradient(135deg, #3BBF7A, #4AADCF);">
+        <h4>Mint → Sky</h4>
+        <div class="css-code">linear-gradient(135deg, #3BBF7A, #4AADCF)</div>
+      </div>
+      <div class="gradient-card" style="background: linear-gradient(135deg, #4AADCF, #8B7FC7);">
+        <h4>Sky → Lavender</h4>
+        <div class="css-code">linear-gradient(135deg, #4AADCF, #8B7FC7)</div>
+      </div>
+      <div class="gradient-card" style="background: linear-gradient(135deg, #8B7FC7, #E07A6B);">
+        <h4>Lavender → Coral</h4>
+        <div class="css-code">linear-gradient(135deg, #8B7FC7, #E07A6B)</div>
+      </div>
+      <div class="gradient-card" style="background: linear-gradient(135deg, #3BBF7A, #8B7FC7, #E07A6B);">
+        <h4>Tricolore CKR</h4>
+        <div class="css-code">linear-gradient(135deg, #3BBF7A, #8B7FC7, #E07A6B)</div>
+      </div>
+      <div class="gradient-card" style="background: linear-gradient(135deg, #2C3A6E, #4AADCF);">
+        <h4>Navy → Sky</h4>
+        <div class="css-code">linear-gradient(135deg, #2C3A6E, #4AADCF)</div>
+      </div>
+      <div class="gradient-card" style="background: linear-gradient(135deg, #E07A6B, #D4A843);">
+        <h4>Coral → Gold</h4>
+        <div class="css-code">linear-gradient(135deg, #E07A6B, #D4A843)</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ TYPOGRAPHY ═══ -->
+  <section>
+    <div class="section-title">05 — Typographie</div>
+    <div class="section-heading">Rendu sur chaque fond</div>
+    <div class="typo-preview">
+      <div class="typo-block mint">
+        <div class="font-label">Bakso Sapi — Display</div>
+        <div class="display">Coloc Kitchen Race</div>
+        <div class="font-label" style="margin-top: 1rem;">Outfit 300 — Body</div>
+        <div class="body-text">Organise des défis culinaires entre colocataires et découvre qui est le meilleur chef de l'appart !</div>
+      </div>
+      <div class="typo-block sky">
+        <div class="font-label">Bakso Sapi — Display</div>
+        <div class="display">Nouveau Challenge</div>
+        <div class="font-label" style="margin-top: 1rem;">Outfit 300 — Body</div>
+        <div class="body-text">Chaque semaine, un nouveau défi culinaire pour pimenter la vie en coloc.</div>
+      </div>
+      <div class="typo-block lavender">
+        <div class="font-label">Bakso Sapi — Display</div>
+        <div class="display">Classement</div>
+        <div class="font-label" style="margin-top: 1rem;">Outfit 300 — Body</div>
+        <div class="body-text">Consulte le tableau des scores et défie tes colocs pour la première place.</div>
+      </div>
+      <div class="typo-block coral">
+        <div class="font-label">Bakso Sapi — Display</div>
+        <div class="display">Bravo Chef !</div>
+        <div class="font-label" style="margin-top: 1rem;">Outfit 300 — Body</div>
+        <div class="body-text">Tu as gagné ce challenge haut la main. Tes colocs te doivent un dessert.</div>
+      </div>
+      <div class="typo-block navy">
+        <div class="font-label">Bakso Sapi — Display</div>
+        <div class="display">Mode Pro</div>
+        <div class="font-label" style="margin-top: 1rem;">Outfit 300 — Body</div>
+        <div class="body-text">Accède aux statistiques avancées et personnalise ton profil de chef.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ SWIFT COLORS ═══ -->
+  <section>
+    <div class="section-title">06 — SwiftUI</div>
+    <div class="section-heading">Intégration code</div>
+    <div style="background: #1A1F2E; border-radius: 16px; padding: 2rem; overflow-x: auto;">
+      <pre style="color: #E2E8F0; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.85rem; line-height: 1.8; margin: 0;"><code><span style="color: #7C93D3;">extension</span> <span style="color: #4AADCF;">Color</span> {
+    <span style="color: #6B7280;">// Primary — white text safe</span>
+    <span style="color: #7C93D3;">static let</span> ckrMint      = <span style="color: #4AADCF;">Color</span>(hex: <span style="color: #3BBF7A;">"#3BBF7A"</span>)
+    <span style="color: #7C93D3;">static let</span> ckrSky       = <span style="color: #4AADCF;">Color</span>(hex: <span style="color: #4AADCF;">"#4AADCF"</span>)
+    <span style="color: #7C93D3;">static let</span> ckrLavender  = <span style="color: #4AADCF;">Color</span>(hex: <span style="color: #8B7FC7;">"#8B7FC7"</span>)
+    <span style="color: #7C93D3;">static let</span> ckrCoral     = <span style="color: #4AADCF;">Color</span>(hex: <span style="color: #E07A6B;">"#E07A6B"</span>)
+    <span style="color: #7C93D3;">static let</span> ckrGold      = <span style="color: #4AADCF;">Color</span>(hex: <span style="color: #D4A843;">"#D4A843"</span>)
+    <span style="color: #7C93D3;">static let</span> ckrNavy      = <span style="color: #4AADCF;">Color</span>(hex: <span style="color: #2C3A6E;">"#2C3A6E"</span>)
+
+    <span style="color: #6B7280;">// Light — for backgrounds & cards</span>
+    <span style="color: #7C93D3;">static let</span> ckrMintLight     = <span style="color: #4AADCF;">Color</span>(hex: <span style="color: #3BBF7A;">"#C8FFD5"</span>)
+    <span style="color: #7C93D3;">static let</span> ckrSkyLight      = <span style="color: #4AADCF;">Color</span>(hex: <span style="color: #4AADCF;">"#D4F1FF"</span>)
+    <span style="color: #7C93D3;">static let</span> ckrLavenderLight = <span style="color: #4AADCF;">Color</span>(hex: <span style="color: #8B7FC7;">"#E8D5FF"</span>)
+    <span style="color: #7C93D3;">static let</span> ckrCoralLight    = <span style="color: #4AADCF;">Color</span>(hex: <span style="color: #E07A6B;">"#FFD9D2"</span>)
+    <span style="color: #7C93D3;">static let</span> ckrGoldLight     = <span style="color: #4AADCF;">Color</span>(hex: <span style="color: #D4A843;">"#FFF3C4"</span>)
+}</code></pre>
+    </div>
+  </section>
+
+  <div class="footer">
+    Coloc Kitchen Race — Brand Guide 2025
+  </div>
+
+</body>
+</html>

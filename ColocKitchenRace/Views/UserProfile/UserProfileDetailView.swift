@@ -101,7 +101,7 @@ struct UserProfileDetailView: View {
             .font(.caption)
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
-            .background(Color.CKRPurple.opacity(0.2))
+            .background(Color.ckrLavenderLight)
             .foregroundStyle(.black)
             .clipShape(Capsule())
     }

@@ -16,9 +16,9 @@ enum CohouseType: String, Codable, CaseIterable, Identifiable, Hashable {
 
     var displayName: String {
         switch self {
-        case .mixed: return "Mixte"
-        case .girls: return "Filles"
-        case .boys: return "Garçons"
+        case .mixed: return String(localized: "Mixed")
+        case .girls: return String(localized: "Girls")
+        case .boys: return String(localized: "Boys")
         }
     }
 }

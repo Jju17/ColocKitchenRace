@@ -127,7 +127,7 @@ struct SignupView: View {
                 .frame(maxWidth: .infinity, minHeight: geo.size.height)
             }
             .scrollDismissesKeyboard(.interactively)
-            .background { Color.CKRBlue.ignoresSafeArea() }
+            .background { Color.ckrSkyLight.ignoresSafeArea() }
         }
     }
 }

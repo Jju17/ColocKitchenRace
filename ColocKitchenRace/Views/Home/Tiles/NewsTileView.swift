@@ -17,7 +17,7 @@ struct NewsTileView: View {
     var body: some View {
         ZStack(alignment: .leading) {
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color.CKRBlue)
+                .fill(Color.ckrSky)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
             VStack(spacing: 0) {
                 VStack(alignment: .leading, spacing: 0) {

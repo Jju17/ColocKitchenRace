@@ -256,7 +256,7 @@ struct CohouseFormView: View {
                             } label: {
                                 Text("Make admin")
                                     .font(.caption)
-                                    .foregroundStyle(Color.CKRPurple)
+                                    .foregroundStyle(Color.ckrLavender)
                             }
                             .buttonStyle(.borderless)
                         }

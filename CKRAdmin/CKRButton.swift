@@ -24,7 +24,7 @@ struct CKRButton: View {
         } label: {
             ZStack(alignment: .center) {
                 RoundedRectangle(cornerRadius: 15)
-                    .fill(Color.CKRYellow)
+                    .fill(Color.ckrGoldLight)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .shadow(color: .gray, radius: 2, x: 3, y: 3)
                 Text(self.titleKey)
@@ -44,5 +44,5 @@ struct CKRButton: View {
         .frame(width: 300, height: 90)
     }
     .frame(maxWidth: .infinity, maxHeight: .infinity)
-    .background { Color.CKRBlue.ignoresSafeArea() }
+    .background { Color.ckrSkyLight.ignoresSafeArea() }
 }

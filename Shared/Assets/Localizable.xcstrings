@@ -257,8 +257,25 @@
         }
       }
     },
-    "Après validation, tu ne pourras plus modifier le nombre de participants ni le type de coloc." : {
-
+    "After validation, you will no longer be able to change the number of participants or the cohouse type." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Après validation, tu ne pourras plus modifier le nombre de participants ni le type de coloc."
+          }
+        }
+      }
+    },
+    "Average age" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Moyenne d'âge"
+          }
+        }
+      }
     },
     "Are you sure you want to delete this challenge ?" : {
       "localizations" : {
@@ -326,6 +343,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Body"
+          }
+        }
+      }
+    },
+    "Boys" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Garçons"
           }
         }
       }
@@ -483,6 +510,16 @@
         }
       }
     },
+    "CKR Registration" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inscription CKR"
+          }
+        }
+      }
+    },
     "CKR Game already exists" : {
       "localizations" : {
         "fr" : {
@@ -583,6 +620,16 @@
         }
       }
     },
+    "Cohouse type" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type de coloc"
+          }
+        }
+      }
+    },
     "Cohouses" : {
       "localizations" : {
         "fr" : {
@@ -629,6 +676,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Confirmer la suppression"
+          }
+        }
+      }
+    },
+    "Confirm registration" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Valider l'inscription"
           }
         }
       }
@@ -996,9 +1053,6 @@
         }
       }
     },
-    "Fermer" : {
-
-    },
     "Filter responses" : {
       "localizations" : {
         "fr" : {
@@ -1055,6 +1109,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Date du jeu"
+          }
+        }
+      }
+    },
+    "Girls" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Filles"
           }
         }
       }
@@ -1230,19 +1294,24 @@
       }
     },
     "Important" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Important"
+          }
+        }
+      }
     },
     "Infos" : {
-
-    },
-    "Inscription CKR" : {
-
-    },
-    "Inscris ta coloc !" : {
-
-    },
-    "Inscrit !" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Infos"
+          }
+        }
+      }
     },
     "Invalid address (incorrect format)." : {
       "localizations" : {
@@ -1303,9 +1372,6 @@
           }
         }
       }
-    },
-    "Le paiement sera ajouté prochainement." : {
-
     },
     "Leaderboard" : {
       "localizations" : {
@@ -1577,6 +1643,16 @@
         }
       }
     },
+    "Mixed" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mixte"
+          }
+        }
+      }
+    },
     "month" : {
       "extractionState" : "manual",
       "localizations" : {
@@ -1587,9 +1663,6 @@
           }
         }
       }
-    },
-    "Moyenne d'âge" : {
-
     },
     "Name" : {
       "localizations" : {
@@ -1875,15 +1948,32 @@
     "Optional — personalize your cohouse page." : {
 
     },
-    "Paiement" : {
-
-    },
     "Participants" : {
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Participants"
+          }
+        }
+      }
+    },
+    "Payment" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Paiement"
+          }
+        }
+      }
+    },
+    "Payment will be added soon." : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Le paiement sera ajouté prochainement."
           }
         }
       }
@@ -1967,6 +2057,46 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Date limite d'inscription"
+          }
+        }
+      }
+    },
+    "Register before %@" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inscris-toi avant le %@"
+          }
+        }
+      }
+    },
+    "Register your cohouse!" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inscris ta coloc !"
+          }
+        }
+      }
+    },
+    "Registered!" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inscrit !"
+          }
+        }
+      }
+    },
+    "Registrations closed" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inscriptions fermées"
           }
         }
       }
@@ -2500,9 +2630,6 @@
     "Total users :" : {
       "shouldTranslate" : false
     },
-    "Type de coloc" : {
-
-    },
     "Type your creative name here..." : {
       "localizations" : {
         "fr" : {
@@ -2562,9 +2689,6 @@
           }
         }
       }
-    },
-    "Valider l'inscription" : {
-
     },
     "You have been removed from this cohouse by admin user." : {
       "localizations" : {

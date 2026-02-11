@@ -114,7 +114,7 @@ struct SigninView: View {
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background { Color.CKRPurple.ignoresSafeArea() }
+        .background { Color.ckrLavenderLight.ignoresSafeArea() }
     }
 }
 

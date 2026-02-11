@@ -8,17 +8,12 @@
 import SwiftUI
 
 extension Color {
-    static let CKRBlue = Color("CKRBlue")
-    static let CKRGreen = Color("CKRGreen")
-    static let CKRPurple = Color("CKRPurple")
-    static let CKRYellow = Color("CKRYellow")
-
-    static var CKRRandom: Color {
-        let colors = [CKRBlue, CKRGreen, CKRPurple, CKRYellow].filter { $0 != lastCKRColor }
-        let randomColor = colors.randomElement() ?? CKRBlue
+    static var ckrRandom: Color {
+        let colors: [Color] = [.ckrMint, .ckrSky, .ckrLavender, .ckrCoral, .ckrGold].filter { $0 != lastCKRColor }
+        let randomColor = colors.randomElement() ?? .ckrMint
         Color.lastCKRColor = randomColor
         return randomColor
     }
 
-    static var lastCKRColor: Color = CKRBlue
+    static var lastCKRColor: Color = .ckrMint
 }

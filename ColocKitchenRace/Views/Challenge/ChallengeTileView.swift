@@ -413,7 +413,7 @@ func ChallengeContentView(
                     .foregroundColor(.white)
                     .background(
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
-                            .fill(Color.CKRPurple)
+                            .fill(Color.ckrLavender)
                     )
                 }
                 .buttonStyle(.plain)

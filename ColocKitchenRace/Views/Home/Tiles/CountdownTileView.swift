@@ -17,8 +17,6 @@ struct CountdownTileView: View {
 
     let nextKitchenRace: Date?
     let countdownStart: Date?
-    var isRegistrationOpen: Bool = false
-    var isAlreadyRegistered: Bool = false
 
     // MARK: - Private properties
 
@@ -45,7 +43,7 @@ struct CountdownTileView: View {
     var body: some View {
         ZStack(alignment: .leading) {
             RoundedRectangle(cornerRadius: 20)
-                .fill(Color.CKRPurple)
+                .fill(Color.ckrLavender)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             if hasCountdownStarted {
@@ -78,7 +76,7 @@ struct CountdownTileView: View {
                         Text("No next date provided")
                     }
                 }
-                .font(.custom("BaksoSapi", size: 14))
+                .font(.custom("BaksoSapi", size: 12))
                 .fontWeight(.light)
                 .textCase(.uppercase)
             }
@@ -87,27 +85,27 @@ struct CountdownTileView: View {
 
             VStack {
                 HStack {
-                    Text("Days")
-                    Spacer()
                     Text("\(self.countDownComponents?.formattedDays ?? "00")")
+                    Spacer()
+                    Text("Days")
                 }
                 Spacer(minLength: 2)
                 HStack {
-                    Text("Hours")
-                    Spacer()
                     Text("\(self.countDownComponents?.formattedHours ?? "00")")
+                    Spacer()
+                    Text("Hours")
                 }
                 Spacer(minLength: 2)
                 HStack {
-                    Text("Minutes")
-                    Spacer()
                     Text("\(self.countDownComponents?.formattedMinutes ?? "00")")
+                    Spacer()
+                    Text("Minutes")
                 }
                 Spacer(minLength: 2)
                 HStack {
-                    Text("Seconds")
-                    Spacer()
                     Text("\(self.countDownComponents?.formattedSeconds ?? "00")")
+                    Spacer()
+                    Text("Seconds")
                 }
             }
             .frame(maxWidth: .infinity)
@@ -115,25 +113,6 @@ struct CountdownTileView: View {
             .font(.custom("BaksoSapi", size: 22))
             .fontWeight(.heavy)
 
-            if isAlreadyRegistered {
-                Text("Inscrit !")
-                    .font(.custom("BaksoSapi", size: 20))
-                    .fontWeight(.heavy)
-                    .foregroundStyle(.green)
-                    .padding(.top, 4)
-            } else if isRegistrationOpen {
-                Text("Inscris ta coloc !")
-                    .font(.custom("BaksoSapi", size: 20))
-                    .fontWeight(.heavy)
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [.yellow, .orange],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .padding(.top, 4)
-            }
         }
         .padding()
     }
@@ -163,23 +142,6 @@ struct CountdownTileView: View {
     CountdownTileView(
         nextKitchenRace: Date.from(year: 2026, month: 09, day: 23, hour: 18),
         countdownStart: Date.from(year: 2025, month: 01, day: 01, hour: 0)
-    )
-}
-
-#Preview("Registration open") {
-    CountdownTileView(
-        nextKitchenRace: Date.from(year: 2026, month: 09, day: 23, hour: 18),
-        countdownStart: Date.from(year: 2025, month: 01, day: 01, hour: 0),
-        isRegistrationOpen: true
-    )
-}
-
-#Preview("Already registered") {
-    CountdownTileView(
-        nextKitchenRace: Date.from(year: 2026, month: 09, day: 23, hour: 18),
-        countdownStart: Date.from(year: 2025, month: 01, day: 01, hour: 0),
-        isRegistrationOpen: true,
-        isAlreadyRegistered: true
     )
 }
 

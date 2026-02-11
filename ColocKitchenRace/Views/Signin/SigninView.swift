@@ -141,7 +141,7 @@ struct SigninView: View {
                 .frame(maxWidth: .infinity, minHeight: geo.size.height)
             }
             .scrollDismissesKeyboard(.interactively)
-            .background { Color.CKRGreen.ignoresSafeArea() }
+            .background { Color.ckrMintLight.ignoresSafeArea() }
         }
     }
 }
