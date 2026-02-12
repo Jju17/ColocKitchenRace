@@ -54,9 +54,9 @@ struct UserProfileFormView: View {
     var body: some View {
         Form {
             Section("Basic info") {
-                TextField("First name", text: $store.wipUser.firstName)
-                TextField("Last name", text: $store.wipUser.lastName)
-                TextField("Email", text: $store.wipUser.email ?? "")
+                TextField("First name *", text: $store.wipUser.firstName)
+                TextField("Last name *", text: $store.wipUser.lastName)
+                TextField("Email *", text: $store.wipUser.email ?? "")
                 TextField("GSM", text: $store.wipUser.phoneNumber ?? "")
             }
 

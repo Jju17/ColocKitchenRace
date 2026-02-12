@@ -86,6 +86,63 @@ struct UserProfileDetailFeatureTests {
         // Error is caught and logged, no crash
     }
 
+    // MARK: - Edit Validation
+
+    @Test("confirmEdit with empty firstName shows error and keeps sheet open")
+    func confirmEdit_emptyFirstName() async {
+        var invalidUser = User.mockUser
+        invalidUser.firstName = ""
+
+        let store = TestStore(
+            initialState: UserProfileDetailFeature.State(
+                destination: .editUser(UserProfileFormFeature.State(wipUser: invalidUser))
+            )
+        ) {
+            UserProfileDetailFeature()
+        }
+
+        await store.send(.confirmEditUserButtonTapped) {
+            $0.errorMessage = "Please fill in all required fields."
+        }
+    }
+
+    @Test("confirmEdit with empty lastName shows error and keeps sheet open")
+    func confirmEdit_emptyLastName() async {
+        var invalidUser = User.mockUser
+        invalidUser.lastName = ""
+
+        let store = TestStore(
+            initialState: UserProfileDetailFeature.State(
+                destination: .editUser(UserProfileFormFeature.State(wipUser: invalidUser))
+            )
+        ) {
+            UserProfileDetailFeature()
+        }
+
+        await store.send(.confirmEditUserButtonTapped) {
+            $0.errorMessage = "Please fill in all required fields."
+        }
+    }
+
+    @Test("confirmEdit with whitespace-only fields shows error")
+    func confirmEdit_whitespaceOnly() async {
+        var invalidUser = User.mockUser
+        invalidUser.firstName = "   "
+        invalidUser.lastName = "  "
+
+        let store = TestStore(
+            initialState: UserProfileDetailFeature.State(
+                destination: .editUser(UserProfileFormFeature.State(wipUser: invalidUser))
+            )
+        ) {
+            UserProfileDetailFeature()
+        }
+
+        await store.send(.confirmEditUserButtonTapped) {
+            $0.errorMessage = "Please fill in all required fields."
+        }
+    }
+
     // MARK: - Dismiss
 
     @Test("Dismiss clears destination")

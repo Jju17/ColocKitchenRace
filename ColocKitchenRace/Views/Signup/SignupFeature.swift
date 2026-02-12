@@ -47,11 +47,15 @@ struct SignupFeature {
             case .signupButtonTapped:
                 state.errorMessage = nil
                 let data = state.signupUserData
-                guard !data.firstName.trimmingCharacters(in: .whitespaces).isEmpty,
-                      !data.lastName.trimmingCharacters(in: .whitespaces).isEmpty,
-                      !data.email.trimmingCharacters(in: .whitespaces).isEmpty,
-                      !data.password.isEmpty
-                else {
+                if let error = UserValidation.validateProfileFields(
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    email: data.email
+                ) {
+                    state.errorMessage = error
+                    return .none
+                }
+                guard !data.password.isEmpty else {
                     state.errorMessage = "Please fill in all required fields."
                     return .none
                 }

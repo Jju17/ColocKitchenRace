@@ -16,6 +16,7 @@ struct AppFeature {
         case tab(TabFeature.State)
         case signin(SigninFeature.State)
         case signup(SignupFeature.State)
+        case emailVerification(EmailVerificationFeature.State)
         case splashScreen(SplashScreenFeature.State)
     }
 
@@ -25,6 +26,7 @@ struct AppFeature {
         case tab(TabFeature.Action)
         case signin(SigninFeature.Action)
         case signup(SignupFeature.Action)
+        case emailVerification(EmailVerificationFeature.Action)
         case splashScreen(SplashScreenFeature.Action)
         case newAuthStateTrigger(FirebaseAuth.User?)
     }
@@ -41,10 +43,14 @@ struct AppFeature {
                     }
                 }
             case let .newAuthStateTrigger(user):
-                if user != nil {
-                    state = State.tab(TabFeature.State())
+                if let user {
+                    if user.isEmailVerified {
+                        state = .tab(TabFeature.State())
+                    } else {
+                        state = .emailVerification(EmailVerificationFeature.State())
+                    }
                 } else {
-                    state = State.signin(SigninFeature.State())
+                    state = .signin(SigninFeature.State())
                 }
                 return .none
             case let .signin(.delegate(action)):
@@ -59,13 +65,14 @@ struct AppFeature {
                     state = State.signin(SigninFeature.State())
                     return .none
                 }
-            case .tab, .signin, .signup, .splashScreen:
+            case .tab, .signin, .signup, .emailVerification, .splashScreen:
                 return .none
             }
         }
         .ifCaseLet(\.tab, action: \.tab) { TabFeature() }
         .ifCaseLet(\.signin, action: \.signin) { SigninFeature() }
         .ifCaseLet(\.signup, action: \.signup) { SignupFeature() }
+        .ifCaseLet(\.emailVerification, action: \.emailVerification) { EmailVerificationFeature() }
         .ifCaseLet(\.splashScreen, action: \.splashScreen) { SplashScreenFeature() }
     }
 }
@@ -87,6 +94,10 @@ struct AppView: View {
             case .signup:
                 if let signupStore = store.scope(state: \.signup, action: \.signup) {
                     SignupView(store: signupStore)
+                }
+            case .emailVerification:
+                if let verificationStore = store.scope(state: \.emailVerification, action: \.emailVerification) {
+                    EmailVerificationView(store: verificationStore)
                 }
             case .splashScreen:
                 if let splashScreenStore = store.scope(state: \.splashScreen, action: \.splashScreen) {

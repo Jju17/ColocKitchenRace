@@ -41,6 +41,16 @@ struct UserProfileDetailFeature {
                 case .confirmEditUserButtonTapped:
                     guard case let .some(.editUser(editState)) = state.destination
                     else { return .none }
+
+                    if let error = UserValidation.validateProfileFields(
+                        firstName: editState.wipUser.firstName,
+                        lastName: editState.wipUser.lastName,
+                        email: editState.wipUser.email
+                    ) {
+                        state.errorMessage = error
+                        return .none
+                    }
+
                     state.destination = nil
                     return .run { _ in
                         try await authenticationClient.updateUser(editState.wipUser)
@@ -160,9 +170,17 @@ struct UserProfileDetailView: View {
                             }
                         }
                         ToolbarItem(placement: .confirmationAction) {
+                            let wip = editUserStore.wipUser
                             Button("Confirm") {
                                 store.send(.confirmEditUserButtonTapped)
                             }
+                            .disabled(
+                                UserValidation.validateProfileFields(
+                                    firstName: wip.firstName,
+                                    lastName: wip.lastName,
+                                    email: wip.email
+                                ) != nil
+                            )
                         }
                     }
             }

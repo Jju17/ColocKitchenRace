@@ -36,6 +36,8 @@ struct AuthenticationClient {
     var signOut: () async throws -> Void
     var deleteAccount: () -> Void
     var updateUser: (_ user: User) async throws -> Void
+    var resendVerificationEmail: @Sendable () async throws -> Void
+    var reloadCurrentUser: @Sendable () async throws -> Bool
     var listenAuthState: @Sendable () -> AsyncStream<FirebaseAuth.User?> = { .never }
 }
 
@@ -124,6 +126,15 @@ extension AuthenticationClient: DependencyKey {
             @Shared(.userInfo) var user
             $user.withLock { $0 = updatedUser }
         },
+        resendVerificationEmail: {
+            guard let user = Auth.auth().currentUser else { throw AuthError.failed }
+            try await user.sendEmailVerification()
+        },
+        reloadCurrentUser: {
+            guard let user = Auth.auth().currentUser else { throw AuthError.failed }
+            try await user.reload()
+            return Auth.auth().currentUser?.isEmailVerified ?? false
+        },
         listenAuthState: {
             AsyncStream { continuation in
                 DispatchQueue.main.async {
@@ -143,6 +154,8 @@ extension AuthenticationClient: DependencyKey {
         signOut: {},
         deleteAccount: {},
         updateUser: { _ in },
+        resendVerificationEmail: {},
+        reloadCurrentUser: { true },
         listenAuthState: { AsyncStream { $0.finish() } }
     )
 
