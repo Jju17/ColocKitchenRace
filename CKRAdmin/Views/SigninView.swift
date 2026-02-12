@@ -7,7 +7,6 @@
 
 import ComposableArchitecture
 import FirebaseAuth
-import SwiftUIIntrospect
 import SwiftUI
 import os
 
@@ -54,8 +53,6 @@ struct SigninFeature {
 struct SigninView: View {
     @Bindable var store: StoreOf<SigninFeature>
     @FocusState var focusedField: SigninField?
-    let emailFieldDelegate = TextFieldDelegate()
-    let passwordFieldDelegate = TextFieldDelegate()
 
     var body: some View {
         VStack(spacing: 10) {
@@ -70,14 +67,7 @@ struct SigninView: View {
                     .textInputAutocapitalization(.never)
                     .focused(self.$focusedField, equals: .email)
                     .submitLabel(.next)
-                    .introspect(.textField, on: .iOS(.v16, .v17)) { textField in
-                        emailFieldDelegate.shouldReturn = {
-                            self.focusNextField()
-                            return false
-                        }
-
-                        textField.delegate = emailFieldDelegate
-                    }
+                    .onSubmit { self.focusNextField() }
                 CKRTextField(title: "PASSWORD", value: $store.password, isSecure: true)
                     .textContentType(.password)
                     .focused(self.$focusedField, equals: .password)

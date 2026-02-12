@@ -6,17 +6,11 @@
 //
 
 import ComposableArchitecture
-import SwiftUIIntrospect
 import SwiftUI
 
 struct SignupView: View {
     @Bindable var store: StoreOf<SignupFeature>
     @FocusState var focusedField: SignupField?
-    let nameFieldDelegate = TextFieldDelegate()
-    let surnameFieldDelegate = TextFieldDelegate()
-    let emailFieldDelegate = TextFieldDelegate()
-    let passwordFieldDelegate = TextFieldDelegate()
-    let phoneFieldDelegate = TextFieldDelegate()
 
     var body: some View {
         GeometryReader { geo in
@@ -31,50 +25,21 @@ struct SignupView: View {
                             CKRTextField(title: "NAME*", value: $store.signupUserData.firstName,
                                          textContentType: .givenName, autocapitalization: .words, submitLabel: .next)
                                 .focused(self.$focusedField, equals: .name)
-                                .introspect(.textField, on: .iOS(.v16, .v17)) { textField in
-                                    nameFieldDelegate.shouldReturn = {
-                                        self.focusNextField()
-                                        return false
-                                    }
-
-                                    textField.delegate = nameFieldDelegate
-                                }
                                 .onSubmit { self.focusNextField() }
                             CKRTextField(title: "SURNAME*", value: $store.signupUserData.lastName,
                                          textContentType: .familyName, autocapitalization: .words, submitLabel: .next)
                                 .focused(self.$focusedField, equals: .surname)
-                                .introspect(.textField, on: .iOS(.v16, .v17)) { textField in
-                                    surnameFieldDelegate.shouldReturn = {
-                                        self.focusNextField()
-                                        return false
-                                    }
-
-                                    textField.delegate = surnameFieldDelegate
-                                }
+                                .onSubmit { self.focusNextField() }
                         }
                         CKRTextField(title: "EMAIL*", value: $store.signupUserData.email,
                                      textContentType: .emailAddress, keyboardType: .emailAddress,
                                      autocapitalization: .never, submitLabel: .next)
                             .focused(self.$focusedField, equals: .email)
-                            .introspect(.textField, on: .iOS(.v16, .v17)) { textField in
-                                emailFieldDelegate.shouldReturn = {
-                                    self.focusNextField()
-                                    return false
-                                }
-
-                                textField.delegate = emailFieldDelegate
-                            }
+                            .onSubmit { self.focusNextField() }
                         CKRTextField(title: "PASSWORD*", value: $store.signupUserData.password,
                                      isSecure: true, textContentType: .newPassword, submitLabel: .next)
                             .focused(self.$focusedField, equals: .password)
-                            .introspect(.textField, on: .iOS(.v16, .v17)) { textField in
-                                passwordFieldDelegate.shouldReturn = {
-                                    self.focusNextField()
-                                    return false
-                                }
-
-                                textField.delegate = passwordFieldDelegate
-                            }
+                            .onSubmit { self.focusNextField() }
                         CKRTextField(title: "PHONE", value: $store.signupUserData.phone,
                                      textContentType: .telephoneNumber, submitLabel: .done)
                             .focused(self.$focusedField, equals: .phone)

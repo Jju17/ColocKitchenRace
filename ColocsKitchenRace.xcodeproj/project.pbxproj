@@ -24,7 +24,6 @@
 		644F09062E997A2700A9B256 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = 644F09052E997A2700A9B256 /* FirebaseCrashlytics */; };
 		644F09082E997A2700A9B256 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 644F09072E997A2700A9B256 /* FirebaseFirestore */; };
 		644F090A2E997A2700A9B256 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 644F09092E997A2700A9B256 /* FirebaseStorage */; };
-		6469FA702C1FAD2E002BDBF6 /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = 6469FA6F2C1FAD2E002BDBF6 /* SwiftUIIntrospect */; };
 		6478D6BD2F2E2C7500DE69CF /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 6478D6BC2F2E2C7500DE69CF /* FirebaseMessaging */; };
 		64884E552AE43CF40075BB39 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		64A1A5DD2F2E54B800D357E9 /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = 64A1A5DC2F2E54B800D357E9 /* FirebaseFunctions */; };
@@ -32,7 +31,6 @@
 		64B66EC62B5D50DB00B8F30B /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 64B66EC52B5D50DB00B8F30B /* ComposableArchitecture */; };
 		64C87C242DEB4D7F00EA27EB /* MijickPopups in Frameworks */ = {isa = PBXBuildFile; productRef = 64C87C232DEB4D7F00EA27EB /* MijickPopups */; };
 		64FBE3762D88682D00D8A89F /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 64FBE3752D88682D00D8A89F /* ComposableArchitecture */; };
-		64FBE3782D88682D00D8A89F /* SwiftUIIntrospect in Frameworks */ = {isa = PBXBuildFile; productRef = 64FBE3772D88682D00D8A89F /* SwiftUIIntrospect */; };
 		64FE3CE72B8D58B800E6AAAE /* Dependencies in Frameworks */ = {isa = PBXBuildFile; productRef = 64FE3CE62B8D58B800E6AAAE /* Dependencies */; };
 		64FE3CE92B8D58B800E6AAAE /* DependenciesMacros in Frameworks */ = {isa = PBXBuildFile; productRef = 64FE3CE82B8D58B800E6AAAE /* DependenciesMacros */; };
 /* End PBXBuildFile section */
@@ -87,7 +85,6 @@
 				"Utils/Dictionnary+Utils.swift",
 				"Utils/Error+Utils.swift",
 				Utils/Global.swift,
-				Utils/Introspect/TextFieldDelegate.swift,
 				"Utils/Logger+Utils.swift",
 				"Utils/URL+Utils.swift",
 				Utils/URLOpener.swift,
@@ -138,7 +135,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6469FA702C1FAD2E002BDBF6 /* SwiftUIIntrospect in Frameworks */,
 				64B66EC62B5D50DB00B8F30B /* ComposableArchitecture in Frameworks */,
 				644F08F02E9957DF00A9B256 /* FirebaseAnalytics in Frameworks */,
 				644F08F62E9957DF00A9B256 /* FirebaseAuth in Frameworks */,
@@ -178,7 +174,6 @@
 				644F09042E997A2700A9B256 /* FirebaseCore in Frameworks */,
 				644F09062E997A2700A9B256 /* FirebaseCrashlytics in Frameworks */,
 				64A1A5DD2F2E54B800D357E9 /* FirebaseFunctions in Frameworks */,
-				64FBE3782D88682D00D8A89F /* SwiftUIIntrospect in Frameworks */,
 				644F090A2E997A2700A9B256 /* FirebaseStorage in Frameworks */,
 				644F09022E997A2700A9B256 /* FirebaseAuth in Frameworks */,
 				644F09082E997A2700A9B256 /* FirebaseFirestore in Frameworks */,
@@ -243,7 +238,6 @@
 				64B66EC52B5D50DB00B8F30B /* ComposableArchitecture */,
 				64FE3CE62B8D58B800E6AAAE /* Dependencies */,
 				64FE3CE82B8D58B800E6AAAE /* DependenciesMacros */,
-				6469FA6F2C1FAD2E002BDBF6 /* SwiftUIIntrospect */,
 				64C87C232DEB4D7F00EA27EB /* MijickPopups */,
 				644F08EF2E9957DF00A9B256 /* FirebaseAnalytics */,
 				644F08F12E9957DF00A9B256 /* FirebaseAnalyticsCore */,
@@ -318,7 +312,6 @@
 			name = CKRAdmin;
 			packageProductDependencies = (
 				64FBE3752D88682D00D8A89F /* ComposableArchitecture */,
-				64FBE3772D88682D00D8A89F /* SwiftUIIntrospect */,
 				644F09012E997A2700A9B256 /* FirebaseAuth */,
 				644F09032E997A2700A9B256 /* FirebaseCore */,
 				644F09052E997A2700A9B256 /* FirebaseCrashlytics */,
@@ -370,7 +363,6 @@
 			packageReferences = (
 				64B66EC42B5D50DB00B8F30B /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 				64FE3CE52B8D58B800E6AAAE /* XCRemoteSwiftPackageReference "swift-dependencies" */,
-				6469FA6E2C1FAD2E002BDBF6 /* XCRemoteSwiftPackageReference "swiftui-introspect" */,
 				64C87C222DEB4D7F00EA27EB /* XCRemoteSwiftPackageReference "Popups" */,
 				644F08EE2E9957DE00A9B256 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				640222CA2F3D74D900CF0600 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
@@ -937,14 +929,6 @@
 				minimumVersion = 12.4.0;
 			};
 		};
-		6469FA6E2C1FAD2E002BDBF6 /* XCRemoteSwiftPackageReference "swiftui-introspect" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/siteline/swiftui-introspect";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 26.0.0;
-			};
-		};
 		64B66EC42B5D50DB00B8F30B /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture.git";
@@ -1037,11 +1021,6 @@
 			package = 644F08EE2E9957DE00A9B256 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseStorage;
 		};
-		6469FA6F2C1FAD2E002BDBF6 /* SwiftUIIntrospect */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 6469FA6E2C1FAD2E002BDBF6 /* XCRemoteSwiftPackageReference "swiftui-introspect" */;
-			productName = SwiftUIIntrospect;
-		};
 		6478D6BC2F2E2C7500DE69CF /* FirebaseMessaging */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 644F08EE2E9957DE00A9B256 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
@@ -1071,11 +1050,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 64B66EC42B5D50DB00B8F30B /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
 			productName = ComposableArchitecture;
-		};
-		64FBE3772D88682D00D8A89F /* SwiftUIIntrospect */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 6469FA6E2C1FAD2E002BDBF6 /* XCRemoteSwiftPackageReference "swiftui-introspect" */;
-			productName = SwiftUIIntrospect;
 		};
 		64FE3CE62B8D58B800E6AAAE /* Dependencies */ = {
 			isa = XCSwiftPackageProductDependency;

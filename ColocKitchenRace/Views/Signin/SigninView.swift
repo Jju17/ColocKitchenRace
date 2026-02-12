@@ -7,7 +7,6 @@
 
 import ComposableArchitecture
 import SwiftUI
-import SwiftUIIntrospect
 import os
 
 @Reducer
@@ -86,8 +85,6 @@ struct SigninFeature {
 struct SigninView: View {
     @Bindable var store: StoreOf<SigninFeature>
     @FocusState var focusedField: SigninField?
-    let emailFieldDelegate = TextFieldDelegate()
-    let passwordFieldDelegate = TextFieldDelegate()
 
     var body: some View {
         GeometryReader { geo in
@@ -102,14 +99,7 @@ struct SigninView: View {
                                      textContentType: .emailAddress, keyboardType: .emailAddress,
                                      autocapitalization: .never, submitLabel: .next)
                             .focused(self.$focusedField, equals: .email)
-                            .introspect(.textField, on: .iOS(.v16, .v17)) { textField in
-                                emailFieldDelegate.shouldReturn = {
-                                    self.focusNextField()
-                                    return false
-                                }
-
-                                textField.delegate = emailFieldDelegate
-                            }
+                            .onSubmit { self.focusNextField() }
                         CKRTextField(title: "PASSWORD", value: $store.password,
                                      isSecure: true, textContentType: .password, submitLabel: .done)
                             .focused(self.$focusedField, equals: .password)
