@@ -91,6 +91,54 @@ struct SignupView: View {
                                 self.store.send(.signupButtonTapped)
                             }
                             .frame(height: 50)
+
+                            HStack {
+                                Rectangle().frame(height: 1).foregroundStyle(.gray.opacity(0.3))
+                                Text("or").font(.footnote).foregroundStyle(.secondary)
+                                Rectangle().frame(height: 1).foregroundStyle(.gray.opacity(0.3))
+                            }
+
+                            Button {
+                                self.store.send(.googleSignupButtonTapped)
+                            } label: {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "g.circle.fill")
+                                        .font(.title2)
+                                    Text("Sign up with Google")
+                                        .fontWeight(.medium)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 50)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 15, style: .continuous)
+                                        .fill(.white)
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 15, style: .continuous)
+                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                )
+                            }
+                            .buttonStyle(.plain)
+
+                            Button {
+                                self.store.send(.appleSignupButtonTapped)
+                            } label: {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "apple.logo")
+                                        .font(.title2)
+                                    Text("Sign up with Apple")
+                                        .fontWeight(.medium)
+                                }
+                                .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 50)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 15, style: .continuous)
+                                        .fill(.black)
+                                )
+                            }
+                            .buttonStyle(.plain)
+
                             if let errorMessage = store.errorMessage {
                                 Text(errorMessage)
                                     .foregroundStyle(.red)

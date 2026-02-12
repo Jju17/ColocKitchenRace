@@ -57,6 +57,8 @@ struct UserProfileFormView: View {
                 TextField("First name *", text: $store.wipUser.firstName)
                 TextField("Last name *", text: $store.wipUser.lastName)
                 TextField("Email *", text: $store.wipUser.email ?? "")
+                    .disabled(!store.wipUser.isEmailEditable)
+                    .foregroundStyle(store.wipUser.isEmailEditable ? .primary : .secondary)
                 TextField("GSM", text: $store.wipUser.phoneNumber ?? "")
             }
 

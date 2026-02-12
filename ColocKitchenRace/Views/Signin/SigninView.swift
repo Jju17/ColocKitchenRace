@@ -26,6 +26,8 @@ struct SigninFeature {
         case switchToSignupButtonTapped
         case delegate(Delegate)
         case signinButtonTapped
+        case googleSigninButtonTapped
+        case appleSigninButtonTapped
         case signinErrorTriggered(String)
 
         @CasePathable
@@ -55,6 +57,20 @@ struct SigninFeature {
                     }
                     return .run { [state] send in
                         _ = try await self.authenticationClient.signIn(email: state.email, password: state.password)
+                    } catch: { error, send in
+                        Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
+                        await send(.signinErrorTriggered(error.localizedDescription))
+                    }
+                case .googleSigninButtonTapped:
+                    return .run { send in
+                        _ = try await self.authenticationClient.signInWithGoogle()
+                    } catch: { error, send in
+                        Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
+                        await send(.signinErrorTriggered(error.localizedDescription))
+                    }
+                case .appleSigninButtonTapped:
+                    return .run { send in
+                        _ = try await self.authenticationClient.signInWithApple()
                     } catch: { error, send in
                         Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
                         await send(.signinErrorTriggered(error.localizedDescription))
@@ -105,6 +121,54 @@ struct SigninView: View {
                                 self.store.send(.signinButtonTapped)
                             }
                             .frame(height: 50)
+
+                            HStack {
+                                Rectangle().frame(height: 1).foregroundStyle(.gray.opacity(0.3))
+                                Text("or").font(.footnote).foregroundStyle(.secondary)
+                                Rectangle().frame(height: 1).foregroundStyle(.gray.opacity(0.3))
+                            }
+
+                            Button {
+                                self.store.send(.googleSigninButtonTapped)
+                            } label: {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "g.circle.fill")
+                                        .font(.title2)
+                                    Text("Sign in with Google")
+                                        .fontWeight(.medium)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 50)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 15, style: .continuous)
+                                        .fill(.white)
+                                )
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 15, style: .continuous)
+                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+                                )
+                            }
+                            .buttonStyle(.plain)
+
+                            Button {
+                                self.store.send(.appleSigninButtonTapped)
+                            } label: {
+                                HStack(spacing: 8) {
+                                    Image(systemName: "apple.logo")
+                                        .font(.title2)
+                                    Text("Sign in with Apple")
+                                        .fontWeight(.medium)
+                                }
+                                .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity)
+                                .frame(height: 50)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 15, style: .continuous)
+                                        .fill(.black)
+                                )
+                            }
+                            .buttonStyle(.plain)
+
                             if let errorMessage = store.errorMessage {
                                 Text(errorMessage)
                                     .foregroundStyle(.red)

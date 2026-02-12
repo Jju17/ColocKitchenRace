@@ -23,6 +23,8 @@ struct SignupFeature {
         case binding(BindingAction<State>)
         case goToSigninButtonTapped
         case signupButtonTapped
+        case googleSignupButtonTapped
+        case appleSignupButtonTapped
         case delegate(Delegate)
         case signupErrorTriggered(String)
 
@@ -44,6 +46,20 @@ struct SignupFeature {
                 return .send(.delegate(.switchToSigninButtonTapped))
             case .delegate:
                 return .none
+            case .googleSignupButtonTapped:
+                return .run { send in
+                    _ = try await self.authenticationClient.signInWithGoogle()
+                } catch: { error, send in
+                    Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
+                    await send(.signupErrorTriggered(error.localizedDescription))
+                }
+            case .appleSignupButtonTapped:
+                return .run { send in
+                    _ = try await self.authenticationClient.signInWithApple()
+                } catch: { error, send in
+                    Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
+                    await send(.signupErrorTriggered(error.localizedDescription))
+                }
             case .signupButtonTapped:
                 state.errorMessage = nil
                 let data = state.signupUserData

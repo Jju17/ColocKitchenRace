@@ -1989,6 +1989,9 @@
     "Optional — personalize your cohouse page." : {
 
     },
+    "or" : {
+
+    },
     "Participants" : {
       "localizations" : {
         "fr" : {
@@ -2403,6 +2406,12 @@
         }
       }
     },
+    "Sign in with Apple" : {
+
+    },
+    "Sign in with Google" : {
+
+    },
     "Sign out" : {
       "localizations" : {
         "fr" : {
@@ -2422,6 +2431,12 @@
           }
         }
       }
+    },
+    "Sign up with Apple" : {
+
+    },
+    "Sign up with Google" : {
+
     },
     "Sort responses" : {
       "localizations" : {

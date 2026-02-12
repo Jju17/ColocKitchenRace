@@ -8,6 +8,7 @@
 import ComposableArchitecture
 import Firebase
 import FirebaseMessaging
+import GoogleSignIn
 import SwiftUI
 import MijickPopups
 import UserNotifications
@@ -25,6 +26,11 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         guard !isTesting else { return true }
 
         FirebaseApp.configure()
+
+        // Configure Google Sign-In
+        if let clientID = FirebaseApp.app()?.options.clientID {
+            GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: clientID)
+        }
 
         // Configure notification center
         UNUserNotificationCenter.current().delegate = self
@@ -50,6 +56,13 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         } catch {
             print("🔔 Error requesting notification permission: \(error)")
         }
+    }
+
+    // MARK: - URL Handling (Google Sign-In)
+
+    func application(_ app: UIApplication, open url: URL,
+                     options: [UIApplication.OpenURLOptionsKey: Any] = [:]) -> Bool {
+        return GIDSignIn.sharedInstance.handle(url)
     }
 
     // MARK: - APNs Token

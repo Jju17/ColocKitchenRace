@@ -19,6 +19,7 @@ extension SignupUser {
     func createUser(authId: String) -> User {
         User(id: UUID(),
              authId: authId,
+             authProvider: .email,
              isSubscribeToNews: false,
              firstName: self.firstName,
              lastName: self.lastName,

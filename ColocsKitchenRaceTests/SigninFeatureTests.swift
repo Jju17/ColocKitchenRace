@@ -127,6 +127,68 @@ struct SigninFeatureTests {
         }
     }
 
+    // MARK: - Google Sign-In
+
+    @Test("Google signin success does not show error")
+    func googleSignin_success() async {
+        let store = TestStore(initialState: SigninFeature.State()) {
+            SigninFeature()
+        } withDependencies: {
+            $0.authenticationClient.signInWithGoogle = { .mockUser }
+        }
+
+        await store.send(.googleSigninButtonTapped)
+    }
+
+    @Test("Google signin failure shows error")
+    func googleSignin_failure() async {
+        let store = TestStore(initialState: SigninFeature.State()) {
+            SigninFeature()
+        } withDependencies: {
+            $0.authenticationClient.signInWithGoogle = {
+                throw AuthError.failedWithError("Cancelled")
+            }
+        }
+
+        await store.send(.googleSigninButtonTapped)
+
+        await store.receive(\.signinErrorTriggered) {
+            $0.errorMessage = "Cancelled"
+        }
+    }
+
+    // MARK: - Apple Sign-In
+
+    @Test("Apple signin success does not show error")
+    func appleSignin_success() async {
+        let store = TestStore(initialState: SigninFeature.State()) {
+            SigninFeature()
+        } withDependencies: {
+            $0.authenticationClient.signInWithApple = { .mockUser }
+        }
+
+        await store.send(.appleSigninButtonTapped)
+    }
+
+    @Test("Apple signin failure shows error")
+    func appleSignin_failure() async {
+        let store = TestStore(initialState: SigninFeature.State()) {
+            SigninFeature()
+        } withDependencies: {
+            $0.authenticationClient.signInWithApple = {
+                throw AuthError.failedWithError("Cancelled")
+            }
+        }
+
+        await store.send(.appleSigninButtonTapped)
+
+        await store.receive(\.signinErrorTriggered) {
+            $0.errorMessage = "Cancelled"
+        }
+    }
+
+    // MARK: - Error Triggered
+
     @Test("signinErrorTriggered sets error message")
     func signinErrorTriggered_setsMessage() async {
         let store = TestStore(initialState: SigninFeature.State()) {

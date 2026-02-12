@@ -143,4 +143,34 @@ struct UserProfileFormFeatureTests {
         #expect(state.wipUser.firstName == "")
         #expect(state.wipUser.lastName == "")
     }
+
+    // MARK: - isEmailEditable
+
+    @Test("isEmailEditable is true for email provider")
+    func emailEditableForEmailProvider() {
+        var user = User.mockUser
+        user.authProvider = .email
+        #expect(user.isEmailEditable == true)
+    }
+
+    @Test("isEmailEditable is true for nil provider (legacy users)")
+    func emailEditableForNilProvider() {
+        var user = User.mockUser
+        user.authProvider = nil
+        #expect(user.isEmailEditable == true)
+    }
+
+    @Test("isEmailEditable is false for google provider")
+    func emailNotEditableForGoogleProvider() {
+        var user = User.mockUser
+        user.authProvider = .google
+        #expect(user.isEmailEditable == false)
+    }
+
+    @Test("isEmailEditable is false for apple provider")
+    func emailNotEditableForAppleProvider() {
+        var user = User.mockUser
+        user.authProvider = .apple
+        #expect(user.isEmailEditable == false)
+    }
 }

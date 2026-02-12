@@ -7,6 +7,12 @@
 
 import Foundation
 
+enum AuthProvider: String, Codable, Equatable {
+    case email
+    case google
+    case apple
+}
+
 enum Gender: String, CaseIterable, Codable {
     case male, female, other
 }
@@ -14,6 +20,7 @@ enum Gender: String, CaseIterable, Codable {
 struct User: Equatable, Hashable, Identifiable, Codable {
     var id: UUID
     var authId: String = ""
+    var authProvider: AuthProvider?
     var isAdmin: Bool? = false
     var isSubscribeToNews: Bool = false
     var firstName: String = ""
@@ -27,6 +34,12 @@ struct User: Equatable, Hashable, Identifiable, Codable {
 }
 
 extension User {
+    /// Whether the email address can be edited by the user.
+    /// Only email/password users (or legacy users without a provider) may edit their email.
+    var isEmailEditable: Bool {
+        authProvider == nil || authProvider == .email
+    }
+
     var fullName: String {
         "\(firstName) \(lastName)"
     }
@@ -42,7 +55,7 @@ extension User {
     }
 
     static var mockUser: User {
-        User(id: UUID(), isSubscribeToNews: true, firstName: "Blob", lastName: "Jr", phoneNumber: "+32 123 45 67 89", email: "blob@example.com", dietaryPreferences: [.lactoseFree])
+        User(id: UUID(), authProvider: .email, isSubscribeToNews: true, firstName: "Blob", lastName: "Jr", phoneNumber: "+32 123 45 67 89", email: "blob@example.com", dietaryPreferences: [.lactoseFree])
     }
 
     static var mockUser2: User {

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		640222CC2F3D74D900CF0600 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = 640222CB2F3D74D900CF0600 /* GoogleSignIn */; };
 		642701AA2ADEA5F700850684 /* (null) in Resources */ = {isa = PBXBuildFile; };
 		642701AC2AE12F9300850684 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		64325AF52AF698D400038EA5 /* (null) in Sources */ = {isa = PBXBuildFile; };
@@ -142,6 +143,7 @@
 				644F08F02E9957DF00A9B256 /* FirebaseAnalytics in Frameworks */,
 				644F08F62E9957DF00A9B256 /* FirebaseAuth in Frameworks */,
 				644F08FC2E9957DF00A9B256 /* FirebaseFirestore in Frameworks */,
+				640222CC2F3D74D900CF0600 /* GoogleSignIn in Frameworks */,
 				644F08FA2E9957DF00A9B256 /* FirebaseCrashlytics in Frameworks */,
 				64FE3CE72B8D58B800E6AAAE /* Dependencies in Frameworks */,
 				644F08FE2E9957DF00A9B256 /* FirebaseStorage in Frameworks */,
@@ -252,6 +254,7 @@
 				644F08FD2E9957DF00A9B256 /* FirebaseStorage */,
 				6478D6BC2F2E2C7500DE69CF /* FirebaseMessaging */,
 				64A1A5DE2F2E54B900D357E9 /* FirebaseFunctions */,
+				640222CB2F3D74D900CF0600 /* GoogleSignIn */,
 			);
 			productName = colockitchenrace;
 			productReference = 64F17B2F2AD2A3BC0047F6F3 /* ColocsKitchenRace.app */;
@@ -370,6 +373,7 @@
 				6469FA6E2C1FAD2E002BDBF6 /* XCRemoteSwiftPackageReference "swiftui-introspect" */,
 				64C87C222DEB4D7F00EA27EB /* XCRemoteSwiftPackageReference "Popups" */,
 				644F08EE2E9957DE00A9B256 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				640222CA2F3D74D900CF0600 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 			);
 			productRefGroup = 64F17B302AD2A3BC0047F6F3 /* Products */;
 			projectDirPath = "";
@@ -917,6 +921,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		640222CA2F3D74D900CF0600 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.1.0;
+			};
+		};
 		644F08EE2E9957DE00A9B256 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
@@ -960,6 +972,11 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		640222CB2F3D74D900CF0600 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 640222CA2F3D74D900CF0600 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
 		644F08EF2E9957DF00A9B256 /* FirebaseAnalytics */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 644F08EE2E9957DE00A9B256 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;

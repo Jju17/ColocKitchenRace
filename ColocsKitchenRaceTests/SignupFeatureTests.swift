@@ -106,6 +106,66 @@ struct SignupFeatureTests {
         #expect(signupCalled == false)
     }
 
+    // MARK: - Google Sign-Up
+
+    @Test("Google signup success does not show error")
+    func googleSignup_success() async {
+        let store = TestStore(initialState: SignupFeature.State()) {
+            SignupFeature()
+        } withDependencies: {
+            $0.authenticationClient.signInWithGoogle = { .mockUser }
+        }
+
+        await store.send(.googleSignupButtonTapped)
+    }
+
+    @Test("Google signup failure shows error")
+    func googleSignup_failure() async {
+        let store = TestStore(initialState: SignupFeature.State()) {
+            SignupFeature()
+        } withDependencies: {
+            $0.authenticationClient.signInWithGoogle = {
+                throw AuthError.failedWithError("Cancelled")
+            }
+        }
+
+        await store.send(.googleSignupButtonTapped)
+
+        await store.receive(\.signupErrorTriggered) {
+            $0.errorMessage = "Cancelled"
+        }
+    }
+
+    // MARK: - Apple Sign-Up
+
+    @Test("Apple signup success does not show error")
+    func appleSignup_success() async {
+        let store = TestStore(initialState: SignupFeature.State()) {
+            SignupFeature()
+        } withDependencies: {
+            $0.authenticationClient.signInWithApple = { .mockUser }
+        }
+
+        await store.send(.appleSignupButtonTapped)
+    }
+
+    @Test("Apple signup failure shows error")
+    func appleSignup_failure() async {
+        let store = TestStore(initialState: SignupFeature.State()) {
+            SignupFeature()
+        } withDependencies: {
+            $0.authenticationClient.signInWithApple = {
+                throw AuthError.failedWithError("Cancelled")
+            }
+        }
+
+        await store.send(.appleSignupButtonTapped)
+
+        await store.receive(\.signupErrorTriggered) {
+            $0.errorMessage = "Cancelled"
+        }
+    }
+
     // MARK: - Phone number preserved
 
     @Test("SignupUser.createUser preserves phone number")
