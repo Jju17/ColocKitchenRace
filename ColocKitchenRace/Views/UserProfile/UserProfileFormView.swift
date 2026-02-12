@@ -88,6 +88,7 @@ struct UserProfileFormView: View {
                 }
             }
         }
+        .scrollDismissesKeyboard(.interactively)
         .navigationBarTitle("Profile")
         .onAppear { store.send(.onAppearTriggered) }
 

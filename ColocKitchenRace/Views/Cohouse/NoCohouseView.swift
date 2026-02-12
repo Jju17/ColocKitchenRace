@@ -291,6 +291,7 @@ struct NoCohouseView: View {
                 }
             }
         }
+        .scrollDismissesKeyboard(.interactively)
         .navigationTitle("Cohouse")
         .onAppear {
             self.codeIsFocused = true

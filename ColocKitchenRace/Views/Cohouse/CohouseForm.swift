@@ -285,6 +285,7 @@ struct CohouseFormView: View {
             }
 
         }
+        .scrollDismissesKeyboard(.interactively)
         .fullScreenCover(isPresented: $store.isIdCardPickerPresented) {
             ImagePicker(
                 selected: { image in

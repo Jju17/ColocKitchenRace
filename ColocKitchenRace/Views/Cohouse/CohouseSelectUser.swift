@@ -64,6 +64,7 @@ struct CohouseSelectUserView: View {
                 store.send(.addUserButtonTapped)
             }
         }
+        .scrollDismissesKeyboard(.interactively)
     }
 }
 
