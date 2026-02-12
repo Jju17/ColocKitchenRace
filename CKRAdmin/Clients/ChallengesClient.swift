@@ -17,6 +17,12 @@ enum ChallengeError: Error, Equatable {
     case unknown(String)
 }
 
+struct ChallengeCounts: Equatable {
+    var total: Int = 0
+    var active: Int = 0
+    var next: Int = 0
+}
+
 @DependencyClient
 struct ChallengeClient {
     var add: @Sendable (_ newChallenge: Challenge) async -> Result<Bool, ChallengeError> = { _ in .success(true) }
@@ -25,6 +31,7 @@ struct ChallengeClient {
     var totalChallengesCount: @Sendable () async -> Result<Int, ChallengeError> = { .success(0) }
     var activeChallengesCount: @Sendable () async -> Result<Int, ChallengeError> = { .success(0) }
     var nextChallengesCount: @Sendable () async -> Result<Int, ChallengeError> = { .success(0) }
+    var watchChallengesCounts: @Sendable () -> AsyncStream<ChallengeCounts> = { AsyncStream { $0.finish() } }
     var delete: (UUID) async throws -> Void
 }
 
@@ -135,6 +142,42 @@ extension ChallengeClient: DependencyKey {
                 }
             }
         },
+        watchChallengesCounts: {
+            AsyncStream { continuation in
+                let listener = Firestore.firestore()
+                    .collection("challenges")
+                    .addSnapshotListener { snapshot, error in
+                        if let error {
+                            Logger.challengeLog.log(level: .error, "watchChallengesCounts error: \(error.localizedDescription)")
+                            return
+                        }
+                        guard let snapshot else { return }
+
+                        let now = Date()
+                        var counts = ChallengeCounts()
+                        counts.total = snapshot.documents.count
+
+                        for doc in snapshot.documents {
+                            let data = doc.data()
+                            guard let startTimestamp = data["startDate"] as? Timestamp,
+                                  let endTimestamp = data["endDate"] as? Timestamp
+                            else { continue }
+
+                            let startDate = startTimestamp.dateValue()
+                            let endDate = endTimestamp.dateValue()
+
+                            if startDate <= now && endDate >= now {
+                                counts.active += 1
+                            } else if startDate > now {
+                                counts.next += 1
+                            }
+                        }
+
+                        continuation.yield(counts)
+                    }
+                continuation.onTermination = { _ in listener.remove() }
+            }
+        },
         delete: { id in
             let db = Firestore.firestore()
             try await db.collection("challenges").document(id.uuidString).delete()
@@ -149,6 +192,7 @@ extension ChallengeClient: DependencyKey {
             totalChallengesCount: { .success(42) },
             activeChallengesCount: { .success(10) },
             nextChallengesCount: { .success(5) },
+            watchChallengesCounts: { AsyncStream { $0.finish() } },
             delete: { _ in }
         )
     }
@@ -161,6 +205,7 @@ extension ChallengeClient: DependencyKey {
             totalChallengesCount: { .success(0) },
             activeChallengesCount: { .success(0) },
             nextChallengesCount: { .success(0) },
+            watchChallengesCounts: { AsyncStream { $0.finish() } },
             delete: { _ in }
         )
     }

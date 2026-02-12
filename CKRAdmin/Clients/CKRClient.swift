@@ -8,6 +8,7 @@
 import ComposableArchitecture
 import FirebaseFirestore
 import FirebaseFunctions
+import os
 
 enum CKRError: Error, Equatable {
     case networkError
@@ -40,6 +41,7 @@ struct CKRClient {
     var newGame: (_ newGame: CKRGame) -> Result<Bool, CKRError> = { _ in .success(true) }
     var updateGame: (_ game: CKRGame) -> Result<Bool, CKRError> = { _ in .success(true) }
     var getGame: @Sendable () async -> Result<CKRGame?, CKRError> = { .success(nil) }
+    var watchGame: @Sendable () -> AsyncStream<CKRGame?> = { AsyncStream { $0.finish() } }
     var deleteGame: @Sendable () async -> Result<Bool, CKRError> = { .success(true) }
     var matchCohouses: @Sendable (_ gameId: String) async -> Result<MatchResult, CKRError> = { _ in .success(MatchResult(success: true, groupCount: 0, groups: [])) }
     var resetMatches: @Sendable (_ gameId: String) async -> Result<Bool, CKRError> = { _ in .success(true) }
@@ -70,15 +72,35 @@ extension CKRClient: DependencyKey {
             do {
                 let querySnapshot = try await Firestore.firestore().collection("ckrGames").getDocuments()
                 let documents = querySnapshot.documents
-                
+
                 guard let document = documents.first else {
                     return .success(nil)
                 }
-                
+
                 let game = try document.data(as: CKRGame.self)
                 return .success(game)
             } catch {
                 return .failure(CKRError.fromFirestoreError(error))
+            }
+        },
+        watchGame: {
+            AsyncStream { continuation in
+                let listener = Firestore.firestore()
+                    .collection("ckrGames")
+                    .addSnapshotListener { snapshot, error in
+                        if let error {
+                            Logger.ckrLog.log(level: .error, "watchGame error: \(error.localizedDescription)")
+                            continuation.yield(nil)
+                            return
+                        }
+                        guard let snapshot else {
+                            continuation.yield(nil)
+                            return
+                        }
+                        let game = snapshot.documents.first.flatMap { try? $0.data(as: CKRGame.self) }
+                        continuation.yield(game)
+                    }
+                continuation.onTermination = { _ in listener.remove() }
             }
         },
         deleteGame: {
@@ -146,6 +168,7 @@ extension CKRClient: DependencyKey {
             newGame: { _ in .success(true) },
             updateGame: { _ in .success(true) },
             getGame: { .success(nil) },
+            watchGame: { AsyncStream { $0.finish() } },
             deleteGame: { .success(true) },
             matchCohouses: { _ in .success(MatchResult(success: true, groupCount: 0, groups: [])) },
             resetMatches: { _ in .success(true) }
@@ -157,6 +180,7 @@ extension CKRClient: DependencyKey {
             newGame: { _ in .success(true) },
             updateGame: { _ in .success(true) },
             getGame: { .success(nil) },
+            watchGame: { AsyncStream { $0.finish() } },
             deleteGame: { .success(true) },
             matchCohouses: { _ in .success(MatchResult(success: true, groupCount: 0, groups: [])) },
             resetMatches: { _ in .success(true) }

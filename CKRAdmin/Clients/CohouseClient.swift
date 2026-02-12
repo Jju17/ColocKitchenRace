@@ -36,6 +36,7 @@ struct CohouseListItem: Equatable, Identifiable, Hashable {
 @DependencyClient
 struct CohouseClient {
     var totalCohousesCount: @Sendable () async -> Result<Int, CohouseError> = { .success(0) }
+    var watchTotalCohousesCount: @Sendable () -> AsyncStream<Int> = { AsyncStream { $0.finish() } }
     var getCohouses: @Sendable (_ ids: [String]) async -> Result<[CohouseMapItem], CohouseError> = { _ in .success([]) }
     var getAllCohouses: @Sendable () async -> Result<[CohouseListItem], CohouseError> = { .success([]) }
 }
@@ -59,6 +60,21 @@ extension CohouseClient: DependencyKey {
                 default:
                     return .failure(.unknown(error.localizedDescription))
                 }
+            }
+        },
+        watchTotalCohousesCount: {
+            AsyncStream { continuation in
+                let listener = Firestore.firestore()
+                    .collection("cohouses")
+                    .addSnapshotListener { snapshot, error in
+                        if let error {
+                            Logger.cohouseLog.log(level: .error, "watchTotalCohousesCount error: \(error.localizedDescription)")
+                            return
+                        }
+                        guard let snapshot else { return }
+                        continuation.yield(snapshot.documents.count)
+                    }
+                continuation.onTermination = { _ in listener.remove() }
             }
         },
         getCohouses: { ids in
@@ -127,6 +143,7 @@ extension CohouseClient: DependencyKey {
     static var previewValue: CohouseClient {
         Self(
             totalCohousesCount: { .success(42) },
+            watchTotalCohousesCount: { AsyncStream { $0.finish() } },
             getCohouses: { ids in
                 .success(ids.enumerated().map { index, id in
                     CohouseMapItem(
@@ -151,6 +168,7 @@ extension CohouseClient: DependencyKey {
     static var testValue: CohouseClient {
         Self(
             totalCohousesCount: { .success(0) },
+            watchTotalCohousesCount: { AsyncStream { $0.finish() } },
             getCohouses: { _ in .success([]) },
             getAllCohouses: { .success([]) }
         )

@@ -31,6 +31,7 @@ enum UserError: Error, Equatable {
 @DependencyClient
 struct UserClient {
     var totalUsersCount: @Sendable () async -> Result<Int, UserError> = { .success(0) }
+    var watchTotalUsersCount: @Sendable () -> AsyncStream<Int> = { AsyncStream { $0.finish() } }
     var searchUsers: @Sendable (_ query: String) async -> Result<[User], UserError> = { _ in .success([]) }
     var setAdminClaim: @Sendable (_ authUid: String, _ isAdmin: Bool) async -> Result<Void, UserError> = { _, _ in .success(()) }
     var updateUserAdminStatus: @Sendable (_ userId: String, _ isAdmin: Bool) async -> Result<Void, UserError> = { _, _ in .success(()) }
@@ -53,6 +54,21 @@ extension UserClient: DependencyKey {
                 default:
                     return .failure(.unknown(error.localizedDescription))
                 }
+            }
+        },
+        watchTotalUsersCount: {
+            AsyncStream { continuation in
+                let listener = Firestore.firestore()
+                    .collection("users")
+                    .addSnapshotListener { snapshot, error in
+                        if let error {
+                            Logger.authLog.log(level: .error, "watchTotalUsersCount error: \(error.localizedDescription)")
+                            return
+                        }
+                        guard let snapshot else { return }
+                        continuation.yield(snapshot.documents.count)
+                    }
+                continuation.onTermination = { _ in listener.remove() }
             }
         },
         searchUsers: { query in
@@ -109,6 +125,7 @@ extension UserClient: DependencyKey {
     static var previewValue: UserClient {
         Self(
             totalUsersCount: { .success(42) },
+            watchTotalUsersCount: { AsyncStream { $0.finish() } },
             searchUsers: { _ in .success(User.mockUsers) },
             setAdminClaim: { _, _ in .success(()) },
             updateUserAdminStatus: { _, _ in .success(()) }
@@ -118,6 +135,7 @@ extension UserClient: DependencyKey {
     static var testValue: UserClient {
         Self(
             totalUsersCount: { .success(0) },
+            watchTotalUsersCount: { AsyncStream { $0.finish() } },
             searchUsers: { _ in .success([]) },
             setAdminClaim: { _, _ in .success(()) },
             updateUserAdminStatus: { _, _ in .success(()) }

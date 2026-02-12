@@ -304,31 +304,30 @@ struct HomeFeature {
                     return .none
                 case .onTask:
                     state.isLoadingGame = true
-                    return .run { send in
-                        // Fetch CKR Game
-                        if let game = try? await self.ckrClient.getGame().get() {
-                            await send(.ckrGameLoaded(game))
-                        } else {
-                            await send(.ckrGameLoaded(nil))
+                    return .merge(
+                        .run { send in
+                            for await game in self.ckrClient.watchGame() {
+                                await send(.ckrGameLoaded(game))
+                            }
+                        },
+                        .run { send in
+                            for await count in self.userClient.watchTotalUsersCount() {
+                                await send(.totalUsersUpdated(count))
+                            }
+                        },
+                        .run { send in
+                            for await count in self.cohouseClient.watchTotalCohousesCount() {
+                                await send(.totalCohousesUpdated(count))
+                            }
+                        },
+                        .run { send in
+                            for await counts in self.challengeClient.watchChallengesCounts() {
+                                await send(.totalChallengesUpdated(counts.total))
+                                await send(.activeChallengesUpdated(counts.active))
+                                await send(.nextChallengesUpdated(counts.next))
+                            }
                         }
-
-                        // Fetch stats
-                        if let count = try? await self.userClient.totalUsersCount().get() {
-                            await send(.totalUsersUpdated(count))
-                        }
-                        if let count = try? await self.cohouseClient.totalCohousesCount().get() {
-                            await send(.totalCohousesUpdated(count))
-                        }
-                        if let count = try? await self.challengeClient.totalChallengesCount().get() {
-                            await send(.totalChallengesUpdated(count))
-                        }
-                        if let count = try? await self.challengeClient.activeChallengesCount().get() {
-                            await send(.activeChallengesUpdated(count))
-                        }
-                        if let count = try? await self.challengeClient.nextChallengesCount().get() {
-                            await send(.nextChallengesUpdated(count))
-                        }
-                    }
+                    )
                 case .signOut:
                     return .run { _ in
                         try await self.authenticationClient.signOut()
