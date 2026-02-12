@@ -21,7 +21,8 @@ struct CKRRegistrationFormFeatureTests {
         cohouse.users = [Self.testUser]
         return CKRRegistrationFormFeature.State(
             cohouse: cohouse,
-            gameId: "test-game-id"
+            gameId: "test-game-id",
+            pricePerPersonCents: 500
         )
     }
 
@@ -56,45 +57,42 @@ struct CKRRegistrationFormFeatureTests {
         }
     }
 
-    // MARK: - Submit
+    // MARK: - Continue to Payment
 
-    @Test("submitButtonTapped does nothing when no users selected")
-    func submitEmpty() async {
+    @Test("continueToPaymentTapped does nothing when no users selected")
+    func continueEmpty() async {
         let store = TestStore(initialState: makeState()) {
             CKRRegistrationFormFeature()
         }
 
-        await store.send(.submitButtonTapped)
+        await store.send(.continueToPaymentTapped)
     }
 
-    @Test("submitButtonTapped calls registerForGame and delegates on success")
-    func submitSuccess() async {
+    @Test("continueToPaymentTapped pushes payment summary onto path")
+    func continueToPayment() async {
         var state = makeState()
         let userId = state.cohouse.users.first!.id
         state.attendingUserIds.insert(userId.uuidString)
 
-        var registerCalled = false
-
         let store = TestStore(initialState: state) {
             CKRRegistrationFormFeature()
-        } withDependencies: {
-            $0.ckrClient.registerForGame = { _, _, _, _, _ in
-                registerCalled = true
-            }
         }
 
-        await store.send(.submitButtonTapped) {
-            $0.isSubmitting = true
+        await store.send(.continueToPaymentTapped) {
+            $0.path.append(.paymentSummary(PaymentSummaryFeature.State(
+                gameId: "test-game-id",
+                cohouse: $0.cohouse,
+                attendingUserIds: $0.attendingUserIds,
+                averageAge: 25,
+                cohouseType: .mixed,
+                pricePerPersonCents: 500,
+                participantCount: 1,
+                totalCents: 500
+            )))
         }
-
-        await store.receive(\.registrationSucceeded) {
-            $0.isSubmitting = false
-        }
-
-        await store.receive(\.delegate.registrationSucceeded)
-
-        #expect(registerCalled)
     }
+
+    // MARK: - Multiple Users
 
     @Test("toggleUser selects multiple users")
     func toggleTwoUsers() async {
@@ -104,7 +102,8 @@ struct CKRRegistrationFormFeatureTests {
 
         let state = CKRRegistrationFormFeature.State(
             cohouse: cohouse,
-            gameId: "test-game-id"
+            gameId: "test-game-id",
+            pricePerPersonCents: 500
         )
 
         let store = TestStore(initialState: state) {
@@ -119,6 +118,8 @@ struct CKRRegistrationFormFeatureTests {
             $0.attendingUserIds.insert(user2.id.uuidString)
         }
     }
+
+    // MARK: - Bindings
 
     @Test("binding cohouseType updates state")
     func bindingCohouseType() async {
@@ -135,27 +136,20 @@ struct CKRRegistrationFormFeatureTests {
         }
     }
 
-    @Test("submitButtonTapped shows error on failure")
-    func submitFailure() async {
+    // MARK: - Computed Properties
+
+    @Test("participantCount and totalCents compute correctly")
+    func computedProperties() {
         var state = makeState()
-        let userId = state.cohouse.users.first!.id
-        state.attendingUserIds.insert(userId.uuidString)
+        #expect(state.participantCount == 0)
+        #expect(state.totalCents == 0)
 
-        let store = TestStore(initialState: state) {
-            CKRRegistrationFormFeature()
-        } withDependencies: {
-            $0.ckrClient.registerForGame = { _, _, _, _, _ in
-                throw CKRError.firebaseError("Network error")
-            }
-        }
+        state.attendingUserIds.insert("user-1")
+        #expect(state.participantCount == 1)
+        #expect(state.totalCents == 500)
 
-        await store.send(.submitButtonTapped) {
-            $0.isSubmitting = true
-        }
-
-        await store.receive(\.registrationFailed) {
-            $0.isSubmitting = false
-            $0.errorMessage = CKRError.firebaseError("Network error").localizedDescription
-        }
+        state.attendingUserIds.insert("user-2")
+        #expect(state.participantCount == 2)
+        #expect(state.totalCents == 1000)
     }
 }

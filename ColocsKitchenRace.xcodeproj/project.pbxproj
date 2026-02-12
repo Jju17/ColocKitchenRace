@@ -28,6 +28,7 @@
 		64884E552AE43CF40075BB39 /* (null) in Sources */ = {isa = PBXBuildFile; };
 		64A1A5DD2F2E54B800D357E9 /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = 64A1A5DC2F2E54B800D357E9 /* FirebaseFunctions */; };
 		64A1A5DF2F2E54B900D357E9 /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = 64A1A5DE2F2E54B900D357E9 /* FirebaseFunctions */; };
+		64AA7E082F3E6A6E002D36AF /* StripePaymentSheet in Frameworks */ = {isa = PBXBuildFile; productRef = 64AA7E072F3E6A6E002D36AF /* StripePaymentSheet */; };
 		64B66EC62B5D50DB00B8F30B /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 64B66EC52B5D50DB00B8F30B /* ComposableArchitecture */; };
 		64C87C242DEB4D7F00EA27EB /* MijickPopups in Frameworks */ = {isa = PBXBuildFile; productRef = 64C87C232DEB4D7F00EA27EB /* MijickPopups */; };
 		64FBE3762D88682D00D8A89F /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 64FBE3752D88682D00D8A89F /* ComposableArchitecture */; };
@@ -135,6 +136,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				64AA7E082F3E6A6E002D36AF /* StripePaymentSheet in Frameworks */,
 				64B66EC62B5D50DB00B8F30B /* ComposableArchitecture in Frameworks */,
 				644F08F02E9957DF00A9B256 /* FirebaseAnalytics in Frameworks */,
 				644F08F62E9957DF00A9B256 /* FirebaseAuth in Frameworks */,
@@ -249,6 +251,7 @@
 				6478D6BC2F2E2C7500DE69CF /* FirebaseMessaging */,
 				64A1A5DE2F2E54B900D357E9 /* FirebaseFunctions */,
 				640222CB2F3D74D900CF0600 /* GoogleSignIn */,
+				64AA7E072F3E6A6E002D36AF /* StripePaymentSheet */,
 			);
 			productName = colockitchenrace;
 			productReference = 64F17B2F2AD2A3BC0047F6F3 /* ColocsKitchenRace.app */;
@@ -366,6 +369,7 @@
 				64C87C222DEB4D7F00EA27EB /* XCRemoteSwiftPackageReference "Popups" */,
 				644F08EE2E9957DE00A9B256 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				640222CA2F3D74D900CF0600 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				64AA7E042F3E614E002D36AF /* XCRemoteSwiftPackageReference "stripe-ios" */,
 			);
 			productRefGroup = 64F17B302AD2A3BC0047F6F3 /* Products */;
 			projectDirPath = "";
@@ -929,6 +933,14 @@
 				minimumVersion = 12.4.0;
 			};
 		};
+		64AA7E042F3E614E002D36AF /* XCRemoteSwiftPackageReference "stripe-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/stripe/stripe-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 25.6.2;
+			};
+		};
 		64B66EC42B5D50DB00B8F30B /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture.git";
@@ -1035,6 +1047,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 644F08EE2E9957DE00A9B256 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseFunctions;
+		};
+		64AA7E072F3E6A6E002D36AF /* StripePaymentSheet */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 64AA7E042F3E614E002D36AF /* XCRemoteSwiftPackageReference "stripe-ios" */;
+			productName = StripePaymentSheet;
 		};
 		64B66EC52B5D50DB00B8F30B /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;

@@ -40,6 +40,7 @@ struct HomeFeatureTests {
             $0.registrationForm = CKRRegistrationFormFeature.State(
                 cohouse: mockCohouse,
                 gameId: mockGame.id.uuidString,
+                pricePerPersonCents: mockGame.pricePerPersonCents,
                 cohouseType: .mixed
             )
         }
@@ -97,7 +98,8 @@ struct HomeFeatureTests {
         var initialState = HomeFeature.State()
         initialState.registrationForm = CKRRegistrationFormFeature.State(
             cohouse: mockCohouse,
-            gameId: mockGame.id.uuidString
+            gameId: mockGame.id.uuidString,
+            pricePerPersonCents: mockGame.pricePerPersonCents
         )
 
         let store = TestStore(initialState: initialState) {

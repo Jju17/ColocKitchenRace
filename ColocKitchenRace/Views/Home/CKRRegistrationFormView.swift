@@ -9,25 +9,36 @@ import ComposableArchitecture
 import os
 import SwiftUI
 
+// MARK: - Feature
+
 @Reducer
 struct CKRRegistrationFormFeature {
+
+    @Reducer
+    enum Path {
+        case paymentSummary(PaymentSummaryFeature)
+    }
+
     @ObservableState
     struct State: Equatable {
+        var path = StackState<Path.State>()
         var cohouse: Cohouse
         var gameId: String
+        var pricePerPersonCents: Int
         var attendingUserIds: Set<String> = []
         var averageAge: Int = 25
         var cohouseType: CohouseType = .mixed
-        var isSubmitting: Bool = false
         var errorMessage: String?
+
+        var participantCount: Int { attendingUserIds.count }
+        var totalCents: Int { participantCount * pricePerPersonCents }
     }
 
-    enum Action: BindableAction, Equatable {
+    enum Action: BindableAction {
         case binding(BindingAction<State>)
         case toggleUser(CohouseUser.ID)
-        case submitButtonTapped
-        case registrationSucceeded
-        case registrationFailed(String)
+        case continueToPaymentTapped
+        case path(StackActionOf<Path>)
         case delegate(Delegate)
 
         @CasePathable
@@ -35,8 +46,6 @@ struct CKRRegistrationFormFeature {
             case registrationSucceeded
         }
     }
-
-    @Dependency(\.ckrClient) var ckrClient
 
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -54,48 +63,69 @@ struct CKRRegistrationFormFeature {
                 }
                 return .none
 
-            case .submitButtonTapped:
+            case .continueToPaymentTapped:
                 guard !state.attendingUserIds.isEmpty else { return .none }
 
-                state.isSubmitting = true
-                state.errorMessage = nil
+                state.path.append(.paymentSummary(PaymentSummaryFeature.State(
+                    gameId: state.gameId,
+                    cohouse: state.cohouse,
+                    attendingUserIds: state.attendingUserIds,
+                    averageAge: state.averageAge,
+                    cohouseType: state.cohouseType,
+                    pricePerPersonCents: state.pricePerPersonCents,
+                    participantCount: state.participantCount,
+                    totalCents: state.totalCents
+                )))
+                return .none
 
-                let gameId = state.gameId
-                let cohouseId = state.cohouse.id.uuidString
-                let attendingUserIds = Array(state.attendingUserIds)
-                let averageAge = state.averageAge
-                let cohouseType = state.cohouseType.rawValue
-
-                return .run { send in
-                    do {
-                        try await ckrClient.registerForGame(
-                            gameId,
-                            cohouseId,
-                            attendingUserIds,
-                            averageAge,
-                            cohouseType
-                        )
-                        await send(.registrationSucceeded)
-                    } catch {
-                        await send(.registrationFailed(error.localizedDescription))
-                    }
-                }
-
-            case .registrationSucceeded:
-                state.isSubmitting = false
+            case .path(.element(_, action: .paymentSummary(.delegate(.registrationSucceeded)))):
                 return .send(.delegate(.registrationSucceeded))
 
-            case let .registrationFailed(message):
-                state.isSubmitting = false
-                state.errorMessage = message
+            case .path:
                 return .none
 
             case .delegate:
                 return .none
             }
         }
+        .forEach(\.path, action: \.path)
     }
 }
+
+extension CKRRegistrationFormFeature.Path.State: Equatable {}
+
+// MARK: - Container View (NavigationStack + path)
+
+/// Wraps the registration form in a NavigationStack with path navigation
+/// for the 2-step flow (Step 1: form → Step 2: payment).
+struct CKRRegistrationFormContainerView: View {
+    @Bindable var store: StoreOf<CKRRegistrationFormFeature>
+    var onDismiss: () -> Void
+
+    var body: some View {
+        NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
+            CKRRegistrationFormView(store: store)
+                .navigationTitle("CKR Registration")
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Close") {
+                            onDismiss()
+                        }
+                    }
+                }
+        } destination: { pathStore in
+            switch pathStore.case {
+            case let .paymentSummary(summaryStore):
+                PaymentSummaryView(store: summaryStore)
+                    .navigationTitle("Payment")
+                    .navigationBarTitleDisplayMode(.inline)
+            }
+        }
+    }
+}
+
+// MARK: - Form View (Step 1)
 
 struct CKRRegistrationFormView: View {
     @Bindable var store: StoreOf<CKRRegistrationFormFeature>
@@ -147,6 +177,24 @@ struct CKRRegistrationFormView: View {
                 .pickerStyle(.segmented)
             }
 
+            Section("Pricing") {
+                HStack {
+                    Text("Price per person")
+                    Spacer()
+                    Text(PaymentSummaryView.formattedCents(store.pricePerPersonCents))
+                        .foregroundStyle(.secondary)
+                }
+
+                HStack {
+                    Text("\(store.participantCount) participant(s)")
+                    Spacer()
+                    Text(store.participantCount > 0
+                         ? PaymentSummaryView.formattedCents(store.totalCents)
+                         : "–")
+                        .fontWeight(.semibold)
+                }
+            }
+
             Section {
                 Text("After validation, you will no longer be able to change the number of participants or the cohouse type.")
                     .font(.footnote)
@@ -154,37 +202,25 @@ struct CKRRegistrationFormView: View {
             } header: {
                 Text("Important")
             }
-
-            Section("Payment") {
-                Text("Payment will be added soon.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-            }
         }
+        .scrollDismissesKeyboard(.interactively)
         .safeAreaInset(edge: .bottom) {
             Button {
-                store.send(.submitButtonTapped)
+                store.send(.continueToPaymentTapped)
             } label: {
-                Group {
-                    if store.isSubmitting {
-                        ProgressView()
-                            .tint(.white)
-                    } else {
-                        Text("Confirm registration")
-                            .font(.custom("BaksoSapi", size: 18))
-                    }
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 14)
-                .background(
-                    store.attendingUserIds.isEmpty || store.isSubmitting
-                        ? Color.gray
-                        : Color.ckrLavender
-                )
-                .foregroundStyle(.white)
-                .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                Text("Continue to payment")
+                    .font(.custom("BaksoSapi", size: 18))
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 14)
+                    .background(
+                        store.attendingUserIds.isEmpty
+                            ? Color.gray
+                            : Color.ckrLavender
+                    )
+                    .foregroundStyle(.white)
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
             }
-            .disabled(store.attendingUserIds.isEmpty || store.isSubmitting)
+            .disabled(store.attendingUserIds.isEmpty)
             .padding(.horizontal)
             .padding(.bottom, 8)
         }
@@ -192,17 +228,16 @@ struct CKRRegistrationFormView: View {
 }
 
 #Preview {
-    NavigationStack {
-        CKRRegistrationFormView(
-            store: Store(
-                initialState: CKRRegistrationFormFeature.State(
-                    cohouse: .mock,
-                    gameId: "preview-game-id"
-                )
-            ) {
-                CKRRegistrationFormFeature()
-            }
-        )
-        .navigationTitle("CKR Registration")
-    }
+    CKRRegistrationFormContainerView(
+        store: Store(
+            initialState: CKRRegistrationFormFeature.State(
+                cohouse: .mock,
+                gameId: "preview-game-id",
+                pricePerPersonCents: 500
+            )
+        ) {
+            CKRRegistrationFormFeature()
+        },
+        onDismiss: {}
+    )
 }

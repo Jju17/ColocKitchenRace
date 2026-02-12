@@ -20,6 +20,7 @@ struct CKRGame: Equatable, Hashable, Identifiable, Codable {
     var nextGameDate: Date
     var registrationDeadline: Date
     var maxParticipants: Int = 100
+    var pricePerPersonCents: Int = 500  // 5,00 EUR – stored in cents (Stripe convention)
     var publishedTimestamp: Date = Date()
     var participantsID: [String] = []       // Cohouse IDs
     var matchedGroups: [MatchedGroup]?      // Groups of 4 cohouse IDs after matching
@@ -38,5 +39,15 @@ struct CKRGame: Equatable, Hashable, Identifiable, Codable {
     /// Whether the countdown has started (deletion no longer allowed without a real admin).
     var hasCountdownStarted: Bool {
         Date() >= startCKRCountdown
+    }
+
+    /// Formatted price per person (e.g. "5,00 €").
+    var formattedPricePerPerson: String {
+        let euros = Double(pricePerPersonCents) / 100.0
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = "EUR"
+        formatter.locale = Locale(identifier: "fr_BE")
+        return formatter.string(from: NSNumber(value: euros)) ?? "\(euros) €"
     }
 }

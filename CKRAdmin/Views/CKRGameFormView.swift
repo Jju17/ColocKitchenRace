@@ -140,6 +140,30 @@ struct CKRGameFormView: View {
                     }
                 }
             }
+
+            Section("Pricing") {
+                HStack {
+                    Text("Price per person")
+                    Spacer()
+                    TextField(
+                        "5.00",
+                        value: Binding(
+                            get: { Double(store.wipCKRGame.pricePerPersonCents) / 100.0 },
+                            set: { store.wipCKRGame.pricePerPersonCents = Int(($0 * 100).rounded()) }
+                        ),
+                        format: .number.precision(.fractionLength(2))
+                    )
+                    .keyboardType(.decimalPad)
+                    .multilineTextAlignment(.trailing)
+                    .frame(width: 80)
+                    Text("€")
+                        .foregroundStyle(.secondary)
+                }
+
+                Text("Stored as \(store.wipCKRGame.pricePerPersonCents) cents — displayed as \(store.wipCKRGame.formattedPricePerPerson)")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            }
         }
     }
 }

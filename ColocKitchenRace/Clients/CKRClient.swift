@@ -26,7 +26,8 @@ struct CKRClient {
         _ cohouseId: String,
         _ attendingUserIds: [String],
         _ averageAge: Int,
-        _ cohouseType: String
+        _ cohouseType: String,
+        _ paymentIntentId: String?
     ) async throws -> Void
 }
 
@@ -59,17 +60,21 @@ extension CKRClient: DependencyKey {
                 return .failure(.firebaseError(error.localizedDescription))
             }
         },
-        registerForGame: { gameId, cohouseId, attendingUserIds, averageAge, cohouseType in
+        registerForGame: { gameId, cohouseId, attendingUserIds, averageAge, cohouseType, paymentIntentId in
             let functions = Functions.functions(region: "europe-west1")
             let callable = functions.httpsCallable("registerForGame")
 
-            let data: [String: Any] = [
+            var data: [String: Any] = [
                 "gameId": gameId,
                 "cohouseId": cohouseId,
                 "attendingUserIds": attendingUserIds,
                 "averageAge": averageAge,
                 "cohouseType": cohouseType
             ]
+
+            if let paymentIntentId {
+                data["paymentIntentId"] = paymentIntentId
+            }
 
             _ = try await callable.call(data)
 

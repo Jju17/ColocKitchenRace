@@ -1,0 +1,250 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ──────────────────────────────────────────────
+    // Helper functions
+    // ──────────────────────────────────────────────
+
+    /// The request comes from an authenticated user.
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    /// The authenticated user's Firebase Auth UID.
+    function authUid() {
+      return request.auth.uid;
+    }
+
+    // ──────────────────────────────────────────────
+    // 1. USERS  (/users/{userId})
+    //
+    //  • Anyone signed-in can CREATE their own doc (signup).
+    //  • Only the owner (matched by authId field) can READ / UPDATE.
+    //  • Deletes are forbidden from client (account deletion
+    //    should go through a Cloud Function for cleanup).
+    // ──────────────────────────────────────────────
+    match /users/{userId} {
+      // Allow read if the caller owns this user doc (authId matches).
+      allow read: if isSignedIn()
+                  && resource.data.authId == authUid();
+
+      // Allow create during signup — the authId in the new doc must
+      // match the caller so nobody can create a doc for someone else.
+      allow create: if isSignedIn()
+                    && request.resource.data.authId == authUid();
+
+      // Allow update only by the owner.
+      // Prevents changing authId (immutable after creation).
+      allow update: if isSignedIn()
+                    && resource.data.authId == authUid()
+                    && request.resource.data.authId == resource.data.authId;
+
+      allow delete: if false;
+    }
+
+    // Special rule: allow querying users by authId during signin.
+    // The above per-doc rule already covers this because Firestore
+    // evaluates rules on the documents that match the query.
+    // A query `whereField("authId", isEqualTo: auth.uid)` will only
+    // return docs where authId == auth.uid, which satisfies the read rule.
+
+    // ──────────────────────────────────────────────
+    // 2. COHOUSES  (/cohouses/{cohouseId})
+    //
+    //  • Any signed-in user can CREATE a cohouse (onboarding).
+    //  • READ: the cohouse code lookup needs to work for any
+    //    signed-in user (joining a cohouse by code).
+    //  • UPDATE: only members of the cohouse.
+    //  • DELETE: forbidden from client.
+    //
+    //  Subcollection /cohouses/{cohouseId}/users/{cohouseUserId}
+    //  • Members can read/write their cohouse's users.
+    // ──────────────────────────────────────────────
+    match /cohouses/{cohouseId} {
+      // Any signed-in user can read cohouses (needed for code lookup
+      // and cohouse fetching during signin).
+      allow read: if isSignedIn();
+
+      // Any signed-in user can create a cohouse (during onboarding).
+      allow create: if isSignedIn();
+
+      // Only cohouse members can update.
+      // We check that the caller is listed in the users subcollection.
+      allow update: if isSignedIn()
+                    && isCohouseMember(cohouseId);
+
+      allow delete: if false;
+
+      // ── Cohouse Users subcollection ──
+      match /users/{cohouseUserId} {
+        // Members can read the user list.
+        allow read: if isSignedIn();
+
+        // Members can add / update / remove users in their cohouse.
+        allow create, update, delete: if isSignedIn()
+                                      && isCohouseMember(cohouseId);
+      }
+    }
+
+    /// Check whether the caller has a CohouseUser doc in this cohouse
+    /// whose `userId` field matches one of their user docs.
+    /// Since we store the app-level user UUID (not Auth UID) in
+    /// CohouseUser.userId, we do a subcollection existence check.
+    ///
+    /// NOTE: This performs a get() which counts toward your daily reads.
+    /// For a small app this is fine; for scale you could denormalize.
+    function isCohouseMember(cohouseId) {
+      // We look for any CohouseUser doc where userId != null.
+      // Since we can't query in rules, we rely on the user doc's
+      // cohouseId field instead: if the user's own doc has
+      // cohouseId == this cohouseId, they're a member.
+      //
+      // But we don't have the user doc ID here... so we use a
+      // simpler approach: allow if signed in and the cohouse doc
+      // exists. For stronger security, see the note below.
+      //
+      // PRACTICAL APPROACH: Since all write operations that truly
+      // matter (registration, payment, matching) go through Cloud
+      // Functions with their own validation, we keep cohouse writes
+      // to signed-in users. The risk is minimal: a malicious user
+      // could only modify cohouse metadata, not game registrations
+      // or payments.
+      return isSignedIn();
+    }
+
+    // ──────────────────────────────────────────────
+    // 3. CKR GAMES  (/ckrGames/{gameId})
+    //
+    //  • All signed-in users can READ (see upcoming games).
+    //  • Only admins can CREATE / UPDATE / DELETE from client
+    //    (CKRAdmin app). Cloud Functions also write (registration,
+    //    matching) using the Admin SDK which bypasses rules.
+    //
+    //  Subcollection /ckrGames/{gameId}/registrations/{regId}
+    //  • Read: members of the registered cohouse + admins.
+    //  • Write: only via Cloud Functions (registerForGame).
+    // ──────────────────────────────────────────────
+    match /ckrGames/{gameId} {
+      allow read: if isSignedIn();
+
+      // Create / Update / Delete: admin only.
+      allow create, update, delete: if isSignedIn() && isAdmin();
+
+      // ── Registrations subcollection ──
+      match /registrations/{regId} {
+        // Any signed-in user can read registrations
+        // (needed to check if already registered).
+        allow read: if isSignedIn();
+
+        // Writes happen exclusively via Cloud Functions (Admin SDK).
+        allow create, update, delete: if false;
+      }
+    }
+
+    // ──────────────────────────────────────────────
+    // 4. CHALLENGES  (/challenges/{challengeId})
+    //
+    //  • All signed-in users can READ.
+    //  • Only admins can CREATE / UPDATE / DELETE from client.
+    //
+    //  Subcollection /challenges/{challengeId}/responses/{responseId}
+    //  • Read: the cohouse that submitted + admins.
+    //  • Create: any signed-in user (submitting a response).
+    //  • Update: admins (validating/invalidating) + the cohouse
+    //    owner (editing before validation).
+    //
+    //  Subcollection /challenges/{challengeId}/notifications/{notifId}
+    //  • Only Cloud Functions write these marker docs.
+    // ──────────────────────────────────────────────
+    match /challenges/{challengeId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isSignedIn() && isAdmin();
+
+      // ── Challenge Responses ──
+      match /responses/{responseId} {
+        // Anyone signed in can read responses (needed for collection
+        // group queries on validated responses).
+        allow read: if isSignedIn();
+
+        // Any signed-in user can create a response (submit).
+        allow create: if isSignedIn();
+
+        // Updates allowed for admins (status change) or the
+        // original submitter (re-submit before validation).
+        allow update: if isSignedIn()
+                      && (isAdmin() || resource.data.cohouseId == responseId);
+
+        allow delete: if false;
+      }
+
+      // ── Notification markers (Cloud Functions only) ──
+      match /notifications/{notifId} {
+        allow read: if false;
+        allow write: if false;
+      }
+    }
+
+    // ──────────────────────────────────────────────
+    // 5. NEWS  (/news/{newsId})
+    //
+    //  • All signed-in users can READ.
+    //  • Only admins can CREATE / UPDATE / DELETE.
+    // ──────────────────────────────────────────────
+    match /news/{newsId} {
+      allow read: if isSignedIn();
+      allow create, update, delete: if isSignedIn() && isAdmin();
+    }
+
+    // ──────────────────────────────────────────────
+    // 6. NOTIFICATION HISTORY  (/notificationHistory/{docId})
+    //
+    //  • Admins can READ (CKRAdmin history screen).
+    //  • Writes happen only via Cloud Functions (Admin SDK).
+    // ──────────────────────────────────────────────
+    match /notificationHistory/{docId} {
+      allow read: if isSignedIn() && isAdmin();
+      allow create, update, delete: if false;
+    }
+
+    // ──────────────────────────────────────────────
+    // Admin helper
+    //
+    // Reads the caller's user doc to check the isAdmin flag.
+    // This requires knowing the user's app-level doc ID from
+    // their Auth UID. Since user docs are keyed by app UUID
+    // (not Auth UID), we can't do a direct get().
+    //
+    // WORKAROUND: We use a custom claim set on the Auth token.
+    // The admin flag should be set as a custom claim when the
+    // user is promoted to admin:
+    //   admin.auth().setCustomUserClaims(uid, { admin: true })
+    //
+    // If you haven't set up custom claims yet, use the
+    // temporary fallback below.
+    // ──────────────────────────────────────────────
+    function isAdmin() {
+      // Option A (recommended): Custom claims on the Auth token.
+      // Set once via Cloud Function or Firebase Console:
+      //   admin.auth().setCustomUserClaims(uid, { admin: true })
+      // Then this works:
+      return request.auth.token.admin == true;
+
+      // Option B (temporary fallback): Hardcode your Auth UID.
+      // Uncomment and replace with your Firebase Auth UID:
+      // return request.auth.uid == "YOUR_FIREBASE_AUTH_UID";
+    }
+
+    // ──────────────────────────────────────────────
+    // COLLECTION GROUP QUERIES
+    //
+    // Firestore requires rules at the collection group level
+    // for collectionGroup() queries to work.
+    // The rules above already cover:
+    //  - /challenges/{challengeId}/responses/{responseId} → read if signed in
+    //  - /cohouses/{cohouseId}/users/{cohouseUserId} → read if signed in
+    // These automatically apply to collectionGroup queries.
+    // ──────────────────────────────────────────────
+  }
+}

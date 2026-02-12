@@ -19,6 +19,7 @@ struct TabFeature {
         var leaderboard = AdminLeaderboardFeature.State()
         var news = NewsFeature.State()
         var notification = NotificationFeature.State()
+        var users = UsersFeature.State()
     }
 
     enum Action {
@@ -29,6 +30,7 @@ struct TabFeature {
         case leaderboard(AdminLeaderboardFeature.Action)
         case news(NewsFeature.Action)
         case notification(NotificationFeature.Action)
+        case users(UsersFeature.Action)
     }
 
     var body: some ReducerOf<Self> {
@@ -56,6 +58,10 @@ struct TabFeature {
             NotificationFeature()
         }
 
+        Scope(state: \.users, action: \.users) {
+            UsersFeature()
+        }
+
         Reduce { state, action in
             switch action {
                 case let .tabChanged(tab):
@@ -73,6 +79,8 @@ struct TabFeature {
                     return .none
                 case .notification:
                     return .none
+                case .users:
+                    return .none
             }
         }
     }
@@ -85,6 +93,7 @@ enum Tab {
     case leaderboard
     case news
     case notification
+    case users
 }
 
 struct MyTabView: View {
@@ -152,6 +161,16 @@ struct MyTabView: View {
                 Label("Notifs", systemImage: "bell.fill")
             }
             .tag(Tab.notification)
+            UsersView(
+                store: self.store.scope(
+                    state: \.users,
+                    action: \.users
+                )
+            )
+            .tabItem {
+                Label("Users", systemImage: "person.2.fill")
+            }
+            .tag(Tab.users)
         }
     }
 }

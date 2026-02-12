@@ -16,5 +16,6 @@ extension Logger {
     static let globalLog = Self(subsystem: "com.julienrahier.colocskitchenrace", category: "Global")
     static let newsLog = Self(subsystem: "com.julienrahier.colocskitchenrace", category: "News")
     static let ckrLog = Self(subsystem: "com.julienrahier.colocskitchenrace", category: "CKR")
+    static let paymentLog = Self(subsystem: "com.julienrahier.colocskitchenrace", category: "Payment")
     static let storageLog = Self(subsystem: "com.julienrahier.colocskitchenrace", category: "StorageClient")
 }

@@ -642,6 +642,7 @@ struct HomeView: View {
             GameInfoItem(label: "Registration deadline", value: game.registrationDeadline.formatted(date: .abbreviated, time: .omitted)),
             GameInfoItem(label: "Game date", value: game.nextGameDate.formatted(date: .abbreviated, time: .omitted)),
             GameInfoItem(label: "Max participants", value: "\(game.maxParticipants)"),
+            GameInfoItem(label: "Price per person", value: game.formattedPricePerPerson),
             GameInfoItem(label: "Registered", value: "\(game.participantsID.count) / \(game.maxParticipants)"),
         ]
     }

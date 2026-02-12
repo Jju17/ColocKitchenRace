@@ -9,6 +9,7 @@ import ComposableArchitecture
 import Firebase
 import FirebaseMessaging
 import GoogleSignIn
+import StripePaymentSheet
 import SwiftUI
 import MijickPopups
 import UserNotifications
@@ -31,6 +32,8 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         if let clientID = FirebaseApp.app()?.options.clientID {
             GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: clientID)
         }
+
+        StripeAPI.defaultPublishableKey = "pk_test_51T05RP8QE7tHleZWcImEiKyo3trd5wzQhph8AQ4oxiUzI8G3xcZMXmQxkVCvqf09HRu3fmuSvyO8HE67GsEBypGY00h8CDS7vZ"
 
         // Configure notification center
         UNUserNotificationCenter.current().delegate = self

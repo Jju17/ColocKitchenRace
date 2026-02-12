@@ -2,14 +2,32 @@ import * as admin from "firebase-admin";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { onDocumentCreated } from "firebase-functions/v2/firestore";
 import { onSchedule } from "firebase-functions/v2/scheduler";
+import Stripe from "stripe";
 
 admin.initializeApp();
 
 const db = admin.firestore();
 const messaging = admin.messaging();
+const auth = admin.auth();
 
 // Region configuration for Europe (Belgium)
 const REGION = "europe-west1";
+
+// Stripe lazy initialization (secret key from Firebase Functions Secrets)
+// Set with: firebase functions:secrets:set STRIPE_SECRET_KEY
+// Initialized lazily to avoid errors during deployment analysis
+// when the secret is not yet available.
+let _stripe: Stripe | null = null;
+function getStripe(): Stripe {
+  if (!_stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) {
+      throw new HttpsError("internal", "Stripe secret key is not configured");
+    }
+    _stripe = new Stripe(key, { apiVersion: "2025-02-24.acacia" });
+  }
+  return _stripe;
+}
 
 // ============================================
 // Types
@@ -557,6 +575,149 @@ export const validateAddress = onCall<ValidateAddressRequest>(
 );
 
 // ============================================
+// Payment
+// ============================================
+
+interface CreatePaymentIntentRequest {
+  gameId: string;
+  cohouseId: string;
+  amountCents: number;
+  participantCount: number;
+}
+
+/**
+ * Create a Stripe PaymentIntent for CKR registration.
+ *
+ * Server-side price validation ensures the client can't tamper with the amount.
+ * Creates/retrieves a Stripe Customer per cohouse for tracking.
+ */
+export const createPaymentIntent = onCall<CreatePaymentIntentRequest>(
+  {
+    region: REGION,
+    secrets: ["STRIPE_SECRET_KEY"],
+  },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Must be authenticated");
+    }
+
+    const { gameId, cohouseId, amountCents, participantCount } = request.data;
+
+    if (!gameId || !cohouseId || !amountCents || !participantCount) {
+      throw new HttpsError(
+        "invalid-argument",
+        "Missing required fields: gameId, cohouseId, amountCents, participantCount"
+      );
+    }
+
+    try {
+      // 1. Fetch the game and validate price server-side
+      const gameDoc = await db.collection("ckrGames").doc(gameId).get();
+      if (!gameDoc.exists) {
+        throw new HttpsError("not-found", "CKR Game not found");
+      }
+
+      const gameData = gameDoc.data()!;
+      const pricePerPersonCents: number = gameData.pricePerPersonCents || 500;
+      const expectedAmount = pricePerPersonCents * participantCount;
+
+      if (amountCents !== expectedAmount) {
+        throw new HttpsError(
+          "invalid-argument",
+          `Amount mismatch: expected ${expectedAmount} cents, got ${amountCents}`
+        );
+      }
+
+      // 2. Check registration prerequisites
+      const registrationDeadline = (
+        gameData.registrationDeadline as admin.firestore.Timestamp
+      ).toDate();
+
+      if (new Date() >= registrationDeadline) {
+        throw new HttpsError(
+          "failed-precondition",
+          "Registration deadline has passed"
+        );
+      }
+
+      const participantsIds: string[] = gameData.participantsID || [];
+      if (participantsIds.includes(cohouseId)) {
+        throw new HttpsError("already-exists", "Already registered for this game");
+      }
+
+      const maxParticipants: number = gameData.maxParticipants || 100;
+      if (participantsIds.length >= maxParticipants) {
+        throw new HttpsError(
+          "failed-precondition",
+          "Maximum number of participants reached"
+        );
+      }
+
+      // 3. Get or create Stripe Customer for this cohouse
+      const cohouseSnapshot = await db
+        .collection("cohouses")
+        .where("id", "==", cohouseId)
+        .limit(1)
+        .get();
+
+      if (cohouseSnapshot.empty) {
+        throw new HttpsError("not-found", "Cohouse not found");
+      }
+
+      const cohouseDoc = cohouseSnapshot.docs[0];
+      const cohouseData = cohouseDoc.data();
+      let stripeCustomerId = cohouseData.stripeCustomerId as string | undefined;
+
+      if (!stripeCustomerId) {
+        const customer = await getStripe().customers.create({
+          name: cohouseData.name || "Unknown Cohouse",
+          metadata: { cohouseId, firebaseUid: request.auth.uid },
+        });
+        stripeCustomerId = customer.id;
+
+        // Save Stripe customer ID back to Firestore
+        await cohouseDoc.ref.update({ stripeCustomerId });
+      }
+
+      // 4. Create Ephemeral Key for the customer
+      const ephemeralKey = await getStripe().ephemeralKeys.create(
+        { customer: stripeCustomerId },
+        { apiVersion: "2025-02-24.acacia" }
+      );
+
+      // 5. Create PaymentIntent
+      const paymentIntent = await getStripe().paymentIntents.create({
+        amount: expectedAmount,
+        currency: "eur",
+        customer: stripeCustomerId,
+        metadata: {
+          gameId,
+          cohouseId,
+          participantCount: participantCount.toString(),
+          firebaseUid: request.auth.uid,
+        },
+        automatic_payment_methods: { enabled: true },
+      });
+
+      console.log(
+        `Payment intent ${paymentIntent.id} created for cohouse ${cohouseId}, game ${gameId}, amount ${expectedAmount} cents`
+      );
+
+      return {
+        clientSecret: paymentIntent.client_secret,
+        customerId: stripeCustomerId,
+        ephemeralKeySecret: ephemeralKey.secret,
+        paymentIntentId: paymentIntent.id,
+      };
+    } catch (error) {
+      if (error instanceof HttpsError) throw error;
+      console.error("Error creating payment intent:", error);
+      throw new HttpsError("internal", "Failed to create payment intent");
+    }
+  }
+);
+
+// ============================================
 // Cohouse Matching
 // ============================================
 
@@ -566,6 +727,7 @@ interface RegisterForGameRequest {
   attendingUserIds: string[];
   averageAge: number;
   cohouseType: string;
+  paymentIntentId?: string;
 }
 
 /**
@@ -581,13 +743,13 @@ interface RegisterForGameRequest {
  * and adds the cohouseId to the game's participantsID array.
  */
 export const registerForGame = onCall<RegisterForGameRequest>(
-  { region: REGION },
+  { region: REGION, secrets: ["STRIPE_SECRET_KEY"] },
   async (request) => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Must be authenticated");
     }
 
-    const { gameId, cohouseId, attendingUserIds, averageAge, cohouseType } =
+    const { gameId, cohouseId, attendingUserIds, averageAge, cohouseType, paymentIntentId } =
       request.data;
 
     if (!gameId || !cohouseId || !attendingUserIds || !averageAge || !cohouseType) {
@@ -657,27 +819,69 @@ export const registerForGame = onCall<RegisterForGameRequest>(
 
       const cohouseDocRef = cohouseSnapshot.docs[0].ref;
 
-      // 6. Add cohouseId to game's participantsID
+      // 6. Verify payment if required
+      const pricePerPersonCents: number = gameData.pricePerPersonCents || 500;
+      if (pricePerPersonCents > 0) {
+        if (!paymentIntentId) {
+          throw new HttpsError("failed-precondition", "Payment is required");
+        }
+
+        const paymentIntentObj = await getStripe().paymentIntents.retrieve(paymentIntentId);
+
+        if (paymentIntentObj.status !== "succeeded") {
+          throw new HttpsError(
+            "failed-precondition",
+            `Payment not completed (status: ${paymentIntentObj.status})`
+          );
+        }
+
+        // Verify payment metadata matches this registration
+        if (
+          paymentIntentObj.metadata.gameId !== gameId ||
+          paymentIntentObj.metadata.cohouseId !== cohouseId
+        ) {
+          throw new HttpsError(
+            "invalid-argument",
+            "Payment does not match this registration"
+          );
+        }
+
+        const expectedAmount = pricePerPersonCents * attendingUserIds.length;
+        if (paymentIntentObj.amount !== expectedAmount) {
+          throw new HttpsError(
+            "invalid-argument",
+            `Payment amount mismatch: expected ${expectedAmount}, got ${paymentIntentObj.amount}`
+          );
+        }
+      }
+
+      // 7. Add cohouseId to game's participantsID
       await db.collection("ckrGames").doc(gameId).update({
         participantsID: admin.firestore.FieldValue.arrayUnion(cohouseId),
       });
 
-      // 7. Store registration metadata
+      // 8. Store registration metadata
+      const registrationData: Record<string, unknown> = {
+        cohouseId,
+        attendingUserIds,
+        averageAge,
+        cohouseType,
+        registeredAt: admin.firestore.FieldValue.serverTimestamp(),
+        registeredBy: request.auth.uid,
+      };
+
+      if (paymentIntentId) {
+        registrationData.paymentIntentId = paymentIntentId;
+      }
+
       await db
         .collection("ckrGames")
         .doc(gameId)
         .collection("registrations")
         .doc(cohouseId)
-        .set({
-          cohouseId,
-          attendingUserIds,
-          averageAge,
-          cohouseType,
-          registeredAt: admin.firestore.FieldValue.serverTimestamp(),
-          registeredBy: request.auth.uid,
-        });
+        .set(registrationData);
 
-      // 8. Update cohouse with cohouseType
+      // 9. Update cohouse with cohouseType
       await cohouseDocRef.update({ cohouseType });
 
       const remainingSpots = maxParticipants - (participantsIds.length + 1);
@@ -958,6 +1162,101 @@ export const getCohousesForMap = onCall<GetCohousesForMapRequest>(
     } catch (error) {
       console.error("Error fetching cohouses for map:", error);
       throw new HttpsError("internal", "Failed to fetch cohouse data");
+    }
+  }
+);
+
+// ============================================
+// Admin Management
+// ============================================
+
+interface SetAdminClaimRequest {
+  targetAuthUid: string;
+  isAdmin: boolean;
+}
+
+/**
+ * Set or remove the "admin" custom claim on a Firebase Auth user.
+ *
+ * This is required for Firestore security rules to check admin status
+ * via `request.auth.token.admin == true`.
+ *
+ * Can only be called by an existing admin. To bootstrap the very first admin,
+ * use the Firebase CLI:
+ *   firebase functions:shell
+ *   > setAdminClaim({ data: { targetAuthUid: "YOUR_AUTH_UID", isAdmin: true }, auth: { uid: "YOUR_AUTH_UID" } })
+ *
+ * Or set custom claims directly:
+ *   admin.auth().setCustomUserClaims("YOUR_AUTH_UID", { admin: true })
+ */
+export const setAdminClaim = onCall<SetAdminClaimRequest>(
+  { region: REGION },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Must be authenticated");
+    }
+
+    const callerUid = request.auth.uid;
+    const { targetAuthUid, isAdmin } = request.data;
+
+    if (!targetAuthUid || typeof isAdmin !== "boolean") {
+      throw new HttpsError(
+        "invalid-argument",
+        "Missing required fields: targetAuthUid (string), isAdmin (boolean)"
+      );
+    }
+
+    // Verify the caller is already an admin (or is the target — for bootstrap)
+    const callerToken = request.auth.token;
+    const callerIsAdmin = callerToken.admin === true;
+
+    if (!callerIsAdmin) {
+      // Allow self-bootstrap only if the user's Firestore doc has isAdmin == true
+      // This enables the first admin to set their own custom claim
+      const userSnapshot = await db
+        .collection("users")
+        .where("authId", "==", callerUid)
+        .limit(1)
+        .get();
+
+      if (userSnapshot.empty) {
+        throw new HttpsError("permission-denied", "User not found");
+      }
+
+      const userData = userSnapshot.docs[0].data();
+      if (userData.isAdmin !== true) {
+        throw new HttpsError(
+          "permission-denied",
+          "Only admins can set admin claims"
+        );
+      }
+
+      // First-time bootstrap: caller has isAdmin in Firestore but not yet in Auth token
+      // Only allow them to set their own claim
+      if (targetAuthUid !== callerUid) {
+        throw new HttpsError(
+          "permission-denied",
+          "During bootstrap, you can only set your own admin claim. " +
+          "Call this function with your own Auth UID first, then you can promote others."
+        );
+      }
+    }
+
+    try {
+      // Set the custom claim
+      await auth.setCustomUserClaims(targetAuthUid, { admin: isAdmin });
+
+      console.log(
+        `Admin claim ${isAdmin ? "set" : "removed"} for Auth UID: ${targetAuthUid} (by: ${callerUid})`
+      );
+
+      return {
+        success: true,
+        message: `Admin claim ${isAdmin ? "granted to" : "revoked from"} user ${targetAuthUid}`,
+      };
+    } catch (error) {
+      console.error("Error setting admin claim:", error);
+      throw new HttpsError("internal", "Failed to set admin claim");
     }
   }
 );

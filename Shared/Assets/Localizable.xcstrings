@@ -128,6 +128,9 @@
         }
       }
     },
+    "%lld participant(s)" : {
+
+    },
     "%lld pt%@" : {
       "localizations" : {
         "en" : {
@@ -163,6 +166,12 @@
           }
         }
       }
+    },
+    "€" : {
+
+    },
+    "5.00" : {
+
     },
     "25" : {
 
@@ -684,6 +693,7 @@
       }
     },
     "Confirm registration" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -712,6 +722,9 @@
           }
         }
       }
+    },
+    "Continue to payment" : {
+
     },
     "Copied!" : {
       "localizations" : {
@@ -1992,6 +2005,9 @@
     "or" : {
 
     },
+    "Order summary" : {
+
+    },
     "Participants" : {
       "localizations" : {
         "fr" : {
@@ -2001,6 +2017,9 @@
           }
         }
       }
+    },
+    "Pay %@" : {
+
     },
     "Payment" : {
       "localizations" : {
@@ -2012,7 +2031,11 @@
         }
       }
     },
+    "Payment is processed securely via Stripe. Your card details are never stored on our servers." : {
+
+    },
     "Payment will be added soon." : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -2054,6 +2077,12 @@
           }
         }
       }
+    },
+    "Price per person" : {
+
+    },
+    "Pricing" : {
+
     },
     "Processing photo…" : {
       "localizations" : {
@@ -2257,6 +2286,9 @@
           }
         }
       }
+    },
+    "Retry registration" : {
+
     },
     "Save" : {
       "localizations" : {
@@ -2518,6 +2550,16 @@
         }
       }
     },
+    "Stored as %lld cents — displayed as %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Stored as %1$lld cents — displayed as %2$@"
+          }
+        }
+      }
+    },
     "Submit photo" : {
       "extractionState" : "stale",
       "localizations" : {
@@ -2697,6 +2739,9 @@
           }
         }
       }
+    },
+    "Total" : {
+
     },
     "Total challenges :" : {
       "shouldTranslate" : false

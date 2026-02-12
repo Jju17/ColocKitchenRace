@@ -75,6 +75,7 @@ struct HomeFeature {
                     state.registrationForm = CKRRegistrationFormFeature.State(
                         cohouse: cohouse,
                         gameId: game.id.uuidString,
+                        pricePerPersonCents: game.pricePerPersonCents,
                         cohouseType: cohouse.cohouseType ?? .mixed
                     )
                     return .none
@@ -159,17 +160,8 @@ struct HomeView: View {
                 }
             }
             .sheet(item: $store.scope(state: \.registrationForm, action: \.registrationForm)) { formStore in
-                NavigationStack {
-                    CKRRegistrationFormView(store: formStore)
-                        .navigationTitle("CKR Registration")
-                        .navigationBarTitleDisplayMode(.inline)
-                        .toolbar {
-                            ToolbarItem(placement: .cancellationAction) {
-                                Button("Close") {
-                                    store.send(.registrationForm(.dismiss))
-                                }
-                            }
-                        }
+                CKRRegistrationFormContainerView(store: formStore) {
+                    store.send(.registrationForm(.dismiss))
                 }
             }
         } destination: { store in
