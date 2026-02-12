@@ -8,16 +8,66 @@
 import ComposableArchitecture
 import SwiftUI
 
+// MARK: - Filter
+
+enum ChallengeFilter: String, CaseIterable, Equatable {
+    case all, todo, inProgress, waitingForReview, reviewed
+
+    var label: String {
+        switch self {
+        case .all:               "All"
+        case .todo:              "📋 To do"
+        case .inProgress:        "🔥 In progress"
+        case .waitingForReview:  "⏳ Waiting"
+        case .reviewed:          "✅ Reviewed"
+        }
+    }
+}
+
 @Reducer
 struct ChallengeFeature {
     @ObservableState
     struct State: Equatable {
         var path = StackState<Path.State>()
         var challengeTiles: IdentifiedArrayOf<ChallengeTileFeature.State> = []
+        var selectedFilter: ChallengeFilter = .all
         var hasCohouse = false
         var isLoading = false
         var errorMessage: String?
         @Presents var leaderboard: LeaderboardFeature.State?
+        var pinnedTileIDs: Set<UUID> = []
+
+        // MARK: - Filtered & Sorted tiles
+
+        var filteredTiles: IdentifiedArrayOf<ChallengeTileFeature.State> {
+            let filtered: [ChallengeTileFeature.State] = challengeTiles.filter { tile in
+                if pinnedTileIDs.contains(tile.id) { return true }
+                return switch selectedFilter {
+                case .all:              true
+                case .todo:             tile.response == nil
+                case .inProgress:       tile.response != nil && tile.liveStatus == nil
+                case .waitingForReview: tile.liveStatus == .waiting
+                case .reviewed:         tile.liveStatus == .validated
+                                        || tile.liveStatus == .invalidated
+                }
+            }
+
+            let sorted = filtered.sorted { a, b in
+                // Primary sort: inProgress → waitingForReview → todo → reviewed
+                let order: (ChallengeTileFeature.State) -> Int = { tile in
+                    if tile.response != nil && tile.liveStatus == nil { return 0 }          // inProgress
+                    if tile.liveStatus == .waiting { return 1 }                             // waitingForReview
+                    if tile.response == nil { return 2 }                                    // todo
+                    return 3                                                                // reviewed
+                }
+                let ao = order(a), bo = order(b)
+                if ao != bo { return ao < bo }
+                // Secondary sort: soonest deadline first
+                return a.challenge.endDate < b.challenge.endDate
+            }
+
+            return IdentifiedArray(uniqueElements: sorted)
+        }
     }
 
     enum Action {
@@ -25,6 +75,7 @@ struct ChallengeFeature {
         case onAppear
         case challengesAndResponsesLoaded(Result<([Challenge], [ChallengeResponse]), Error>)
         case failed(String)
+        case filterChanged(ChallengeFilter)
         case challengeTiles(IdentifiedActionOf<ChallengeTileFeature>)
         case leaderboardButtonTapped
         case leaderboard(PresentationAction<LeaderboardFeature.Action>)
@@ -61,6 +112,7 @@ struct ChallengeFeature {
 
             // MARK: - onAppear
             case .onAppear:
+                state.pinnedTileIDs = []
                 state.hasCohouse = currentCohouse != nil
 
                 // No cohouse -> We empty the tiles, nothing to load
@@ -106,7 +158,7 @@ struct ChallengeFeature {
                         return .none
                     }
 
-                    // Index des réponses par challengeId pour lookup rapide
+                    // Index responses by challengeId for quick lookup
                     let responseByChallenge = Dictionary(
                         uniqueKeysWithValues: responses.map { ($0.challengeId, $0) }
                     )
@@ -132,6 +184,12 @@ struct ChallengeFeature {
                     return .none
                 }
 
+            // MARK: - Filter
+            case let .filterChanged(filter):
+                state.selectedFilter = filter
+                state.pinnedTileIDs = []
+                return .none
+
             // MARK: - Explicit failure
             case let .failed(msg):
                 state.isLoading = false
@@ -143,6 +201,18 @@ struct ChallengeFeature {
                 state.leaderboard = LeaderboardFeature.State(
                     myCohouseId: currentCohouse?.id.uuidString
                 )
+                return .none
+
+            // MARK: - Child tile pinning
+
+            case let .challengeTiles(.element(id: tileID, action: .startTapped)):
+                if state.selectedFilter != .all {
+                    state.pinnedTileIDs.insert(tileID)
+                }
+                return .none
+
+            case let .challengeTiles(.element(id: tileID, action: .delegate(.responseSubmitted))):
+                state.pinnedTileIDs.remove(tileID)
                 return .none
 
             // MARK: - Child / navigation passthrough
@@ -168,23 +238,29 @@ struct ChallengeFeature {
     }
 }
 
+// MARK: - View
+
 struct ChallengeView: View {
     @Bindable var store: StoreOf<ChallengeFeature>
+    @State private var currentPage: UUID?
 
     var body: some View {
         NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
-            ZStack {
-                Color(.systemBackground).ignoresSafeArea()
-
+            VStack(spacing: 0) {
                 if store.isLoading {
+                    Spacer()
                     ProgressView("Loading challenges…")
                         .font(.custom("BaksoSapi", size: 18))
+                    Spacer()
                 }
                 else if let msg = store.errorMessage {
+                    Spacer()
                     Text(msg).foregroundStyle(.red)
                         .font(.custom("BaksoSapi", size: 16))
+                    Spacer()
                 }
                 else if !store.hasCohouse {
+                    Spacer()
                     VStack(spacing: 20) {
                         Text("Join or create a cohouse\nto participate in challenges.")
                             .font(.custom("BaksoSapi", size: 18))
@@ -198,8 +274,10 @@ struct ChallengeView: View {
                         .font(.custom("BaksoSapi", size: 16))
                     }
                     .padding()
+                    Spacer()
                 }
                 else if store.challengeTiles.isEmpty {
+                    Spacer()
                     VStack(spacing: 12) {
                         Image(systemName: "flag")
                             .font(.system(size: 40))
@@ -211,18 +289,61 @@ struct ChallengeView: View {
                             .font(.custom("BaksoSapi", size: 16))
                             .foregroundStyle(.tertiary)
                     }
+                    Spacer()
                 }
                 else {
-                    SnapPagingContainer(itemWidth: UIScreen.main.bounds.width - 32) {
-                        ForEachStore(store.scope(state: \.challengeTiles, action: \.challengeTiles)) { tileStore in
-                            ChallengeTileView(store: tileStore)
+                    // Filter chips
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 10) {
+                            ForEach(ChallengeFilter.allCases, id: \.self) { filter in
+                                FilterChipView(
+                                    title: filter.label,
+                                    isSelected: store.selectedFilter == filter
+                                ) {
+                                    store.send(.filterChanged(filter))
+                                }
+                            }
                         }
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
+                    }
+
+                    if store.filteredTiles.isEmpty {
+                        Spacer()
+                        VStack(spacing: 12) {
+                            Image(systemName: "tray")
+                                .font(.system(size: 40))
+                                .foregroundStyle(.secondary)
+                            Text("No \(store.selectedFilter.label.lowercased()) challenges")
+                                .font(.custom("BaksoSapi", size: 18))
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                    } else {
+                        SnapPagingContainer(itemWidth: UIScreen.main.bounds.width - 32, currentPage: $currentPage) {
+                            ForEach(Array(store.filteredTiles.enumerated()), id: \.element.id) { _, tileState in
+                                if let tileStore = store.scope(state: \.challengeTiles[id: tileState.id], action: \.challengeTiles[id: tileState.id]) {
+                                    ChallengeTileView(store: tileStore, colorIndex: stableColorIndex(for: tileState.id))
+                                }
+                            }
+                        }
+
+                        // Page dots
+                        PageDotsView(
+                            total: store.filteredTiles.count,
+                            currentIndex: store.filteredTiles.firstIndex(where: { $0.id == currentPage }) ?? 0
+                        )
+                        .padding(.bottom, 8)
                     }
                 }
             }
+            .background(Color(.systemBackground))
+            .onChange(of: store.selectedFilter) { _, _ in
+                currentPage = store.filteredTiles.first?.id
+            }
             .navigationTitle("Challenges")
             .navigationBarTitleDisplayMode(.large)
-            .font(.custom("BaksoSapi", size: 32)) // Titre principal
+            .font(.custom("BaksoSapi", size: 32))
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
@@ -253,6 +374,11 @@ struct ChallengeView: View {
             }
         }
         .onAppear { store.send(.onAppear) }
+    }
+
+    /// Derive a stable color index from the tile's UUID so it never changes on re-sort.
+    private func stableColorIndex(for id: UUID) -> Int {
+        abs(id.hashValue)
     }
 }
 

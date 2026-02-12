@@ -61,32 +61,68 @@ struct ChallengeTileFeatureTests {
 
     // MARK: - Start
 
-//    @Test("startTapped creates response and watches status")
-//    func startTapped_activeChallenge() async {
-//        let challenge = makeActiveChallenge()
-//
-//        let store = TestStore(initialState: makeState(for: challenge)) {
-//            ChallengeTileFeature()
-//        } withDependencies: {
-//            $0.challengeResponseClient.watchStatus = { _, _ in
-//                AsyncStream { $0.finish() }
-//            }
-//            $0.date = .constant(Date())
-//        }
-//
-//        await store.send(.startTapped) {
-//            $0.response = ChallengeResponse(
-//                id: $0.response!.id, // stable UUID generated
-//                challengeId: challenge.id,
-//                cohouseId: "cohouse-1",
-//                challengeTitle: challenge.title,
-//                cohouseName: "Test House",
-//                content: .noChoice,
-//                status: .waiting,
-//                submissionDate: store.dependencies.date.now
-//            )
-//        }
-//    }
+    @Test("startTapped on noChoice challenge auto-submits immediately")
+    func startTapped_noChoice_autoSubmits() async {
+        let challenge = makeActiveChallenge() // noChoice by default
+        let fixedDate = Date()
+
+        var submittedResponse: ChallengeResponse?
+
+        let store = TestStore(initialState: makeState(for: challenge)) {
+            ChallengeTileFeature()
+        } withDependencies: {
+            $0.challengeResponseClient.watchStatus = { _, _ in
+                AsyncStream { $0.finish() }
+            }
+            $0.challengeResponseClient.submit = { resp in
+                submittedResponse = resp
+                return resp
+            }
+            $0.date = .constant(fixedDate)
+        }
+        store.exhaustivity = .off
+
+        await store.send(.startTapped)
+
+        // After startTapped on noChoice: response created + isSubmitting = true
+        #expect(store.state.response != nil)
+        #expect(store.state.isSubmitting == true || submittedResponse != nil)
+        #expect(store.state.response?.content == .noChoice)
+        #expect(store.state.response?.challengeId == challenge.id)
+
+        // Wait for submit to finish
+        await store.receive(\._submitFinished)
+
+        #expect(store.state.isSubmitting == false)
+        #expect(store.state.liveStatus == .waiting)
+        #expect(submittedResponse?.content == .noChoice)
+    }
+
+    @Test("startTapped on non-noChoice challenge does not auto-submit")
+    func startTapped_pictureChallenge_noAutoSubmit() async {
+        let challenge = Challenge(
+            id: UUID(), title: "Photo", startDate: .distantPast, endDate: .distantFuture,
+            body: "Take a photo", content: .picture(PictureContent())
+        )
+        let fixedDate = Date()
+
+        let store = TestStore(initialState: makeState(for: challenge)) {
+            ChallengeTileFeature()
+        } withDependencies: {
+            $0.challengeResponseClient.watchStatus = { _, _ in
+                AsyncStream { $0.finish() }
+            }
+            $0.date = .constant(fixedDate)
+        }
+        store.exhaustivity = .off
+
+        await store.send(.startTapped)
+
+        // Response created but NOT auto-submitting
+        #expect(store.state.response != nil)
+        #expect(store.state.isSubmitting == false)
+        #expect(store.state.response?.challengeId == challenge.id)
+    }
 
     @Test("startTapped does nothing when challenge is expired")
     func startTapped_expired() async {

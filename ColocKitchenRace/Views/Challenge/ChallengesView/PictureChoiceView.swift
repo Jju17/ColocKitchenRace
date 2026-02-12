@@ -100,12 +100,12 @@ struct PictureChoiceView: View {
                 .font(.system(size: 17, weight: .semibold))
                 .frame(maxWidth: .infinity)
                 .frame(height: 56)
-                .foregroundColor(.blue)
-                .background(Color.blue.opacity(0.1))
+                .foregroundColor(.ckrSky)
+                .background(Color.ckrSky.opacity(0.1))
                 .clipShape(RoundedRectangle(cornerRadius: 16))
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.blue.opacity(0.4), lineWidth: 2)
+                        .stroke(Color.ckrSky.opacity(0.4), lineWidth: 2)
                 )
             }
             .buttonStyle(.plain)
@@ -118,7 +118,7 @@ struct PictureChoiceView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 20))
                     .overlay(
                         RoundedRectangle(cornerRadius: 20)
-                            .stroke(Color.green.opacity(0.5), lineWidth: 4)
+                            .stroke(Color.ckrMint.opacity(0.5), lineWidth: 4)
                     )
                     .shadow(radius: 8)
 

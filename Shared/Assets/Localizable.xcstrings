@@ -1006,6 +1006,9 @@
         }
       }
     },
+    "En attente de validation" : {
+
+    },
     "End Date" : {
       "localizations" : {
         "fr" : {
@@ -1210,6 +1213,7 @@
       }
     },
     "i" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -1229,7 +1233,11 @@
         }
       }
     },
+    "I've done it!" : {
+
+    },
     "I’ve done it!" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -1278,6 +1286,9 @@
           }
         }
       }
+    },
+    "Ignorer" : {
+
     },
     "Image failed to load" : {
       "localizations" : {
@@ -1780,6 +1791,9 @@
         }
       }
     },
+    "No %@ challenges" : {
+
+    },
     "No challenges" : {
       "localizations" : {
         "fr" : {
@@ -2261,6 +2275,7 @@
       }
     },
     "Select a photo, then submit." : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -2321,6 +2336,7 @@
       }
     },
     "Send your photo for validation." : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -2467,6 +2483,7 @@
       }
     },
     "Submit photo" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -2515,6 +2532,12 @@
           }
         }
       }
+    },
+    "Ta réponse" : {
+
+    },
+    "Ta réponse a été envoyée ! L'admin va la valider bientôt." : {
+
     },
     "Take a photo of your ID card" : {
       "localizations" : {

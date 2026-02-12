@@ -15,10 +15,11 @@ struct NoChoiceView: View {
         VStack(spacing: 24) {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 64))
-                .foregroundColor(.green)
+                .foregroundColor(.ckrMint)
 
-            Text("I’ve done it!")
-                .font(.title2.bold())
+            Text("I've done it!")
+                .font(.custom("BaksoSapi", size: 20))
+                .fontWeight(.bold)
 
             Button("MARK AS DONE") {
                 onSubmit()

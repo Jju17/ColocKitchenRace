@@ -19,7 +19,7 @@ struct SubmitButtonStyle: ViewModifier {
             .foregroundColor(.white)
             .background(
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
-                    .fill(isEnabled ? Color.green : Color.gray.opacity(0.5))
+                    .fill(isEnabled ? Color.ckrMint : Color.gray.opacity(0.5))
             )
             .overlay(
                 HStack {

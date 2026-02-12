@@ -10,11 +10,13 @@ import SwiftUI
 struct SnapPagingContainer<Content: View>: View {
     let itemWidth: CGFloat
     let spacing: CGFloat
+    @Binding var currentPage: UUID?
     @ViewBuilder var content: () -> Content
 
-    init(itemWidth: CGFloat, spacing: CGFloat = 20, @ViewBuilder content: @escaping () -> Content) {
+    init(itemWidth: CGFloat, spacing: CGFloat = 20, currentPage: Binding<UUID?> = .constant(nil), @ViewBuilder content: @escaping () -> Content) {
         self.itemWidth = itemWidth
         self.spacing = spacing
+        self._currentPage = currentPage
         self.content = content
     }
 
@@ -32,6 +34,8 @@ struct SnapPagingContainer<Content: View>: View {
             .scrollTargetBehavior(.viewAligned)
             .scrollClipDisabled()
             .scrollBounceBehavior(.basedOnSize)
+            .scrollPosition(id: $currentPage)
         }
+        .ignoresSafeArea(.keyboard)
     }
 }

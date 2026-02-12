@@ -34,13 +34,12 @@ extension ChallengesClient: DependencyKey {
 
             let snapshot = try await Firestore.firestore()
                 .collection("challenges")
-                // TODO: Sort & order challenges here
-                // .order(by: "publicationTimestamp", descending: true)
                 .getDocuments()
 
             let allChallenges = snapshot.documents.compactMap { document in
                 try? document.data(as: Challenge.self)
             }
+            .sorted { $0.endDate < $1.endDate }
 
             $challenges.withLock { $0 = allChallenges }
             return allChallenges

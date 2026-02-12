@@ -198,11 +198,11 @@ struct LeaderboardView: View {
         .padding(.vertical, 12)
         .background(
             RoundedRectangle(cornerRadius: 16)
-                .fill(isMyCohouse ? Color.blue.opacity(0.12) : Color(.secondarySystemBackground))
+                .fill(isMyCohouse ? Color.ckrSky.opacity(0.12) : Color(.secondarySystemBackground))
         )
         .overlay(
             RoundedRectangle(cornerRadius: 16)
-                .strokeBorder(isMyCohouse ? Color.blue.opacity(0.4) : Color.clear, lineWidth: 2)
+                .strokeBorder(isMyCohouse ? Color.ckrSky.opacity(0.4) : Color.clear, lineWidth: 2)
         )
     }
 
@@ -237,7 +237,7 @@ struct LeaderboardView: View {
         .padding(.vertical, 10)
         .background(
             RoundedRectangle(cornerRadius: 12)
-                .fill(isMyCohouse ? Color.blue.opacity(0.08) : Color.clear)
+                .fill(isMyCohouse ? Color.ckrSky.opacity(0.08) : Color.clear)
         )
     }
 }
