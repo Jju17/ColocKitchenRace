@@ -24,7 +24,7 @@ struct HomeFeatureTests {
             startCKRCountdown: Date.distantPast,
             nextGameDate: Date.distantFuture,
             registrationDeadline: Date.distantFuture,
-            participantsID: []
+            cohouseIDs: []
         )
 
         @Shared(.cohouse) var cohouse
@@ -65,7 +65,7 @@ struct HomeFeatureTests {
             startCKRCountdown: Date.distantPast,
             nextGameDate: Date.distantFuture,
             registrationDeadline: Date.distantFuture,
-            participantsID: [mockCohouse.id.uuidString]
+            cohouseIDs: [mockCohouse.id.uuidString]
         )
 
         @Shared(.cohouse) var cohouse
@@ -87,7 +87,7 @@ struct HomeFeatureTests {
             startCKRCountdown: Date.distantPast,
             nextGameDate: Date.distantFuture,
             registrationDeadline: Date.distantFuture,
-            participantsID: []
+            cohouseIDs: []
         )
 
         @Shared(.cohouse) var cohouse
@@ -190,7 +190,7 @@ struct HomeFeatureTests {
             startCKRCountdown: Date.distantPast,
             nextGameDate: Date.distantFuture,
             registrationDeadline: Date.distantPast,
-            participantsID: []
+            cohouseIDs: []
         )
 
         @Shared(.cohouse) var cohouse

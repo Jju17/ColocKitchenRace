@@ -50,6 +50,10 @@ extension AuthenticationClient: DependencyKey {
         signIn: { email, password in
             let authResult = try await Auth.auth().signIn(withEmail: email, password: password)
 
+            // Force-refresh the ID token so that custom claims (e.g. admin: true)
+            // are available immediately for Firestore security rules evaluation.
+            try await authResult.user.getIDTokenResult(forcingRefresh: true)
+
             let snapshot = try await Firestore.firestore()
                 .collection("users")
                 .whereField("authId", isEqualTo: authResult.user.uid)
@@ -70,6 +74,11 @@ extension AuthenticationClient: DependencyKey {
             try Auth.auth().signOut()
         },
         verifyAdmin: { uid in
+            // Force-refresh token to pick up custom claims (admin)
+            if let currentUser = Auth.auth().currentUser {
+                try await currentUser.getIDTokenResult(forcingRefresh: true)
+            }
+
             let snapshot = try await Firestore.firestore()
                 .collection("users")
                 .whereField("authId", isEqualTo: uid)

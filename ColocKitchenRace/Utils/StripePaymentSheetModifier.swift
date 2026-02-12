@@ -12,9 +12,6 @@ import SwiftUI
 // MARK: - Payment Sheet View Modifier
 
 /// A SwiftUI ViewModifier that bridges the Stripe PaymentSheet into the SwiftUI/TCA world.
-///
-/// When the Stripe SDK is available (added via SPM), this modifier presents the
-/// PaymentSheet when `isPresented` becomes true and calls `onCompletion` with the result.
 struct StripePaymentSheetModifier: ViewModifier {
     let isPresented: Bool
     let clientSecret: String?
@@ -44,6 +41,11 @@ struct StripePaymentSheetModifier: ViewModifier {
          config.merchantDisplayName = "Colocs Kitchen Race"
          config.customer = .init(id: customerId, ephemeralKeySecret: ephemeralKeySecret)
          config.allowsDelayedPaymentMethods = false
+         config.returnURL = "colockitchenrace://stripe-redirect"
+         config.applePay = .init(
+             merchantId: "merchant.dev.rahier.colocskitchenrace",
+             merchantCountryCode: "BE"
+         )
         
          let paymentSheet = PaymentSheet(
              paymentIntentClientSecret: clientSecret,

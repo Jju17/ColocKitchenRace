@@ -60,6 +60,8 @@ const mockSendEachForMulticast = jest.fn().mockResolvedValue({
 
 const mockSend = jest.fn().mockResolvedValue("mock-message-id");
 
+const mockSetCustomUserClaims = jest.fn().mockResolvedValue(undefined);
+
 jest.mock("firebase-admin", () => ({
   initializeApp: jest.fn(),
   firestore: Object.assign(
@@ -67,13 +69,21 @@ jest.mock("firebase-admin", () => ({
       collection: jest.fn().mockImplementation((name: string) => makeCollection(name)),
     })),
     {
-      FieldValue: { serverTimestamp: jest.fn(() => "SERVER_TIMESTAMP"), delete: jest.fn(() => "FIELD_DELETE") },
+      FieldValue: {
+        serverTimestamp: jest.fn(() => "SERVER_TIMESTAMP"),
+        delete: jest.fn(() => "FIELD_DELETE"),
+        arrayUnion: jest.fn((...args: any[]) => args),
+        increment: jest.fn((n: number) => n),
+      },
       FieldPath: { documentId: jest.fn(() => "__doc_id__") },
     }
   ),
   messaging: jest.fn(() => ({
     sendEachForMulticast: mockSendEachForMulticast,
     send: mockSend,
+  })),
+  auth: jest.fn(() => ({
+    setCustomUserClaims: mockSetCustomUserClaims,
   })),
 }));
 
@@ -222,7 +232,7 @@ describe("sendNotificationToEdition", () => {
   });
 
   it("returns success false with message when no participants", async () => {
-    firestoreData = { ckrGames: { e1: { participantsID: [] } } };
+    firestoreData = { ckrGames: { e1: { cohouseIDs: [] } } };
 
     const result = await callWith(
       sendNotificationToEdition,
@@ -325,7 +335,7 @@ describe("matchCohouses", () => {
   });
 
   it("throws failed-precondition when no participants", async () => {
-    firestoreData = { ckrGames: { g1: { participantsID: [] } } };
+    firestoreData = { ckrGames: { g1: { cohouseIDs: [] } } };
     await expect(
       callWith(matchCohouses, { gameId: "g1" })
     ).rejects.toThrow(/no cohouses/i);
@@ -333,7 +343,7 @@ describe("matchCohouses", () => {
 
   it("throws failed-precondition when count is not multiple of 4", async () => {
     firestoreData = {
-      ckrGames: { g1: { participantsID: ["c1", "c2", "c3", "c4", "c5"] } },
+      ckrGames: { g1: { cohouseIDs: ["c1", "c2", "c3", "c4", "c5"] } },
       cohouses: {
         c1: { id: "c1", name: "A", latitude: 50.850, longitude: 4.350 },
         c2: { id: "c2", name: "B", latitude: 50.851, longitude: 4.351 },
@@ -349,7 +359,7 @@ describe("matchCohouses", () => {
 
   it("matches 4 cohouses, stores results, returns groups", async () => {
     firestoreData = {
-      ckrGames: { g1: { participantsID: ["c1", "c2", "c3", "c4"] } },
+      ckrGames: { g1: { cohouseIDs: ["c1", "c2", "c3", "c4"] } },
       cohouses: {
         c1: { id: "c1", name: "A", latitude: 50.850, longitude: 4.350 },
         c2: { id: "c2", name: "B", latitude: 50.851, longitude: 4.351 },
@@ -377,7 +387,7 @@ describe("matchCohouses", () => {
 
   it("matches 8 cohouses into 2 groups", async () => {
     firestoreData = {
-      ckrGames: { g2: { participantsID: ["c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8"] } },
+      ckrGames: { g2: { cohouseIDs: ["c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8"] } },
       cohouses: {
         c1: { id: "c1", name: "A1", latitude: 50.827, longitude: 4.372 },
         c2: { id: "c2", name: "A2", latitude: 50.828, longitude: 4.373 },
@@ -404,7 +414,7 @@ describe("matchCohouses", () => {
   it("cleans up orphaned IDs and continues matching with remaining cohouses", async () => {
     // 6 participants in game, but c5 and c6 have been deleted from Firestore
     firestoreData = {
-      ckrGames: { g3: { participantsID: ["c1", "c2", "c3", "c4", "c5", "c6"] } },
+      ckrGames: { g3: { cohouseIDs: ["c1", "c2", "c3", "c4", "c5", "c6"] } },
       cohouses: {
         c1: { id: "c1", name: "A", latitude: 50.850, longitude: 4.350 },
         c2: { id: "c2", name: "B", latitude: 50.851, longitude: 4.351 },
@@ -422,10 +432,10 @@ describe("matchCohouses", () => {
     expect(result.groups[0].sort()).toEqual(["c1", "c2", "c3", "c4"]);
     expect(result.removedOrphanedIds.sort()).toEqual(["c5", "c6"]);
 
-    // Verify participantsID was cleaned up and old matching was cleared
+    // Verify cohouseIDs was cleaned up and old matching was cleared
     expect(mockUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
-        participantsID: ["c1", "c2", "c3", "c4"],
+        cohouseIDs: ["c1", "c2", "c3", "c4"],
         matchedGroups: "FIELD_DELETE",
         matchedAt: "FIELD_DELETE",
       })
@@ -435,7 +445,7 @@ describe("matchCohouses", () => {
   it("cleans up orphaned IDs and throws when remaining count is not enough", async () => {
     // 5 participants, but c4 and c5 deleted → only 3 remain → less than 4
     firestoreData = {
-      ckrGames: { g4: { participantsID: ["c1", "c2", "c3", "c4", "c5"] } },
+      ckrGames: { g4: { cohouseIDs: ["c1", "c2", "c3", "c4", "c5"] } },
       cohouses: {
         c1: { id: "c1", name: "A", latitude: 50.850, longitude: 4.350 },
         c2: { id: "c2", name: "B", latitude: 50.851, longitude: 4.351 },
@@ -448,10 +458,10 @@ describe("matchCohouses", () => {
       callWith(matchCohouses, { gameId: "g4" })
     ).rejects.toThrow(/at least 4/i);
 
-    // Verify participantsID was cleaned up and old matching was cleared
+    // Verify cohouseIDs was cleaned up and old matching was cleared
     expect(mockUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
-        participantsID: ["c1", "c2", "c3"],
+        cohouseIDs: ["c1", "c2", "c3"],
         matchedGroups: "FIELD_DELETE",
         matchedAt: "FIELD_DELETE",
       })
@@ -461,7 +471,7 @@ describe("matchCohouses", () => {
   it("cleans up orphaned IDs and throws when remaining count is not multiple of 4", async () => {
     // 9 participants, but c8 and c9 deleted → 7 remain → not multiple of 4
     firestoreData = {
-      ckrGames: { g6: { participantsID: ["c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8", "c9"] } },
+      ckrGames: { g6: { cohouseIDs: ["c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8", "c9"] } },
       cohouses: {
         c1: { id: "c1", name: "A", latitude: 50.850, longitude: 4.350 },
         c2: { id: "c2", name: "B", latitude: 50.851, longitude: 4.351 },
@@ -478,10 +488,10 @@ describe("matchCohouses", () => {
       callWith(matchCohouses, { gameId: "g6" })
     ).rejects.toThrow(/multiple of 4/i);
 
-    // Verify participantsID was cleaned up and old matching was cleared
+    // Verify cohouseIDs was cleaned up and old matching was cleared
     expect(mockUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
-        participantsID: ["c1", "c2", "c3", "c4", "c5", "c6", "c7"],
+        cohouseIDs: ["c1", "c2", "c3", "c4", "c5", "c6", "c7"],
         matchedGroups: "FIELD_DELETE",
         matchedAt: "FIELD_DELETE",
       })
@@ -490,7 +500,7 @@ describe("matchCohouses", () => {
 
   it("cleans up and throws when all cohouses are orphaned", async () => {
     firestoreData = {
-      ckrGames: { g5: { participantsID: ["c1", "c2", "c3", "c4"] } },
+      ckrGames: { g5: { cohouseIDs: ["c1", "c2", "c3", "c4"] } },
       cohouses: {
         // All cohouses deleted from Firestore
       },
@@ -500,10 +510,10 @@ describe("matchCohouses", () => {
       callWith(matchCohouses, { gameId: "g5" })
     ).rejects.toThrow(/no cohouses remaining/i);
 
-    // Verify participantsID was cleaned to empty and old matching was cleared
+    // Verify cohouseIDs was cleaned to empty and old matching was cleared
     expect(mockUpdate).toHaveBeenCalledWith(
       expect.objectContaining({
-        participantsID: [],
+        cohouseIDs: [],
         matchedGroups: "FIELD_DELETE",
         matchedAt: "FIELD_DELETE",
       })

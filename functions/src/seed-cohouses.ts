@@ -232,7 +232,7 @@ async function main() {
       registrationDeadline: admin.firestore.Timestamp.fromDate(deadline),
       maxParticipants: Math.max(100, count),
       publishedTimestamp: admin.firestore.Timestamp.fromDate(now),
-      participantsID: cohouseIds,
+      cohouseIDs: cohouseIds,
     });
 
     console.log(`  Created new CKR Game: ${gameId}`);
@@ -242,7 +242,7 @@ async function main() {
     // Update existing game
     const existingGame = gamesSnapshot.docs[0];
     await existingGame.ref.update({
-      participantsID: cohouseIds,
+      cohouseIDs: cohouseIds,
       maxParticipants: Math.max(
         (existingGame.data().maxParticipants as number) || 100,
         count

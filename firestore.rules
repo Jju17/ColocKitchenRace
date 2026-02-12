@@ -22,24 +22,27 @@ service cloud.firestore {
     //
     //  • Anyone signed-in can CREATE their own doc (signup).
     //  • Only the owner (matched by authId field) can READ / UPDATE.
+    //  • Admins can READ all users and UPDATE (e.g. toggle isAdmin).
     //  • Deletes are forbidden from client (account deletion
     //    should go through a Cloud Function for cleanup).
     // ──────────────────────────────────────────────
     match /users/{userId} {
-      // Allow read if the caller owns this user doc (authId matches).
+      // Allow read if the caller owns this user doc OR is an admin.
       allow read: if isSignedIn()
-                  && resource.data.authId == authUid();
+                  && (resource.data.authId == authUid() || isAdmin());
 
       // Allow create during signup — the authId in the new doc must
       // match the caller so nobody can create a doc for someone else.
       allow create: if isSignedIn()
                     && request.resource.data.authId == authUid();
 
-      // Allow update only by the owner.
-      // Prevents changing authId (immutable after creation).
+      // Allow update by the owner (authId immutable) or by an admin.
       allow update: if isSignedIn()
-                    && resource.data.authId == authUid()
-                    && request.resource.data.authId == resource.data.authId;
+                    && (
+                      (resource.data.authId == authUid()
+                       && request.resource.data.authId == resource.data.authId)
+                      || isAdmin()
+                    );
 
       allow delete: if false;
     }
@@ -239,12 +242,22 @@ service cloud.firestore {
     // ──────────────────────────────────────────────
     // COLLECTION GROUP QUERIES
     //
-    // Firestore requires rules at the collection group level
-    // for collectionGroup() queries to work.
-    // The rules above already cover:
-    //  - /challenges/{challengeId}/responses/{responseId} → read if signed in
-    //  - /cohouses/{cohouseId}/users/{cohouseUserId} → read if signed in
-    // These automatically apply to collectionGroup queries.
+    // Firestore requires explicit rules for collectionGroup()
+    // queries. The path-based rules above only match documents
+    // at their specific paths. For collectionGroup queries to
+    // work, we need wildcard rules that match the collection
+    // name at any depth in the hierarchy.
     // ──────────────────────────────────────────────
+
+    // Allow collectionGroup("responses") queries for signed-in users.
+    match /{path=**}/responses/{responseId} {
+      allow read: if isSignedIn();
+    }
+
+    // Allow collectionGroup("users") queries for signed-in users
+    // (cohouse users subcollection).
+    match /{path=**}/users/{userId} {
+      allow read: if isSignedIn();
+    }
   }
 }

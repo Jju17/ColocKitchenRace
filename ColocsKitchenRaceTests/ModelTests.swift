@@ -373,7 +373,8 @@ struct CKRGameModelTests {
         let deadline = Date().addingTimeInterval(60 * 60 * 24 * 46) // 46 days
         let countdown = Date().addingTimeInterval(60 * 60 * 24 * 30) // 30 days
         let game = CKRGame(startCKRCountdown: countdown, nextGameDate: futureDate, registrationDeadline: deadline)
-        #expect(game.participantsID.isEmpty)
+        #expect(game.cohouseIDs.isEmpty)
+        #expect(game.totalRegisteredParticipants == 0)
         #expect(game.editionNumber == 1)
         #expect(game.maxParticipants == 100)
         #expect(game.id != UUID())
@@ -407,9 +408,9 @@ struct CKRGameModelTests {
             startCKRCountdown: Date().addingTimeInterval(60 * 60 * 24 * 30),
             nextGameDate: Date().addingTimeInterval(60 * 60 * 24 * 60),
             registrationDeadline: Date().addingTimeInterval(60 * 60 * 24 * 46),
-            maxParticipants: 4
+            maxParticipants: 20
         )
-        game.participantsID = ["a", "b", "c", "d"]
+        game.totalRegisteredParticipants = 20
         #expect(game.isRegistrationOpen == false)
     }
 
@@ -422,8 +423,8 @@ struct CKRGameModelTests {
             maxParticipants: 20
         )
         #expect(game.remainingSpots == 20)
-        game.participantsID = ["a", "b", "c"]
-        #expect(game.remainingSpots == 17)
+        game.totalRegisteredParticipants = 12
+        #expect(game.remainingSpots == 8)
     }
 }
 

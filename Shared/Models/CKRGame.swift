@@ -22,18 +22,19 @@ struct CKRGame: Equatable, Hashable, Identifiable, Codable {
     var maxParticipants: Int = 100
     var pricePerPersonCents: Int = 500  // 5,00 EUR – stored in cents (Stripe convention)
     var publishedTimestamp: Date = Date()
-    var participantsID: [String] = []       // Cohouse IDs
-    var matchedGroups: [MatchedGroup]?      // Groups of 4 cohouse IDs after matching
-    var matchedAt: Date?                    // Timestamp of last matching
+    var cohouseIDs: [String] = []                // Registered cohouse IDs (for matching)
+    var totalRegisteredParticipants: Int = 0      // Total number of individual persons registered
+    var matchedGroups: [MatchedGroup]?            // Groups of 4 cohouse IDs after matching
+    var matchedAt: Date?                          // Timestamp of last matching
 
     /// Whether registrations are still open (deadline not passed and capacity not reached).
     var isRegistrationOpen: Bool {
-        Date() < registrationDeadline && participantsID.count < maxParticipants
+        Date() < registrationDeadline && totalRegisteredParticipants < maxParticipants
     }
 
-    /// Number of remaining spots.
+    /// Number of remaining spots (in persons).
     var remainingSpots: Int {
-        max(0, maxParticipants - participantsID.count)
+        max(0, maxParticipants - totalRegisteredParticipants)
     }
 
     /// Whether the countdown has started (deletion no longer allowed without a real admin).

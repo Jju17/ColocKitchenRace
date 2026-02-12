@@ -56,6 +56,22 @@
         }
       }
     },
+    "%@ %@?" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ %2$@?"
+          }
+        }
+      }
+    },
+    "%@ will be able to access CKRAdmin and manage the app." : {
+
+    },
+    "%@ will no longer have admin access." : {
+
+    },
     "%lld" : {
       "localizations" : {
         "fr" : {
@@ -176,6 +192,9 @@
     "25" : {
 
     },
+    "1000" : {
+
+    },
     "A verification link has been sent to your email address. Please check your inbox and click the link to continue." : {
 
     },
@@ -290,6 +309,7 @@
       }
     },
     "Are you sure? This will permanently delete the current CKR Game and all its data (participants, matches, etc.)." : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -298,6 +318,9 @@
           }
         }
       }
+    },
+    "Are you sure? This will permanently delete the current CKR Game and all its data (participants, matches, etc.).%@" : {
+
     },
     "Are you sure? This will permanently remove all matched groups from the current game. This action is not reversible." : {
       "localizations" : {
@@ -390,6 +413,7 @@
       }
     },
     "Cannot delete" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -1531,6 +1555,9 @@
         }
       }
     },
+    "Make Admin" : {
+
+    },
     "MARK AS DONE" : {
       "localizations" : {
         "fr" : {
@@ -1641,6 +1668,9 @@
         }
       }
     },
+    "Max participants:" : {
+
+    },
     "Me" : {
       "localizations" : {
         "fr" : {
@@ -1721,6 +1751,9 @@
           }
         }
       }
+    },
+    "Name or email" : {
+
     },
     "Never mind" : {
       "localizations" : {
@@ -1926,6 +1959,9 @@
         }
       }
     },
+    "No results" : {
+
+    },
     "No specific response" : {
       "localizations" : {
         "fr" : {
@@ -1935,6 +1971,9 @@
           }
         }
       }
+    },
+    "No users match \"%@\"" : {
+
     },
     "No validated challenges yet" : {
       "localizations" : {
@@ -2174,6 +2213,9 @@
         }
       }
     },
+    "Remove Admin" : {
+
+    },
     "Remove photo" : {
       "localizations" : {
         "fr" : {
@@ -2299,6 +2341,12 @@
           }
         }
       }
+    },
+    "Search for a user" : {
+
+    },
+    "Searching..." : {
+
     },
     "Seconds" : {
       "localizations" : {
@@ -2681,6 +2729,7 @@
       }
     },
     "The CKR countdown has already started (%@). Contact a system administrator to delete this game." : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -2752,6 +2801,9 @@
     "Total users :" : {
       "shouldTranslate" : false
     },
+    "Type a name or email to find users" : {
+
+    },
     "Type your creative name here..." : {
       "localizations" : {
         "fr" : {
@@ -2761,6 +2813,9 @@
           }
         }
       }
+    },
+    "Users" : {
+
     },
     "Valid address ✅" : {
       "localizations" : {

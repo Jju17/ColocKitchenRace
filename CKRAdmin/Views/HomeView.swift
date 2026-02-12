@@ -144,30 +144,23 @@ struct HomeFeature {
                     }
                 case .deleteGameButtonTapped:
                     guard let game = state.currentGame else { return .none }
-                    if game.hasCountdownStarted {
-                        state.destination = .alert(
-                            AlertState {
-                                TextState("Cannot delete")
-                            } message: {
-                                TextState("The CKR countdown has already started (\(game.startCKRCountdown.formatted(date: .abbreviated, time: .omitted))). Contact a system administrator to delete this game.")
+                    let warning = game.hasCountdownStarted
+                        ? "\n\n⚠️ The CKR countdown has already started (\(game.startCKRCountdown.formatted(date: .abbreviated, time: .omitted)))."
+                        : ""
+                    state.destination = .alert(
+                        AlertState {
+                            TextState("Delete CKR Game?")
+                        } actions: {
+                            ButtonState(role: .destructive, action: .confirmDeleteGame) {
+                                TextState("Delete")
                             }
-                        )
-                    } else {
-                        state.destination = .alert(
-                            AlertState {
-                                TextState("Delete CKR Game?")
-                            } actions: {
-                                ButtonState(role: .destructive, action: .confirmDeleteGame) {
-                                    TextState("Delete")
-                                }
-                                ButtonState(role: .cancel) {
-                                    TextState("Cancel")
-                                }
-                            } message: {
-                                TextState("Are you sure? This will permanently delete the current CKR Game and all its data (participants, matches, etc.).")
+                            ButtonState(role: .cancel) {
+                                TextState("Cancel")
                             }
-                        )
-                    }
+                        } message: {
+                            TextState("Are you sure? This will permanently delete the current CKR Game and all its data (participants, matches, etc.).\(warning)")
+                        }
+                    )
                     return .none
                 case .confirmDeleteGameButtonTapped:
                     return .run { send in
@@ -226,7 +219,7 @@ struct HomeFeature {
                     }
                 case .matchCohousesButtonTapped:
                     guard let game = state.currentGame else { return .none }
-                    let count = game.participantsID.count
+                    let count = game.cohouseIDs.count
                     state.destination = .alert(
                         AlertState {
                             TextState("Match cohouses?")
@@ -608,7 +601,7 @@ struct HomeView: View {
                     } label: {
                         Label("Match cohouses", systemImage: "arrow.triangle.swap")
                     }
-                    .disabled(game.participantsID.isEmpty)
+                    .disabled(game.cohouseIDs.isEmpty)
                 }
 
                 if game.matchedGroups != nil {
@@ -643,7 +636,7 @@ struct HomeView: View {
             GameInfoItem(label: "Game date", value: game.nextGameDate.formatted(date: .abbreviated, time: .omitted)),
             GameInfoItem(label: "Max participants", value: "\(game.maxParticipants)"),
             GameInfoItem(label: "Price per person", value: game.formattedPricePerPerson),
-            GameInfoItem(label: "Registered", value: "\(game.participantsID.count) / \(game.maxParticipants)"),
+            GameInfoItem(label: "Registered", value: "\(game.totalRegisteredParticipants) / \(game.maxParticipants) participants (\(game.cohouseIDs.count) cohouses)"),
         ]
     }
 }

@@ -38,7 +38,7 @@ struct HomeFeature {
 
         var isAlreadyRegistered: Bool {
             guard let game = ckrGame, let cohouse else { return false }
-            return game.participantsID.contains(cohouse.id.uuidString)
+            return game.cohouseIDs.contains(cohouse.id.uuidString)
         }
     }
 

@@ -78,10 +78,11 @@ extension CKRClient: DependencyKey {
 
             _ = try await callable.call(data)
 
-            // Refresh local ckrGame to reflect updated participantsID
+            // Refresh local ckrGame to reflect updated registration
             @Shared(.ckrGame) var ckrGame
             if var game = ckrGame {
-                game.participantsID.append(cohouseId)
+                game.cohouseIDs.append(cohouseId)
+                game.totalRegisteredParticipants += attendingUserIds.count
                 $ckrGame.withLock { $0 = game }
             }
         }

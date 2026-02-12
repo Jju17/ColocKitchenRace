@@ -279,9 +279,9 @@ export const sendNotificationToEdition = onCall<SendToEditionRequest>(
         throw new HttpsError("not-found", "Edition not found");
       }
 
-      const participantsIds: string[] = editionDoc.data()?.participantsID || [];
+      const cohouseIDs: string[] = editionDoc.data()?.cohouseIDs || [];
 
-      if (participantsIds.length === 0) {
+      if (cohouseIDs.length === 0) {
         const message = "No participants in this edition";
         await saveNotificationHistory({
           target: "edition",
@@ -300,7 +300,7 @@ export const sendNotificationToEdition = onCall<SendToEditionRequest>(
       // Collect all user IDs from all participating cohouses
       const allUserIds: string[] = [];
 
-      for (const cohouseId of participantsIds) {
+      for (const cohouseId of cohouseIDs) {
         const cohouseUsersSnapshot = await db
           .collection("cohouses")
           .doc(cohouseId)
@@ -346,7 +346,7 @@ export const sendNotificationToEdition = onCall<SendToEditionRequest>(
         success: !noTokens && result.failure === 0,
         sent: result.success,
         failed: result.failure,
-        totalCohouses: participantsIds.length,
+        totalCohouses: cohouseIDs.length,
         totalUsers: allUserIds.length,
         message: message ?? null,
       };
@@ -640,13 +640,14 @@ export const createPaymentIntent = onCall<CreatePaymentIntentRequest>(
         );
       }
 
-      const participantsIds: string[] = gameData.participantsID || [];
-      if (participantsIds.includes(cohouseId)) {
+      const cohouseIDs: string[] = gameData.cohouseIDs || [];
+      if (cohouseIDs.includes(cohouseId)) {
         throw new HttpsError("already-exists", "Already registered for this game");
       }
 
       const maxParticipants: number = gameData.maxParticipants || 100;
-      if (participantsIds.length >= maxParticipants) {
+      const totalRegisteredParticipants: number = gameData.totalRegisteredParticipants || 0;
+      if (totalRegisteredParticipants + participantCount > maxParticipants) {
         throw new HttpsError(
           "failed-precondition",
           "Maximum number of participants reached"
@@ -686,17 +687,19 @@ export const createPaymentIntent = onCall<CreatePaymentIntentRequest>(
       );
 
       // 5. Create PaymentIntent
+      // Explicit payment methods: card + Bancontact (Belgium).
+      // Link is excluded on purpose (not used in Belgium).
       const paymentIntent = await getStripe().paymentIntents.create({
         amount: expectedAmount,
         currency: "eur",
         customer: stripeCustomerId,
+        payment_method_types: ["card", "bancontact"],
         metadata: {
           gameId,
           cohouseId,
           participantCount: participantCount.toString(),
           firebaseUid: request.auth.uid,
         },
-        automatic_payment_methods: { enabled: true },
       });
 
       console.log(
@@ -740,7 +743,8 @@ interface RegisterForGameRequest {
  * - Cohouse exists
  *
  * Stores registration metadata in ckrGames/{gameId}/registrations/{cohouseId}
- * and adds the cohouseId to the game's participantsID array.
+ * and adds the cohouseId to the game's cohouseIDs array.
+ * Also increments totalRegisteredParticipants by the number of attending persons.
  */
 export const registerForGame = onCall<RegisterForGameRequest>(
   { region: REGION, secrets: ["STRIPE_SECRET_KEY"] },
@@ -775,8 +779,9 @@ export const registerForGame = onCall<RegisterForGameRequest>(
       }
 
       const gameData = gameDoc.data()!;
-      const participantsIds: string[] = gameData.participantsID || [];
+      const cohouseIDs: string[] = gameData.cohouseIDs || [];
       const maxParticipants: number = gameData.maxParticipants || 100;
+      const totalRegisteredParticipants: number = gameData.totalRegisteredParticipants || 0;
 
       // 2. Check registration deadline
       const registrationDeadline = (
@@ -790,8 +795,8 @@ export const registerForGame = onCall<RegisterForGameRequest>(
         );
       }
 
-      // 3. Check capacity
-      if (participantsIds.length >= maxParticipants) {
+      // 3. Check capacity (based on total persons, not cohouses)
+      if (totalRegisteredParticipants + attendingUserIds.length > maxParticipants) {
         throw new HttpsError(
           "failed-precondition",
           "Maximum number of participants reached"
@@ -799,7 +804,7 @@ export const registerForGame = onCall<RegisterForGameRequest>(
       }
 
       // 4. Check duplicate
-      if (participantsIds.includes(cohouseId)) {
+      if (cohouseIDs.includes(cohouseId)) {
         throw new HttpsError(
           "already-exists",
           "This cohouse is already registered for this game"
@@ -855,9 +860,10 @@ export const registerForGame = onCall<RegisterForGameRequest>(
         }
       }
 
-      // 7. Add cohouseId to game's participantsID
+      // 7. Add cohouseId to game's cohouseIDs and increment participant count
       await db.collection("ckrGames").doc(gameId).update({
-        participantsID: admin.firestore.FieldValue.arrayUnion(cohouseId),
+        cohouseIDs: admin.firestore.FieldValue.arrayUnion(cohouseId),
+        totalRegisteredParticipants: admin.firestore.FieldValue.increment(attendingUserIds.length),
       });
 
       // 8. Store registration metadata
@@ -884,10 +890,10 @@ export const registerForGame = onCall<RegisterForGameRequest>(
       // 9. Update cohouse with cohouseType
       await cohouseDocRef.update({ cohouseType });
 
-      const remainingSpots = maxParticipants - (participantsIds.length + 1);
+      const remainingSpots = maxParticipants - (totalRegisteredParticipants + attendingUserIds.length);
 
       console.log(
-        `Cohouse ${cohouseId} registered for game ${gameId}. Remaining spots: ${remainingSpots}`
+        `Cohouse ${cohouseId} registered for game ${gameId} with ${attendingUserIds.length} persons. Remaining spots: ${remainingSpots}`
       );
 
       return { success: true, remainingSpots };
@@ -946,9 +952,9 @@ export const matchCohouses = onCall<MatchCohousesRequest>(
       }
 
       const gameData = gameDoc.data();
-      const participantsIds: string[] = gameData?.participantsID || [];
+      const cohouseIDs: string[] = gameData?.cohouseIDs || [];
 
-      if (participantsIds.length === 0) {
+      if (cohouseIDs.length === 0) {
         throw new HttpsError(
           "failed-precondition",
           "No cohouses registered for this game"
@@ -962,8 +968,8 @@ export const matchCohouses = onCall<MatchCohousesRequest>(
 
       // Batch Firestore reads (max 30 per 'in' query)
       const batches = [];
-      for (let i = 0; i < participantsIds.length; i += 30) {
-        batches.push(participantsIds.slice(i, i + 30));
+      for (let i = 0; i < cohouseIDs.length; i += 30) {
+        batches.push(cohouseIDs.slice(i, i + 30));
       }
 
       for (const batch of batches) {
@@ -988,21 +994,21 @@ export const matchCohouses = onCall<MatchCohousesRequest>(
       }
 
       // 3. Clean up orphaned IDs (cohouses deleted from Firestore)
-      const orphanedIds = participantsIds.filter((id) => !foundIds.includes(id));
+      const orphanedIds = cohouseIDs.filter((id) => !foundIds.includes(id));
       let removedCount = 0;
 
       if (orphanedIds.length > 0) {
         console.log(
-          `Cleaning up ${orphanedIds.length} orphaned cohouse IDs from participantsID: ${orphanedIds.join(", ")}`
+          `Cleaning up ${orphanedIds.length} orphaned cohouse IDs from cohouseIDs: ${orphanedIds.join(", ")}`
         );
 
-        const cleanedParticipantsIds = participantsIds.filter(
+        const cleanedCohouseIDs = cohouseIDs.filter(
           (id) => !orphanedIds.includes(id)
         );
 
         // Also clear previous matchedGroups since they reference deleted cohouses
         await db.collection("ckrGames").doc(gameId).update({
-          participantsID: cleanedParticipantsIds,
+          cohouseIDs: cleanedCohouseIDs,
           matchedGroups: admin.firestore.FieldValue.delete(),
           matchedAt: admin.firestore.FieldValue.delete(),
         });
@@ -1023,7 +1029,7 @@ export const matchCohouses = onCall<MatchCohousesRequest>(
         throw new HttpsError(
           "failed-precondition",
           "No cohouses remaining after cleanup" +
-          (removedCount > 0 ? ` (${removedCount} orphaned cohouse(s) were removed from participantsID)` : "")
+          (removedCount > 0 ? ` (${removedCount} orphaned cohouse(s) were removed from cohouseIDs)` : "")
         );
       }
 
@@ -1031,7 +1037,7 @@ export const matchCohouses = onCall<MatchCohousesRequest>(
         throw new HttpsError(
           "failed-precondition",
           `Need at least 4 cohouses to perform matching, but only ${points.length} remaining` +
-          (removedCount > 0 ? ` (${removedCount} orphaned cohouse(s) were removed from participantsID)` : "")
+          (removedCount > 0 ? ` (${removedCount} orphaned cohouse(s) were removed from cohouseIDs)` : "")
         );
       }
 
@@ -1040,7 +1046,7 @@ export const matchCohouses = onCall<MatchCohousesRequest>(
           "failed-precondition",
           `Number of participants (${points.length}) must be a multiple of 4. ` +
           `Current count leaves ${points.length % 4} cohouse(s) unmatched.` +
-          (removedCount > 0 ? ` (${removedCount} orphaned cohouse(s) were removed from participantsID)` : "")
+          (removedCount > 0 ? ` (${removedCount} orphaned cohouse(s) were removed from cohouseIDs)` : "")
         );
       }
 

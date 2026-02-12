@@ -31,9 +31,6 @@ struct CKRGameFormFeature {
     /// Minimum gap between consecutive dates (1 hour).
     static let minimumDateGap: TimeInterval = 3600
 
-    /// Allowed max participants values (multiples of 4, from 4 to 100).
-    static let participantOptions: [Int] = stride(from: 20, through: 400, by: 4).map { $0 }
-
     // MARK: - State
 
     @ObservableState
@@ -134,10 +131,20 @@ struct CKRGameFormView: View {
             }
 
             Section("Participants") {
-                Picker("Max participants", selection: $store.wipCKRGame.maxParticipants) {
-                    ForEach(CKRGameFormFeature.participantOptions, id: \.self) { count in
-                        Text("\(count)").tag(count)
-                    }
+                HStack {
+                    Text("Max participants:")
+                    Spacer()
+                    TextField(
+                        "1000",
+                        value: Binding(
+                            get: { store.wipCKRGame.maxParticipants },
+                            set: { store.wipCKRGame.maxParticipants = Int($0) }
+                        ),
+                        format: .number
+                    )
+                    .keyboardType(.numberPad)
+                    .multilineTextAlignment(.trailing)
+                    .frame(width: 80)
                 }
             }
 
