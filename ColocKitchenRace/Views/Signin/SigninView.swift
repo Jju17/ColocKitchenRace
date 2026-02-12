@@ -98,12 +98,10 @@ struct SigninView: View {
                         .frame(width: 150, height: 150, alignment: .center)
 
                     VStack(spacing: 10) {
-                        CKRTextField(title: "EMAIL", value: $store.email)
-                            .textContentType(.emailAddress)
-                            .keyboardType(.emailAddress)
-                            .textInputAutocapitalization(.never)
+                        CKRTextField(title: "EMAIL", value: $store.email,
+                                     textContentType: .emailAddress, keyboardType: .emailAddress,
+                                     autocapitalization: .never, submitLabel: .next)
                             .focused(self.$focusedField, equals: .email)
-                            .submitLabel(.next)
                             .introspect(.textField, on: .iOS(.v16, .v17)) { textField in
                                 emailFieldDelegate.shouldReturn = {
                                     self.focusNextField()
@@ -112,10 +110,9 @@ struct SigninView: View {
 
                                 textField.delegate = emailFieldDelegate
                             }
-                        CKRTextField(title: "PASSWORD", value: $store.password, isSecure: true)
-                            .textContentType(.password)
+                        CKRTextField(title: "PASSWORD", value: $store.password,
+                                     isSecure: true, textContentType: .password, submitLabel: .done)
                             .focused(self.$focusedField, equals: .password)
-                            .submitLabel(.done)
                         VStack(spacing: 12) {
                             CKRButton("Sign in") {
                                 self.store.send(.signinButtonTapped)

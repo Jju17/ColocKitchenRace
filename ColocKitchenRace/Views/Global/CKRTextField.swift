@@ -11,6 +11,10 @@ struct CKRTextField: View {
     var title: String
     @Binding var value: String
     var isSecure: Bool = false
+    var textContentType: UITextContentType?
+    var keyboardType: UIKeyboardType = .default
+    var autocapitalization: TextInputAutocapitalization?
+    var submitLabel: SubmitLabel?
 
     @FocusState private var isFocused: Bool
 
@@ -24,12 +28,18 @@ struct CKRTextField: View {
                     .fill(Color.white)
                 if isSecure {
                     SecureField("", text: $value)
+                        .textContentType(textContentType)
                         .padding(.horizontal)
                         .focused($isFocused)
+                        .applySubmitLabel(submitLabel)
                 } else {
                     TextField("", text: $value)
+                        .textContentType(textContentType)
+                        .keyboardType(keyboardType)
+                        .textInputAutocapitalization(autocapitalization)
                         .padding(.horizontal)
                         .focused($isFocused)
+                        .applySubmitLabel(submitLabel)
                 }
             }
             .frame(maxHeight: .infinity)
@@ -37,6 +47,19 @@ struct CKRTextField: View {
             .onTapGesture { isFocused = true }
         }
         .frame(height: 80)
+    }
+}
+
+// MARK: - SubmitLabel Helper
+
+private extension View {
+    @ViewBuilder
+    func applySubmitLabel(_ label: SubmitLabel?) -> some View {
+        if let label {
+            self.submitLabel(label)
+        } else {
+            self
+        }
     }
 }
 

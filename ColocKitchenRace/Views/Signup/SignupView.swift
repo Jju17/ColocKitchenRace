@@ -28,11 +28,9 @@ struct SignupView: View {
 
                     VStack(spacing: 10) {
                         HStack(spacing: 15) {
-                            CKRTextField(title: "NAME*", value: $store.signupUserData.firstName)
-                                .textContentType(.givenName)
-                                .textInputAutocapitalization(.words)
+                            CKRTextField(title: "NAME*", value: $store.signupUserData.firstName,
+                                         textContentType: .givenName, autocapitalization: .words, submitLabel: .next)
                                 .focused(self.$focusedField, equals: .name)
-                                .submitLabel(.next)
                                 .introspect(.textField, on: .iOS(.v16, .v17)) { textField in
                                     nameFieldDelegate.shouldReturn = {
                                         self.focusNextField()
@@ -42,11 +40,9 @@ struct SignupView: View {
                                     textField.delegate = nameFieldDelegate
                                 }
                                 .onSubmit { self.focusNextField() }
-                            CKRTextField(title: "SURNAME*", value: $store.signupUserData.lastName)
-                                .textContentType(.familyName)
-                                .textInputAutocapitalization(.words)
+                            CKRTextField(title: "SURNAME*", value: $store.signupUserData.lastName,
+                                         textContentType: .familyName, autocapitalization: .words, submitLabel: .next)
                                 .focused(self.$focusedField, equals: .surname)
-                                .submitLabel(.next)
                                 .introspect(.textField, on: .iOS(.v16, .v17)) { textField in
                                     surnameFieldDelegate.shouldReturn = {
                                         self.focusNextField()
@@ -56,12 +52,10 @@ struct SignupView: View {
                                     textField.delegate = surnameFieldDelegate
                                 }
                         }
-                        CKRTextField(title: "EMAIL*", value: $store.signupUserData.email)
-                            .textContentType(.emailAddress)
-                            .keyboardType(.emailAddress)
-                            .textInputAutocapitalization(.never)
+                        CKRTextField(title: "EMAIL*", value: $store.signupUserData.email,
+                                     textContentType: .emailAddress, keyboardType: .emailAddress,
+                                     autocapitalization: .never, submitLabel: .next)
                             .focused(self.$focusedField, equals: .email)
-                            .submitLabel(.next)
                             .introspect(.textField, on: .iOS(.v16, .v17)) { textField in
                                 emailFieldDelegate.shouldReturn = {
                                     self.focusNextField()
@@ -70,10 +64,9 @@ struct SignupView: View {
 
                                 textField.delegate = emailFieldDelegate
                             }
-                        CKRTextField(title: "PASSWORD*", value: $store.signupUserData.password, isSecure: true)
-                            .textContentType(.newPassword)
+                        CKRTextField(title: "PASSWORD*", value: $store.signupUserData.password,
+                                     isSecure: true, textContentType: .newPassword, submitLabel: .next)
                             .focused(self.$focusedField, equals: .password)
-                            .submitLabel(.next)
                             .introspect(.textField, on: .iOS(.v16, .v17)) { textField in
                                 passwordFieldDelegate.shouldReturn = {
                                     self.focusNextField()
@@ -82,10 +75,9 @@ struct SignupView: View {
 
                                 textField.delegate = passwordFieldDelegate
                             }
-                        CKRTextField(title: "PHONE", value: $store.signupUserData.phone)
-                            .textContentType(.telephoneNumber)
+                        CKRTextField(title: "PHONE", value: $store.signupUserData.phone,
+                                     textContentType: .telephoneNumber, submitLabel: .done)
                             .focused(self.$focusedField, equals: .phone)
-                            .submitLabel(.done)
                         VStack(spacing: 12) {
                             CKRButton("Sign up") {
                                 self.store.send(.signupButtonTapped)
