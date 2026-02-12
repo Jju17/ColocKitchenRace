@@ -24,9 +24,14 @@ struct EmailVerificationFeature {
         case checkVerificationTapped
         case resendEmailTapped
         case signOutTapped
+        case delegate(Delegate)
         case _checkResult(Bool)
         case _resendSucceeded
         case _resendFailed
+
+        enum Delegate {
+            case emailVerified
+        }
     }
 
     @Dependency(\.authenticationClient) var authClient
@@ -46,12 +51,15 @@ struct EmailVerificationFeature {
 
             case let ._checkResult(verified):
                 state.isChecking = false
-                if !verified {
+                if verified {
+                    // Notify AppFeature to switch to main tab.
+                    // Firebase's addStateDidChangeListener does NOT fire
+                    // after user.reload(), so we use a delegate action instead.
+                    return .send(.delegate(.emailVerified))
+                } else {
                     state.message = "Email not yet verified. Check your inbox."
+                    return .none
                 }
-                // When verified, the auth state listener in AppFeature
-                // will re-trigger and switch to .tab automatically.
-                return .none
 
             case .resendEmailTapped:
                 state.isResending = true

@@ -65,6 +65,9 @@ struct AppFeature {
                     state = State.signin(SigninFeature.State())
                     return .none
                 }
+            case .emailVerification(.delegate(.emailVerified)):
+                state = .tab(TabFeature.State())
+                return .none
             case .tab, .signin, .signup, .emailVerification, .splashScreen:
                 return .none
             }
