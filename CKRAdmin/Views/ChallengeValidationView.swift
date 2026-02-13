@@ -21,7 +21,8 @@ struct ChallengeValidationFeature {
 
     enum Action: BindableAction {
         case binding(BindingAction<State>)
-        case fetchResponses
+        case onTask
+        case responsesUpdated([ChallengeResponse])
         case responsesLoaded(Result<[ChallengeResponse], ChallengeResponseError>)
         case setResponseStatus(challengeId: UUID, cohouseId: String, status: ChallengeResponseStatus)
         case setFilterStatus(FilterStatus)
@@ -51,12 +52,18 @@ struct ChallengeValidationFeature {
             switch action {
                 case .binding:
                     return .none
-                case .fetchResponses:
+                case .onTask:
                     state.isLoading = true
                     return .run { send in
-                        let result = await self.challengeResponseClient.getAll()
-                        await send(.responsesLoaded(result))
+                        for await responses in self.challengeResponseClient.watchAllResponses() {
+                            await send(.responsesUpdated(responses))
+                        }
                     }
+                case .responsesUpdated(let responses):
+                    state.responses = responses
+                    state.isLoading = false
+                    state.errorMessage = nil
+                    return .none
                 case .responsesLoaded(.success(let responses)):
                     state.responses = responses
                     state.isLoading = false
@@ -202,8 +209,8 @@ struct ChallengeValidationView: View {
                     }
                 }
             }
-            .onAppear {
-                store.send(.fetchResponses)
+            .task {
+                store.send(.onTask)
             }
         }
     }

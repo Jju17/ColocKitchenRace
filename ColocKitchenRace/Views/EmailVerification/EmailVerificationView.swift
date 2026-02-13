@@ -29,7 +29,8 @@ struct EmailVerificationFeature {
         case _resendSucceeded
         case _resendFailed
 
-        enum Delegate {
+        @CasePathable
+        enum Delegate: Equatable {
             case emailVerified
         }
     }
@@ -85,6 +86,9 @@ struct EmailVerificationFeature {
                 return .run { _ in
                     try await authClient.signOut()
                 }
+
+            case .delegate:
+                return .none
             }
         }
     }

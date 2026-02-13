@@ -34,7 +34,7 @@ struct EmailVerificationFeatureTests {
         }
     }
 
-    @Test("checkVerificationTapped when email is verified clears message")
+    @Test("checkVerificationTapped when email is verified sends delegate action")
     func checkVerification_verified() async {
         let store = TestStore(initialState: EmailVerificationFeature.State()) {
             EmailVerificationFeature()
@@ -49,6 +49,8 @@ struct EmailVerificationFeatureTests {
         await store.receive(\._checkResult) {
             $0.isChecking = false
         }
+
+        await store.receive(\.delegate.emailVerified)
     }
 
     @Test("checkVerificationTapped handles reload error gracefully")

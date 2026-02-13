@@ -40,6 +40,7 @@ struct ChallengeResponseClient {
     var submit: @Sendable (_ response: ChallengeResponse) async throws -> ChallengeResponse = { $0 }
     var watchStatus: @Sendable (_ challengeId: UUID, _ cohouseId: String) -> AsyncStream<ChallengeResponseStatus> = { _, _ in AsyncStream { $0.finish() } }
     var watchAllValidatedResponses: @Sendable () -> AsyncStream<[ChallengeResponse]> = { AsyncStream { $0.finish() } }
+    var watchAllResponses: @Sendable () -> AsyncStream<[ChallengeResponse]> = { AsyncStream { $0.finish() } }
 }
 
 // MARK: - Implementations
@@ -162,6 +163,27 @@ extension ChallengeResponseClient: DependencyKey {
                 }
                 continuation.onTermination = { _ in listener.remove() }
             }
+        },
+        watchAllResponses: {
+            let query = Firestore.firestore()
+                .collectionGroup("responses")
+
+            return AsyncStream { continuation in
+                let listener = query.addSnapshotListener { snap, error in
+                    if let error {
+                        Logger.challengeResponseLog.log(level: .error, "watchAllResponses error: \(error.localizedDescription)")
+                        continuation.yield([])
+                        return
+                    }
+                    guard let snap else {
+                        continuation.yield([])
+                        return
+                    }
+                    let responses = snap.documents.compactMap { try? $0.data(as: ChallengeResponse.self) }
+                    continuation.yield(responses)
+                }
+                continuation.onTermination = { _ in listener.remove() }
+            }
         }
     )
 
@@ -174,7 +196,8 @@ extension ChallengeResponseClient: DependencyKey {
         addAllMockChallengeResponses: { .success(()) },
         submit: { $0 },
         watchStatus: { _, _ in AsyncStream { $0.finish() } },
-        watchAllValidatedResponses: { AsyncStream { $0.finish() } }
+        watchAllValidatedResponses: { AsyncStream { $0.finish() } },
+        watchAllResponses: { AsyncStream { $0.finish() } }
     )
 
     // MARK: Preview
@@ -191,6 +214,12 @@ extension ChallengeResponseClient: DependencyKey {
         watchAllValidatedResponses: {
             AsyncStream { continuation in
                 continuation.yield(ChallengeResponse.mockList.filter { $0.status == .validated })
+                continuation.finish()
+            }
+        },
+        watchAllResponses: {
+            AsyncStream { continuation in
+                continuation.yield(ChallengeResponse.mockList)
                 continuation.finish()
             }
         }
