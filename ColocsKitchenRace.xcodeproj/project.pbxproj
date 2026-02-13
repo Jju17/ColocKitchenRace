@@ -78,6 +78,7 @@
 				Models/Challenge/ChallengeType.swift,
 				Models/ChallengeSubmitPayload.swift,
 				Models/CKRGame.swift,
+				Models/CKRMyPlanning.swift,
 				"Utils/CGFloat+Utils.swift",
 				"Utils/Collection+Utils.swift",
 				"Utils/Color+Utils.swift",

@@ -45,6 +45,9 @@ struct CKRClient {
     var deleteGame: @Sendable () async -> Result<Bool, CKRError> = { .success(true) }
     var matchCohouses: @Sendable (_ gameId: String) async -> Result<MatchResult, CKRError> = { _ in .success(MatchResult(success: true, groupCount: 0, groups: [])) }
     var resetMatches: @Sendable (_ gameId: String) async -> Result<Bool, CKRError> = { _ in .success(true) }
+    var updateEventSettings: @Sendable (_ gameId: String, _ settings: CKREventSettings) async -> Result<Bool, CKRError> = { _, _ in .success(true) }
+    var confirmMatching: @Sendable (_ gameId: String) async -> Result<[GroupPlanning], CKRError> = { _ in .success([]) }
+    var revealPlanning: @Sendable (_ gameId: String) async -> Result<Bool, CKRError> = { _ in .success(true) }
 }
 
 
@@ -160,6 +163,73 @@ extension CKRClient: DependencyKey {
             } catch {
                 return .failure(CKRError.fromFirestoreError(error))
             }
+        },
+        updateEventSettings: { gameId, settings in
+            do {
+                let functions = Functions.functions(region: "europe-west1")
+                let formatter = ISO8601DateFormatter()
+                let data: [String: Any] = [
+                    "gameId": gameId,
+                    "aperoStartTime": formatter.string(from: settings.aperoStartTime),
+                    "aperoEndTime": formatter.string(from: settings.aperoEndTime),
+                    "dinerStartTime": formatter.string(from: settings.dinerStartTime),
+                    "dinerEndTime": formatter.string(from: settings.dinerEndTime),
+                    "partyStartTime": formatter.string(from: settings.partyStartTime),
+                    "partyEndTime": formatter.string(from: settings.partyEndTime),
+                    "partyAddress": settings.partyAddress,
+                    "partyName": settings.partyName,
+                    "partyNote": settings.partyNote ?? ""
+                ]
+                _ = try await functions.httpsCallable("updateEventSettings").call(data)
+                return .success(true)
+            } catch {
+                return .failure(CKRError.fromFirestoreError(error))
+            }
+        },
+        confirmMatching: { gameId in
+            do {
+                let functions = Functions.functions(region: "europe-west1")
+                let result = try await functions.httpsCallable("confirmMatching").call([
+                    "gameId": gameId
+                ])
+
+                guard let data = result.data as? [String: Any],
+                      let rawPlannings = data["groupPlannings"] as? [[String: Any]]
+                else {
+                    return .failure(.unknown("Invalid response from confirmMatching"))
+                }
+
+                let plannings = rawPlannings.compactMap { raw -> GroupPlanning? in
+                    guard let groupIndex = raw["groupIndex"] as? Int,
+                          let cohouseA = raw["cohouseA"] as? String,
+                          let cohouseB = raw["cohouseB"] as? String,
+                          let cohouseC = raw["cohouseC"] as? String,
+                          let cohouseD = raw["cohouseD"] as? String
+                    else { return nil }
+                    return GroupPlanning(
+                        groupIndex: groupIndex,
+                        cohouseA: cohouseA,
+                        cohouseB: cohouseB,
+                        cohouseC: cohouseC,
+                        cohouseD: cohouseD
+                    )
+                }
+
+                return .success(plannings)
+            } catch {
+                return .failure(CKRError.fromFirestoreError(error))
+            }
+        },
+        revealPlanning: { gameId in
+            do {
+                let functions = Functions.functions(region: "europe-west1")
+                _ = try await functions.httpsCallable("revealPlanning").call([
+                    "gameId": gameId
+                ])
+                return .success(true)
+            } catch {
+                return .failure(CKRError.fromFirestoreError(error))
+            }
         }
     )
 
@@ -171,7 +241,10 @@ extension CKRClient: DependencyKey {
             watchGame: { AsyncStream { $0.finish() } },
             deleteGame: { .success(true) },
             matchCohouses: { _ in .success(MatchResult(success: true, groupCount: 0, groups: [])) },
-            resetMatches: { _ in .success(true) }
+            resetMatches: { _ in .success(true) },
+            updateEventSettings: { _, _ in .success(true) },
+            confirmMatching: { _ in .success([]) },
+            revealPlanning: { _ in .success(true) }
         )
     }
 
@@ -183,7 +256,10 @@ extension CKRClient: DependencyKey {
             watchGame: { AsyncStream { $0.finish() } },
             deleteGame: { .success(true) },
             matchCohouses: { _ in .success(MatchResult(success: true, groupCount: 0, groups: [])) },
-            resetMatches: { _ in .success(true) }
+            resetMatches: { _ in .success(true) },
+            updateEventSettings: { _, _ in .success(true) },
+            confirmMatching: { _ in .success([]) },
+            revealPlanning: { _ in .success(true) }
         )
     }
 }

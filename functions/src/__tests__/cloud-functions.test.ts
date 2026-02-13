@@ -25,31 +25,68 @@ function makeDocRef(collection: string, docId: string) {
     }),
     set: jest.fn().mockResolvedValue(undefined),
     update: mockUpdate,
-    collection: jest.fn().mockImplementation((subName: string) => ({
-      get: jest.fn().mockImplementation(async () => {
+    collection: jest.fn().mockImplementation((subName: string) => {
+      const subGet = jest.fn().mockImplementation(async () => {
         const docs = firestoreSubcollections[collection]?.[docId]?.[subName] || [];
         return {
           empty: docs.length === 0,
           docs: docs.map((d: any, i: number) => ({ data: () => d, id: `sub_${i}` })),
         };
-      }),
-    })),
+      });
+      const subCol: any = {
+        get: subGet,
+        where: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        doc: jest.fn().mockImplementation((subDocId: string) => makeDocRef(`${collection}/${docId}/${subName}`, subDocId)),
+      };
+      // Make where/limit return the same object so chaining works
+      subCol.where.mockReturnValue(subCol);
+      subCol.limit.mockReturnValue(subCol);
+      return subCol;
+    }),
   };
 }
 
 function makeCollection(name: string) {
-  return {
+  const filters: Array<{ field: string; op: string; value: any }> = [];
+
+  const query: any = {
     doc: jest.fn().mockImplementation((id: string) => makeDocRef(name, id)),
-    where: jest.fn().mockReturnThis(),
-    limit: jest.fn().mockReturnThis(),
+    where: jest.fn().mockImplementation((field: string, op: string, value: any) => {
+      filters.push({ field, op, value });
+      return query;
+    }),
+    limit: jest.fn().mockReturnValue(null as any),
     get: jest.fn().mockImplementation(async () => {
-      const docs = firestoreData[name] || {};
+      const allDocs = firestoreData[name] || {};
+      let entries = Object.entries(allDocs);
+
+      // Apply "==" and "in" filters
+      for (const f of filters) {
+        const isDocId = f.field === "__doc_id__";
+        if (f.op === "==") {
+          entries = entries.filter(([id, d]) =>
+            isDocId ? id === f.value : (d as any)[f.field] === f.value
+          );
+        } else if (f.op === "in") {
+          entries = entries.filter(([id, d]) =>
+            isDocId
+              ? (f.value as any[]).includes(id)
+              : (f.value as any[]).includes((d as any)[f.field])
+          );
+        }
+      }
+
       return {
-        empty: Object.keys(docs).length === 0,
-        docs: Object.entries(docs).map(([id, data]) => ({ data: () => data, id })),
+        empty: entries.length === 0,
+        docs: entries.map(([id, data]) => ({ data: () => data, id })),
       };
     }),
   };
+
+  query.limit.mockReturnValue(query);
+
+  return query;
 }
 
 const mockSendEachForMulticast = jest.fn().mockResolvedValue({
@@ -76,6 +113,17 @@ jest.mock("firebase-admin", () => ({
         increment: jest.fn((n: number) => n),
       },
       FieldPath: { documentId: jest.fn(() => "__doc_id__") },
+      Timestamp: class MockTimestamp {
+        _seconds: number;
+        _nanoseconds: number;
+        constructor(seconds: number, nanoseconds: number) {
+          this._seconds = seconds;
+          this._nanoseconds = nanoseconds;
+        }
+        toDate() {
+          return new Date(this._seconds * 1000);
+        }
+      },
     }
   ),
   messaging: jest.fn(() => ({
@@ -100,6 +148,10 @@ import {
   validateAddress,
   matchCohouses,
   getCohousesForMap,
+  updateEventSettings,
+  confirmMatching,
+  revealPlanning,
+  getMyPlanning,
 } from "../index";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────────
@@ -583,5 +635,379 @@ describe("getCohousesForMap", () => {
     expect(result.success).toBe(true);
     expect(result.cohouses).toHaveLength(1);
     expect(result.cohouses[0].id).toBe("c1");
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// updateEventSettings
+// ═══════════════════════════════════════════════════════════════════════════════
+
+describe("updateEventSettings", () => {
+  it("throws invalid-argument when required fields missing", async () => {
+    await expect(
+      callWith(updateEventSettings, { gameId: "", aperoStartTime: "" })
+    ).rejects.toThrow(/invalid-argument|missing/i);
+  });
+
+  it("throws not-found when game does not exist", async () => {
+    await expect(
+      callWith(updateEventSettings, {
+        gameId: "nope",
+        aperoStartTime: "2026-03-15T18:30:00Z",
+        aperoEndTime: "2026-03-15T20:30:00Z",
+        dinerStartTime: "2026-03-15T21:00:00Z",
+        dinerEndTime: "2026-03-15T23:00:00Z",
+        partyStartTime: "2026-03-16T00:00:00Z",
+        partyEndTime: "2026-03-16T05:00:00Z",
+        partyAddress: "Grand Place 1, Bruxelles",
+        partyName: "TEUF",
+      })
+    ).rejects.toThrow(/not.found/i);
+  });
+
+  it("saves event settings and returns success", async () => {
+    firestoreData = {
+      ckrGames: { g1: { cohouseIDs: ["c1", "c2", "c3", "c4"] } },
+    };
+
+    const result = await callWith(updateEventSettings, {
+      gameId: "g1",
+      aperoStartTime: "2026-03-15T18:30:00Z",
+      aperoEndTime: "2026-03-15T20:30:00Z",
+      dinerStartTime: "2026-03-15T21:00:00Z",
+      dinerEndTime: "2026-03-15T23:00:00Z",
+      partyStartTime: "2026-03-16T00:00:00Z",
+      partyEndTime: "2026-03-16T05:00:00Z",
+      partyAddress: "Grand Place 1, Bruxelles",
+      partyName: "TEUF",
+    });
+
+    expect(result.success).toBe(true);
+    expect(mockUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventSettings: expect.objectContaining({
+          partyAddress: "Grand Place 1, Bruxelles",
+          partyName: "TEUF",
+        }),
+      })
+    );
+  });
+
+  it("saves optional partyNote when provided", async () => {
+    firestoreData = {
+      ckrGames: { g1: { cohouseIDs: [] } },
+    };
+
+    const result = await callWith(updateEventSettings, {
+      gameId: "g1",
+      aperoStartTime: "2026-03-15T18:30:00Z",
+      aperoEndTime: "2026-03-15T20:30:00Z",
+      dinerStartTime: "2026-03-15T21:00:00Z",
+      dinerEndTime: "2026-03-15T23:00:00Z",
+      partyStartTime: "2026-03-16T00:00:00Z",
+      partyEndTime: "2026-03-16T05:00:00Z",
+      partyAddress: "Grand Place 1, Bruxelles",
+      partyName: "TEUF",
+      partyNote: "Pas de bracelet, pas d'entrée !",
+    });
+
+    expect(result.success).toBe(true);
+    expect(mockUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventSettings: expect.objectContaining({
+          partyNote: "Pas de bracelet, pas d'entrée !",
+        }),
+      })
+    );
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// confirmMatching
+// ═══════════════════════════════════════════════════════════════════════════════
+
+describe("confirmMatching", () => {
+  it("throws invalid-argument when gameId missing", async () => {
+    await expect(
+      callWith(confirmMatching, { gameId: "" })
+    ).rejects.toThrow(/invalid-argument|missing/i);
+  });
+
+  it("throws not-found when game does not exist", async () => {
+    await expect(
+      callWith(confirmMatching, { gameId: "nope" })
+    ).rejects.toThrow(/not.found/i);
+  });
+
+  it("throws failed-precondition when no matched groups", async () => {
+    firestoreData = { ckrGames: { g1: { matchedGroups: [], eventSettings: {} } } };
+    await expect(
+      callWith(confirmMatching, { gameId: "g1" })
+    ).rejects.toThrow(/no matched groups|matching first/i);
+  });
+
+  it("throws failed-precondition when no event settings", async () => {
+    firestoreData = {
+      ckrGames: {
+        g1: {
+          matchedGroups: [{ cohouseIds: ["c1", "c2", "c3", "c4"] }],
+        },
+      },
+    };
+    await expect(
+      callWith(confirmMatching, { gameId: "g1" })
+    ).rejects.toThrow(/event settings|configured/i);
+  });
+
+  it("assigns A/B/C/D roles for one group and stores plannings", async () => {
+    firestoreData = {
+      ckrGames: {
+        g1: {
+          matchedGroups: [{ cohouseIds: ["c1", "c2", "c3", "c4"] }],
+          eventSettings: { partyName: "TEUF" },
+        },
+      },
+    };
+
+    const result = await callWith(confirmMatching, { gameId: "g1" });
+
+    expect(result.success).toBe(true);
+    expect(result.groupCount).toBe(1);
+    expect(result.groupPlannings).toHaveLength(1);
+
+    const gp = result.groupPlannings[0];
+    expect(gp.groupIndex).toBe(1);
+    // All 4 cohouse IDs should be assigned to A/B/C/D
+    const assignedIds = [gp.cohouseA, gp.cohouseB, gp.cohouseC, gp.cohouseD].sort();
+    expect(assignedIds).toEqual(["c1", "c2", "c3", "c4"]);
+
+    // Verify Firestore was updated
+    expect(mockUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        groupPlannings: expect.arrayContaining([
+          expect.objectContaining({ groupIndex: 1 }),
+        ]),
+      })
+    );
+  });
+
+  it("assigns roles for multiple groups", async () => {
+    firestoreData = {
+      ckrGames: {
+        g2: {
+          matchedGroups: [
+            { cohouseIds: ["c1", "c2", "c3", "c4"] },
+            { cohouseIds: ["c5", "c6", "c7", "c8"] },
+          ],
+          eventSettings: { partyName: "TEUF" },
+        },
+      },
+    };
+
+    const result = await callWith(confirmMatching, { gameId: "g2" });
+
+    expect(result.success).toBe(true);
+    expect(result.groupCount).toBe(2);
+    expect(result.groupPlannings).toHaveLength(2);
+
+    // Group 1
+    const g1Ids = [
+      result.groupPlannings[0].cohouseA,
+      result.groupPlannings[0].cohouseB,
+      result.groupPlannings[0].cohouseC,
+      result.groupPlannings[0].cohouseD,
+    ].sort();
+    expect(g1Ids).toEqual(["c1", "c2", "c3", "c4"]);
+
+    // Group 2
+    const g2Ids = [
+      result.groupPlannings[1].cohouseA,
+      result.groupPlannings[1].cohouseB,
+      result.groupPlannings[1].cohouseC,
+      result.groupPlannings[1].cohouseD,
+    ].sort();
+    expect(g2Ids).toEqual(["c5", "c6", "c7", "c8"]);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// revealPlanning
+// ═══════════════════════════════════════════════════════════════════════════════
+
+describe("revealPlanning", () => {
+  it("throws invalid-argument when gameId missing", async () => {
+    await expect(
+      callWith(revealPlanning, { gameId: "" })
+    ).rejects.toThrow(/invalid-argument|missing/i);
+  });
+
+  it("throws not-found when game does not exist", async () => {
+    await expect(
+      callWith(revealPlanning, { gameId: "nope" })
+    ).rejects.toThrow(/not.found/i);
+  });
+
+  it("throws failed-precondition when no group plannings", async () => {
+    firestoreData = { ckrGames: { g1: { groupPlannings: [] } } };
+    await expect(
+      callWith(revealPlanning, { gameId: "g1" })
+    ).rejects.toThrow(/confirmed|matching/i);
+  });
+
+  it("reveals planning and updates Firestore", async () => {
+    firestoreData = {
+      ckrGames: {
+        g1: {
+          cohouseIDs: [],
+          groupPlannings: [
+            { groupIndex: 1, cohouseA: "c1", cohouseB: "c2", cohouseC: "c3", cohouseD: "c4" },
+          ],
+        },
+      },
+    };
+
+    const result = await callWith(revealPlanning, { gameId: "g1" });
+
+    expect(result.success).toBe(true);
+    expect(mockUpdate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        isRevealed: true,
+        revealedAt: "SERVER_TIMESTAMP",
+      })
+    );
+  });
+
+  it("sends push notifications to registered cohouse users", async () => {
+    firestoreData = {
+      ckrGames: {
+        g1: {
+          cohouseIDs: ["c1"],
+          groupPlannings: [
+            { groupIndex: 1, cohouseA: "c1", cohouseB: "c2", cohouseC: "c3", cohouseD: "c4" },
+          ],
+        },
+      },
+      cohouses: {
+        c1: { id: "c1", name: "Zone 88" },
+      },
+      users: {
+        u1: { id: "u1", fcmToken: "tok1" },
+      },
+    };
+    firestoreSubcollections = {
+      cohouses: {
+        c1: { users: [{ userId: "u1" }] },
+      },
+    };
+
+    const result = await callWith(revealPlanning, { gameId: "g1" });
+
+    expect(result.success).toBe(true);
+    // Notification should have been sent
+    expect(mockSendEachForMulticast).toHaveBeenCalled();
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// getMyPlanning
+// ═══════════════════════════════════════════════════════════════════════════════
+
+describe("getMyPlanning", () => {
+  it("throws invalid-argument when fields missing", async () => {
+    await expect(
+      callWith(getMyPlanning, { gameId: "", cohouseId: "" })
+    ).rejects.toThrow(/invalid-argument|missing/i);
+  });
+
+  it("throws not-found when game does not exist", async () => {
+    await expect(
+      callWith(getMyPlanning, { gameId: "nope", cohouseId: "c1" })
+    ).rejects.toThrow(/not.found/i);
+  });
+
+  it("throws failed-precondition when planning not revealed", async () => {
+    firestoreData = {
+      ckrGames: {
+        g1: { isRevealed: false, groupPlannings: [], eventSettings: {} },
+      },
+    };
+    await expect(
+      callWith(getMyPlanning, { gameId: "g1", cohouseId: "c1" })
+    ).rejects.toThrow(/not been revealed/i);
+  });
+
+  it("throws not-found when cohouse not in any group", async () => {
+    firestoreData = {
+      ckrGames: {
+        g1: {
+          isRevealed: true,
+          eventSettings: { partyName: "TEUF", partyAddress: "Grand Place" },
+          groupPlannings: [
+            { groupIndex: 1, cohouseA: "c1", cohouseB: "c2", cohouseC: "c3", cohouseD: "c4" },
+          ],
+        },
+      },
+    };
+    await expect(
+      callWith(getMyPlanning, { gameId: "g1", cohouseId: "c99" })
+    ).rejects.toThrow(/not in any group/i);
+  });
+
+  it("returns planning for role A (visitor for apéro, host for dîner)", async () => {
+    firestoreData = {
+      ckrGames: {
+        g1: {
+          isRevealed: true,
+          eventSettings: {
+            aperoStartTime: new Date("2026-03-15T18:30:00Z"),
+            aperoEndTime: new Date("2026-03-15T20:30:00Z"),
+            dinerStartTime: new Date("2026-03-15T21:00:00Z"),
+            dinerEndTime: new Date("2026-03-15T23:00:00Z"),
+            partyStartTime: new Date("2026-03-16T00:00:00Z"),
+            partyEndTime: new Date("2026-03-16T05:00:00Z"),
+            partyName: "TEUF",
+            partyAddress: "Grand Place 1, Bruxelles",
+            partyNote: "Bracelet obligatoire",
+          },
+          groupPlannings: [
+            { groupIndex: 1, cohouseA: "c1", cohouseB: "c2", cohouseC: "c3", cohouseD: "c4" },
+          ],
+        },
+      },
+      cohouses: {
+        c1: { id: "c1", name: "Coloc A", address: { street: "Rue A", postalCode: "1000", city: "Bxl" } },
+        c2: { id: "c2", name: "Coloc B", address: { street: "Rue B", postalCode: "1050", city: "Ixelles" } },
+        c3: { id: "c3", name: "Coloc C", address: { street: "Rue C", postalCode: "1060", city: "St-Gilles" } },
+      },
+      users: {},
+    };
+    firestoreSubcollections = {
+      ckrGames: {
+        g1: {
+          registrations: [],
+        },
+      },
+      cohouses: {
+        c1: { users: [] },
+        c2: { users: [] },
+        c3: { users: [] },
+      },
+    };
+
+    const result = await callWith(getMyPlanning, { gameId: "g1", cohouseId: "c1" });
+
+    expect(result.success).toBe(true);
+    expect(result.planning).toBeDefined();
+
+    // Role A: visitor for apéro (goes to B), host for dîner (C comes to A)
+    expect(result.planning.apero.role).toBe("visitor");
+    expect(result.planning.apero.cohouseName).toBe("Coloc B");
+    expect(result.planning.diner.role).toBe("host");
+    expect(result.planning.diner.cohouseName).toBe("Coloc C");
+
+    // Party info
+    expect(result.planning.party.name).toBe("TEUF");
+    expect(result.planning.party.address).toBe("Grand Place 1, Bruxelles");
+    expect(result.planning.party.note).toBe("Bracelet obligatoire");
   });
 });

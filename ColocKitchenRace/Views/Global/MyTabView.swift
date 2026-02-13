@@ -17,6 +17,7 @@ struct TabFeature {
         var challenge = ChallengeFeature.State()
         var cohouse = CohouseFeature.State()
         var home = HomeFeature.State()
+        var planning = PlanningFeature.State()
     }
 
     enum Action {
@@ -24,6 +25,7 @@ struct TabFeature {
         case challenge(ChallengeFeature.Action)
         case cohouse(CohouseFeature.Action)
         case home(HomeFeature.Action)
+        case planning(PlanningFeature.Action)
     }
 
     var body: some ReducerOf<Self> {
@@ -35,6 +37,9 @@ struct TabFeature {
         }
         Scope(state: \.home, action: \.home) {
             HomeFeature()
+        }
+        Scope(state: \.planning, action: \.planning) {
+            PlanningFeature()
         }
 
         Reduce { state, action in
@@ -48,7 +53,7 @@ struct TabFeature {
                 case .challenge(.delegate(.switchToCohouseButtonTapped)):
                       state.selectedTab = .cohouse
                       return .none
-                case .challenge, .cohouse, .home:
+                case .challenge, .cohouse, .home, .planning:
                     return .none
             }
         }
@@ -56,7 +61,7 @@ struct TabFeature {
 }
 
 enum Tab: Equatable {
-    case home, challenges, cohouse
+    case home, challenges, planning, cohouse
 }
 
 struct MyTabView: View {
@@ -85,6 +90,19 @@ struct MyTabView: View {
                 Label("Challenges", systemImage: "star.fill")
             }
             .tag(Tab.challenges)
+
+            if store.planning.isRevealed && store.planning.isRegistered {
+                PlanningView(
+                    store: self.store.scope(
+                        state: \.planning,
+                        action: \.planning
+                    )
+                )
+                .tabItem {
+                    Label("Planning", systemImage: "calendar")
+                }
+                .tag(Tab.planning)
+            }
 
             CohouseView(
                 store: self.store.scope(

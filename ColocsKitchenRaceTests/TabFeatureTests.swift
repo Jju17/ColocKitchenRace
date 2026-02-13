@@ -104,6 +104,19 @@ struct TabFeatureTests {
         #expect(store.state.selectedTab == .home)
     }
 
+    // MARK: - Planning Tab
+
+    @Test("Switching to planning tab updates selectedTab")
+    func tabChanged_planning() async {
+        let store = TestStore(initialState: TabFeature.State()) {
+            TabFeature()
+        }
+
+        await store.send(.tabChanged(.planning)) {
+            $0.selectedTab = .planning
+        }
+    }
+
     // MARK: - Default State
 
     @Test("Default tab is home")

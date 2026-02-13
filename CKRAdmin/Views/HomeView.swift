@@ -16,12 +16,14 @@ struct HomeFeature {
         case addNewCKRGame(CKRGameFormFeature)
         case editCKRGame(CKRGameFormFeature)
         case matchedGroupsMap(MatchedGroupsMapFeature)
+        case eventSettingsForm(CKREventSettingsFormFeature)
         case alert(AlertState<Action.Alert>)
 
         enum Action {
             case addNewCKRGame(CKRGameFormFeature.Action)
             case editCKRGame(CKRGameFormFeature.Action)
             case matchedGroupsMap(MatchedGroupsMapFeature.Action)
+            case eventSettingsForm(CKREventSettingsFormFeature.Action)
             case alert(Alert)
 
             enum Alert {
@@ -30,6 +32,8 @@ struct HomeFeature {
                 case confirmResetMatches
                 case confirmDeleteGame
                 case confirmEditGame
+                case confirmConfirmMatching
+                case confirmRevealPlanning
             }
         }
     }
@@ -54,6 +58,9 @@ struct HomeFeature {
         var currentGame: CKRGame?
         var isLoadingGame: Bool = false
         var isMatchingCohouses: Bool = false
+        var isConfirmingMatching: Bool = false
+        var isSavingEventSettings: Bool = false
+        var isRevealingPlanning: Bool = false
         var error: String?
     }
 
@@ -81,6 +88,18 @@ struct HomeFeature {
         case resetMatchesCompleted
         case resetMatchesFailed(String)
         case viewMatchedGroupsMapButtonTapped
+        case configureEventButtonTapped
+        case confirmSaveEventSettings
+        case saveEventSettingsCompleted
+        case saveEventSettingsFailed(String)
+        case confirmMatchingButtonTapped
+        case confirmConfirmMatchingButtonTapped
+        case confirmMatchingCompleted([GroupPlanning])
+        case confirmMatchingFailed(String)
+        case revealPlanningButtonTapped
+        case confirmRevealPlanningButtonTapped
+        case revealPlanningCompleted
+        case revealPlanningFailed(String)
         case signOut
         case totalUsersUpdated(Int)
         case totalCohousesUpdated(Int)
@@ -302,6 +321,150 @@ struct HomeFeature {
                         }
                     )
                     return .none
+                // MARK: - Event Settings & Planning
+                case .configureEventButtonTapped:
+                    guard let game = state.currentGame else { return .none }
+                    if let existingSettings = game.eventSettings {
+                        state.destination = .eventSettingsForm(
+                            CKREventSettingsFormFeature.State(existingSettings: existingSettings)
+                        )
+                    } else {
+                        state.destination = .eventSettingsForm(
+                            CKREventSettingsFormFeature.State(gameDate: game.nextGameDate)
+                        )
+                    }
+                    return .none
+                case .confirmSaveEventSettings:
+                    guard case let .some(.eventSettingsForm(formState)) = state.destination,
+                          let game = state.currentGame
+                    else { return .none }
+                    let settings = formState.settings
+                    let gameId = game.id.uuidString
+                    state.destination = nil
+                    state.isSavingEventSettings = true
+                    return .run { send in
+                        let result = await self.ckrClient.updateEventSettings(gameId, settings)
+                        switch result {
+                        case .success:
+                            await send(.saveEventSettingsCompleted)
+                        case .failure(let error):
+                            await send(.saveEventSettingsFailed(error.localizedDescription))
+                        }
+                    }
+                case .saveEventSettingsCompleted:
+                    state.isSavingEventSettings = false
+                    return .none
+                case let .saveEventSettingsFailed(errorMessage):
+                    state.isSavingEventSettings = false
+                    state.destination = .alert(
+                        AlertState {
+                            TextState("Save failed")
+                        } message: {
+                            TextState(errorMessage)
+                        }
+                    )
+                    return .none
+                case .confirmMatchingButtonTapped:
+                    state.destination = .alert(
+                        AlertState {
+                            TextState("Confirm matching?")
+                        } actions: {
+                            ButtonState(action: .confirmConfirmMatching) {
+                                TextState("Confirm")
+                            }
+                            ButtonState(role: .cancel) {
+                                TextState("Cancel")
+                            }
+                        } message: {
+                            TextState("This will randomly assign A/B/C/D roles within each group. The role assignment determines who goes where for apéro and dîner.")
+                        }
+                    )
+                    return .none
+                case .confirmConfirmMatchingButtonTapped:
+                    guard let game = state.currentGame else { return .none }
+                    state.isConfirmingMatching = true
+                    let gameId = game.id.uuidString
+                    return .run { send in
+                        let result = await self.ckrClient.confirmMatching(gameId)
+                        switch result {
+                        case .success(let plannings):
+                            await send(.confirmMatchingCompleted(plannings))
+                        case .failure(let error):
+                            await send(.confirmMatchingFailed(error.localizedDescription))
+                        }
+                    }
+                case let .confirmMatchingCompleted(plannings):
+                    state.isConfirmingMatching = false
+                    state.currentGame?.groupPlannings = plannings
+                    state.destination = .alert(
+                        AlertState {
+                            TextState("Matching confirmed!")
+                        } message: {
+                            TextState("\(plannings.count) groups have been assigned A/B/C/D roles.")
+                        }
+                    )
+                    return .none
+                case let .confirmMatchingFailed(errorMessage):
+                    state.isConfirmingMatching = false
+                    state.destination = .alert(
+                        AlertState {
+                            TextState("Confirm matching failed")
+                        } message: {
+                            TextState(errorMessage)
+                        }
+                    )
+                    return .none
+                case .revealPlanningButtonTapped:
+                    state.destination = .alert(
+                        AlertState {
+                            TextState("Reveal planning?")
+                        } actions: {
+                            ButtonState(role: .destructive, action: .confirmRevealPlanning) {
+                                TextState("Reveal to all participants")
+                            }
+                            ButtonState(role: .cancel) {
+                                TextState("Cancel")
+                            }
+                        } message: {
+                            TextState("This will make the evening planning visible to all registered cohouses and send a push notification. This action cannot be undone.")
+                        }
+                    )
+                    return .none
+                case .confirmRevealPlanningButtonTapped:
+                    guard let game = state.currentGame else { return .none }
+                    state.isRevealingPlanning = true
+                    let gameId = game.id.uuidString
+                    return .run { send in
+                        let result = await self.ckrClient.revealPlanning(gameId)
+                        switch result {
+                        case .success:
+                            await send(.revealPlanningCompleted)
+                        case .failure(let error):
+                            await send(.revealPlanningFailed(error.localizedDescription))
+                        }
+                    }
+                case .revealPlanningCompleted:
+                    state.isRevealingPlanning = false
+                    state.currentGame?.isRevealed = true
+                    state.currentGame?.revealedAt = Date()
+                    state.destination = .alert(
+                        AlertState {
+                            TextState("Planning revealed! 🎉")
+                        } message: {
+                            TextState("All participants can now see their evening planning.")
+                        }
+                    )
+                    return .none
+                case let .revealPlanningFailed(errorMessage):
+                    state.isRevealingPlanning = false
+                    state.destination = .alert(
+                        AlertState {
+                            TextState("Reveal failed")
+                        } message: {
+                            TextState(errorMessage)
+                        }
+                    )
+                    return .none
                 case .onTask:
                     state.isLoadingGame = true
                     return .merge(
@@ -362,6 +525,10 @@ struct HomeFeature {
                     return .send(.confirmResetMatchesButtonTapped)
                 case .destination(.presented(.alert(.confirmDeleteGame))):
                     return .send(.confirmDeleteGameButtonTapped)
+                case .destination(.presented(.alert(.confirmConfirmMatching))):
+                    return .send(.confirmConfirmMatchingButtonTapped)
+                case .destination(.presented(.alert(.confirmRevealPlanning))):
+                    return .send(.confirmRevealPlanningButtonTapped)
                 case .destination(.presented(.alert(.confirmEditGame))):
                     guard let game = state.currentGame else { return .none }
                     state.destination = .editCKRGame(CKRGameFormFeature.State(game: game))
@@ -500,6 +667,27 @@ struct HomeView: View {
                     }
             }
         }
+        // Sheet: Event Settings Form
+        .sheet(
+            item: $store.scope(state: \.destination?.eventSettingsForm, action: \.destination.eventSettingsForm)
+        ) { eventSettingsStore in
+            NavigationStack {
+                CKREventSettingsFormView(store: eventSettingsStore)
+                    .navigationTitle("Event Settings")
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Dismiss") {
+                                store.send(.dismissDestinationButtonTapped)
+                            }
+                        }
+                        ToolbarItem(placement: .confirmationAction) {
+                            Button("Save") {
+                                store.send(.confirmSaveEventSettings)
+                            }
+                        }
+                    }
+            }
+        }
         // Sheet: Matched Groups Map
         .sheet(
             item: $store.scope(state: \.destination?.matchedGroupsMap, action: \.destination.matchedGroupsMap)
@@ -608,6 +796,85 @@ struct HomeView: View {
                         store.send(.resetMatchesButtonTapped)
                     } label: {
                         Label("Reset matches", systemImage: "arrow.counterclockwise")
+                    }
+                }
+
+                // MARK: - Event Planning Section
+                if game.matchedGroups != nil {
+                    // Event Settings
+                    if store.isSavingEventSettings {
+                        HStack {
+                            Label("Saving event settings...", systemImage: "clock")
+                            Spacer()
+                            ProgressView()
+                        }
+                    } else {
+                        Button {
+                            store.send(.configureEventButtonTapped)
+                        } label: {
+                            HStack {
+                                Label("Configure event", systemImage: "calendar.badge.clock")
+                                Spacer()
+                                if game.eventSettings != nil {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .foregroundStyle(.green)
+                                }
+                            }
+                        }
+                    }
+
+                    // Confirm Matching (assign A/B/C/D roles)
+                    if game.eventSettings != nil {
+                        if store.isConfirmingMatching {
+                            HStack {
+                                Label("Assigning roles...", systemImage: "shuffle")
+                                Spacer()
+                                ProgressView()
+                            }
+                        } else {
+                            Button {
+                                store.send(.confirmMatchingButtonTapped)
+                            } label: {
+                                HStack {
+                                    Label("Confirm matching", systemImage: "shuffle")
+                                    Spacer()
+                                    if game.groupPlannings != nil {
+                                        Image(systemName: "checkmark.circle.fill")
+                                            .foregroundStyle(.green)
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Reveal Planning
+                    if game.groupPlannings != nil && !game.isRevealed {
+                        if store.isRevealingPlanning {
+                            HStack {
+                                Label("Revealing...", systemImage: "eye")
+                                Spacer()
+                                ProgressView()
+                            }
+                        } else {
+                            Button {
+                                store.send(.revealPlanningButtonTapped)
+                            } label: {
+                                Label("Reveal to participants", systemImage: "eye")
+                            }
+                        }
+                    }
+
+                    if game.isRevealed {
+                        HStack {
+                            Label("Planning revealed", systemImage: "eye.fill")
+                                .foregroundStyle(.green)
+                            Spacer()
+                            if let revealedAt = game.revealedAt {
+                                Text(revealedAt.formatted(date: .abbreviated, time: .shortened))
+                                    .foregroundStyle(.secondary)
+                                    .font(.caption)
+                            }
+                        }
                     }
                 }
             } else {
