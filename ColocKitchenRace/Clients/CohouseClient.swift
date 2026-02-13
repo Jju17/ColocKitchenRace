@@ -118,6 +118,9 @@ extension CohouseClient: DependencyKey {
             return path
         },
         loadCoverImage: { path in
+            // Demo mode: return empty data (no cover image in demo)
+            if DemoMode.isActive { return Data() }
+
             let ref = Storage.storage().reference(withPath: path)
             return try await ref.data(maxSize: 4 * 1024 * 1024)
         },

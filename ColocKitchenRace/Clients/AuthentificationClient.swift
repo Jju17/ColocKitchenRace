@@ -95,6 +95,12 @@ extension AuthenticationClient: DependencyKey {
             try? await Messaging.messaging().subscribe(toTopic: "all_users")
             $userInfo.withLock { $0 = loggedUser }
 
+            // Demo mode: seed all @Shared with mock data and skip Firestore cohouse loading
+            if loggedUser.email == DemoMode.demoEmail {
+                DemoMode.seedSharedState(for: loggedUser)
+                return loggedUser
+            }
+
             // Auto-load user's cohouse if they have one
             if let cohouseId = loggedUser.cohouseId {
                 let cohouseRef = db.collection("cohouses").document(cohouseId)

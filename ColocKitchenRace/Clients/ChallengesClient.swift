@@ -30,6 +30,13 @@ extension ChallengesClient: DependencyKey {
 
     static let liveValue = Self(
         getAll: {
+            // Demo mode: return mock challenges without hitting Firestore
+            if DemoMode.isActive {
+                @Shared(.challenges) var challenges
+                $challenges.withLock { $0 = DemoMode.demoChallenges }
+                return DemoMode.demoChallenges
+            }
+
             @Shared(.challenges) var challenges
 
             let snapshot = try await Firestore.firestore()

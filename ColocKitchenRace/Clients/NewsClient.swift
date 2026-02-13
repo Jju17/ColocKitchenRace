@@ -31,6 +31,13 @@ extension NewsClient: DependencyKey {
 
     static let liveValue = Self(
         getLast: {
+            // Demo mode: return mock news without hitting Firestore
+            if DemoMode.isActive {
+                @Shared(.news) var news
+                $news.withLock { $0 = DemoMode.demoNews }
+                return .success(DemoMode.demoNews)
+            }
+
             do {
                 @Shared(.news) var news
 
@@ -57,6 +64,8 @@ extension NewsClient: DependencyKey {
                     .order(by: "publicationTimestamp", descending: true)
                     .limit(to: 10)
                     .addSnapshotListener { snapshot, error in
+                        // Demo mode: don't overwrite mock news with Firestore data
+                        if DemoMode.isActive { return }
                         guard let snapshot, error == nil else { return }
 
                         let news = snapshot.documents.compactMap { document in

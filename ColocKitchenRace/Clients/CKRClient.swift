@@ -43,6 +43,13 @@ extension CKRClient: DependencyKey {
 
     static let liveValue = Self(
         getLast: {
+            // Demo mode: return mock game without hitting Firestore
+            if DemoMode.isActive {
+                @Shared(.ckrGame) var ckrGame
+                $ckrGame.withLock { $0 = DemoMode.demoCKRGame }
+                return .success(DemoMode.demoCKRGame)
+            }
+
             do {
                 @Shared(.ckrGame) var ckrGame
 
@@ -91,6 +98,11 @@ extension CKRClient: DependencyKey {
             }
         },
         getMyPlanning: { gameId, cohouseId in
+            // Demo mode: return mock planning without calling Cloud Function
+            if DemoMode.isActive {
+                return DemoMode.demoPlanning
+            }
+
             let functions = Functions.functions(region: "europe-west1")
             let result = try await functions.httpsCallable("getMyPlanning").call([
                 "gameId": gameId,

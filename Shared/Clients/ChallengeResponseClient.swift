@@ -64,6 +64,11 @@ extension ChallengeResponseClient: DependencyKey {
             }
         },
         getAllForCohouse: { cohouseId in
+            // Demo mode: return mock responses without hitting Firestore
+            if DemoMode.isActive {
+                return .success(DemoMode.demoChallengeResponses)
+            }
+
             do {
                 let snapshot = try await Firestore.firestore()
                     .collectionGroup("responses")
@@ -113,6 +118,9 @@ extension ChallengeResponseClient: DependencyKey {
             }
         },
         submit: { response in
+            // Demo mode: no-op, don't write to Firestore
+            if DemoMode.isActive { return response }
+
             do {
                 let db = Firestore.firestore()
                 let doc = db.collection("challenges")
@@ -128,6 +136,15 @@ extension ChallengeResponseClient: DependencyKey {
             }
         },
         watchStatus: { challengeId, cohouseId in
+            // Demo mode: return mock status without setting up Firestore listener
+            if DemoMode.isActive {
+                return AsyncStream { continuation in
+                    if let response = DemoMode.demoChallengeResponses.first(where: { $0.challengeId == challengeId }) {
+                        continuation.yield(response.status)
+                    }
+                }
+            }
+
             let doc = Firestore.firestore()
                 .collection("challenges")
                 .document(challengeId.uuidString)
