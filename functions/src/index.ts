@@ -7,4 +7,5 @@ export { registerForGame } from "./registration";
 export { matchCohouses } from "./match-cohouses";
 export { updateEventSettings, confirmMatching, revealPlanning, getMyPlanning } from "./planning";
 export { setAdminClaim } from "./admin";
+export { deleteAccount } from "./account";
 export { onNewsCreated, onChallengeCreated, checkChallengeSchedules } from "./triggers";

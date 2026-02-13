@@ -10,6 +10,7 @@ import ComposableArchitecture
 import CryptoKit
 import FirebaseAuth
 import FirebaseFirestore
+import FirebaseFunctions
 import FirebaseMessaging
 import GoogleSignIn
 import os
@@ -38,7 +39,7 @@ struct AuthenticationClient {
     var signUp: @Sendable (_ signupUserData: SignupUser) async throws -> User
     var signIn: @Sendable (_ email: String, _ password: String) async throws -> User
     var signOut: () async throws -> Void
-    var deleteAccount: () -> Void
+    var deleteAccount: @Sendable () async throws -> Void
     var updateUser: (_ user: User) async throws -> Void
     var resendVerificationEmail: @Sendable () async throws -> Void
     var signInWithGoogle: @Sendable () async throws -> User
@@ -121,7 +122,34 @@ extension AuthenticationClient: DependencyKey {
             $challenges.withLock { $0 = [] }
         },
         deleteAccount: {
-            // TODO: Implement account deletion
+            @Shared(.userInfo) var user
+            @Shared(.cohouse) var cohouse
+            @Shared(.ckrGame) var ckrGame
+            @Shared(.news) var news
+            @Shared(.challenges) var challenges
+
+            guard let userInfo = user else {
+                throw AuthError.failedWithError("No user session found")
+            }
+
+            // 1. Unsubscribe from FCM topic before account is deleted
+            try? await Messaging.messaging().unsubscribe(fromTopic: "all_users")
+
+            // 2. Call Cloud Function to delete all server-side data
+            let functions = Functions.functions(region: "europe-west1")
+            _ = try await functions.httpsCallable("deleteAccount").call([
+                "userId": userInfo.id.uuidString
+            ])
+
+            // 3. Sign out locally (Auth account already deleted server-side)
+            try? Auth.auth().signOut()
+
+            // 4. Clear all local shared state
+            $user.withLock { $0 = nil }
+            $cohouse.withLock { $0 = nil }
+            $ckrGame.withLock { $0 = nil }
+            $news.withLock { $0 = [] }
+            $challenges.withLock { $0 = [] }
         },
         updateUser: { updatedUser in
             let docRef = Firestore.firestore()
@@ -301,7 +329,7 @@ extension AuthenticationClient: DependencyKey {
         signUp: { _ in .mockUser },
         signIn: { _, _ in .mockUser },
         signOut: {},
-        deleteAccount: {},
+        deleteAccount: { },
         updateUser: { _ in },
         resendVerificationEmail: {},
         signInWithGoogle: { .mockUser },
