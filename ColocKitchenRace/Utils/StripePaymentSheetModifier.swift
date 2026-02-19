@@ -67,22 +67,10 @@ struct StripePaymentSheetModifier: ViewModifier {
                  onCompletion(.completed)
              case .canceled:
                  Logger.paymentLog.info("Payment canceled by user")
-                 // Demo mode: treat cancel as success so the reviewer can complete the flow
-                 if DemoMode.isActive {
-                     Logger.paymentLog.info("[Demo] Treating cancel as successful payment")
-                     onCompletion(.completed)
-                 } else {
-                     onCompletion(.canceled)
-                 }
+                 onCompletion(.canceled)
              case let .failed(error):
                  Logger.paymentLog.error("Payment failed: \(error.localizedDescription)")
-                 // Demo mode: treat failure as success so the reviewer can complete the flow
-                 if DemoMode.isActive {
-                     Logger.paymentLog.info("[Demo] Treating payment failure as success")
-                     onCompletion(.completed)
-                 } else {
-                     onCompletion(.failed(error.localizedDescription))
-                 }
+                 onCompletion(.failed(error.localizedDescription))
              }
          }
     }

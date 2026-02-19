@@ -43,17 +43,6 @@ extension StripeClient: DependencyKey {
 
     static let liveValue = Self(
         createPaymentIntent: { gameId, cohouseId, amountCents, participantCount in
-            // Demo mode: return mock payment intent without hitting Stripe
-            if DemoMode.isActive {
-                Logger.paymentLog.info("[Demo] Returning mock payment intent")
-                return PaymentIntentResult(
-                    clientSecret: "pi_demo_secret_xxx",
-                    customerId: "cus_demo_xxx",
-                    ephemeralKeySecret: "ek_demo_xxx",
-                    paymentIntentId: "pi_demo_xxx"
-                )
-            }
-
             Logger.paymentLog.info("Creating payment intent for game \(gameId), cohouse \(cohouseId), amount \(amountCents) cents, \(participantCount) participants")
 
             let functions = Functions.functions(region: "europe-west1")

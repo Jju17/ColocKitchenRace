@@ -241,7 +241,7 @@ extension AuthenticationClient: DependencyKey {
             @Shared(.cohouse) var cohouse
 
             // 1. Run Apple Sign-In flow on the main actor
-            let helper = AppleSignInHelper()
+            let helper = await MainActor.run { AppleSignInHelper() }
             let authorization = try await helper.signIn()
 
             guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential,

@@ -128,6 +128,11 @@ extension CohouseClient: DependencyKey {
             @Shared(.cohouse) var currentCohouse
             @Shared(.userInfo) var userInfo
 
+            // Demo mode: return current cohouse from shared state without hitting Firestore
+            if DemoMode.isActive, let cohouse = currentCohouse {
+                return cohouse
+            }
+
             guard let userInfo else {
                 throw CohouseClientError.missingUserInfo
             }
