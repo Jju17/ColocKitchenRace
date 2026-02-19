@@ -58,7 +58,7 @@ struct CKREventSettingsFormView: View {
 
     var body: some View {
         Form {
-            Section("Apéro") {
+            Section("Aperitif") {
                 DatePicker(
                     "Start",
                     selection: $store.settings.aperoStartTime,
@@ -71,7 +71,7 @@ struct CKREventSettingsFormView: View {
                 )
             }
 
-            Section("Dîner") {
+            Section("Diner") {
                 DatePicker(
                     "Start",
                     selection: $store.settings.dinerStartTime,
@@ -84,7 +84,7 @@ struct CKREventSettingsFormView: View {
                 )
             }
 
-            Section("Teuf / Party") {
+            Section("Party") {
                 TextField("Party name", text: $store.settings.partyName)
                 TextField("Address", text: $store.settings.partyAddress)
                 DatePicker(
