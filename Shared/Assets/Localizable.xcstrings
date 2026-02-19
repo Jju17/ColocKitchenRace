@@ -1667,6 +1667,7 @@
 
     },
     "MARK AS DONE" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -2977,6 +2978,9 @@
     },
     "Total users :" : {
       "shouldTranslate" : false
+    },
+    "Tu as réalisé le défi ?" : {
+
     },
     "Type a name or email to find users" : {
 
