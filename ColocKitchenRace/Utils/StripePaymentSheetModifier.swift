@@ -28,13 +28,6 @@ struct StripePaymentSheetModifier: ViewModifier {
     }
 
     private func presentPaymentSheet() {
-        // Demo mode: skip Stripe entirely and simulate a successful payment
-        if DemoMode.isActive {
-            Logger.paymentLog.info("[Demo] Simulating successful payment")
-            onCompletion(.completed)
-            return
-        }
-
         guard let clientSecret,
               let customerId,
               let ephemeralKeySecret
@@ -53,12 +46,12 @@ struct StripePaymentSheetModifier: ViewModifier {
              merchantId: "merchant.dev.rahier.colocskitchenrace",
              merchantCountryCode: "BE"
          )
-        
+
          let paymentSheet = PaymentSheet(
              paymentIntentClientSecret: clientSecret,
              configuration: config
          )
-        
+
          guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                let rootVC = windowScene.windows.first?.rootViewController?.topMostViewController()
          else {
@@ -66,7 +59,7 @@ struct StripePaymentSheetModifier: ViewModifier {
              onCompletion(.failed("Unable to present payment sheet"))
              return
          }
-        
+
          paymentSheet.present(from: rootVC) { result in
              switch result {
              case .completed:
@@ -74,10 +67,22 @@ struct StripePaymentSheetModifier: ViewModifier {
                  onCompletion(.completed)
              case .canceled:
                  Logger.paymentLog.info("Payment canceled by user")
-                 onCompletion(.canceled)
+                 // Demo mode: treat cancel as success so the reviewer can complete the flow
+                 if DemoMode.isActive {
+                     Logger.paymentLog.info("[Demo] Treating cancel as successful payment")
+                     onCompletion(.completed)
+                 } else {
+                     onCompletion(.canceled)
+                 }
              case let .failed(error):
                  Logger.paymentLog.error("Payment failed: \(error.localizedDescription)")
-                 onCompletion(.failed(error.localizedDescription))
+                 // Demo mode: treat failure as success so the reviewer can complete the flow
+                 if DemoMode.isActive {
+                     Logger.paymentLog.info("[Demo] Treating payment failure as success")
+                     onCompletion(.completed)
+                 } else {
+                     onCompletion(.failed(error.localizedDescription))
+                 }
              }
          }
     }

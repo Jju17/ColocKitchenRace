@@ -353,7 +353,7 @@ struct ChallengeTileView: View {
                 await ChallengeInfoPopup(
                     symbol: "star.fill",
                     title: "Points",
-                    description: "Ce challenge vaut \(points) point\(points > 1 ? "s" : ""). Complète-le pour les ajouter au score de ta coloc !",
+                    description: "This challenge is worth \(points) point\(points > 1 ? "s" : ""). Complete it to add them to your coloc's score!",
                     accentColor: headerColor
                 ).present()
             }
@@ -415,7 +415,7 @@ struct ChallengeTileView: View {
 
             // Feedback
             if store.isSubmitting {
-                ProgressView("Envoi en cours…")
+                ProgressView("Submitting…")
                     .font(.custom("BaksoSapi", size: 16))
                     .padding()
             }

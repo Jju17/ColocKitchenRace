@@ -74,7 +74,7 @@ private struct SingleAnswerInputSheet: View {
                 Spacer()
             }
             .padding()
-            .navigationTitle("Ta réponse")
+            .navigationTitle("Your answer")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {

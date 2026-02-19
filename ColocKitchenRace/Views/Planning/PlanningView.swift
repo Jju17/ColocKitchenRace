@@ -89,15 +89,15 @@ struct PlanningView: View {
             Group {
                 if !store.isRevealed || !store.isRegistered {
                     ContentUnavailableView(
-                        "Planning pas encore disponible",
+                        "Planning not yet available",
                         systemImage: "calendar.badge.clock",
-                        description: Text("Le planning de la soiree sera bientot disponible !")
+                        description: Text("The event planning will be available soon!")
                     )
                 } else if store.isLoading {
-                    ProgressView("Chargement du planning...")
+                    ProgressView("Loading planning...")
                 } else if let error = store.errorMessage {
                     ContentUnavailableView(
-                        "Erreur",
+                        "Error",
                         systemImage: "exclamationmark.triangle",
                         description: Text(error)
                     )
@@ -105,9 +105,9 @@ struct PlanningView: View {
                     planningContent(planning)
                 } else {
                     ContentUnavailableView(
-                        "Planning pas encore disponible",
+                        "Planning not yet available",
                         systemImage: "calendar.badge.clock",
-                        description: Text("Le planning de la soiree sera bientot disponible !")
+                        description: Text("The event planning will be available soon!")
                     )
                 }
             }

@@ -18,11 +18,11 @@ enum DietaryPreference: String, Codable, CaseIterable, Identifiable, Hashable {
 
     var displayName: String {
         switch self {
-        case .vegetarian: return "Végétarien"
-        case .vegan: return "Végan"
-        case .glutenFree: return "Sans gluten"
-        case .lactoseFree: return "Sans lactose"
-        case .nutFree: return "Sans noix"
+        case .vegetarian: return String(localized: "Vegetarian")
+        case .vegan: return String(localized: "Vegan")
+        case .glutenFree: return String(localized: "Gluten free")
+        case .lactoseFree: return String(localized: "Lactose free")
+        case .nutFree: return String(localized: "Nut free")
         }
     }
 
