@@ -365,17 +365,6 @@
         }
       }
     },
-    "Are you sure? This will permanently delete the current CKR Game and all its data (participants, matches, etc.)." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Es-tu sûr ? Cela supprimera définitivement le jeu CKR actuel et toutes ses données (participants, matchs, etc.)."
-          }
-        }
-      }
-    },
     "Are you sure? This will permanently delete the current CKR Game and all its data (participants, matches, etc.).%@" : {
 
     },
@@ -468,17 +457,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Annuler"
-          }
-        }
-      }
-    },
-    "Cannot delete" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Suppression impossible"
           }
         }
       }
@@ -790,17 +768,6 @@
     },
     "Confirm matching?" : {
 
-    },
-    "Confirm registration" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Valider l'inscription"
-          }
-        }
-      }
     },
     "Content" : {
       "localizations" : {
@@ -1129,17 +1096,6 @@
         }
       }
     },
-    "Email" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Email"
-          }
-        }
-      }
-    },
     "Email *" : {
 
     },
@@ -1224,17 +1180,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Décision finale pour le challenge"
-          }
-        }
-      }
-    },
-    "First name" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Prénom"
           }
         }
       }
@@ -1365,17 +1310,6 @@
         }
       }
     },
-    "i" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "i"
-          }
-        }
-      }
-    },
     "I understand, continue" : {
       "localizations" : {
         "fr" : {
@@ -1388,17 +1322,6 @@
     },
     "I've done it!" : {
 
-    },
-    "I’ve done it!" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "C'est fait !"
-          }
-        }
-      }
     },
     "I've verified my email" : {
 
@@ -1536,17 +1459,6 @@
         }
       }
     },
-    "Last name" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Nom"
-          }
-        }
-      }
-    },
     "Last name *" : {
 
     },
@@ -1665,17 +1577,6 @@
     },
     "Make Admin" : {
 
-    },
-    "MARK AS DONE" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "MARQUER COMME FAIT"
-          }
-        }
-      }
     },
     "Match %lld cohouses" : {
       "localizations" : {
@@ -2197,17 +2098,6 @@
     "Payment is processed securely via Stripe. Your card details are never stored on our servers." : {
 
     },
-    "Payment will be added soon." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le paiement sera ajouté prochainement."
-          }
-        }
-      }
-    },
     "Photo Library" : {
 
     },
@@ -2538,17 +2428,6 @@
         }
       }
     },
-    "Select a photo, then submit." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Sélectionne une photo, puis envoie."
-          }
-        }
-      }
-    },
     "Select Type" : {
       "localizations" : {
         "fr" : {
@@ -2595,17 +2474,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Envoyer à"
-          }
-        }
-      }
-    },
-    "Send your photo for validation." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Envoie ta photo pour validation."
           }
         }
       }
@@ -2771,17 +2639,6 @@
         }
       }
     },
-    "Submit photo" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Envoyer la photo"
-          }
-        }
-      }
-    },
     "SUBMIT PHOTO" : {
       "localizations" : {
         "fr" : {
@@ -2893,17 +2750,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Texte"
-          }
-        }
-      }
-    },
-    "The CKR countdown has already started (%@). Contact a system administrator to delete this game." : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Le compte à rebours CKR a déjà commencé (%@). Contacte un administrateur pour supprimer ce jeu."
           }
         }
       }
