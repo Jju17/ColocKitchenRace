@@ -74,16 +74,23 @@ enum DemoMode {
     // MARK: - Demo CKRGame (revealed, with planning)
 
     static var demoCKRGame: CKRGame {
-        CKRGame(
+        // Registration deadline and game date are always in the future so the
+        // Apple reviewer can go through the full registration + payment flow.
+        let gameDate = Calendar.current.date(byAdding: .month, value: 2, to: Date())!
+        let deadline = Calendar.current.date(byAdding: .day, value: -5, to: gameDate)!
+
+        return CKRGame(
             id: demoGameId,
             editionNumber: 3,
             startCKRCountdown: Date.from(year: 2026, month: 1, day: 1),
-            nextGameDate: Date.from(year: 2026, month: 4, day: 15, hour: 18),
-            registrationDeadline: Date.from(year: 2026, month: 4, day: 10),
+            nextGameDate: gameDate,
+            registrationDeadline: deadline,
             maxParticipants: 100,
             pricePerPersonCents: 500,
             publishedTimestamp: Date.from(year: 2026, month: 1, day: 15),
-            cohouseIDs: [demoCohouseId.uuidString, "other-cohouse-1", "other-cohouse-2", "other-cohouse-3"],
+            // Demo cohouse is NOT in cohouseIDs so the reviewer sees the registration flow.
+            // After successful mock payment, registerForGame adds it locally.
+            cohouseIDs: ["other-cohouse-1", "other-cohouse-2", "other-cohouse-3"],
             totalRegisteredParticipants: 48,
             matchedGroups: [
                 MatchedGroup(cohouseIds: [demoCohouseId.uuidString, "other-cohouse-1", "other-cohouse-2", "other-cohouse-3"])

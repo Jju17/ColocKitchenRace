@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import MapKit
 import os
 import SwiftUI
 import UIKit
@@ -245,6 +246,25 @@ struct CohouseDetailView: View {
                         cardRow(label: "City", value: store.cohouse.address.city)
                     }
                     .background(Color(.secondarySystemGroupedBackground))
+                    .clipShape(cardShape)
+                }
+
+                // Location map
+                if let lat = store.cohouse.latitude,
+                   let lng = store.cohouse.longitude {
+                    Map(
+                        initialPosition: .region(
+                            MKCoordinateRegion(
+                                center: CLLocationCoordinate2D(latitude: lat, longitude: lng),
+                                span: MKCoordinateSpan(latitudeDelta: 0.005, longitudeDelta: 0.005)
+                            )
+                        ),
+                        interactionModes: []
+                    ) {
+                        Marker(store.cohouse.name, coordinate: CLLocationCoordinate2D(latitude: lat, longitude: lng))
+                    }
+                    .mapStyle(.standard)
+                    .frame(height: 200)
                     .clipShape(cardShape)
                 }
 

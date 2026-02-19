@@ -61,9 +61,7 @@ struct ChallengeContentView: View {
                         SingleAnswerView(isSubmitting: isSubmitting) { text in onSubmit(.singleAnswer(text)) }
 
                     case .noChoice:
-                        if !isSubmitting {
-                            NoChoiceView(isSubmitting: isSubmitting) { onSubmit(.noChoice) }
-                        }
+                        NoChoiceView(isSubmitting: isSubmitting) { onSubmit(.noChoice) }
                     }
                 }
             } else if !challenge.hasStarted {

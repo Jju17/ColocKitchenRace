@@ -61,12 +61,10 @@ struct ChallengeTileFeatureTests {
 
     // MARK: - Start
 
-    @Test("startTapped on noChoice challenge auto-submits immediately")
-    func startTapped_noChoice_autoSubmits() async {
+    @Test("startTapped on noChoice challenge creates response but does not auto-submit")
+    func startTapped_noChoice_noAutoSubmit() async {
         let challenge = makeActiveChallenge() // noChoice by default
         let fixedDate = Date()
-
-        var submittedResponse: ChallengeResponse?
 
         let store = TestStore(initialState: makeState(for: challenge)) {
             ChallengeTileFeature()
@@ -74,28 +72,18 @@ struct ChallengeTileFeatureTests {
             $0.challengeResponseClient.watchStatus = { _, _ in
                 AsyncStream { $0.finish() }
             }
-            $0.challengeResponseClient.submit = { resp in
-                submittedResponse = resp
-                return resp
-            }
             $0.date = .constant(fixedDate)
         }
         store.exhaustivity = .off
 
         await store.send(.startTapped)
 
-        // After startTapped on noChoice: response created + isSubmitting = true
+        // After startTapped on noChoice: response created but NOT auto-submitting
+        // User must explicitly tap "I've done it!" to submit
         #expect(store.state.response != nil)
-        #expect(store.state.isSubmitting == true || submittedResponse != nil)
+        #expect(store.state.isSubmitting == false)
         #expect(store.state.response?.content == .noChoice)
         #expect(store.state.response?.challengeId == challenge.id)
-
-        // Wait for submit to finish
-        await store.receive(\._submitFinished)
-
-        #expect(store.state.isSubmitting == false)
-        #expect(store.state.liveStatus == .waiting)
-        #expect(submittedResponse?.content == .noChoice)
     }
 
     @Test("startTapped on non-noChoice challenge does not auto-submit")

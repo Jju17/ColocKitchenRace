@@ -87,20 +87,12 @@ struct ChallengeTileFeature {
                     // Watch admin status
                     let challengeId = state.challenge.id
                     let cohouseId = state.cohouseId
-                    let watchEffect: Effect<Action> = .run { send in
+                    return .run { send in
                         for await status in responseClient.watchStatus(challengeId, cohouseId) {
                             await send(._statusUpdated(status))
                         }
                     }
                     .cancellable(id: CancelID.statusWatcher, cancelInFlight: true)
-
-                    // Auto-submit for noChoice challenges — no extra step needed
-                    if case .noChoice = state.challenge.content {
-                        state.isSubmitting = true
-                        return .merge(watchEffect, submit(newResponse))
-                    }
-
-                    return watchEffect
 
                 case let .submitTapped(payload):
                     guard var current = state.response,

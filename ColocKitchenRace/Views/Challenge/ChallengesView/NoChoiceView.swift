@@ -12,19 +12,33 @@ struct NoChoiceView: View {
     let onSubmit: () -> Void
 
     var body: some View {
-        VStack(spacing: 24) {
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 64))
+        VStack(spacing: 16) {
+            Image(systemName: "checkmark.circle")
+                .font(.system(size: 48))
                 .foregroundColor(.ckrMint)
 
-            Text("I've done it!")
-                .font(.custom("BaksoSapi", size: 20))
-                .fontWeight(.bold)
+            Text("Tu as réalisé le défi ?")
+                .font(.custom("BaksoSapi", size: 18))
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
 
-            Button("MARK AS DONE") {
+            Button {
                 onSubmit()
+            } label: {
+                HStack {
+                    Image(systemName: "checkmark.circle.fill")
+                    Text("I've done it!")
+                }
+                .font(.system(size: 20, weight: .bold, design: .rounded))
+                .frame(maxWidth: .infinity)
+                .frame(height: 56)
+                .foregroundColor(.white)
+                .background(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(Color.ckrMint)
+                )
             }
-            .submitButton(isLoading: isSubmitting)
+            .buttonStyle(.plain)
             .disabled(isSubmitting)
         }
     }

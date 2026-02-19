@@ -28,6 +28,13 @@ struct StripePaymentSheetModifier: ViewModifier {
     }
 
     private func presentPaymentSheet() {
+        // Demo mode: skip Stripe entirely and simulate a successful payment
+        if DemoMode.isActive {
+            Logger.paymentLog.info("[Demo] Simulating successful payment")
+            onCompletion(.completed)
+            return
+        }
+
         guard let clientSecret,
               let customerId,
               let ephemeralKeySecret

@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import MapKit
 import os
 import SwiftUI
 
@@ -51,6 +52,7 @@ struct CohouseFormFeature {
         case quitCohouseButtonTapped
         case addressValidationResponse(TaskResult<AddressValidationResult>)
         case applySuggestedAddress(ValidatedAddress)
+        case pinDragged(latitude: Double, longitude: Double)
 
         // Cover image
         case coverImagePickTapped
@@ -164,6 +166,11 @@ struct CohouseFormFeature {
                     state.addressValidationResult = nil
                     return .none
 
+                case let .pinDragged(latitude, longitude):
+                    state.wipCohouse.latitude = latitude
+                    state.wipCohouse.longitude = longitude
+                    return .none
+
                 // Cover image
                 case .coverImagePickTapped:
                     state.coverImageSourceSheet = true
@@ -210,6 +217,7 @@ struct CohouseFormFeature {
 
 struct CohouseFormView: View {
     @Bindable var store: StoreOf<CohouseFormFeature>
+    @State private var isMapPickerPresented = false
 
     var body: some View {
         Form {
@@ -239,6 +247,15 @@ struct CohouseFormView: View {
                 }
 
                 self.addressValidationView
+
+                if store.wipCohouse.latitude != nil,
+                   store.wipCohouse.longitude != nil {
+                    Button {
+                        isMapPickerPresented = true
+                    } label: {
+                        Label("Adjust pin on map", systemImage: "map")
+                    }
+                }
             }
 
             Section("Members") {
@@ -319,6 +336,18 @@ struct CohouseFormView: View {
         .confirmationDialog("Photo source", isPresented: $store.coverImageSourceSheet) {
             Button("Camera") { store.send(.coverImageSourceChosen(.camera)) }
             Button("Photo Library") { store.send(.coverImageSourceChosen(.library)) }
+        }
+        .sheet(isPresented: $isMapPickerPresented) {
+            if let lat = store.wipCohouse.latitude,
+               let lng = store.wipCohouse.longitude {
+                CohouseMapPickerView(
+                    cohouseName: store.wipCohouse.name,
+                    latitude: lat,
+                    longitude: lng
+                ) { newLat, newLng in
+                    store.send(.pinDragged(latitude: newLat, longitude: newLng))
+                }
+            }
         }
     }
 
@@ -531,6 +560,83 @@ struct CohouseFormView: View {
         let adminUser = store.wipCohouse.users.first { $0.isAdmin }?.userId
         let userInfo = store.userInfo?.id.uuidString
         return adminUser == userInfo
+    }
+}
+
+// MARK: - Map Picker View
+
+struct CohouseMapPickerView: View {
+    let cohouseName: String
+    let latitude: Double
+    let longitude: Double
+    let onConfirm: (Double, Double) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var pinCoordinate: CLLocationCoordinate2D
+    @State private var mapPosition: MapCameraPosition
+
+    init(
+        cohouseName: String,
+        latitude: Double,
+        longitude: Double,
+        onConfirm: @escaping (Double, Double) -> Void
+    ) {
+        self.cohouseName = cohouseName
+        self.latitude = latitude
+        self.longitude = longitude
+        self.onConfirm = onConfirm
+
+        let coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        self._pinCoordinate = State(initialValue: coordinate)
+        self._mapPosition = State(initialValue: .region(
+            MKCoordinateRegion(
+                center: coordinate,
+                span: MKCoordinateSpan(latitudeDelta: 0.008, longitudeDelta: 0.008)
+            )
+        ))
+    }
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 0) {
+                MapReader { reader in
+                    Map(position: $mapPosition) {
+                        Marker(
+                            cohouseName.isEmpty ? "Cohouse" : cohouseName,
+                            coordinate: pinCoordinate
+                        )
+                    }
+                    .mapStyle(.standard)
+                    .onTapGesture { screenCoord in
+                        if let coordinate = reader.convert(screenCoord, from: .local) {
+                            pinCoordinate = coordinate
+                        }
+                    }
+                }
+
+                Text("Tap on the map to adjust the pin location")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .padding(.vertical, 10)
+                    .frame(maxWidth: .infinity)
+                    .background(Color(.systemGroupedBackground))
+            }
+            .navigationTitle("Pin location")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        onConfirm(pinCoordinate.latitude, pinCoordinate.longitude)
+                        dismiss()
+                    }
+                }
+            }
+        }
     }
 }
 

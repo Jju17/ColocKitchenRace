@@ -8,6 +8,7 @@
 import ComposableArchitecture
 import FirebaseFirestore
 import FirebaseFunctions
+import os
 
 // MARK: - Error
 
@@ -72,6 +73,18 @@ extension CKRClient: DependencyKey {
             }
         },
         registerForGame: { gameId, cohouseId, attendingUserIds, averageAge, cohouseType, paymentIntentId in
+            // Demo mode: skip Cloud Function call, just update local state
+            if DemoMode.isActive {
+                Logger.ckrLog.info("[Demo] Simulating registration for game")
+                @Shared(.ckrGame) var ckrGame
+                if var game = ckrGame {
+                    game.cohouseIDs.append(cohouseId)
+                    game.totalRegisteredParticipants += attendingUserIds.count
+                    $ckrGame.withLock { $0 = game }
+                }
+                return
+            }
+
             let functions = Functions.functions(region: "europe-west1")
             let callable = functions.httpsCallable("registerForGame")
 

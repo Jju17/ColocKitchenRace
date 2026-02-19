@@ -99,11 +99,13 @@ struct DemoCohouseTests {
 
 struct DemoCKRGameTests {
 
-    @Test("Demo game is revealed and has demo cohouse registered")
-    func gameIsRevealedAndRegistered() {
+    @Test("Demo game is revealed and demo cohouse is not yet registered")
+    func gameIsRevealedAndNotRegistered() {
         let game = DemoMode.demoCKRGame
         #expect(game.isRevealed == true)
-        #expect(game.cohouseIDs.contains(DemoMode.demoCohouseId.uuidString))
+        // Demo cohouse is NOT pre-registered so the Apple reviewer sees the registration flow
+        #expect(!game.cohouseIDs.contains(DemoMode.demoCohouseId.uuidString))
+        #expect(game.isRegistrationOpen, "Registration should be open so the reviewer can register")
     }
 
     @Test("Demo game has event settings")
@@ -131,9 +133,9 @@ struct DemoCKRGameTests {
     @Test("Demo game has future dates")
     func gameDatesAreInFuture() {
         let game = DemoMode.demoCKRGame
-        let referenceDate = Date.from(year: 2026, month: 3, day: 1)
-        #expect(game.nextGameDate > referenceDate)
-        #expect(game.registrationDeadline > referenceDate)
+        let now = Date()
+        #expect(game.nextGameDate > now)
+        #expect(game.registrationDeadline > now)
     }
 }
 
@@ -337,8 +339,8 @@ struct DemoModeSeedTests {
 
 struct DemoModePlanningVisibilityTests {
 
-    @Test("Planning tab is visible when demo data is seeded")
-    func planningTabVisible() {
+    @Test("Planning tab is visible after demo user registers")
+    func planningTabVisibleAfterRegistration() {
         // Seed demo data
         let demoUser = User(id: DemoMode.demoUserId, email: DemoMode.demoEmail)
         DemoMode.seedSharedState(for: demoUser)
@@ -346,15 +348,27 @@ struct DemoModePlanningVisibilityTests {
         @Shared(.ckrGame) var ckrGame
         @Shared(.cohouse) var cohouse
 
-        // Check the same conditions that PlanningFeature.State uses
         let isRevealed = ckrGame?.isRevealed ?? false
-        let isRegistered: Bool = {
+        #expect(isRevealed == true)
+
+        // Initially, demo cohouse is NOT registered (so registration flow is accessible)
+        let isRegisteredBefore: Bool = {
             guard let game = ckrGame, let cohouse else { return false }
             return game.cohouseIDs.contains(cohouse.id.uuidString)
         }()
+        #expect(isRegisteredBefore == false)
 
-        #expect(isRevealed == true)
-        #expect(isRegistered == true)
+        // After mock registration, the cohouseId is appended locally
+        if var game = ckrGame, let cohouse {
+            game.cohouseIDs.append(cohouse.id.uuidString)
+            $ckrGame.withLock { $0 = game }
+        }
+
+        let isRegisteredAfter: Bool = {
+            guard let game = ckrGame, let cohouse else { return false }
+            return game.cohouseIDs.contains(cohouse.id.uuidString)
+        }()
+        #expect(isRegisteredAfter == true)
 
         // Cleanup
         @Shared(.userInfo) var userInfo

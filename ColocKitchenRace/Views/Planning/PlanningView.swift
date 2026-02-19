@@ -72,6 +72,8 @@ struct PlanningFeature {
     }
 }
 
+// MARK: - View
+
 struct PlanningView: View {
     let store: StoreOf<PlanningFeature>
 
@@ -89,7 +91,7 @@ struct PlanningView: View {
                     ContentUnavailableView(
                         "Planning pas encore disponible",
                         systemImage: "calendar.badge.clock",
-                        description: Text("Le planning de la soirée sera bientôt disponible !")
+                        description: Text("Le planning de la soiree sera bientot disponible !")
                     )
                 } else if store.isLoading {
                     ProgressView("Chargement du planning...")
@@ -105,7 +107,7 @@ struct PlanningView: View {
                     ContentUnavailableView(
                         "Planning pas encore disponible",
                         systemImage: "calendar.badge.clock",
-                        description: Text("Le planning de la soirée sera bientôt disponible !")
+                        description: Text("Le planning de la soiree sera bientot disponible !")
                     )
                 }
             }
@@ -116,117 +118,121 @@ struct PlanningView: View {
         }
     }
 
+    // MARK: - Planning Content (Timeline)
+
     @ViewBuilder
     private func planningContent(_ planning: CKRMyPlanning) -> some View {
         ScrollView {
-            VStack(spacing: 20) {
-                // APÉRO
-                stepCard(
-                    emoji: "🍻",
-                    title: "APÉRO",
-                    step: planning.apero,
-                    cohouseName: store.cohouse?.name
-                )
-
-                // DÎNER
-                stepCard(
-                    emoji: "🍽️",
-                    title: "DÎNER",
-                    step: planning.diner,
-                    cohouseName: store.cohouse?.name
-                )
-
-                // TEUF
-                partyCard(planning.party)
-            }
-            .padding()
-        }
-    }
-
-    @ViewBuilder
-    private func stepCard(emoji: String, title: String, step: PlanningStep, cohouseName: String?) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text(emoji)
-                    .font(.title)
-                Text("\(title) - \(timeFormatter.string(from: step.startTime)) - \(timeFormatter.string(from: step.endTime))")
-                    .font(.headline)
-                    .bold()
-            }
-
-            if step.role == .host {
-                Text("Vous recevez **\(step.cohouseName)** chez vous")
-                    .font(.subheadline)
-            } else {
-                Text("Vous allez chez **\(step.cohouseName)**")
-                    .font(.subheadline)
-            }
-
-            VStack(alignment: .leading, spacing: 6) {
-                Label(step.address, systemImage: "mappin.and.ellipse")
-                    .font(.subheadline)
-
-                if let hostPhone = step.hostPhone {
-                    Label("Tel. hôte : \(hostPhone)", systemImage: "phone")
-                        .font(.subheadline)
+            VStack(spacing: 0) {
+                timelineRow(style: .apero, startTime: planning.apero.startTime, isLast: false) {
+                    PlanningStepCardView(
+                        step: planning.apero,
+                        style: .apero,
+                        timeFormatter: timeFormatter
+                    )
                 }
 
-                if let visitorPhone = step.visitorPhone {
-                    Label("Tel. invité : \(visitorPhone)", systemImage: "phone")
-                        .font(.subheadline)
+                timelineRow(style: .diner, startTime: planning.diner.startTime, isLast: false) {
+                    PlanningStepCardView(
+                        step: planning.diner,
+                        style: .diner,
+                        timeFormatter: timeFormatter
+                    )
+                }
+
+                timelineRow(style: .party, startTime: planning.party.startTime, isLast: true) {
+                    PlanningPartyCardView(
+                        party: planning.party,
+                        style: .party,
+                        timeFormatter: timeFormatter
+                    )
                 }
             }
-
-            Text("Vous serez **\(step.totalPeople)** au total\(dietaryText(step.dietarySummary))")
-                .font(.subheadline)
+            .padding(.horizontal)
+            .padding(.vertical, 8)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(Color(.systemGray6))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
+
+    // MARK: - Timeline Row
 
     @ViewBuilder
-    private func partyCard(_ party: PartyInfo) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("🎉")
-                    .font(.title)
-                Text("\(party.name) - \(timeFormatter.string(from: party.startTime)) - \(timeFormatter.string(from: party.endTime))")
-                    .font(.headline)
-                    .bold()
+    private func timelineRow<Content: View>(
+        style: StepStyle,
+        startTime: Date,
+        isLast: Bool,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            VStack(spacing: 6) {
+                Text(timeFormatter.string(from: startTime))
+                    .font(.custom("BaksoSapi", size: 14))
+                    .foregroundStyle(.secondary)
+
+                Circle()
+                    .fill(style.color)
+                    .frame(width: 14, height: 14)
+                    .overlay(
+                        Circle()
+                            .fill(Color(.systemBackground))
+                            .frame(width: 6, height: 6)
+                    )
+
+                if !isLast {
+                    Rectangle()
+                        .fill(style.color.opacity(0.3))
+                        .frame(width: 2)
+                        .frame(maxHeight: .infinity)
+                }
             }
+            .frame(width: 50)
 
-            Label(party.address, systemImage: "mappin.and.ellipse")
-                .font(.subheadline)
-
-            if let note = party.note, !note.isEmpty {
-                Text(note)
-                    .font(.subheadline)
-                    .italic()
-            }
-
-            Text("Pas de bracelet, pas d'entrée !")
-                .font(.subheadline)
-                .bold()
-                .underline()
+            content()
+                .padding(.bottom, isLast ? 0 : 20)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding()
-        .background(Color(.systemGray6))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
-    }
-
-    private func dietaryText(_ summary: [String: Int]) -> String {
-        if summary.isEmpty { return "" }
-        let items = summary.map { "\($0.value) \($0.key.lowercased())" }
-        return " dont \(items.joined(separator: ", "))"
     }
 }
 
+// MARK: - Preview
+
 #Preview {
     PlanningView(
-        store: Store(initialState: PlanningFeature.State()) {
+        store: Store(
+            initialState: {
+                var state = PlanningFeature.State()
+                state.planning = CKRMyPlanning(
+                    apero: PlanningStep(
+                        role: .visitor,
+                        cohouseName: "Les Joyeux Lurons",
+                        address: "Rue de la Loi 42, 1000 Bruxelles",
+                        hostPhone: "+32 471 123456",
+                        visitorPhone: "+32 472 654321",
+                        totalPeople: 8,
+                        dietarySummary: ["Vegetarien": 2, "Sans gluten": 1],
+                        startTime: Date().addingTimeInterval(3600),
+                        endTime: Date().addingTimeInterval(3600 * 3)
+                    ),
+                    diner: PlanningStep(
+                        role: .host,
+                        cohouseName: "La Bande a Manu",
+                        address: "Avenue Louise 88, 1050 Ixelles",
+                        hostPhone: "+32 472 654321",
+                        visitorPhone: nil,
+                        totalPeople: 6,
+                        dietarySummary: ["Sans gluten": 1],
+                        startTime: Date().addingTimeInterval(3600 * 3),
+                        endTime: Date().addingTimeInterval(3600 * 5)
+                    ),
+                    party: PartyInfo(
+                        name: "CKR Party",
+                        address: "Rue Blaes 208, 1000 Bruxelles",
+                        startTime: Date().addingTimeInterval(3600 * 5),
+                        endTime: Date().addingTimeInterval(3600 * 10),
+                        note: "Ramene ta bonne humeur !"
+                    )
+                )
+                return state
+            }()
+        ) {
             PlanningFeature()
         }
     )

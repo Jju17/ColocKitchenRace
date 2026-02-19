@@ -118,12 +118,6 @@
 			);
 			target = 64FBE0242D8860CC00D8A89F /* CKRAdmin */;
 		};
-		64CE5D2D2F3EF236002D084B /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-			);
-			target = 64FBE0242D8860CC00D8A89F /* CKRAdmin */;
-		};
 		64FBE3442D88665300D8A89F /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -137,7 +131,7 @@
 		6405CBC82D886B7400BE8B0D /* Shared */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (6405CBCD2D886B7400BE8B0D /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Shared; sourceTree = "<group>"; };
 		64BBCE862F38F53600EEB1FE /* ColocsKitchenRaceTests */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (64BBCE972F38F55400EEB1FE /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = ColocsKitchenRaceTests; sourceTree = "<group>"; };
 		64FBE0262D8860CC00D8A89F /* CKRAdmin */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (641196422DDF7CB50075A0C4 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 64C87C212DEB401800EA27EB /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = CKRAdmin; sourceTree = "<group>"; };
-		64FBE2FD2D88665300D8A89F /* ColocKitchenRace */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (64FBE3442D88665300D8A89F /* PBXFileSystemSynchronizedBuildFileExceptionSet */, 64CE5D2D2F3EF236002D084B /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = ColocKitchenRace; sourceTree = "<group>"; };
+		64FBE2FD2D88665300D8A89F /* ColocKitchenRace */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (64FBE3442D88665300D8A89F /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = ColocKitchenRace; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
