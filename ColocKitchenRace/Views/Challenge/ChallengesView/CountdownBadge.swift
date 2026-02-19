@@ -21,7 +21,7 @@ struct CountdownBadge: View {
                 Task {
                     await ChallengeInfoPopup(
                         symbol: "timer",
-                        title: "Temps restant",
+                        title: "Time remaining",
                         description: detailedCountdown,
                         accentColor: accentColor
                     ).present()
@@ -63,7 +63,7 @@ struct CountdownBadge: View {
 
     private var detailedCountdown: String {
         let remaining = endDate.timeIntervalSince(now)
-        guard remaining > 0 else { return "Ce challenge est terminé." }
+        guard remaining > 0 else { return "This challenge is over." }
 
         let days = Int(remaining) / 86400
         let hours = (Int(remaining) % 86400) / 3600
@@ -71,13 +71,13 @@ struct CountdownBadge: View {
 
         let timeString: String
         if days > 0 {
-            timeString = "\(days) jour\(days > 1 ? "s" : "") et \(hours) heure\(hours > 1 ? "s" : "")"
+            timeString = "\(days) day\(days > 1 ? "s" : "") and \(hours) hour\(hours > 1 ? "s" : "")"
         } else if hours > 0 {
-            timeString = "\(hours) heure\(hours > 1 ? "s" : "") et \(minutes) minute\(minutes > 1 ? "s" : "")"
+            timeString = "\(hours) hour\(hours > 1 ? "s" : "") and \(minutes) minute\(minutes > 1 ? "s" : "")"
         } else {
             timeString = "\(minutes) minute\(minutes > 1 ? "s" : "")"
         }
 
-        return "Il reste \(timeString) pour compléter ce challenge. Dépêche-toi ! ⏳"
+        return "\(timeString) left to complete this challenge. Hurry up! ⏳"
     }
 }

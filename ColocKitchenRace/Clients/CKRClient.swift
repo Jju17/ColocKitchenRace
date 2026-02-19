@@ -44,9 +44,14 @@ extension CKRClient: DependencyKey {
 
     static let liveValue = Self(
         getLast: {
-            // Demo mode: return mock game without hitting Firestore
+            // Demo mode: return current game state without hitting Firestore.
+            // If a game already exists in shared state (e.g. after registration updated it),
+            // preserve it instead of resetting to the default demo game.
             if DemoMode.isActive {
                 @Shared(.ckrGame) var ckrGame
+                if let existingGame = ckrGame {
+                    return .success(existingGame)
+                }
                 $ckrGame.withLock { $0 = DemoMode.demoCKRGame }
                 return .success(DemoMode.demoCKRGame)
             }

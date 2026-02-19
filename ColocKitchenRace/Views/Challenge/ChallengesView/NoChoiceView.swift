@@ -17,7 +17,7 @@ struct NoChoiceView: View {
                 .font(.system(size: 48))
                 .foregroundColor(.ckrMint)
 
-            Text("Tu as réalisé le défi ?")
+            Text("Did you complete the challenge?")
                 .font(.custom("BaksoSapi", size: 18))
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)

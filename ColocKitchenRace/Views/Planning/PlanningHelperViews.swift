@@ -14,8 +14,8 @@ struct PlanningRoleBadge: View {
 
     var body: some View {
         let (text, icon): (String, String) = switch role {
-        case .host:    ("Hote", "house.fill")
-        case .visitor: ("Invite", "figure.walk")
+        case .host:    ("Host", "house.fill")
+        case .visitor: ("Guest", "figure.walk")
         }
 
         Label(text, systemImage: icon)
@@ -51,8 +51,8 @@ struct PlanningAddressButton: View {
             .foregroundStyle(.primary)
         }
         .buttonStyle(.plain)
-        .confirmationDialog("Ouvrir l'adresse", isPresented: $showSheet) {
-            Button("Apple Plans") {
+        .confirmationDialog("Open address", isPresented: $showSheet) {
+            Button("Apple Maps") {
                 let encoded = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
                 URLOpener.open(urlString: "maps://?q=\(encoded)")
             }
@@ -60,10 +60,10 @@ struct PlanningAddressButton: View {
                 let encoded = address.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
                 URLOpener.open(urlString: "https://www.google.com/maps/search/?api=1&query=\(encoded)")
             }
-            Button("Copier l'adresse") {
+            Button("Copy address") {
                 UIPasteboard.general.string = address
             }
-            Button("Annuler", role: .cancel) {}
+            Button("Cancel", role: .cancel) {}
         }
     }
 }
@@ -79,14 +79,14 @@ struct PlanningPhoneRow: View {
         VStack(alignment: .leading, spacing: 8) {
             if let hostPhone {
                 PlanningPhoneButton(
-                    label: "Tel. hote",
+                    label: "Host phone",
                     number: hostPhone,
                     accentColor: accentColor
                 )
             }
             if let visitorPhone {
                 PlanningPhoneButton(
-                    label: "Tel. invite",
+                    label: "Guest phone",
                     number: visitorPhone,
                     accentColor: accentColor
                 )
@@ -124,15 +124,15 @@ struct PlanningPhoneButton: View {
             }
         }
         .buttonStyle(.plain)
-        .confirmationDialog("Appeler", isPresented: $showSheet) {
+        .confirmationDialog("Call", isPresented: $showSheet) {
             Button("\(label) : \(number)") {
                 let cleaned = number.replacingOccurrences(of: " ", with: "")
                 URLOpener.open(urlString: "tel:\(cleaned)")
             }
-            Button("Copier") {
+            Button("Copy") {
                 UIPasteboard.general.string = number
             }
-            Button("Annuler", role: .cancel) {}
+            Button("Cancel", role: .cancel) {}
         }
     }
 }

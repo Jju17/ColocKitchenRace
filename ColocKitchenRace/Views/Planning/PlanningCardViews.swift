@@ -56,7 +56,7 @@ struct PlanningStepCardView: View {
             // Role description
             if step.role == .host {
                 Label {
-                    Text("Vous recevez **\(step.cohouseName)** chez vous")
+                    Text("You're hosting **\(step.cohouseName)** at your place")
                         .font(.subheadline)
                 } icon: {
                     Image(systemName: "house.fill")
@@ -64,7 +64,7 @@ struct PlanningStepCardView: View {
                 }
             } else {
                 Label {
-                    Text("Vous allez chez **\(step.cohouseName)**")
+                    Text("You're going to **\(step.cohouseName)**'s place")
                         .font(.subheadline)
                 } icon: {
                     Image(systemName: "figure.walk")
@@ -92,7 +92,7 @@ struct PlanningStepCardView: View {
             HStack(spacing: 6) {
                 Image(systemName: "person.2.fill")
                     .foregroundStyle(style.color)
-                Text("**\(step.totalPeople)** personnes\(dietaryText(step.dietarySummary))")
+                Text("**\(step.totalPeople)** people\(dietaryText(step.dietarySummary))")
                     .font(.subheadline)
             }
 
@@ -107,7 +107,7 @@ struct PlanningStepCardView: View {
     private func dietaryText(_ summary: [String: Int]) -> String {
         if summary.isEmpty { return "" }
         let items = summary.map { "\($0.value) \($0.key.lowercased())" }
-        return " dont \(items.joined(separator: ", "))"
+        return " including \(items.joined(separator: ", "))"
     }
 }
 
@@ -173,7 +173,7 @@ struct PlanningPartyCardView: View {
             HStack(spacing: 6) {
                 Image(systemName: "exclamationmark.triangle.fill")
                     .foregroundStyle(.ckrGold)
-                Text("Pas de bracelet, pas d'entree !")
+                Text("No bracelet, no entry!")
                     .font(.custom("BaksoSapi", size: 14))
                     .fontWeight(.heavy)
             }
@@ -209,9 +209,9 @@ enum StepStyle {
 
     var title: String {
         switch self {
-        case .apero:  return "APERO"
-        case .diner:  return "DINER"
-        case .party:  return "TEUF"
+        case .apero:  return "APERITIF"
+        case .diner:  return "DINNER"
+        case .party:  return "PARTY"
         }
     }
 }

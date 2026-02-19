@@ -9,7 +9,7 @@
 /// Priority top --> Bottom
 ///
 /// - [-] Activate App Check
-/// - [-] Check localization
+/// - [x] Check localization
 
 
 

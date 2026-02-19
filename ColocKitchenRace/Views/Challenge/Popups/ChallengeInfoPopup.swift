@@ -45,7 +45,7 @@ struct ChallengeInfoPopup: CenterPopup {
             Button {
                 Task { await dismissLastPopup() }
             } label: {
-                Text("Ignorer")
+                Text("Dismiss")
                     .font(.custom("BaksoSapi", size: 14))
                     .fontWeight(.bold)
                     .foregroundStyle(.white)
@@ -72,28 +72,28 @@ extension ChallengeInfoPopup {
             return ChallengeInfoPopup(
                 symbol: "camera.fill",
                 title: "Picture Challenge",
-                description: "Prends ta plus belle photo. Souris 😄",
+                description: "Take your best photo. Smile 😄",
                 accentColor: accentColor
             )
         case .multipleChoice:
             return ChallengeInfoPopup(
                 symbol: "list.bullet.clipboard.fill",
                 title: "Multiple Choice",
-                description: "Choisis la bonne réponse. Une seule tentative 🫣",
+                description: "Pick the right answer. Only one attempt 🫣",
                 accentColor: accentColor
             )
         case .singleAnswer:
             return ChallengeInfoPopup(
                 symbol: "text.cursor",
                 title: "Single Answer",
-                description: "Réponse libre. Joue le jeu, sans tricher 👀",
+                description: "Free answer. Play fair, no cheating 👀",
                 accentColor: accentColor
             )
         case .noChoice:
             return ChallengeInfoPopup(
                 symbol: "checkmark.circle.fill",
                 title: "Action Challenge",
-                description: "Rien à faire ici. Valide quand c'est fait ✅",
+                description: "Nothing to do here. Validate when it's done ✅",
                 accentColor: accentColor
             )
         }
@@ -104,7 +104,7 @@ extension ChallengeInfoPopup {
     ChallengeInfoPopup(
         symbol: "camera.fill",
         title: "Picture Challenge",
-        description: "Prends ta plus belle photo. Souris 😄",
+        description: "Take your best photo. Smile 😄",
         accentColor: .ckrCoral
     )
 }
