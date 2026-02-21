@@ -433,6 +433,9 @@
         }
       }
     },
+    "Aperitif" : {
+
+    },
     "APERITIF" : {
       "localizations" : {
         "fr" : {
@@ -643,6 +646,9 @@
         }
       }
     },
+    "Choice %lld" : {
+
+    },
     "Choice: %@" : {
       "localizations" : {
         "fr" : {
@@ -692,6 +698,12 @@
           }
         }
       }
+    },
+    "CKR Countdown start" : {
+
+    },
+    "CKR Game already exists" : {
+
     },
     "CKR Registration" : {
       "localizations" : {
@@ -1053,6 +1065,9 @@
         }
       }
     },
+    "Delete" : {
+
+    },
     "Delete account" : {
       "localizations" : {
         "fr" : {
@@ -1142,6 +1157,9 @@
           }
         }
       }
+    },
+    "Diner" : {
+
     },
     "DINNER" : {
       "localizations" : {
@@ -1526,6 +1544,9 @@
     "Hello, World!" : {
       "shouldTranslate" : false
     },
+    "History" : {
+
+    },
     "Home" : {
       "localizations" : {
         "fr" : {
@@ -1796,6 +1817,9 @@
         }
       }
     },
+    "Loading history…" : {
+
+    },
     "Loading leaderboard…" : {
       "localizations" : {
         "fr" : {
@@ -1815,6 +1839,9 @@
           }
         }
       }
+    },
+    "Loading..." : {
+
     },
     "Location" : {
       "localizations" : {
@@ -2006,6 +2033,9 @@
         }
       }
     },
+    "Message" : {
+
+    },
     "Minutes" : {
       "localizations" : {
         "fr" : {
@@ -2116,6 +2146,9 @@
           }
         }
       }
+    },
+    "Next challenges :" : {
+
     },
     "Next CKR Game" : {
       "localizations" : {
@@ -2448,6 +2481,9 @@
         }
       }
     },
+    "Party" : {
+
+    },
     "PARTY" : {
       "localizations" : {
         "fr" : {
@@ -2747,6 +2783,9 @@
           }
         }
       }
+    },
+    "Reset" : {
+
     },
     "Reset all matches?" : {
       "localizations" : {
@@ -3164,6 +3203,9 @@
         }
       }
     },
+    "Status" : {
+
+    },
     "Status: %@" : {
       "localizations" : {
         "fr" : {
@@ -3330,6 +3372,12 @@
         }
       }
     },
+    "Target ID" : {
+
+    },
+    "Text" : {
+
+    },
     "The event planning will be available soon!" : {
       "localizations" : {
         "fr" : {
@@ -3399,6 +3447,9 @@
           }
         }
       }
+    },
+    "This will permanently delete your account and all associated data." : {
+
     },
     "This will permanently delete your account, your data, and remove you from your cohouse. This action cannot be undone." : {
       "localizations" : {
@@ -3478,6 +3529,9 @@
           }
         }
       }
+    },
+    "Users" : {
+
     },
     "Valid address ✅" : {
       "localizations" : {

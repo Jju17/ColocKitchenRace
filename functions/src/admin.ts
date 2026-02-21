@@ -21,12 +21,9 @@ interface SetAdminClaimRequest {
  * via `request.auth.token.admin == true`.
  *
  * Can only be called by an existing admin. To bootstrap the very first admin,
- * use the Firebase CLI:
- *   firebase functions:shell
- *   > setAdminClaim({ data: { targetAuthUid: "YOUR_AUTH_UID", isAdmin: true }, auth: { uid: "YOUR_AUTH_UID" } })
- *
- * Or set custom claims directly:
- *   admin.auth().setCustomUserClaims("YOUR_AUTH_UID", { admin: true })
+ * use the CLI script:
+ *   cd functions
+ *   npm run set-admin -- --uid YOUR_AUTH_UID
  */
 export const setAdminClaim = onCall<SetAdminClaimRequest>(
   { region: REGION },

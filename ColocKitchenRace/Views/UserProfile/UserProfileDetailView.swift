@@ -161,8 +161,10 @@ struct UserProfileDetailView: View {
                 Button {
                     self.store.send(.signOutButtonTapped)
                 } label: {
-                    Text("Sign out")
-                        .foregroundStyle(Color.red)
+                    HStack {
+                        Image(systemName: "rectangle.portrait.and.arrow.right")
+                        Text("Sign out")
+                    }
                 }
             }
 
@@ -174,15 +176,36 @@ struct UserProfileDetailView: View {
                         HStack(spacing: 8) {
                             ProgressView()
                             Text("Deleting account...")
-                                .foregroundStyle(Color.red)
                         }
                     } else {
-                        Text("Delete account")
-                            .foregroundStyle(Color.red)
-                            .bold()
+                        HStack {
+                            Image(systemName: "trash")
+                            Text("Delete account")
+                        }
                     }
                 }
+                .foregroundStyle(Color.red)
                 .disabled(store.isDeleting)
+                .confirmationDialog(
+                    "Delete account",
+                    isPresented: Binding(
+                        get: { store.showDeleteConfirmation },
+                        set: { if !$0 { store.send(.dismissDeleteConfirmation) } }
+                    ),
+                    titleVisibility: .visible
+                ) {
+                    Button("Delete my account", role: .destructive) {
+                        store.send(.deleteAccountConfirmed)
+                    }
+                    Button("Cancel", role: .cancel) {
+                        store.send(.dismissDeleteConfirmation)
+                    }
+                } message: {
+                    Text("This will permanently delete your account, your data, and remove you from your cohouse. This action cannot be undone.")
+                }
+            } footer: {
+                Text("This will permanently delete your account and all associated data.")
+                    .font(.caption)
             }
         }
         .navigationBarTitle("Profile")
@@ -229,24 +252,6 @@ struct UserProfileDetailView: View {
                     }
             }
         }
-        .confirmationDialog(
-            "Delete account",
-            isPresented: Binding(
-                get: { store.showDeleteConfirmation },
-                set: { if !$0 { store.send(.dismissDeleteConfirmation) } }
-            ),
-            titleVisibility: .visible
-        ) {
-            Button("Delete my account", role: .destructive) {
-                store.send(.deleteAccountConfirmed)
-            }
-            Button("Cancel", role: .cancel) {
-                store.send(.dismissDeleteConfirmation)
-            }
-        } message: {
-            Text("This will permanently delete your account, your data, and remove you from your cohouse. This action cannot be undone.")
-        }
-
     }
 }
 
