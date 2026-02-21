@@ -39,4 +39,12 @@ enum UserValidation {
         let pattern = #"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"#
         return email.range(of: pattern, options: .regularExpression) != nil
     }
+
+    /// Checks whether the given string looks like a valid phone number.
+    /// Accepts optional leading `+`, digits, spaces, hyphens and parentheses, minimum 7 characters.
+    static func isValidPhone(_ phone: String) -> Bool {
+        let trimmed = phone.trimmingCharacters(in: .whitespaces)
+        let pattern = #"^\+?[0-9\s\-()]{7,}$"#
+        return trimmed.range(of: pattern, options: .regularExpression) != nil
+    }
 }

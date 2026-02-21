@@ -21,6 +21,7 @@ struct UserProfileDetailFeature {
     struct State: Equatable {
         @Presents var destination: Destination.State?
         var errorMessage: String?
+        var successMessage: String?
         var isDeleting: Bool = false
         var showDeleteConfirmation: Bool = false
         @Shared(.userInfo) var userInfo
@@ -34,9 +35,12 @@ struct UserProfileDetailFeature {
         case dismissDeleteConfirmation
         case dismissDestinationButtonTapped
         case dismissErrorMessageButtonTapped
+        case dismissSuccessMessageButtonTapped
         case editUserButtonTapped
         case signOutButtonTapped
         case signOutFailed(String)
+        case _emailVerificationSent(String)
+        case _emailChangeFailed(String)
     }
 
     @Dependency(\.authenticationClient) var authenticationClient
@@ -57,11 +61,37 @@ struct UserProfileDetailFeature {
                         return .none
                     }
 
-                    state.destination = nil
-                    return .run { _ in
-                        try await authenticationClient.updateUser(editState.wipUser)
-                    } catch: { error, _ in
-                        Logger.authLog.log(level: .error, "Failed to update user: \(error)")
+                    let wipUser = editState.wipUser
+                    let originalEmail = state.userInfo?.email
+                    let newEmail = wipUser.email?.trimmingCharacters(in: .whitespaces)
+                    let emailChanged = wipUser.isEmailEditable
+                        && originalEmail != nil
+                        && newEmail != nil
+                        && newEmail != originalEmail?.trimmingCharacters(in: .whitespaces)
+
+                    if emailChanged, let newEmail {
+                        // Email changed — save other fields with old email, then send verification
+                        var userWithOldEmail = wipUser
+                        userWithOldEmail.email = originalEmail
+                        let savedUser = userWithOldEmail
+
+                        state.destination = nil
+                        return .run { send in
+                            try await authenticationClient.updateUser(savedUser)
+                            try await authenticationClient.sendVerificationEmail(newEmail)
+                            await send(._emailVerificationSent(newEmail))
+                        } catch: { error, send in
+                            Logger.authLog.log(level: .error, "Email change failed: \(error)")
+                            await send(._emailChangeFailed(error.localizedDescription))
+                        }
+                    } else {
+                        // Email not changed — save everything normally
+                        state.destination = nil
+                        return .run { _ in
+                            try await authenticationClient.updateUser(wipUser)
+                        } catch: { error, _ in
+                            Logger.authLog.log(level: .error, "Failed to update user: \(error)")
+                        }
                     }
                 case .deleteAccountButtonTapped:
                     state.showDeleteConfirmation = true
@@ -90,6 +120,15 @@ struct UserProfileDetailFeature {
                     return .none
                 case .dismissErrorMessageButtonTapped:
                     state.errorMessage = nil
+                    return .none
+                case .dismissSuccessMessageButtonTapped:
+                    state.successMessage = nil
+                    return .none
+                case let ._emailVerificationSent(newEmail):
+                    state.successMessage = "A verification link has been sent to \(newEmail). Your email will be updated once you click it."
+                    return .none
+                case let ._emailChangeFailed(message):
+                    state.errorMessage = message
                     return .none
                 case .editUserButtonTapped:
                     state.destination = .editUser(
@@ -225,6 +264,14 @@ struct UserProfileDetailView: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text(store.errorMessage ?? "")
+        }
+        .alert("Email Verification", isPresented: Binding(
+            get: { store.successMessage != nil },
+            set: { if !$0 { store.send(.dismissSuccessMessageButtonTapped) } }
+        )) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(store.successMessage ?? "")
         }
         .sheet(item: $store.scope(state: \.destination?.editUser, action: \.destination.editUser)) { editUserStore in
             NavigationStack {

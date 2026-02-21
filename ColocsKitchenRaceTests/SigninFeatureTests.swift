@@ -44,18 +44,6 @@ struct SigninFeatureTests {
         }
     }
 
-    // MARK: - Navigation
-
-    @Test("Switch to signup delegates correctly")
-    func switchToSignup() async {
-        let store = TestStore(initialState: SigninFeature.State()) {
-            SigninFeature()
-        }
-
-        await store.send(.switchToSignupButtonTapped)
-        await store.receive(\.delegate.switchToSignupButtonTapped)
-    }
-
     // MARK: - Binding
 
     @Test("Email and password fields bind correctly")
@@ -197,6 +185,105 @@ struct SigninFeatureTests {
 
         await store.send(.signinErrorTriggered("Network timeout")) {
             $0.errorMessage = "Network timeout"
+        }
+    }
+
+    // MARK: - Account Not Found / Create Account
+
+    @Test("Signin with non-existent account shows create account confirmation")
+    func signinAccountNotFound_showsConfirmation() async {
+        let store = TestStore(initialState: SigninFeature.State(email: "new@test.com", password: "password123")) {
+            SigninFeature()
+        } withDependencies: {
+            $0.authenticationClient.signIn = { _, _ in
+                throw AuthError.accountNotFound
+            }
+        }
+
+        await store.send(.signinButtonTapped)
+
+        await store.receive(\._accountNotFound) {
+            $0.showCreateAccountConfirmation = true
+        }
+    }
+
+    @Test("Create account confirmed calls createAccount and dismisses alert")
+    func createAccountConfirmed_callsCreate() async {
+        var createCalled = false
+        var createEmail: String?
+
+        let store = TestStore(
+            initialState: SigninFeature.State(
+                email: "new@test.com",
+                password: "password123",
+                showCreateAccountConfirmation: true
+            )
+        ) {
+            SigninFeature()
+        } withDependencies: {
+            $0.authenticationClient.createAccount = { email, _ in
+                createCalled = true
+                createEmail = email
+                return .mockUser
+            }
+        }
+
+        await store.send(.createAccountConfirmed) {
+            $0.showCreateAccountConfirmation = false
+        }
+
+        #expect(createCalled == true)
+        #expect(createEmail == "new@test.com")
+    }
+
+    @Test("Create account cancelled dismisses alert without creating account")
+    func createAccountCancelled_dismisses() async {
+        var createCalled = false
+
+        let store = TestStore(
+            initialState: SigninFeature.State(
+                email: "new@test.com",
+                password: "password123",
+                showCreateAccountConfirmation: true
+            )
+        ) {
+            SigninFeature()
+        } withDependencies: {
+            $0.authenticationClient.createAccount = { _, _ in
+                createCalled = true
+                return .mockUser
+            }
+        }
+
+        await store.send(.createAccountCancelled) {
+            $0.showCreateAccountConfirmation = false
+        }
+
+        #expect(createCalled == false)
+    }
+
+    @Test("Create account failure shows error message")
+    func createAccountFails_showsError() async {
+        let store = TestStore(
+            initialState: SigninFeature.State(
+                email: "new@test.com",
+                password: "weak",
+                showCreateAccountConfirmation: true
+            )
+        ) {
+            SigninFeature()
+        } withDependencies: {
+            $0.authenticationClient.createAccount = { _, _ in
+                throw AuthError.failedWithError("Password must be at least 6 characters")
+            }
+        }
+
+        await store.send(.createAccountConfirmed) {
+            $0.showCreateAccountConfirmation = false
+        }
+
+        await store.receive(\.signinErrorTriggered) {
+            $0.errorMessage = "Password must be at least 6 characters"
         }
     }
 }

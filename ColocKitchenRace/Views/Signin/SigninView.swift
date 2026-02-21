@@ -18,21 +18,18 @@ struct SigninFeature {
         var errorMessage: String?
         var focusedField: SigninField?
         var password: String = ""
+        var showCreateAccountConfirmation: Bool = false
     }
 
     enum Action: BindableAction {
         case binding(BindingAction<State>)
-        case switchToSignupButtonTapped
-        case delegate(Delegate)
         case signinButtonTapped
         case googleSigninButtonTapped
         case appleSigninButtonTapped
         case signinErrorTriggered(String)
-
-        @CasePathable
-        enum Delegate {
-            case switchToSignupButtonTapped
-        }
+        case _accountNotFound
+        case createAccountConfirmed
+        case createAccountCancelled
     }
 
     @Dependency(\.authenticationClient) var authenticationClient
@@ -43,10 +40,6 @@ struct SigninFeature {
             switch action {
                 case .binding:
                     return .none
-                case .switchToSignupButtonTapped:
-                    return .send(.delegate(.switchToSignupButtonTapped))
-                case .delegate:
-                    return .none
                 case .signinButtonTapped:
                     guard !state.email.trimmingCharacters(in: .whitespaces).isEmpty,
                           !state.password.isEmpty
@@ -54,12 +47,31 @@ struct SigninFeature {
                         state.errorMessage = "Please fill in all fields."
                         return .none
                     }
+                    state.errorMessage = nil
                     return .run { [state] send in
                         _ = try await self.authenticationClient.signIn(email: state.email, password: state.password)
+                    } catch: { error, send in
+                        if let authError = error as? AuthError, authError == .accountNotFound {
+                            await send(._accountNotFound)
+                        } else {
+                            Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
+                            await send(.signinErrorTriggered(error.localizedDescription))
+                        }
+                    }
+                case ._accountNotFound:
+                    state.showCreateAccountConfirmation = true
+                    return .none
+                case .createAccountConfirmed:
+                    state.showCreateAccountConfirmation = false
+                    return .run { [state] send in
+                        _ = try await self.authenticationClient.createAccount(email: state.email, password: state.password)
                     } catch: { error, send in
                         Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
                         await send(.signinErrorTriggered(error.localizedDescription))
                     }
+                case .createAccountCancelled:
+                    state.showCreateAccountConfirmation = false
+                    return .none
                 case .googleSigninButtonTapped:
                     return .run { send in
                         _ = try await self.authenticationClient.signInWithGoogle()
@@ -108,6 +120,12 @@ struct SigninView: View {
                                 self.store.send(.signinButtonTapped)
                             }
                             .frame(height: 50)
+                            
+                            if let errorMessage = store.errorMessage {
+                                Text(errorMessage)
+                                    .foregroundStyle(.red)
+                                    .font(.footnote)
+                            }
 
                             HStack {
                                 Rectangle().frame(height: 1).foregroundStyle(.gray.opacity(0.3))
@@ -155,19 +173,6 @@ struct SigninView: View {
                                 )
                             }
                             .buttonStyle(.plain)
-
-                            if let errorMessage = store.errorMessage {
-                                Text(errorMessage)
-                                    .foregroundStyle(.red)
-                                    .font(.footnote)
-                            }
-                            HStack {
-                                Text("You need an account?")
-                                Button("Click here") {
-                                    self.store.send(.switchToSignupButtonTapped)
-                                }
-                            }
-                            .font(.system(size: 14))
                         }
                         .padding(.top)
                     }
@@ -193,6 +198,19 @@ struct SigninView: View {
             }
             .scrollDismissesKeyboard(.interactively)
             .background { Color.ckrMintLight.ignoresSafeArea() }
+            .alert("Create account", isPresented: Binding(
+                get: { store.showCreateAccountConfirmation },
+                set: { if !$0 { store.send(.createAccountCancelled) } }
+            )) {
+                Button("Create") {
+                    store.send(.createAccountConfirmed)
+                }
+                Button("Cancel", role: .cancel) {
+                    store.send(.createAccountCancelled)
+                }
+            } message: {
+                Text("No account found for this email. Would you like to create a new account?")
+            }
         }
     }
 }

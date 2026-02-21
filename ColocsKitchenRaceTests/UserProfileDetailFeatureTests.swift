@@ -208,4 +208,173 @@ struct UserProfileDetailFeatureTests {
             $0.errorMessage = nil
         }
     }
+
+    @Test("dismissSuccessMessageButtonTapped clears successMessage")
+    func dismissSuccess() async {
+        let store = TestStore(
+            initialState: UserProfileDetailFeature.State(successMessage: "Some success")
+        ) {
+            UserProfileDetailFeature()
+        }
+
+        await store.send(.dismissSuccessMessageButtonTapped) {
+            $0.successMessage = nil
+        }
+    }
+
+    // MARK: - Email Change with Verification
+
+    @Test("confirmEdit with changed email sends verification and saves other fields")
+    func confirmEdit_emailChanged_sendsVerification() async {
+        @Shared(.userInfo) var userInfo
+        var originalUser = User.mockUser
+        originalUser.email = "old@test.com"
+        $userInfo.withLock { $0 = originalUser }
+
+        var changedUser = originalUser
+        changedUser.email = "new@test.com"
+        changedUser.firstName = "UpdatedName"
+
+        var updatedUser: User?
+        var verificationEmail: String?
+
+        let store = TestStore(
+            initialState: UserProfileDetailFeature.State(
+                destination: .editUser(UserProfileFormFeature.State(wipUser: changedUser))
+            )
+        ) {
+            UserProfileDetailFeature()
+        } withDependencies: {
+            $0.authenticationClient.updateUser = { user in updatedUser = user }
+            $0.authenticationClient.sendVerificationEmail = { email in verificationEmail = email }
+        }
+
+        await store.send(.confirmEditUserButtonTapped) {
+            $0.destination = nil
+        }
+
+        await store.receive(\._emailVerificationSent) {
+            $0.successMessage = "A verification link has been sent to new@test.com. Your email will be updated once you click it."
+        }
+
+        // Other fields saved with the OLD email
+        #expect(updatedUser?.email == "old@test.com")
+        #expect(updatedUser?.firstName == "UpdatedName")
+        // Verification sent to NEW email
+        #expect(verificationEmail == "new@test.com")
+
+        $userInfo.withLock { $0 = nil }
+    }
+
+    @Test("confirmEdit with changed email but sendVerification fails shows error")
+    func confirmEdit_emailChanged_verificationFails() async {
+        @Shared(.userInfo) var userInfo
+        var originalUser = User.mockUser
+        originalUser.email = "old@test.com"
+        $userInfo.withLock { $0 = originalUser }
+
+        var changedUser = originalUser
+        changedUser.email = "new@test.com"
+
+        let store = TestStore(
+            initialState: UserProfileDetailFeature.State(
+                destination: .editUser(UserProfileFormFeature.State(wipUser: changedUser))
+            )
+        ) {
+            UserProfileDetailFeature()
+        } withDependencies: {
+            $0.authenticationClient.updateUser = { _ in }
+            $0.authenticationClient.sendVerificationEmail = { _ in
+                throw NSError(domain: "auth", code: 1, userInfo: [NSLocalizedDescriptionKey: "Too many requests"])
+            }
+        }
+
+        await store.send(.confirmEditUserButtonTapped) {
+            $0.destination = nil
+        }
+
+        await store.receive(\._emailChangeFailed) {
+            $0.errorMessage = "Too many requests"
+        }
+
+        $userInfo.withLock { $0 = nil }
+    }
+
+    @Test("confirmEdit with same email does not send verification")
+    func confirmEdit_sameEmail_noVerification() async {
+        @Shared(.userInfo) var userInfo
+        $userInfo.withLock { $0 = .mockUser }
+
+        var sameEmailUser = User.mockUser
+        sameEmailUser.firstName = "NewName"
+
+        var updatedUser: User?
+        var verificationCalled = false
+
+        let store = TestStore(
+            initialState: UserProfileDetailFeature.State(
+                destination: .editUser(UserProfileFormFeature.State(wipUser: sameEmailUser))
+            )
+        ) {
+            UserProfileDetailFeature()
+        } withDependencies: {
+            $0.authenticationClient.updateUser = { user in updatedUser = user }
+            $0.authenticationClient.sendVerificationEmail = { _ in verificationCalled = true }
+        }
+
+        await store.send(.confirmEditUserButtonTapped) {
+            $0.destination = nil
+        }
+
+        // updateUser called with the new name AND the same email
+        #expect(updatedUser?.firstName == "NewName")
+        #expect(updatedUser?.email == User.mockUser.email)
+        // No verification email sent
+        #expect(verificationCalled == false)
+
+        $userInfo.withLock { $0 = nil }
+    }
+
+    @Test("confirmEdit with changed email saves other fields immediately")
+    func confirmEdit_emailChanged_savesOtherFields() async {
+        @Shared(.userInfo) var userInfo
+        var originalUser = User.mockUser
+        originalUser.email = "old@test.com"
+        $userInfo.withLock { $0 = originalUser }
+
+        var changedUser = originalUser
+        changedUser.email = "new@test.com"
+        changedUser.firstName = "Julie"
+        changedUser.lastName = "Dupont"
+        changedUser.phoneNumber = "+32 470 99 99 99"
+
+        var savedUser: User?
+
+        let store = TestStore(
+            initialState: UserProfileDetailFeature.State(
+                destination: .editUser(UserProfileFormFeature.State(wipUser: changedUser))
+            )
+        ) {
+            UserProfileDetailFeature()
+        } withDependencies: {
+            $0.authenticationClient.updateUser = { user in savedUser = user }
+            $0.authenticationClient.sendVerificationEmail = { _ in }
+        }
+
+        await store.send(.confirmEditUserButtonTapped) {
+            $0.destination = nil
+        }
+
+        await store.receive(\._emailVerificationSent) {
+            $0.successMessage = "A verification link has been sent to new@test.com. Your email will be updated once you click it."
+        }
+
+        // Saved with old email but updated other fields
+        #expect(savedUser?.email == "old@test.com")
+        #expect(savedUser?.firstName == "Julie")
+        #expect(savedUser?.lastName == "Dupont")
+        #expect(savedUser?.phoneNumber == "+32 470 99 99 99")
+
+        $userInfo.withLock { $0 = nil }
+    }
 }

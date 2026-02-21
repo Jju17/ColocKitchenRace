@@ -297,6 +297,7 @@ enum DemoMode {
         // Ensure the user's cohouseId points to the demo cohouse
         var demoUser = user
         demoUser.cohouseId = demoCohouseId.uuidString
+        demoUser.phoneNumber = "+32 470 00 00 00"
         $userInfo.withLock { $0 = demoUser }
 
         $cohouse.withLock { $0 = demoCohouse }

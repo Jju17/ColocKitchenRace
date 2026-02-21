@@ -15,7 +15,7 @@ struct AppFeature {
     enum State: Equatable {
         case tab(TabFeature.State)
         case signin(SigninFeature.State)
-        case signup(SignupFeature.State)
+        case profileCompletion(ProfileCompletionFeature.State)
         case emailVerification(EmailVerificationFeature.State)
         case splashScreen(SplashScreenFeature.State)
     }
@@ -25,7 +25,7 @@ struct AppFeature {
         case onTask
         case tab(TabFeature.Action)
         case signin(SigninFeature.Action)
-        case signup(SignupFeature.Action)
+        case profileCompletion(ProfileCompletionFeature.Action)
         case emailVerification(EmailVerificationFeature.Action)
         case splashScreen(SplashScreenFeature.Action)
         case newAuthStateTrigger(FirebaseAuth.User?)
@@ -45,7 +45,27 @@ struct AppFeature {
             case let .newAuthStateTrigger(user):
                 if let user {
                     if user.isEmailVerified {
-                        state = .tab(TabFeature.State())
+                        @Shared(.userInfo) var userInfo
+
+                        // Sync Firebase Auth email → Firestore if changed (e.g. after email re-verification)
+                        var syncEffect: Effect<Action> = .none
+                        let authEmail = user.email
+                        let firestoreEmail = userInfo?.email
+                        if let authEmail, authEmail != firestoreEmail, var updatedUser = userInfo {
+                            updatedUser.email = authEmail
+                            $userInfo.withLock { $0 = updatedUser }
+                            let userToSync = updatedUser
+                            syncEffect = .run { _ in
+                                try await self.authenticationClient.updateUser(userToSync)
+                            } catch: { _, _ in }
+                        }
+
+                        if let currentUser = userInfo, currentUser.needsProfileCompletion {
+                            state = .profileCompletion(ProfileCompletionFeature.State())
+                        } else {
+                            state = .tab(TabFeature.State())
+                        }
+                        return syncEffect
                     } else {
                         state = .emailVerification(EmailVerificationFeature.State())
                     }
@@ -53,28 +73,24 @@ struct AppFeature {
                     state = .signin(SigninFeature.State())
                 }
                 return .none
-            case let .signin(.delegate(action)):
-                switch action {
-                case .switchToSignupButtonTapped:
-                    state = State.signup(SignupFeature.State())
-                    return .none
-                }
-            case let .signup(.delegate(action)):
-                switch action {
-                case .switchToSigninButtonTapped:
-                    state = State.signin(SigninFeature.State())
-                    return .none
-                }
-            case .emailVerification(.delegate(.emailVerified)):
+            case .profileCompletion(.delegate(.profileCompleted)):
                 state = .tab(TabFeature.State())
                 return .none
-            case .tab, .signin, .signup, .emailVerification, .splashScreen:
+            case .emailVerification(.delegate(.emailVerified)):
+                @Shared(.userInfo) var userInfo
+                if let currentUser = userInfo, currentUser.needsProfileCompletion {
+                    state = .profileCompletion(ProfileCompletionFeature.State())
+                } else {
+                    state = .tab(TabFeature.State())
+                }
+                return .none
+            case .tab, .signin, .profileCompletion, .emailVerification, .splashScreen:
                 return .none
             }
         }
         .ifCaseLet(\.tab, action: \.tab) { TabFeature() }
         .ifCaseLet(\.signin, action: \.signin) { SigninFeature() }
-        .ifCaseLet(\.signup, action: \.signup) { SignupFeature() }
+        .ifCaseLet(\.profileCompletion, action: \.profileCompletion) { ProfileCompletionFeature() }
         .ifCaseLet(\.emailVerification, action: \.emailVerification) { EmailVerificationFeature() }
         .ifCaseLet(\.splashScreen, action: \.splashScreen) { SplashScreenFeature() }
     }
@@ -94,9 +110,9 @@ struct AppView: View {
                 if let signinStore = store.scope(state: \.signin, action: \.signin) {
                     SigninView(store: signinStore)
                 }
-            case .signup:
-                if let signupStore = store.scope(state: \.signup, action: \.signup) {
-                    SignupView(store: signupStore)
+            case .profileCompletion:
+                if let profileStore = store.scope(state: \.profileCompletion, action: \.profileCompletion) {
+                    ProfileCompletionView(store: profileStore)
                 }
             case .emailVerification:
                 if let verificationStore = store.scope(state: \.emailVerification, action: \.emailVerification) {

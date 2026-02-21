@@ -44,6 +44,13 @@ extension User {
         "\(firstName) \(lastName)"
     }
 
+    /// Whether the user still needs to fill in required profile fields (first name, last name, phone).
+    var needsProfileCompletion: Bool {
+        firstName.trimmingCharacters(in: .whitespaces).isEmpty
+        || lastName.trimmingCharacters(in: .whitespaces).isEmpty
+        || (phoneNumber ?? "").trimmingCharacters(in: .whitespaces).isEmpty
+    }
+
     func toCohouseUser(cohouseUserId: UUID = UUID(), isAdmin: Bool = false) -> CohouseUser {
         CohouseUser(id: cohouseUserId, isAdmin: isAdmin, surname: fullName, userId: id.uuidString)
     }

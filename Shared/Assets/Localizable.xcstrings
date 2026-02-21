@@ -414,6 +414,7 @@
       }
     },
     "Already have an account?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -716,6 +717,7 @@
       }
     },
     "Click here" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -845,6 +847,9 @@
         }
       }
     },
+    "Complete your profile" : {
+
+    },
     "Configure event" : {
       "localizations" : {
         "fr" : {
@@ -914,6 +919,9 @@
           }
         }
       }
+    },
+    "Continue" : {
+
     },
     "Continue anyway" : {
       "localizations" : {
@@ -1004,6 +1012,9 @@
           }
         }
       }
+    },
+    "Create account" : {
+
     },
     "Create new CKR Game" : {
       "localizations" : {
@@ -1310,6 +1321,9 @@
           }
         }
       }
+    },
+    "Email Verification" : {
+
     },
     "End" : {
       "localizations" : {
@@ -2189,6 +2203,9 @@
           }
         }
       }
+    },
+    "No account found for this email. Would you like to create a new account?" : {
+
     },
     "No bracelet, no entry!" : {
       "localizations" : {
@@ -3124,6 +3141,7 @@
       "shouldTranslate" : false
     },
     "Sign up" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -3134,6 +3152,7 @@
       }
     },
     "Sign up with Apple" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -3144,6 +3163,7 @@
       }
     },
     "Sign up with Google" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -3613,6 +3633,9 @@
         }
       }
     },
+    "We need a few more details before you can get started." : {
+
+    },
     "You have been removed from this cohouse by admin user." : {
       "localizations" : {
         "fr" : {
@@ -3624,6 +3647,7 @@
       }
     },
     "You need an account?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {

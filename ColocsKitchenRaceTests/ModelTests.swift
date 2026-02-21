@@ -124,38 +124,22 @@ struct UserModelTests {
         #expect(regularCohouseUser.isAdmin == false)
     }
 
-    @Test("SignupUser.createUser preserves phone number")
-    func signupUserPreservesPhone() {
-        let signupData = SignupUser(
-            firstName: "Test",
-            lastName: "User",
-            email: "test@test.com",
-            password: "password",
-            phone: "+32479506841"
-        )
-        let user = signupData.createUser(authId: "auth-123")
+    @Test("User.needsProfileCompletion returns true when fields are missing")
+    func needsProfileCompletion_missingFields() {
+        let userNoName = User(id: UUID(), firstName: "", lastName: "", email: "test@test.com")
+        #expect(userNoName.needsProfileCompletion == true)
 
-        #expect(user.phoneNumber == "+32479506841")
-        #expect(user.firstName == "Test")
-        #expect(user.lastName == "User")
-        #expect(user.email == "test@test.com")
-        #expect(user.authId == "auth-123")
-        // isSubscribeToNews defaults to false at signup — user can enable later in profile
-        #expect(user.isSubscribeToNews == false)
+        let userNoPhone = User(id: UUID(), firstName: "Test", lastName: "User", email: "test@test.com")
+        #expect(userNoPhone.needsProfileCompletion == true)
+
+        let userWhitespace = User(id: UUID(), firstName: "  ", lastName: "User", phoneNumber: "+32 470 12 34 56", email: "test@test.com")
+        #expect(userWhitespace.needsProfileCompletion == true)
     }
 
-    @Test("SignupUser.createUser with empty phone sets nil")
-    func signupUserEmptyPhone() {
-        let signupData = SignupUser(
-            firstName: "Test",
-            lastName: "User",
-            email: "test@test.com",
-            password: "password",
-            phone: ""
-        )
-        let user = signupData.createUser(authId: "auth-123")
-
-        #expect(user.phoneNumber == nil)
+    @Test("User.needsProfileCompletion returns false when all fields present")
+    func needsProfileCompletion_allPresent() {
+        let completeUser = User(id: UUID(), firstName: "Test", lastName: "User", phoneNumber: "+32479506841", email: "test@test.com")
+        #expect(completeUser.needsProfileCompletion == false)
     }
 }
 

@@ -21,6 +21,7 @@ import UIKit
 enum AuthError: Error, LocalizedError, Equatable {
     case failed
     case failedWithError(String)
+    case accountNotFound
 
     var errorDescription: String? {
         switch self {
@@ -28,6 +29,8 @@ enum AuthError: Error, LocalizedError, Equatable {
             return "Authentication failed"
         case .failedWithError(let message):
             return message
+        case .accountNotFound:
+            return "No account found for this email."
         }
     }
 }
@@ -36,14 +39,15 @@ enum AuthError: Error, LocalizedError, Equatable {
 
 @DependencyClient
 struct AuthenticationClient {
-    var signUp: @Sendable (_ signupUserData: SignupUser) async throws -> User
     var signIn: @Sendable (_ email: String, _ password: String) async throws -> User
+    var createAccount: @Sendable (_ email: String, _ password: String) async throws -> User
     var signOut: () async throws -> Void
     var deleteAccount: @Sendable () async throws -> Void
     var updateUser: (_ user: User) async throws -> Void
     var resendVerificationEmail: @Sendable () async throws -> Void
     var signInWithGoogle: @Sendable () async throws -> User
     var signInWithApple: @Sendable () async throws -> User
+    var sendVerificationEmail: @Sendable (_ newEmail: String) async throws -> Void
     var reloadCurrentUser: @Sendable () async throws -> Bool
     var listenAuthState: @Sendable () -> AsyncStream<FirebaseAuth.User?> = { .never }
 }
@@ -55,41 +59,50 @@ extension AuthenticationClient: DependencyKey {
     // MARK: Live
 
     static let liveValue = Self(
-        signUp: { signupUserData in
-            @Shared(.userInfo) var userInfo
-
-            let authResult = try await Auth.auth().createUser(
-                withEmail: signupUserData.email,
-                password: signupUserData.password
-            )
-            try await authResult.user.sendEmailVerification()
-
-            let newUser = signupUserData.createUser(authId: authResult.user.uid)
-
-            try Firestore.firestore()
-                .collection("users")
-                .document(newUser.id.uuidString)
-                .setData(from: newUser)
-
-            try? await Messaging.messaging().subscribe(toTopic: "all_users")
-
-            $userInfo.withLock { $0 = newUser }
-            return newUser
-        },
         signIn: { email, password in
             @Shared(.userInfo) var userInfo
             @Shared(.cohouse) var cohouse
 
             let db = Firestore.firestore()
-            let authResult = try await Auth.auth().signIn(withEmail: email, password: password)
 
+            // Try signing in. If the user doesn't exist, throw .accountNotFound
+            // so the UI can ask for confirmation before creating an account.
+            let authResult: AuthDataResult
+            do {
+                authResult = try await Auth.auth().signIn(withEmail: email, password: password)
+            } catch {
+                let errorCode = (error as NSError).code
+                // Firebase may return .userNotFound (17011) or .invalidCredential
+                // (17004, when email enumeration protection is enabled) for non-existent accounts.
+                if errorCode == AuthErrorCode.userNotFound.rawValue
+                    || errorCode == AuthErrorCode.invalidCredential.rawValue {
+                    throw AuthError.accountNotFound
+                }
+                throw error
+            }
+
+            // Existing user — find Firestore profile
             let snapshot = try await db
                 .collection("users")
                 .whereField("authId", isEqualTo: authResult.user.uid)
                 .getDocuments()
 
-            guard let loggedUser = try snapshot.documents.first?.data(as: User.self) else {
-                throw AuthError.failed
+            let loggedUser: User
+            if let existing = try snapshot.documents.first?.data(as: User.self) {
+                loggedUser = existing
+            } else {
+                // Firebase Auth account exists but no Firestore profile (edge case) — create one
+                let newUser = User(
+                    id: UUID(),
+                    authId: authResult.user.uid,
+                    authProvider: .email,
+                    isSubscribeToNews: false,
+                    email: email
+                )
+                try db.collection("users")
+                    .document(newUser.id.uuidString)
+                    .setData(from: newUser)
+                loggedUser = newUser
             }
 
             try? await Messaging.messaging().subscribe(toTopic: "all_users")
@@ -110,6 +123,30 @@ extension AuthenticationClient: DependencyKey {
             }
 
             return loggedUser
+        },
+        createAccount: { email, password in
+            @Shared(.userInfo) var userInfo
+
+            let db = Firestore.firestore()
+
+            let createResult = try await Auth.auth().createUser(withEmail: email, password: password)
+            try await createResult.user.sendEmailVerification()
+
+            let newUser = User(
+                id: UUID(),
+                authId: createResult.user.uid,
+                authProvider: .email,
+                isSubscribeToNews: false,
+                email: email
+            )
+
+            try db.collection("users")
+                .document(newUser.id.uuidString)
+                .setData(from: newUser)
+
+            try? await Messaging.messaging().subscribe(toTopic: "all_users")
+            $userInfo.withLock { $0 = newUser }
+            return newUser
         },
         signOut: {
             try? await Messaging.messaging().unsubscribe(fromTopic: "all_users")
@@ -313,6 +350,10 @@ extension AuthenticationClient: DependencyKey {
 
             return user
         },
+        sendVerificationEmail: { newEmail in
+            guard let user = Auth.auth().currentUser else { throw AuthError.failed }
+            try await user.sendEmailVerification(beforeUpdatingEmail: newEmail)
+        },
         reloadCurrentUser: {
             guard let user = Auth.auth().currentUser else { throw AuthError.failed }
             try await user.reload()
@@ -332,14 +373,15 @@ extension AuthenticationClient: DependencyKey {
     // MARK: Test
 
     static let testValue = Self(
-        signUp: { _ in .mockUser },
         signIn: { _, _ in .mockUser },
+        createAccount: { _, _ in .mockUser },
         signOut: {},
         deleteAccount: { },
         updateUser: { _ in },
         resendVerificationEmail: {},
         signInWithGoogle: { .mockUser },
         signInWithApple: { .mockUser },
+        sendVerificationEmail: { _ in },
         reloadCurrentUser: { true },
         listenAuthState: { AsyncStream { $0.finish() } }
     )
