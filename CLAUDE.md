@@ -182,11 +182,20 @@ xcodebuild -project ios/ColocsKitchenRace.xcodeproj -scheme colockitchenrace -de
 - `/news/{newsId}` - In-app news
 - `/notificationHistory/{docId}` - Admin notification logs
 
-## CI/CD
-### iOS (Bitrise)
+## CI/CD (Bitrise)
+Config: `bitrise.yml` at project root.
+
+### iOS
 - `deploy_testflight` workflow: builds main app -> TestFlight
 - `deploy_testflight_admin` workflow: builds CKRAdmin -> TestFlight
 - `GoogleService-Info.plist` restored from Base64 secrets at build time
+
+### Android
+- `android_test` workflow: runs unit tests (debug variant)
+- `deploy_play_store` workflow: builds signed release AAB -> Play Store internal track
+- `google-services.json` restored from Base64 secret (`GOOGLE_SERVICES_JSON_BASE64`)
+- Keystore restored from Base64 secret (`ANDROID_KEYSTORE_BASE64`)
+- Required secrets: `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`
 
 ## Important Notes
 - All Firebase resources are in `europe-west1` (Belgium)
