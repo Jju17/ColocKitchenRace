@@ -1,0 +1,260 @@
+[debug] [2026-02-21T16:19:58.518Z] ----------------------------------------------------------------------
+[debug] [2026-02-21T16:19:58.519Z] Command:       /opt/homebrew/Cellar/node/25.6.1/bin/node /opt/homebrew/bin/firebase emulators:start --only functions
+[debug] [2026-02-21T16:19:58.519Z] CLI Version:   15.6.0
+[debug] [2026-02-21T16:19:58.520Z] Platform:      darwin
+[debug] [2026-02-21T16:19:58.520Z] Node Version:  v25.6.1
+[debug] [2026-02-21T16:19:58.520Z] Time:          Sat Feb 21 2026 17:19:58 GMT+0100 (Central European Standard Time)
+[debug] [2026-02-21T16:19:58.520Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-02-21T16:19:59.070Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-02-21T16:19:59.070Z] > authorizing via signed-in user (julien@rahier.dev)
+[info] i  emulators: Starting emulators: functions {"metadata":{"emulator":{"name":"hub"},"message":"Starting emulators: functions"}}
+[debug] [2026-02-21T16:19:59.342Z] [logging] Logging Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-02-21T16:19:59.342Z] assigned listening specs for emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}]},"metadata":{"message":"assigned listening specs for emulators"}}
+[debug] [2026-02-21T16:19:59.344Z] Write emulator hub locator at /var/folders/wf/26q7xj4j2g345hwxf2h7_nyw0000gn/T/hub-colockitchenrace.json
+[debug] [2026-02-21T16:19:59.603Z] [functions] Functions Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-02-21T16:19:59.603Z] [eventarc] Eventarc Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-02-21T16:19:59.603Z] [tasks] Cloud Tasks Emulator only supports listening on one address (127.0.0.1). Not listening on ::1
+[debug] [2026-02-21T16:19:59.603Z] late-assigned ports for functions and eventarc emulators {"user":{"hub":[{"address":"127.0.0.1","family":"IPv4","port":4400},{"address":"::1","family":"IPv6","port":4400}],"ui":[{"address":"127.0.0.1","family":"IPv4","port":4000},{"address":"::1","family":"IPv6","port":4000}],"logging":[{"address":"127.0.0.1","family":"IPv4","port":4500}],"functions":[{"address":"127.0.0.1","family":"IPv4","port":5001}],"eventarc":[{"address":"127.0.0.1","family":"IPv4","port":9299}],"tasks":[{"address":"127.0.0.1","family":"IPv4","port":9499}]},"metadata":{"message":"late-assigned ports for functions and eventarc emulators"}}
+[warn] ⚠  functions: The following emulators are not running, calls to these services from the Functions emulator will affect production: apphosting, auth, firestore, database, hosting, pubsub, storage, dataconnect {"metadata":{"emulator":{"name":"functions"},"message":"The following emulators are not running, calls to these services from the Functions emulator will affect production: \u001b[1mapphosting, auth, firestore, database, hosting, pubsub, storage, dataconnect\u001b[22m"}}
+[warn] ⚠  functions: Application Default Credentials detected. Non-emulated services will access production using these credentials. Be careful! {"metadata":{"emulator":{"name":"functions"},"message":"Application Default Credentials detected. Non-emulated services will access production using these credentials. Be careful!"}}
+[debug] [2026-02-21T16:20:05.578Z] Checked if tokens are valid: false, expires at: 1771689425169
+[debug] [2026-02-21T16:20:05.578Z] Checked if tokens are valid: false, expires at: 1771689425169
+[debug] [2026-02-21T16:20:05.578Z] > refreshing access token with scopes: []
+[debug] [2026-02-21T16:20:05.583Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2026-02-21T16:20:05.583Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-02-21T16:20:05.690Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2026-02-21T16:20:05.691Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2026-02-21T16:20:05.716Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/colockitchenrace/adminSdkConfig [none]
+[debug] [2026-02-21T16:20:06.232Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/colockitchenrace/adminSdkConfig 200
+[debug] [2026-02-21T16:20:06.232Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/colockitchenrace/adminSdkConfig {"projectId":"colockitchenrace","storageBucket":"colockitchenrace.firebasestorage.app"}
+[info] i  ui: downloading ui-v1.15.0.zip... {"metadata":{"emulator":{"name":"ui"},"message":"downloading ui-v1.15.0.zip..."}}
+[debug] [2026-02-21T16:20:06.256Z] >>> [apiv2][query] GET https://storage.googleapis.com/firebase-preview-drop/emulator/ui-v1.15.0.zip 
+[debug] [2026-02-21T16:20:06.310Z] <<< [apiv2][status] GET https://storage.googleapis.com/firebase-preview-drop/emulator/ui-v1.15.0.zip 200
+[debug] [2026-02-21T16:20:06.311Z] <<< [apiv2][body] GET https://storage.googleapis.com/firebase-preview-drop/emulator/ui-v1.15.0.zip [stream]
+[debug] [2026-02-21T16:20:06.501Z] Data is 3538469
+[debug] [2026-02-21T16:20:06.501Z] [unzip] Entry: client/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-02-21T16:20:06.501Z] [unzip] Processing entry: client/
+[debug] [2026-02-21T16:20:06.501Z] [unzip] mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/
+[debug] [2026-02-21T16:20:06.501Z] [unzip] Entry: client/favicon-16x16.png (compressed_size=293 bytes, uncompressed_size=293 bytes)
+[debug] [2026-02-21T16:20:06.502Z] [unzip] Processing entry: client/favicon-16x16.png
+[debug] [2026-02-21T16:20:06.502Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client
+[debug] [2026-02-21T16:20:06.502Z] [unzip] Writing file: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/favicon-16x16.png
+[debug] [2026-02-21T16:20:06.502Z] [unzip] Entry: client/safari-pinned-tab.svg (compressed_size=1433 bytes, uncompressed_size=2611 bytes)
+[debug] [2026-02-21T16:20:06.502Z] [unzip] Processing entry: client/safari-pinned-tab.svg
+[debug] [2026-02-21T16:20:06.502Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client
+[debug] [2026-02-21T16:20:06.502Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/safari-pinned-tab.svg
+[debug] [2026-02-21T16:20:06.505Z] [unzip] Entry: client/favicon.ico (compressed_size=2933 bytes, uncompressed_size=13294 bytes)
+[debug] [2026-02-21T16:20:06.505Z] [unzip] Processing entry: client/favicon.ico
+[debug] [2026-02-21T16:20:06.505Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client
+[debug] [2026-02-21T16:20:06.505Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/favicon.ico
+[debug] [2026-02-21T16:20:06.506Z] [unzip] Entry: client/index.html (compressed_size=1364 bytes, uncompressed_size=3071 bytes)
+[debug] [2026-02-21T16:20:06.506Z] [unzip] Processing entry: client/index.html
+[debug] [2026-02-21T16:20:06.506Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client
+[debug] [2026-02-21T16:20:06.506Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/index.html
+[debug] [2026-02-21T16:20:06.507Z] [unzip] Entry: client/android-chrome-192x192.png (compressed_size=2684 bytes, uncompressed_size=2684 bytes)
+[debug] [2026-02-21T16:20:06.507Z] [unzip] Processing entry: client/android-chrome-192x192.png
+[debug] [2026-02-21T16:20:06.507Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client
+[debug] [2026-02-21T16:20:06.507Z] [unzip] Writing file: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/android-chrome-192x192.png
+[debug] [2026-02-21T16:20:06.507Z] [unzip] Entry: client/apple-touch-icon.png (compressed_size=2123 bytes, uncompressed_size=2152 bytes)
+[debug] [2026-02-21T16:20:06.507Z] [unzip] Processing entry: client/apple-touch-icon.png
+[debug] [2026-02-21T16:20:06.507Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client
+[debug] [2026-02-21T16:20:06.507Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/apple-touch-icon.png
+[debug] [2026-02-21T16:20:06.508Z] [unzip] Entry: client/android-chrome-512x512.png (compressed_size=5369 bytes, uncompressed_size=5411 bytes)
+[debug] [2026-02-21T16:20:06.508Z] [unzip] Processing entry: client/android-chrome-512x512.png
+[debug] [2026-02-21T16:20:06.508Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client
+[debug] [2026-02-21T16:20:06.508Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/android-chrome-512x512.png
+[debug] [2026-02-21T16:20:06.508Z] [unzip] Entry: client/manifest.json (compressed_size=245 bytes, uncompressed_size=551 bytes)
+[debug] [2026-02-21T16:20:06.508Z] [unzip] Processing entry: client/manifest.json
+[debug] [2026-02-21T16:20:06.508Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client
+[debug] [2026-02-21T16:20:06.508Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/manifest.json
+[debug] [2026-02-21T16:20:06.509Z] [unzip] Entry: client/robots.txt (compressed_size=26 bytes, uncompressed_size=26 bytes)
+[debug] [2026-02-21T16:20:06.509Z] [unzip] Processing entry: client/robots.txt
+[debug] [2026-02-21T16:20:06.509Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client
+[debug] [2026-02-21T16:20:06.509Z] [unzip] Writing file: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/robots.txt
+[debug] [2026-02-21T16:20:06.509Z] [unzip] Entry: client/mstile-150x150.png (compressed_size=2034 bytes, uncompressed_size=2034 bytes)
+[debug] [2026-02-21T16:20:06.509Z] [unzip] Processing entry: client/mstile-150x150.png
+[debug] [2026-02-21T16:20:06.509Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client
+[debug] [2026-02-21T16:20:06.509Z] [unzip] Writing file: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/mstile-150x150.png
+[debug] [2026-02-21T16:20:06.509Z] [unzip] Entry: client/assets/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-02-21T16:20:06.509Z] [unzip] Processing entry: client/assets/
+[debug] [2026-02-21T16:20:06.509Z] [unzip] mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/
+[debug] [2026-02-21T16:20:06.509Z] [unzip] Entry: client/assets/index-BX-A56oj.js (compressed_size=582089 bytes, uncompressed_size=2092775 bytes)
+[debug] [2026-02-21T16:20:06.510Z] [unzip] Processing entry: client/assets/index-BX-A56oj.js
+[debug] [2026-02-21T16:20:06.510Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets
+[debug] [2026-02-21T16:20:06.510Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/index-BX-A56oj.js
+[debug] [2026-02-21T16:20:06.515Z] [unzip] Entry: client/assets/index-CjB9C900.css (compressed_size=35979 bytes, uncompressed_size=298654 bytes)
+[debug] [2026-02-21T16:20:06.515Z] [unzip] Processing entry: client/assets/index-CjB9C900.css
+[debug] [2026-02-21T16:20:06.515Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets
+[debug] [2026-02-21T16:20:06.515Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/index-CjB9C900.css
+[debug] [2026-02-21T16:20:06.516Z] [unzip] Entry: client/assets/index-BX-A56oj.js.map (compressed_size=2362482 bytes, uncompressed_size=10036679 bytes)
+[debug] [2026-02-21T16:20:06.516Z] [unzip] Processing entry: client/assets/index-BX-A56oj.js.map
+[debug] [2026-02-21T16:20:06.516Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets
+[debug] [2026-02-21T16:20:06.516Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/index-BX-A56oj.js.map
+[debug] [2026-02-21T16:20:06.544Z] [unzip] Entry: client/assets/extensions/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-02-21T16:20:06.544Z] [unzip] Processing entry: client/assets/extensions/
+[debug] [2026-02-21T16:20:06.544Z] [unzip] mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/extensions/
+[debug] [2026-02-21T16:20:06.544Z] [unzip] Entry: client/assets/extensions/default-extension.png (compressed_size=1646 bytes, uncompressed_size=1657 bytes)
+[debug] [2026-02-21T16:20:06.544Z] [unzip] Processing entry: client/assets/extensions/default-extension.png
+[debug] [2026-02-21T16:20:06.544Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/extensions
+[debug] [2026-02-21T16:20:06.544Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/extensions/default-extension.png
+[debug] [2026-02-21T16:20:06.545Z] [unzip] Entry: client/assets/img/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-02-21T16:20:06.545Z] [unzip] Processing entry: client/assets/img/
+[debug] [2026-02-21T16:20:06.545Z] [unzip] mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/img/
+[debug] [2026-02-21T16:20:06.545Z] [unzip] Entry: client/assets/img/database.png (compressed_size=29449 bytes, uncompressed_size=29988 bytes)
+[debug] [2026-02-21T16:20:06.545Z] [unzip] Processing entry: client/assets/img/database.png
+[debug] [2026-02-21T16:20:06.545Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/img
+[debug] [2026-02-21T16:20:06.545Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/img/database.png
+[debug] [2026-02-21T16:20:06.545Z] [unzip] Entry: client/assets/provider-icons/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-02-21T16:20:06.545Z] [unzip] Processing entry: client/assets/provider-icons/
+[debug] [2026-02-21T16:20:06.545Z] [unzip] mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons/
+[debug] [2026-02-21T16:20:06.545Z] [unzip] Entry: client/assets/provider-icons/auth_service_saml.svg (compressed_size=575 bytes, uncompressed_size=1226 bytes)
+[debug] [2026-02-21T16:20:06.545Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_saml.svg
+[debug] [2026-02-21T16:20:06.545Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-02-21T16:20:06.545Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_saml.svg
+[debug] [2026-02-21T16:20:06.545Z] [unzip] Entry: client/assets/provider-icons/auth_service_phone.svg (compressed_size=261 bytes, uncompressed_size=414 bytes)
+[debug] [2026-02-21T16:20:06.546Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_phone.svg
+[debug] [2026-02-21T16:20:06.546Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-02-21T16:20:06.546Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_phone.svg
+[debug] [2026-02-21T16:20:06.546Z] [unzip] Entry: client/assets/provider-icons/auth_service_facebook.svg (compressed_size=289 bytes, uncompressed_size=457 bytes)
+[debug] [2026-02-21T16:20:06.546Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_facebook.svg
+[debug] [2026-02-21T16:20:06.546Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-02-21T16:20:06.546Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_facebook.svg
+[debug] [2026-02-21T16:20:06.546Z] [unzip] Entry: client/assets/provider-icons/auth_service_game_center.svg (compressed_size=991 bytes, uncompressed_size=3921 bytes)
+[debug] [2026-02-21T16:20:06.546Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_game_center.svg
+[debug] [2026-02-21T16:20:06.546Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-02-21T16:20:06.546Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_game_center.svg
+[debug] [2026-02-21T16:20:06.546Z] [unzip] Entry: client/assets/provider-icons/auth_service_apple.svg (compressed_size=230 bytes, uncompressed_size=334 bytes)
+[debug] [2026-02-21T16:20:06.546Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_apple.svg
+[debug] [2026-02-21T16:20:06.546Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-02-21T16:20:06.546Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_apple.svg
+[debug] [2026-02-21T16:20:06.547Z] [unzip] Entry: client/assets/provider-icons/auth_service_github.svg (compressed_size=466 bytes, uncompressed_size=838 bytes)
+[debug] [2026-02-21T16:20:06.547Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_github.svg
+[debug] [2026-02-21T16:20:06.547Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-02-21T16:20:06.547Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_github.svg
+[debug] [2026-02-21T16:20:06.547Z] [unzip] Entry: client/assets/provider-icons/auth_service_mslive.svg (compressed_size=203 bytes, uncompressed_size=378 bytes)
+[debug] [2026-02-21T16:20:06.547Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_mslive.svg
+[debug] [2026-02-21T16:20:06.547Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-02-21T16:20:06.547Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_mslive.svg
+[debug] [2026-02-21T16:20:06.547Z] [unzip] Entry: client/assets/provider-icons/auth_service_yahoo.svg (compressed_size=577 bytes, uncompressed_size=1182 bytes)
+[debug] [2026-02-21T16:20:06.547Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_yahoo.svg
+[debug] [2026-02-21T16:20:06.547Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-02-21T16:20:06.547Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_yahoo.svg
+[debug] [2026-02-21T16:20:06.547Z] [unzip] Entry: client/assets/provider-icons/auth_service_twitter.svg (compressed_size=444 bytes, uncompressed_size=751 bytes)
+[debug] [2026-02-21T16:20:06.547Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_twitter.svg
+[debug] [2026-02-21T16:20:06.547Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-02-21T16:20:06.547Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_twitter.svg
+[debug] [2026-02-21T16:20:06.547Z] [unzip] Entry: client/assets/provider-icons/auth_service_play_games.svg (compressed_size=565 bytes, uncompressed_size=1173 bytes)
+[debug] [2026-02-21T16:20:06.547Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_play_games.svg
+[debug] [2026-02-21T16:20:06.547Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-02-21T16:20:06.547Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_play_games.svg
+[debug] [2026-02-21T16:20:06.548Z] [unzip] Entry: client/assets/provider-icons/auth_service_email.svg (compressed_size=228 bytes, uncompressed_size=326 bytes)
+[debug] [2026-02-21T16:20:06.548Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_email.svg
+[debug] [2026-02-21T16:20:06.548Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-02-21T16:20:06.548Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_email.svg
+[debug] [2026-02-21T16:20:06.548Z] [unzip] Entry: client/assets/provider-icons/auth_service_google.svg (compressed_size=409 bytes, uncompressed_size=720 bytes)
+[debug] [2026-02-21T16:20:06.548Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_google.svg
+[debug] [2026-02-21T16:20:06.548Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-02-21T16:20:06.548Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_google.svg
+[debug] [2026-02-21T16:20:06.548Z] [unzip] Entry: client/assets/provider-icons/auth_service_oidc.svg (compressed_size=414 bytes, uncompressed_size=858 bytes)
+[debug] [2026-02-21T16:20:06.548Z] [unzip] Processing entry: client/assets/provider-icons/auth_service_oidc.svg
+[debug] [2026-02-21T16:20:06.548Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons
+[debug] [2026-02-21T16:20:06.548Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/assets/provider-icons/auth_service_oidc.svg
+[debug] [2026-02-21T16:20:06.549Z] [unzip] Entry: client/browserconfig.xml (compressed_size=491 bytes, uncompressed_size=822 bytes)
+[debug] [2026-02-21T16:20:06.549Z] [unzip] Processing entry: client/browserconfig.xml
+[debug] [2026-02-21T16:20:06.549Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client
+[debug] [2026-02-21T16:20:06.549Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/browserconfig.xml
+[debug] [2026-02-21T16:20:06.549Z] [unzip] Entry: client/favicon-32x32.png (compressed_size=475 bytes, uncompressed_size=475 bytes)
+[debug] [2026-02-21T16:20:06.549Z] [unzip] Processing entry: client/favicon-32x32.png
+[debug] [2026-02-21T16:20:06.549Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client
+[debug] [2026-02-21T16:20:06.549Z] [unzip] Writing file: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/client/favicon-32x32.png
+[debug] [2026-02-21T16:20:06.549Z] [unzip] Entry: server/ (compressed_size=0 bytes, uncompressed_size=0 bytes)
+[debug] [2026-02-21T16:20:06.549Z] [unzip] Processing entry: server/
+[debug] [2026-02-21T16:20:06.549Z] [unzip] mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/server/
+[debug] [2026-02-21T16:20:06.549Z] [unzip] Entry: server/server.mjs.map (compressed_size=217845 bytes, uncompressed_size=944978 bytes)
+[debug] [2026-02-21T16:20:06.549Z] [unzip] Processing entry: server/server.mjs.map
+[debug] [2026-02-21T16:20:06.549Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/server
+[debug] [2026-02-21T16:20:06.549Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/server/server.mjs.map
+[debug] [2026-02-21T16:20:06.551Z] [unzip] Entry: server/server.mjs (compressed_size=276407 bytes, uncompressed_size=933701 bytes)
+[debug] [2026-02-21T16:20:06.551Z] [unzip] Processing entry: server/server.mjs
+[debug] [2026-02-21T16:20:06.551Z] [unzip] else mkdir: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/server
+[debug] [2026-02-21T16:20:06.551Z] [unzip] deflating: /Users/julien/.cache/firebase/emulators/ui-v1.15.0/server/server.mjs
+[info] i  functions: Watching "/Users/julien/Repos/ColocKitchenRace/functions" for Cloud Functions... {"metadata":{"emulator":{"name":"functions"},"message":"Watching \"/Users/julien/Repos/ColocKitchenRace/functions\" for Cloud Functions..."}}
+[debug] [2026-02-21T16:20:06.555Z] Validating nodejs source
+[debug] [2026-02-21T16:20:07.087Z] > [functions] package.json contents: {
+  "name": "ckr-functions",
+  "description": "Firebase Cloud Functions for Colocs Kitchen Race",
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "shell": "npm run build && firebase functions:shell",
+    "start": "npm run shell",
+    "deploy": "firebase deploy --only functions",
+    "logs": "firebase functions:log",
+    "test": "jest",
+    "set-admin": "npm run build && node lib/set-admin.js"
+  },
+  "engines": {
+    "node": "22"
+  },
+  "main": "lib/index.js",
+  "dependencies": {
+    "firebase-admin": "^13.6.0",
+    "firebase-functions": "^7.0.5",
+    "stripe": "^17.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.3.0",
+    "firebase-functions-test": "^3.1.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.4.6",
+    "typescript": "^5.3.0"
+  },
+  "private": true
+}
+[debug] [2026-02-21T16:20:07.088Z] Building nodejs source
+[debug] [2026-02-21T16:20:07.088Z] Failed to find version of module node: reached end of search path /Users/julien/Repos/ColocKitchenRace/functions/node_modules
+[warn] ⚠  functions: Your requested "node" version "22" doesn't match your global version "25". Using node@25 from host. 
+[debug] [2026-02-21T16:20:07.089Z] Could not find functions.yaml. Must use http discovery
+[debug] [2026-02-21T16:20:07.091Z] Found firebase-functions binary at '/Users/julien/Repos/ColocKitchenRace/functions/node_modules/.bin/firebase-functions'
+[info] Serving at port 8305
+
+[debug] [2026-02-21T16:20:07.402Z] Got response from /__/functions.yaml {"endpoints":{"sendNotificationToCohouse":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"labels":{},"callableTrigger":{},"entryPoint":"sendNotificationToCohouse"},"sendNotificationToEdition":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"labels":{},"callableTrigger":{},"entryPoint":"sendNotificationToEdition"},"sendNotificationToAll":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"labels":{},"callableTrigger":{},"entryPoint":"sendNotificationToAll"},"checkDuplicateCohouse":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"labels":{},"callableTrigger":{},"entryPoint":"checkDuplicateCohouse"},"validateAddress":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"labels":{},"callableTrigger":{},"entryPoint":"validateAddress"},"getCohousesForMap":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"labels":{},"callableTrigger":{},"entryPoint":"getCohousesForMap"},"createPaymentIntent":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"secretEnvironmentVariables":[{"key":"STRIPE_SECRET_KEY"}],"labels":{},"callableTrigger":{},"entryPoint":"createPaymentIntent"},"registerForGame":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"secretEnvironmentVariables":[{"key":"STRIPE_SECRET_KEY"}],"labels":{},"callableTrigger":{},"entryPoint":"registerForGame"},"matchCohouses":{"availableMemoryMb":null,"timeoutSeconds":120,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"labels":{},"callableTrigger":{},"entryPoint":"matchCohouses"},"updateEventSettings":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"labels":{},"callableTrigger":{},"entryPoint":"updateEventSettings"},"confirmMatching":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"labels":{},"callableTrigger":{},"entryPoint":"confirmMatching"},"revealPlanning":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"labels":{},"callableTrigger":{},"entryPoint":"revealPlanning"},"getMyPlanning":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"labels":{},"callableTrigger":{},"entryPoint":"getMyPlanning"},"setAdminClaim":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"labels":{},"callableTrigger":{},"entryPoint":"setAdminClaim"},"deleteAccount":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"labels":{},"callableTrigger":{},"entryPoint":"deleteAccount"},"onNewsCreated":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"news/{newsId}"},"retry":false},"entryPoint":"onNewsCreated"},"onChallengeCreated":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"labels":{},"eventTrigger":{"eventType":"google.cloud.firestore.document.v1.created","eventFilters":{"database":"(default)","namespace":"(default)"},"eventFilterPathPatterns":{"document":"challenges/{challengeId}"},"retry":false},"entryPoint":"onChallengeCreated"},"checkChallengeSchedules":{"availableMemoryMb":null,"timeoutSeconds":null,"minInstances":null,"maxInstances":null,"ingressSettings":null,"concurrency":null,"serviceAccountEmail":null,"vpc":null,"platform":"gcfv2","region":["europe-west1"],"labels":{},"scheduleTrigger":{"schedule":"every 5 minutes","retryConfig":{},"timeZone":"Europe/Brussels"},"entryPoint":"checkChallengeSchedules"}},"specVersion":"v1alpha1","requiredAPIs":[{"api":"cloudscheduler.googleapis.com","reason":"Needed for scheduled functions."}],"extensions":{}}
+[info] ✔  functions: Loaded functions definitions from source: sendNotificationToCohouse, sendNotificationToEdition, sendNotificationToAll, checkDuplicateCohouse, validateAddress, getCohousesForMap, createPaymentIntent, registerForGame, matchCohouses, updateEventSettings, confirmMatching, revealPlanning, getMyPlanning, setAdminClaim, deleteAccount, onNewsCreated, onChallengeCreated, checkChallengeSchedules. {"metadata":{"emulator":{"name":"functions"},"message":"Loaded functions definitions from source: sendNotificationToCohouse, sendNotificationToEdition, sendNotificationToAll, checkDuplicateCohouse, validateAddress, getCohousesForMap, createPaymentIntent, registerForGame, matchCohouses, updateEventSettings, confirmMatching, revealPlanning, getMyPlanning, setAdminClaim, deleteAccount, onNewsCreated, onChallengeCreated, checkChallengeSchedules."}}
+[info] ✔  functions[europe-west1-sendNotificationToCohouse]: http function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/sendNotificationToCohouse). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/sendNotificationToCohouse)."}}
+[info] ✔  functions[europe-west1-sendNotificationToEdition]: http function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/sendNotificationToEdition). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/sendNotificationToEdition)."}}
+[info] ✔  functions[europe-west1-sendNotificationToAll]: http function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/sendNotificationToAll). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/sendNotificationToAll)."}}
+[info] ✔  functions[europe-west1-checkDuplicateCohouse]: http function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/checkDuplicateCohouse). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/checkDuplicateCohouse)."}}
+[info] ✔  functions[europe-west1-validateAddress]: http function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/validateAddress). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/validateAddress)."}}
+[info] ✔  functions[europe-west1-getCohousesForMap]: http function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/getCohousesForMap). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/getCohousesForMap)."}}
+[info] ✔  functions[europe-west1-createPaymentIntent]: http function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/createPaymentIntent). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/createPaymentIntent)."}}
+[info] ✔  functions[europe-west1-registerForGame]: http function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/registerForGame). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/registerForGame)."}}
+[info] ✔  functions[europe-west1-matchCohouses]: http function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/matchCohouses). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/matchCohouses)."}}
+[info] ✔  functions[europe-west1-updateEventSettings]: http function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/updateEventSettings). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/updateEventSettings)."}}
+[info] ✔  functions[europe-west1-confirmMatching]: http function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/confirmMatching). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/confirmMatching)."}}
+[info] ✔  functions[europe-west1-revealPlanning]: http function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/revealPlanning). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/revealPlanning)."}}
+[info] ✔  functions[europe-west1-getMyPlanning]: http function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/getMyPlanning). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/getMyPlanning)."}}
+[info] ✔  functions[europe-west1-setAdminClaim]: http function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/setAdminClaim). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/setAdminClaim)."}}
+[info] ✔  functions[europe-west1-deleteAccount]: http function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/deleteAccount). {"metadata":{"emulator":{"name":"functions"},"message":"\u001b[1mhttp\u001b[22m function initialized (http://127.0.0.1:5001/colockitchenrace/europe-west1/deleteAccount)."}}
+[info] i  functions[europe-west1-onNewsCreated]: function ignored because the firestore emulator does not exist or is not running. {"metadata":{"emulator":{"name":"functions"},"message":"function ignored because the firestore emulator does not exist or is not running."}}
+[info] i  functions[europe-west1-onChallengeCreated]: function ignored because the firestore emulator does not exist or is not running. {"metadata":{"emulator":{"name":"functions"},"message":"function ignored because the firestore emulator does not exist or is not running."}}
+[info] i  functions[europe-west1-checkChallengeSchedules]: function ignored because the pubsub emulator does not exist or is not running. {"metadata":{"emulator":{"name":"functions"},"message":"function ignored because the pubsub emulator does not exist or is not running."}}
+[debug] [2026-02-21T16:20:11.419Z] Could not find VSCode notification endpoint: FetchError: request to http://localhost:40001/vscode/notify failed, reason: . If you are not running the Firebase Data Connect VSCode extension, this is expected and not an issue.
+[info] 
+┌─────────────────────────────────────────────────────────────┐
+│ ✔  All emulators ready! It is now safe to connect your app. │
+│ i  View Emulator UI at http://127.0.0.1:4000/               │
+└─────────────────────────────────────────────────────────────┘
+
+┌───────────┬────────────────┬─────────────────────────────────┐
+│ Emulator  │ Host:Port      │ View in Emulator UI             │
+├───────────┼────────────────┼─────────────────────────────────┤
+│ Functions │ 127.0.0.1:5001 │ http://127.0.0.1:4000/functions │
+└───────────┴────────────────┴─────────────────────────────────┘
+  Emulator Hub host: 127.0.0.1 port: 4400
+  Other reserved ports: 4500
+
+Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files.
+ 

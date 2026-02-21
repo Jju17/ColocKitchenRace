@@ -3,19 +3,35 @@
 
 # Firebase Configuration (Sensitive Data)
 GoogleService-Info.plist
+google-services.json
 
 # Xcode-specific files
 build/
 DerivedData/
 *.xcuserstate
-
-# Ignore all .env files (environment secrets)
-.env
 *.xcbkptlist
+
+# Android
+android/.gradle/
+android/app/build/
+android/build/
+android/local.properties
+android/app/google-services.json
+*.apk
+*.aab
 
 # Node.js
 node_modules/
 functions/lib/
+
+# Next.js (web)
+web/.next/
+web/out/
+web/node_modules/
+
+# Environment secrets
+.env
+.env.*
 
 # Firebase
 .firebase/

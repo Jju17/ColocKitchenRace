@@ -2,10 +2,10 @@
 
 ## Project Overview
 
-Colocs Kitchen Race (CKR) is an iOS app for organizing community dining events in Brussels, Belgium. Cohouses (shared living communities) register for game editions and get matched into groups rotating through apero, dinner, and party events. Users earn points via challenges and compete on leaderboards.
+Colocs Kitchen Race (CKR) is a mobile app for organizing community dining events in Brussels, Belgium. Cohouses (shared living communities) register for game editions and get matched into groups rotating through apero, dinner, and party events. Users earn points via challenges and compete on leaderboards.
 
 **Repo:** https://github.com/Jju17/ColocKitchenRace
-**Bundle IDs:** `dev.rahier.colockitchenrace` (main), `dev.rahier.ckradmin` (admin)
+**Bundle IDs:** `dev.rahier.colockitchenrace` (iOS main + Android), `dev.rahier.ckradmin` (iOS admin)
 
 ## Tech Stack
 
@@ -22,6 +22,24 @@ Colocs Kitchen Race (CKR) is an iOS app for organizing community dining events i
 - **Crash reporting:** Firebase Crashlytics
 - **Modals:** MijickPopups
 
+### Android
+- **Language:** Kotlin
+- **UI:** Jetpack Compose + Material 3
+- **Architecture:** MVI (ViewModel + State + Intent + Effect)
+- **DI:** Hilt
+- **Auth:** Firebase Auth (Credential Manager for Google, OAuthProvider for Apple)
+- **Database:** Firestore
+- **Storage:** Firebase Storage
+- **Payments:** Stripe Android SDK (PaymentSheet)
+- **Notifications:** Firebase Cloud Messaging (FCM)
+- **Crash reporting:** Firebase Crashlytics
+- **Image loading:** Coil
+
+### Web (Next.js)
+- **Language:** TypeScript
+- **Framework:** Next.js 14+ (App Router)
+- **Status:** Placeholder / landing page
+
 ### Backend (Firebase Cloud Functions)
 - **Language:** TypeScript, Node 22
 - **Runtime:** Firebase Cloud Functions v2 (region: `europe-west1`)
@@ -33,39 +51,75 @@ Colocs Kitchen Race (CKR) is an iOS app for organizing community dining events i
 
 ```
 ColocKitchenRace/
-├── ColocKitchenRace/         # Main iOS app
-│   ├── App.swift             # TCA root reducer (AppFeature)
-│   ├── Views/                # Feature-based UI (Home, Planning, Challenge, Cohouse, Signin, Signup, UserProfile)
-│   ├── Models/               # App-specific models
-│   ├── Clients/              # Service layer (CKRClient, AuthentificationClient, ChallengesClient, etc.)
-│   └── Utils/                # Helpers (Logger, Date, View extensions)
-├── CKRAdmin/                 # Admin iOS app (separate target, same Xcode project)
-├── Shared/                   # Code shared between main app and admin
-│   ├── Models/               # Common models (Challenge, CKRGame, User, Cohouse, etc.)
-│   ├── Clients/              # Shared client logic
-│   └── Utils/                # Common utilities
-├── functions/                # Firebase Cloud Functions (TypeScript)
-│   ├── src/                  # Source (index.ts, registration.ts, planning.ts, payment.ts, matching.ts, etc.)
-│   └── __tests__/            # Jest tests
-├── ColocsKitchenRaceTests/   # iOS XCTest suite (23 test files)
-├── firestore.rules           # Firestore security rules
-├── firestore.indexes.json    # Firestore composite indexes
-├── firebase.json             # Firebase project config
-└── bitrise.yml               # CI/CD config
+├── ios/                              # iOS apps
+│   ├── ColocKitchenRace/             # Main iOS app
+│   │   ├── App.swift                 # TCA root reducer (AppFeature)
+│   │   ├── Views/                    # Feature-based UI
+│   │   ├── Models/                   # App-specific models
+│   │   ├── Clients/                  # Service layer
+│   │   └── Utils/                    # Helpers
+│   ├── CKRAdmin/                     # Admin iOS app
+│   ├── Shared/                       # Code shared between iOS targets
+│   │   ├── Models/                   # Common models
+│   │   ├── Clients/                  # Shared client logic
+│   │   └── Utils/                    # Common utilities
+│   ├── ColocsKitchenRace.xcodeproj/  # Xcode project
+│   └── ColocsKitchenRaceTests/       # iOS XCTest suite
+├── android/                          # Android app
+│   ├── app/src/main/java/dev/rahier/colockitchenrace/
+│   │   ├── data/model/               # Data models (Kotlin)
+│   │   ├── data/repository/          # Repository interfaces + implementations
+│   │   ├── di/                       # Hilt DI modules
+│   │   ├── ui/                       # Compose screens (MVI pattern)
+│   │   │   ├── auth/                 # Sign-in, email verification, profile completion
+│   │   │   ├── home/                 # Home tab + registration
+│   │   │   ├── challenges/           # Challenges tab + leaderboard
+│   │   │   ├── planning/             # Planning tab
+│   │   │   ├── cohouse/              # Cohouse tab
+│   │   │   ├── profile/              # User profile
+│   │   │   └── components/           # Shared UI components
+│   │   └── util/                     # Utilities
+│   └── app/build.gradle.kts
+├── web/                              # Next.js web app
+│   ├── app/                          # App Router pages
+│   └── package.json
+├── functions/                        # Firebase Cloud Functions
+│   ├── src/                          # TypeScript source
+│   └── __tests__/                    # Jest tests
+├── firestore.rules                   # Firestore security rules
+├── firestore.indexes.json            # Firestore composite indexes
+└── firebase.json                     # Firebase project config
 ```
 
 ## Build & Run
 
 ### iOS App
 ```bash
-# Open in Xcode
+cd ios
 open ColocsKitchenRace.xcodeproj
 
 # Build from CLI
-xcodebuild -project ColocsKitchenRace.xcodeproj -scheme colockitchenrace -destination generic/platform=iOS build
+xcodebuild -project ios/ColocsKitchenRace.xcodeproj -scheme colockitchenrace -destination generic/platform=iOS build
 ```
 
 Schemes: `colockitchenrace` (main app), `CKRAdmin` (admin app)
+
+### Android App
+```bash
+cd android
+./gradlew assembleDebug
+
+# Run tests
+./gradlew test
+```
+
+### Web App
+```bash
+cd web
+npm install
+npm run dev      # Dev server on port 3000
+npm run build    # Production build
+```
 
 ### Backend
 ```bash
@@ -79,31 +133,35 @@ firebase deploy --only functions  # Deploy to production
 
 ### iOS Tests
 ```bash
-xcodebuild -project ColocsKitchenRace.xcodeproj -scheme colockitchenrace -derivedDataPath DerivedData test
+xcodebuild -project ios/ColocsKitchenRace.xcodeproj -scheme colockitchenrace -derivedDataPath DerivedData test
 ```
 
 ## Architecture & Conventions
 
-### TCA Pattern
+### iOS - TCA Pattern
 - Each feature has a `*Feature.swift` reducer and a `*View.swift` view
 - Root flow: `AppFeature` -> `TabFeature` -> individual feature reducers
 - Clients use `@DependencyClient` for testability
 - Tests use TCA's `TestStore` for exhaustive action/state verification
-
-### Naming
-- Reducers: `FeatureNameFeature.swift` (e.g., `SignupFeature.swift`)
-- Views: `FeatureNameView.swift` (e.g., `SignupView.swift`)
-- Clients: `ServiceNameClient.swift` (e.g., `ChallengesClient.swift`)
+- Naming: `FeatureNameFeature.swift` (reducer), `FeatureNameView.swift` (view), `ServiceNameClient.swift` (client)
 - Shared components go in `Views/Global/`
 
-### Logging
-Custom `Logger` extension with domain-specific loggers: `Logger.authLog`, `Logger.ckrLog`, etc.
+### Android - MVI Pattern
+- Each feature has a `*Contract.kt` (State/Intent/Effect), `*ViewModel.kt`, and `*Screen.kt`
+- Root flow: `CKRNavGraph` -> `MainScreen` (tabs) -> individual screens
+- Repository pattern for data layer, injected via Hilt
+- `@HiltViewModel` for all ViewModels
+- Naming: `FeatureNameScreen.kt` (UI), `FeatureNameViewModel.kt` (logic), `FeatureNameContract.kt` (MVI contract)
 
 ### Demo Mode
 - Test account: `test_apple@colocskitchenrace.be`
-- `DemoMode` enum provides mock data for Apple App Review
+- `DemoMode` provides mock data for App Store / Play Store review
 - Bypasses Firestore/Cloud Functions when active
 - Uses stable UUIDs for cross-model references
+
+### Logging
+- iOS: Custom `Logger` extension with domain-specific loggers: `Logger.authLog`, `Logger.ckrLog`, etc.
+- Android: Android `Log` with tag-based logging
 
 ## Cloud Functions (Key Endpoints)
 - `registerForGame` - Game registration + Stripe PaymentIntent creation
@@ -113,6 +171,8 @@ Custom `Logger` extension with domain-specific loggers: `Logger.authLog`, `Logge
 - `revealPlanning` - Makes matching results visible to users
 - `sendNotification*` - FCM notification distribution
 - `deleteAccount` - User account cleanup
+- `checkDuplicateCohouse` - Duplicate detection
+- `validateAddress` - Geocoding via OpenStreetMap
 
 ## Firestore Collections
 - `/users/{userId}` - User profiles (authId-bound)
@@ -122,15 +182,15 @@ Custom `Logger` extension with domain-specific loggers: `Logger.authLog`, `Logge
 - `/news/{newsId}` - In-app news
 - `/notificationHistory/{docId}` - Admin notification logs
 
-## CI/CD (Bitrise)
+## CI/CD
+### iOS (Bitrise)
 - `deploy_testflight` workflow: builds main app -> TestFlight
 - `deploy_testflight_admin` workflow: builds CKRAdmin -> TestFlight
 - `GoogleService-Info.plist` restored from Base64 secrets at build time
-- SPM dependencies cached between builds
 
 ## Important Notes
 - All Firebase resources are in `europe-west1` (Belgium)
-- Security-sensitive operations (registration, payments, matching) go through Cloud Functions, not direct Firestore writes
+- Security-sensitive operations (registration, payments, matching) go through Cloud Functions
 - Firestore security rules use custom claims (`request.auth.token.admin`) for admin access
 - Account deletion must go through Cloud Functions for proper cleanup
 - The `DemoMode.swift` file is excluded from the CKRAdmin target
