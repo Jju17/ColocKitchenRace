@@ -12,6 +12,7 @@ DerivedData/
 *.xcbkptlist
 
 # Android
+android/.idea/
 android/.gradle/
 android/app/build/
 android/build/
