@@ -48,6 +48,9 @@ fun UserProfileScreen(
                         Icon(Icons.Default.Edit, contentDescription = "Modifier")
                     }
                 },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                ),
             )
         },
     ) { padding ->

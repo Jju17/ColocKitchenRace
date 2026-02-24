@@ -7,6 +7,7 @@ import dev.rahier.colocskitchenrace.data.model.Challenge
 import dev.rahier.colocskitchenrace.data.model.ChallengeContent
 import dev.rahier.colocskitchenrace.data.repository.ChallengeRepository
 import dev.rahier.colocskitchenrace.util.Constants
+import dev.rahier.colocskitchenrace.util.DemoMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,6 +26,11 @@ class ChallengeRepositoryImpl @Inject constructor(
 
     @Suppress("UNCHECKED_CAST")
     override suspend fun getAll(): List<Challenge> {
+        if (DemoMode.isActive) {
+            _challenges.value = DemoMode.demoChallenges
+            return DemoMode.demoChallenges
+        }
+
         val snapshot = firestore.collection(Constants.CHALLENGES_COLLECTION)
             .orderBy("endDate", Query.Direction.ASCENDING)
             .get()

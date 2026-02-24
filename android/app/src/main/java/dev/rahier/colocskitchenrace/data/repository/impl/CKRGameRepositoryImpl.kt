@@ -7,6 +7,7 @@ import com.google.firebase.functions.FirebaseFunctions
 import dev.rahier.colocskitchenrace.data.model.*
 import dev.rahier.colocskitchenrace.data.repository.CKRGameRepository
 import dev.rahier.colocskitchenrace.util.Constants
+import dev.rahier.colocskitchenrace.util.DemoMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,6 +27,12 @@ class CKRGameRepositoryImpl @Inject constructor(
 
     @Suppress("UNCHECKED_CAST")
     override suspend fun getLatest(): CKRGame? {
+        if (DemoMode.isActive) {
+            val game = DemoMode.demoCKRGame
+            _currentGame.value = game
+            return game
+        }
+
         val snapshot = firestore.collection(Constants.CKR_GAMES_COLLECTION)
             .orderBy("publishedTimestamp", Query.Direction.DESCENDING)
             .limit(1)
@@ -46,6 +53,8 @@ class CKRGameRepositoryImpl @Inject constructor(
         cohouseId: String,
         paymentIntentId: String,
     ) {
+        if (DemoMode.isActive) return // Demo mode: skip real confirmation
+
         val params = hashMapOf<String, Any>(
             "gameId" to gameId,
             "cohouseId" to cohouseId,
@@ -56,6 +65,8 @@ class CKRGameRepositoryImpl @Inject constructor(
 
     @Suppress("UNCHECKED_CAST")
     override suspend fun getMyPlanning(gameId: String, cohouseId: String): CKRMyPlanning {
+        if (DemoMode.isActive) return DemoMode.demoPlanning
+
         val result = functions.getHttpsCallable("getMyPlanning")
             .call(hashMapOf("gameId" to gameId, "cohouseId" to cohouseId))
             .await()

@@ -1,6 +1,7 @@
 package dev.rahier.colocskitchenrace.data.repository.impl
 
 import android.app.Activity
+import android.content.Context
 import android.util.Log
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.firebase.auth.FirebaseAuth
@@ -9,11 +10,13 @@ import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.auth.OAuthProvider
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.rahier.colocskitchenrace.data.model.AuthProvider
 import dev.rahier.colocskitchenrace.data.model.User
 import dev.rahier.colocskitchenrace.data.repository.AuthRepository
 import dev.rahier.colocskitchenrace.data.repository.CohouseRepository
 import dev.rahier.colocskitchenrace.util.Constants
+import dev.rahier.colocskitchenrace.util.DemoMode
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +30,7 @@ import javax.inject.Singleton
 
 @Singleton
 class AuthRepositoryImpl @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val auth: FirebaseAuth,
     private val firestore: FirebaseFirestore,
     private val messaging: FirebaseMessaging,
@@ -134,6 +138,7 @@ class AuthRepositoryImpl @Inject constructor(
         auth.signOut()
         _currentUser.value = null
         cohouseRepository.setCurrentCohouse(null)
+        DemoMode.deactivate()
     }
 
     override suspend fun deleteAccount(userId: String) {
@@ -164,13 +169,7 @@ class AuthRepositoryImpl @Inject constructor(
         return auth.currentUser?.isEmailVerified == true
     }
 
-    override fun listenAuthState(): Flow<Boolean> = callbackFlow {
-        val listener = FirebaseAuth.AuthStateListener { firebaseAuth ->
-            trySend(firebaseAuth.currentUser != null)
-        }
-        auth.addAuthStateListener(listener)
-        awaitClose { auth.removeAuthStateListener(listener) }
-    }
+    override fun listenAuthState(): Flow<Boolean> = isLoggedIn
 
     override fun storeFCMToken(token: String) {
         val user = _currentUser.value ?: return
@@ -184,6 +183,24 @@ class AuthRepositoryImpl @Inject constructor(
         val firebaseUser = auth.currentUser ?: return null
         val authId = firebaseUser.uid
 
+        // Check demo mode
+        val email = firebaseUser.email ?: ""
+        if (email == DemoMode.DEMO_EMAIL) {
+            DemoMode.activate()
+            val demoUser = User(
+                id = DemoMode.DEMO_USER_ID,
+                authId = authId,
+                authProvider = AuthProvider.EMAIL,
+                email = email,
+                firstName = "Apple",
+                lastName = "Reviewer",
+                cohouseId = DemoMode.DEMO_COHOUSE_ID,
+            )
+            _currentUser.value = demoUser
+            cohouseRepository.setCurrentCohouse(DemoMode.demoCohouse)
+            return demoUser
+        }
+
         // Query Firestore for user profile by authId
         val snapshot = firestore.collection(Constants.USERS_COLLECTION)
             .whereEqualTo("authId", authId)
@@ -193,7 +210,8 @@ class AuthRepositoryImpl @Inject constructor(
 
         if (snapshot.documents.isEmpty()) return null
 
-        val user = mapToUser(snapshot.documents[0].data!!, snapshot.documents[0].id)
+        val docData = snapshot.documents[0].data ?: return null
+        val user = mapToUser(docData, snapshot.documents[0].id)
         _currentUser.value = user
 
         // Load cohouse if user has one
@@ -223,6 +241,29 @@ class AuthRepositoryImpl @Inject constructor(
         firstName: String = "",
         lastName: String = "",
     ): User {
+        // Activate or deactivate demo mode based on email
+        if (email == DemoMode.DEMO_EMAIL) {
+            DemoMode.activate()
+        } else {
+            DemoMode.deactivate()
+        }
+
+        // Demo mode: return mock user + cohouse
+        if (DemoMode.isActive) {
+            val demoUser = User(
+                id = DemoMode.DEMO_USER_ID,
+                authId = authId,
+                authProvider = provider,
+                email = email,
+                firstName = "Apple",
+                lastName = "Reviewer",
+                cohouseId = DemoMode.DEMO_COHOUSE_ID,
+            )
+            _currentUser.value = demoUser
+            cohouseRepository.setCurrentCohouse(DemoMode.demoCohouse)
+            return demoUser
+        }
+
         // Try to find existing user by authId
         val snapshot = firestore.collection(Constants.USERS_COLLECTION)
             .whereEqualTo("authId", authId)
@@ -230,7 +271,7 @@ class AuthRepositoryImpl @Inject constructor(
             .get()
             .await()
 
-        val user = if (snapshot.documents.isNotEmpty()) {
+        val user = if (snapshot.documents.isNotEmpty() && snapshot.documents[0].data != null) {
             mapToUser(snapshot.documents[0].data!!, snapshot.documents[0].id)
         } else {
             val newUser = User(
@@ -269,9 +310,11 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     private fun getWebClientId(): String {
-        // This should come from google-services.json / strings.xml
-        // Placeholder - will be auto-configured by Firebase
-        return "YOUR_WEB_CLIENT_ID.apps.googleusercontent.com"
+        // Read default_web_client_id from strings resource (auto-generated from google-services.json)
+        val resId = context.resources.getIdentifier("default_web_client_id", "string", context.packageName)
+        if (resId != 0) return context.getString(resId)
+        // Fallback: hardcoded from google-services.json (client_type: 3 = web)
+        return "1030034975653-r9beetrg8e3ijj43a30k3uan4oj5ifdc.apps.googleusercontent.com"
     }
 
     companion object {

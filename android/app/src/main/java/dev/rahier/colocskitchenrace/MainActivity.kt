@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.stripe.android.PaymentConfiguration
 import dagger.hilt.android.AndroidEntryPoint
 import dev.rahier.colocskitchenrace.ui.CKRApp
 import dev.rahier.colocskitchenrace.ui.theme.CKRTheme
@@ -15,6 +16,13 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // Initialize Stripe SDK
+        PaymentConfiguration.init(
+            context = applicationContext,
+            publishableKey = BuildConfig.STRIPE_PUBLISHABLE_KEY,
+        )
+
         setContent {
             CKRTheme {
                 CKRApp()

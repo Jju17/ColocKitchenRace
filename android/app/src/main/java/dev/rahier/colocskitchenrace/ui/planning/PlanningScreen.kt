@@ -16,6 +16,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.rahier.colocskitchenrace.data.model.PlanningStep
 import dev.rahier.colocskitchenrace.data.model.PartyInfo
 import dev.rahier.colocskitchenrace.data.model.StepRole
+import dev.rahier.colocskitchenrace.ui.components.CKRButton
 import dev.rahier.colocskitchenrace.ui.theme.*
 import dev.rahier.colocskitchenrace.util.DateUtils
 
@@ -63,6 +64,24 @@ fun PlanningScreen(
             PartyItem(
                 party = planning.party,
             )
+        } else if (state.error != null) {
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center,
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "Erreur lors du chargement du planning",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = CkrCoral,
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    CKRButton(
+                        text = "Reessayer",
+                        onClick = { viewModel.onIntent(PlanningIntent.Retry) },
+                    )
+                }
+            }
         } else {
             Text(
                 text = "Le planning n'est pas encore disponible",

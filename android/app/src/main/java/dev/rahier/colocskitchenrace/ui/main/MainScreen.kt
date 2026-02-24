@@ -1,5 +1,6 @@
 package dev.rahier.colocskitchenrace.ui.main
 
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -110,7 +111,9 @@ fun MainScreen(
         NavHost(
             navController = navController,
             startDestination = Tab.HOME.route,
-            modifier = Modifier.padding(innerPadding),
+            modifier = Modifier
+                .padding(innerPadding)
+                .consumeWindowInsets(innerPadding),
         ) {
             // Tab destinations
             composable(Tab.HOME.route) {
@@ -194,9 +197,6 @@ fun MainScreen(
                     cohouseType = cohouseType,
                     totalPriceCents = totalPriceCents,
                     participantCount = participantCount,
-                    onPaymentSheet = { _, _, _ ->
-                        // Stripe PaymentSheet is presented via Activity result in real implementation
-                    },
                     onRegistrationComplete = {
                         navController.popBackStack(Tab.HOME.route, inclusive = false)
                     },

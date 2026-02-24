@@ -19,6 +19,10 @@ data class PlanningState(
     val error: String? = null,
 )
 
+sealed class PlanningIntent {
+    data object Retry : PlanningIntent()
+}
+
 @HiltViewModel
 class PlanningViewModel @Inject constructor(
     private val gameRepository: CKRGameRepository,
@@ -32,6 +36,12 @@ class PlanningViewModel @Inject constructor(
         loadPlanning()
     }
 
+    fun onIntent(intent: PlanningIntent) {
+        when (intent) {
+            PlanningIntent.Retry -> loadPlanning()
+        }
+    }
+
     private fun loadPlanning() {
         viewModelScope.launch {
             val game = gameRepository.currentGame.value ?: return@launch
@@ -39,7 +49,7 @@ class PlanningViewModel @Inject constructor(
 
             if (!game.isRevealed || !game.cohouseIDs.contains(cohouse.id)) return@launch
 
-            _state.update { it.copy(isLoading = true) }
+            _state.update { it.copy(isLoading = true, error = null) }
             try {
                 val planning = gameRepository.getMyPlanning(game.id, cohouse.id)
                 _state.update { it.copy(planning = planning, isLoading = false) }

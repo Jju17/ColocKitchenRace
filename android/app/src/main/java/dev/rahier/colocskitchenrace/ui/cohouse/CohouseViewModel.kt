@@ -132,9 +132,18 @@ class CohouseViewModel @Inject constructor(
     private fun quitCohouse() {
         viewModelScope.launch {
             try {
-                cohouseRepository.quitCohouse()
                 val user = authRepository.currentUser.value
+                val cohouse = _state.value.cohouse
+                cohouseRepository.quitCohouse()
                 if (user != null) {
+                    // Remove CohouseUser from cohouse subcollection (like iOS)
+                    if (cohouse != null) {
+                        val cohouseUser = cohouse.users.find { it.userId == user.id }
+                        if (cohouseUser != null) {
+                            cohouseRepository.removeUser(cohouseUser.id, cohouse.id)
+                        }
+                    }
+                    // Clear cohouseId on user doc
                     authRepository.updateUser(user.copy(cohouseId = null))
                 }
             } catch (_: Exception) {}

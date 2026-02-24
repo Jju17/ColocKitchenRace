@@ -3,6 +3,7 @@ package dev.rahier.colocskitchenrace.data.repository.impl
 import com.google.firebase.functions.FirebaseFunctions
 import dev.rahier.colocskitchenrace.data.repository.PaymentIntentResult
 import dev.rahier.colocskitchenrace.data.repository.StripeRepository
+import dev.rahier.colocskitchenrace.util.DemoMode
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -22,6 +23,15 @@ class StripeRepositoryImpl @Inject constructor(
         averageAge: Int,
         cohouseType: String,
     ): PaymentIntentResult {
+        if (DemoMode.isActive) {
+            return PaymentIntentResult(
+                clientSecret = "demo_client_secret",
+                customerId = "demo_customer_id",
+                ephemeralKeySecret = "demo_ephemeral_key",
+                paymentIntentId = "demo_pi_${System.currentTimeMillis()}",
+            )
+        }
+
         val result = functions.getHttpsCallable("reserveAndCreatePayment")
             .call(
                 hashMapOf(

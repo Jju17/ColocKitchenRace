@@ -153,6 +153,14 @@ private fun CohouseDetailContent(
     val clipboardManager = LocalClipboardManager.current
     var showCopied by remember { mutableStateOf(false) }
 
+    // Reset "copied" indicator after 2 seconds
+    LaunchedEffect(showCopied) {
+        if (showCopied) {
+            kotlinx.coroutines.delay(2000)
+            showCopied = false
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()

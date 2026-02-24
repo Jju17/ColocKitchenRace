@@ -10,6 +10,7 @@ import dev.rahier.colocskitchenrace.data.model.PostalAddress
 import dev.rahier.colocskitchenrace.data.repository.CohouseRepository
 import dev.rahier.colocskitchenrace.data.repository.DuplicateResult
 import dev.rahier.colocskitchenrace.util.Constants
+import dev.rahier.colocskitchenrace.util.DemoMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -48,6 +49,8 @@ class CohouseRepositoryImpl @Inject constructor(
     }
 
     override suspend fun get(id: String): Cohouse {
+        if (DemoMode.isActive) return DemoMode.demoCohouse
+
         val doc = firestore.collection(Constants.COHOUSES_COLLECTION)
             .document(id)
             .get()
@@ -111,6 +114,15 @@ class CohouseRepositoryImpl @Inject constructor(
             .collection("users")
             .document(user.id)
             .set(cohouseUserToMap(user))
+            .await()
+    }
+
+    override suspend fun removeUser(cohouseUserId: String, cohouseId: String) {
+        firestore.collection(Constants.COHOUSES_COLLECTION)
+            .document(cohouseId)
+            .collection("users")
+            .document(cohouseUserId)
+            .delete()
             .await()
     }
 

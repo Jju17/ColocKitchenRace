@@ -6,6 +6,7 @@ import com.google.firebase.firestore.Query
 import dev.rahier.colocskitchenrace.data.model.News
 import dev.rahier.colocskitchenrace.data.repository.NewsRepository
 import dev.rahier.colocskitchenrace.util.Constants
+import dev.rahier.colocskitchenrace.util.DemoMode
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -20,6 +21,8 @@ class NewsRepositoryImpl @Inject constructor(
 ) : NewsRepository {
 
     override suspend fun getLatest(): List<News> {
+        if (DemoMode.isActive) return DemoMode.demoNews
+
         val snapshot = firestore.collection(Constants.NEWS_COLLECTION)
             .orderBy("publicationTimestamp", Query.Direction.DESCENDING)
             .limit(10)

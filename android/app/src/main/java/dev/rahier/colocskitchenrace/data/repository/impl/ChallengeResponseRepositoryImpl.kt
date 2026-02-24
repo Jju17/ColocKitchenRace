@@ -8,6 +8,7 @@ import dev.rahier.colocskitchenrace.data.model.ChallengeResponseContent
 import dev.rahier.colocskitchenrace.data.model.ChallengeResponseStatus
 import dev.rahier.colocskitchenrace.data.repository.ChallengeResponseRepository
 import dev.rahier.colocskitchenrace.util.Constants
+import dev.rahier.colocskitchenrace.util.DemoMode
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -24,6 +25,8 @@ class ChallengeResponseRepositoryImpl @Inject constructor(
 
     @Suppress("UNCHECKED_CAST")
     override suspend fun getAll(): List<ChallengeResponse> {
+        if (DemoMode.isActive) return DemoMode.demoChallengeResponses
+
         val snapshot = firestore.collectionGroup(Constants.RESPONSES_SUBCOLLECTION)
             .get()
             .await()
@@ -36,6 +39,10 @@ class ChallengeResponseRepositoryImpl @Inject constructor(
 
     @Suppress("UNCHECKED_CAST")
     override suspend fun getAllForCohouse(cohouseId: String): List<ChallengeResponse> {
+        if (DemoMode.isActive) {
+            return DemoMode.demoChallengeResponses.filter { it.cohouseId == cohouseId }
+        }
+
         val snapshot = firestore.collectionGroup(Constants.RESPONSES_SUBCOLLECTION)
             .whereEqualTo("cohouseId", cohouseId)
             .get()
@@ -61,6 +68,8 @@ class ChallengeResponseRepositoryImpl @Inject constructor(
     }
 
     override suspend fun submit(response: ChallengeResponse): ChallengeResponse {
+        if (DemoMode.isActive) return response
+
         val data = responseToMap(response)
         firestore.collection(Constants.CHALLENGES_COLLECTION)
             .document(response.challengeId)

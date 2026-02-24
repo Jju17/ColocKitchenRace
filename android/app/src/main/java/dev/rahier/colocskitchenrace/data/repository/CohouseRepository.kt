@@ -12,6 +12,7 @@ interface CohouseRepository {
     suspend fun getByCode(code: String): Cohouse
     suspend fun set(id: String, cohouse: Cohouse)
     suspend fun setUser(user: CohouseUser, cohouseId: String)
+    suspend fun removeUser(cohouseUserId: String, cohouseId: String)
     suspend fun quitCohouse()
     suspend fun checkDuplicate(name: String, street: String, city: String): DuplicateResult
     suspend fun uploadCoverImage(cohouseId: String, imageData: ByteArray): String

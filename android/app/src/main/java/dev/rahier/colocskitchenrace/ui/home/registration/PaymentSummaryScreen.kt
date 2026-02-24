@@ -10,6 +10,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.stripe.android.paymentsheet.PaymentSheet
+import com.stripe.android.paymentsheet.PaymentSheetResult
+import com.stripe.android.paymentsheet.rememberPaymentSheet
 import dev.rahier.colocskitchenrace.ui.components.CKRButton
 import dev.rahier.colocskitchenrace.ui.theme.*
 
@@ -24,11 +27,29 @@ fun PaymentSummaryScreen(
     totalPriceCents: Int,
     participantCount: Int,
     viewModel: PaymentSummaryViewModel = hiltViewModel(),
-    onPaymentSheet: (clientSecret: String, customerId: String, ephemeralKeySecret: String) -> Unit,
     onRegistrationComplete: () -> Unit,
     onBack: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+
+    // Stripe PaymentSheet integration
+    val paymentSheet = rememberPaymentSheet { result ->
+        when (result) {
+            is PaymentSheetResult.Completed -> {
+                viewModel.onIntent(PaymentSummaryIntent.PaymentSucceeded)
+            }
+            is PaymentSheetResult.Canceled -> {
+                // User canceled — do nothing, they can retry
+            }
+            is PaymentSheetResult.Failed -> {
+                viewModel.onIntent(
+                    PaymentSummaryIntent.PaymentFailed(
+                        result.error.localizedMessage ?: "Erreur de paiement"
+                    )
+                )
+            }
+        }
+    }
 
     LaunchedEffect(Unit) {
         viewModel.onIntent(
@@ -47,11 +68,20 @@ fun PaymentSummaryScreen(
     LaunchedEffect(Unit) {
         viewModel.effect.collect { effect ->
             when (effect) {
-                is PaymentSummaryEffect.PresentPaymentSheet -> onPaymentSheet(
-                    effect.clientSecret,
-                    effect.customerId,
-                    effect.ephemeralKeySecret,
-                )
+                is PaymentSummaryEffect.PresentPaymentSheet -> {
+                    val configuration = PaymentSheet.Configuration.Builder("Colocs Kitchen Race")
+                        .customer(
+                            PaymentSheet.CustomerConfiguration(
+                                id = effect.customerId,
+                                ephemeralKeySecret = effect.ephemeralKeySecret,
+                            )
+                        )
+                        .build()
+                    paymentSheet.presentWithPaymentIntent(
+                        paymentIntentClientSecret = effect.clientSecret,
+                        configuration = configuration,
+                    )
+                }
                 PaymentSummaryEffect.RegistrationComplete -> onRegistrationComplete()
             }
         }
@@ -66,6 +96,9 @@ fun PaymentSummaryScreen(
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Retour")
                     }
                 },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.background,
+                ),
             )
         },
     ) { padding ->
