@@ -1,6 +1,6 @@
 //
 //  Error+Utils.swift
-//  colockitchenrace
+//  colocskitchenrace
 //
 //  Created by Julien Rahier on 22/07/2024.
 //

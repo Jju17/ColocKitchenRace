@@ -1,6 +1,6 @@
 //
 //  Dictionary+Utils.swift
-//  colockitchenrace
+//  colocskitchenrace
 //
 //  Created by Julien Rahier on 18/07/2024.
 //

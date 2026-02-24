@@ -27,16 +27,16 @@ struct PaymentSummaryFeatureTests {
         )
     }
 
-    // MARK: - Payment Intent Creation
+    // MARK: - Reservation + Payment Intent Creation
 
-    @Test("onAppear creates payment intent")
-    func onAppearCreatesPaymentIntent() async {
+    @Test("onAppear reserves spot and creates payment intent")
+    func onAppearReservesAndCreatesPaymentIntent() async {
         var createCalled = false
 
         let store = TestStore(initialState: makeState()) {
             PaymentSummaryFeature()
         } withDependencies: {
-            $0.stripeClient.createPaymentIntent = { _, _, _, _ in
+            $0.stripeClient.reserveAndCreatePayment = { _, _, _, _, _, _, _ in
                 createCalled = true
                 return PaymentIntentResult(
                     clientSecret: "pi_secret",
@@ -62,12 +62,12 @@ struct PaymentSummaryFeatureTests {
         #expect(createCalled)
     }
 
-    @Test("onAppear handles payment intent creation failure")
-    func onAppearPaymentIntentFailed() async {
+    @Test("onAppear handles reservation failure")
+    func onAppearReservationFailed() async {
         let store = TestStore(initialState: makeState()) {
             PaymentSummaryFeature()
         } withDependencies: {
-            $0.stripeClient.createPaymentIntent = { _, _, _, _ in
+            $0.stripeClient.reserveAndCreatePayment = { _, _, _, _, _, _, _ in
                 throw StripeError.paymentIntentCreationFailed("Network error")
             }
         }
@@ -121,34 +121,34 @@ struct PaymentSummaryFeatureTests {
         }
     }
 
-    // MARK: - Payment Completed
+    // MARK: - Payment Completed → Confirmation
 
-    @Test("payment completed triggers registration and delegates success")
-    func paymentCompletedRegisters() async {
+    @Test("payment completed triggers confirmation and delegates success")
+    func paymentCompletedConfirms() async {
         var state = makeState()
         state.paymentIntentId = "pi_test"
 
-        var registerCalled = false
+        var confirmCalled = false
 
         let store = TestStore(initialState: state) {
             PaymentSummaryFeature()
         } withDependencies: {
-            $0.ckrClient.registerForGame = { _, _, _, _, _, _ in
-                registerCalled = true
+            $0.ckrClient.confirmRegistration = { _, _, _ in
+                confirmCalled = true
             }
         }
 
         await store.send(.paymentCompleted(.completed)) {
-            $0.isRegistering = true
+            $0.isConfirming = true
         }
 
-        await store.receive(\._registrationSucceeded) {
-            $0.isRegistering = false
+        await store.receive(\._confirmationSucceeded) {
+            $0.isConfirming = false
         }
 
         await store.receive(\.delegate.registrationSucceeded)
 
-        #expect(registerCalled)
+        #expect(confirmCalled)
     }
 
     @Test("payment canceled does nothing")
@@ -171,64 +171,64 @@ struct PaymentSummaryFeatureTests {
         }
     }
 
-    // MARK: - Registration Failure After Payment
+    // MARK: - Confirmation Failure After Payment
 
-    @Test("registration failure after payment shows specific error")
-    func registrationFailedAfterPayment() async {
+    @Test("confirmation failure after payment shows specific error")
+    func confirmationFailedAfterPayment() async {
         var state = makeState()
         state.paymentIntentId = "pi_test"
 
         let store = TestStore(initialState: state) {
             PaymentSummaryFeature()
         } withDependencies: {
-            $0.ckrClient.registerForGame = { _, _, _, _, _, _ in
+            $0.ckrClient.confirmRegistration = { _, _, _ in
                 throw CKRError.firebaseError("Server error")
             }
         }
 
         await store.send(.paymentCompleted(.completed)) {
-            $0.isRegistering = true
+            $0.isConfirming = true
         }
 
-        await store.receive(\._registrationFailed) {
-            $0.isRegistering = false
-            $0.errorMessage = "Payment succeeded but registration failed: \(CKRError.firebaseError("Server error").localizedDescription). Please try again."
+        await store.receive(\._confirmationFailed) {
+            $0.isConfirming = false
+            $0.errorMessage = "Payment succeeded but confirmation failed: \(CKRError.firebaseError("Server error").localizedDescription). Please try again."
         }
     }
 
-    // MARK: - Retry Registration
+    // MARK: - Retry Confirmation
 
-    @Test("retryRegistrationTapped retries registration")
-    func retryRegistration() async {
+    @Test("retryConfirmationTapped retries confirmation")
+    func retryConfirmation() async {
         var state = makeState()
         state.paymentIntentId = "pi_test"
         state.errorMessage = "Previous error"
 
-        var registerCalled = false
+        var confirmCalled = false
 
         let store = TestStore(initialState: state) {
             PaymentSummaryFeature()
         } withDependencies: {
-            $0.ckrClient.registerForGame = { _, _, _, _, _, _ in
-                registerCalled = true
+            $0.ckrClient.confirmRegistration = { _, _, _ in
+                confirmCalled = true
             }
         }
 
-        await store.send(.retryRegistrationTapped) {
-            $0.isRegistering = true
+        await store.send(.retryConfirmationTapped) {
+            $0.isConfirming = true
             $0.errorMessage = nil
         }
 
-        await store.receive(\._registrationSucceeded) {
-            $0.isRegistering = false
+        await store.receive(\._confirmationSucceeded) {
+            $0.isConfirming = false
         }
 
         await store.receive(\.delegate.registrationSucceeded)
 
-        #expect(registerCalled)
+        #expect(confirmCalled)
     }
 
-    @Test("retryRegistrationTapped does nothing without paymentIntentId")
+    @Test("retryConfirmationTapped does nothing without paymentIntentId")
     func retryWithoutPaymentIntent() async {
         var state = makeState()
         state.errorMessage = "Some error"
@@ -237,6 +237,6 @@ struct PaymentSummaryFeatureTests {
             PaymentSummaryFeature()
         }
 
-        await store.send(.retryRegistrationTapped)
+        await store.send(.retryConfirmationTapped)
     }
 }

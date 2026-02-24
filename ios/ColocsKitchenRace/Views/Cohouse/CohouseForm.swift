@@ -1,0 +1,654 @@
+//
+//  CohouseFormView.swift
+//  colocskitchenrace
+//
+//  Created by Julien Rahier on 09/10/2023.
+//
+
+import ComposableArchitecture
+import MapKit
+import os
+import SwiftUI
+
+@Reducer
+struct CohouseFormFeature {
+
+    @ObservableState
+    struct State: Equatable {
+        @Shared(.userInfo) var userInfo
+        var wipCohouse: Cohouse
+        var isNewCohouse: Bool = false
+        var originalAddress: PostalAddress?
+        var addressValidationResult: AddressValidationResult?
+        var isValidatingAddress: Bool = false
+        var creationError: String?
+
+        // Cover image
+        var coverImageData: Data?
+        var isCoverImagePickerPresented: Bool = false
+        var coverImageSourceSheet: Bool = false
+        var coverImageSource: CoverImageSource = .library
+
+        enum CoverImageSource: Equatable { case camera, library }
+
+        // ID card
+        var idCardImageData: Data?
+        var isIdCardPickerPresented: Bool = false
+        var isProcessingIdCard: Bool = false
+        var idCardScanResult: IdCardScanResult?
+
+        /// Whether the address has been modified from the original (relevant for edit mode).
+        var hasAddressChanged: Bool {
+            guard let original = originalAddress else { return true }
+            return wipCohouse.address != original
+        }
+    }
+
+    enum Action: BindableAction, Equatable {
+        case addUserButtonTapped
+        case assignAdmin(userId: CohouseUser.ID)
+        case binding(BindingAction<State>)
+        case deleteUsers(atOffset: IndexSet)
+        case quitCohouseButtonTapped
+        case addressValidationResponse(TaskResult<AddressValidationResult>)
+        case applySuggestedAddress(ValidatedAddress)
+        case pinDragged(latitude: Double, longitude: Double)
+
+        // Cover image
+        case coverImagePickTapped
+        case coverImageSourceChosen(State.CoverImageSource)
+        case coverImagePicked(Data)
+        case coverImageCleared
+
+        // ID card
+        case idCardPickTapped
+        case idCardPicked(Data)
+        case idCardCleared
+        case idCardScanResponse(IdCardScanResult)
+    }
+
+    private enum CancelID { case addressValidation }
+
+    @Dependency(\.cohouseClient) var cohouseClient
+    @Dependency(\.addressValidatorClient) var addressValidatorClient
+    @Dependency(\.idCardScannerClient) var idCardScannerClient
+    @Dependency(\.continuousClock) var clock
+    @Dependency(\.uuid) var uuid
+
+    var body: some ReducerOf<Self> {
+        BindingReducer()
+
+        Reduce { state, action in
+            switch action {
+                case .addUserButtonTapped:
+                    state.wipCohouse.users.append(CohouseUser(id: uuid()))
+                    return .none
+                case let .assignAdmin(userId):
+                    for index in state.wipCohouse.users.indices {
+                        state.wipCohouse.users[index].isAdmin = (state.wipCohouse.users[index].id == userId)
+                    }
+                    return .none
+                case .binding:
+                    state.creationError = nil
+
+                    // Check if address fields changed → trigger auto-validation
+                    let address = state.wipCohouse.address
+                    let trimmedStreet = address.street.trimmingCharacters(in: .whitespacesAndNewlines)
+                    let trimmedCity = address.city.trimmingCharacters(in: .whitespacesAndNewlines)
+
+                    // If address is too short, just clear validation
+                    guard trimmedStreet.count >= 5, trimmedCity.count >= 2 else {
+                        state.addressValidationResult = nil
+                        state.isValidatingAddress = false
+                        return .cancel(id: CancelID.addressValidation)
+                    }
+
+                    // If address matches the one already validated, don't re-validate
+                    if let result = state.addressValidationResult {
+                        switch result {
+                        case .valid(let v), .lowConfidence(let v):
+                            if v.input == address { return .none }
+                        default:
+                            break
+                        }
+                    }
+
+                    state.addressValidationResult = nil
+                    state.isValidatingAddress = true
+
+                    return .run { [address] send in
+                        try await clock.sleep(for: .milliseconds(600))
+                        await send(
+                            .addressValidationResponse(
+                                TaskResult {
+                                    await addressValidatorClient.validate(address)
+                                }
+                            )
+                        )
+                    }
+                    .cancellable(id: CancelID.addressValidation, cancelInFlight: true)
+
+                case let .deleteUsers(atOffset: indices):
+                    let nonAdminIndexes = indices.filter {
+                        !state.wipCohouse.users[$0].isAdmin
+                    }
+
+                    for index in nonAdminIndexes.sorted(by: >) {
+                        state.wipCohouse.users.remove(at: index)
+                    }
+
+                    if state.wipCohouse.users.isEmpty {
+                        state.wipCohouse.users.append(CohouseUser(id: uuid(), isAdmin: true))
+                    }
+                    return .none
+                case .quitCohouseButtonTapped:
+                    return .run { _ in
+                        try await self.cohouseClient.quitCohouse()
+                    } catch: { error, _ in
+                        Logger.cohouseLog.log(level: .error, "Failed to quit cohouse: \(error)")
+                    }
+                case let .addressValidationResponse(.success(result)):
+                    state.isValidatingAddress = false
+                    state.addressValidationResult = result
+                    return .none
+                case .addressValidationResponse(.failure):
+                    state.isValidatingAddress = false
+                    state.addressValidationResult = .notFound
+                    return .none
+                case .applySuggestedAddress(let validated):
+                    let suggestion = PostalAddress(
+                        street: validated.normalizedStreet ?? validated.input.street,
+                        city: validated.normalizedCity ?? validated.input.city,
+                        postalCode: validated.normalizedPostalCode ?? validated.input.postalCode,
+                        country: validated.normalizedCountry ?? validated.input.country
+                    )
+                    state.wipCohouse.address = suggestion
+                    state.addressValidationResult = nil
+                    return .none
+
+                case let .pinDragged(latitude, longitude):
+                    state.wipCohouse.latitude = latitude
+                    state.wipCohouse.longitude = longitude
+                    return .none
+
+                // Cover image
+                case .coverImagePickTapped:
+                    state.coverImageSourceSheet = true
+                    return .none
+                case let .coverImageSourceChosen(source):
+                    state.coverImageSourceSheet = false
+                    state.coverImageSource = source
+                    state.isCoverImagePickerPresented = true
+                    return .none
+                case let .coverImagePicked(data):
+                    state.coverImageData = data
+                    state.isCoverImagePickerPresented = false
+                    return .none
+                case .coverImageCleared:
+                    state.coverImageData = nil
+                    return .none
+
+                // ID card
+                case .idCardPickTapped:
+                    state.isIdCardPickerPresented = true
+                    return .none
+                case let .idCardPicked(data):
+                    state.idCardImageData = data
+                    state.isIdCardPickerPresented = false
+                    state.creationError = nil
+                    state.isProcessingIdCard = true
+                    state.idCardScanResult = nil
+                    return .run { send in
+                        let result = await idCardScannerClient.scanIdCard(data)
+                        await send(.idCardScanResponse(result))
+                    }
+                case .idCardCleared:
+                    state.idCardImageData = nil
+                    state.idCardScanResult = nil
+                    return .none
+                case let .idCardScanResponse(result):
+                    state.isProcessingIdCard = false
+                    state.idCardScanResult = result
+                    return .none
+            }
+        }
+    }
+}
+
+struct CohouseFormView: View {
+    @Bindable var store: StoreOf<CohouseFormFeature>
+    @State private var isMapPickerPresented = false
+
+    var body: some View {
+        Form {
+            if let error = store.creationError {
+                Section {
+                    Text(error)
+                        .foregroundStyle(.red)
+                        .font(.footnote)
+                }
+            }
+
+            Section {
+                TextField("Cohouse name", text: $store.wipCohouse.name)
+            }
+
+            self.coverImageSection
+
+            Section("Location") {
+                TextField(text: $store.wipCohouse.address.street) {
+                    Text("Address")
+                }
+                TextField(text: $store.wipCohouse.address.postalCode) {
+                    Text("Postcode")
+                }
+                TextField(text: $store.wipCohouse.address.city) {
+                    Text("City")
+                }
+
+                self.addressValidationView
+
+                if store.wipCohouse.latitude != nil,
+                   store.wipCohouse.longitude != nil {
+                    Button {
+                        isMapPickerPresented = true
+                    } label: {
+                        Label("Adjust pin on map", systemImage: "map")
+                    }
+                }
+            }
+
+            Section("Members") {
+                ForEach($store.wipCohouse.users) { $user in
+                    HStack {
+                        TextField("Name", text: $user.surname)
+                        if user.isAdmin {
+                            Image(systemName: "star.fill")
+                                .foregroundStyle(.yellow)
+                                .font(.footnote)
+                        }
+                        if !store.isNewCohouse && isCurrentUserAdmin() && !user.isAdmin {
+                            Button {
+                                store.send(.assignAdmin(userId: user.id))
+                            } label: {
+                                Text("Make admin")
+                                    .font(.caption)
+                                    .foregroundStyle(Color.ckrLavender)
+                            }
+                            .buttonStyle(.borderless)
+                        }
+                    }
+                }
+                .onDelete { indices in
+                    store.send(.deleteUsers(atOffset: indices))
+                }
+
+                Button("Add user") {
+                    store.send(.addUserButtonTapped)
+                }
+            }
+
+            if store.isNewCohouse {
+                self.idCardSection
+            }
+
+            if !store.isNewCohouse && !self.isCurrentUserAdmin() {
+                Section {
+                    Button("Quit cohouse") {
+                        store.send(.quitCohouseButtonTapped)
+                    }
+                    .foregroundStyle(.red)
+                }
+            }
+
+        }
+        .scrollDismissesKeyboard(.interactively)
+        .fullScreenCover(isPresented: $store.isIdCardPickerPresented) {
+            ImagePicker(
+                selected: { image in
+                    if let data = ImagePipeline.compress(image: image) {
+                        store.send(.idCardPicked(data))
+                    } else {
+                        store.send(.idCardCleared)
+                    }
+                },
+                cancelled: {
+                    store.send(.binding(.set(\.isIdCardPickerPresented, false)))
+                },
+                source: .camera
+            )
+            .ignoresSafeArea()
+        }
+        .fullScreenCover(isPresented: $store.isCoverImagePickerPresented) {
+            ImagePicker(
+                selected: { image in
+                    if let data = ImagePipeline.compress(image: image) {
+                        store.send(.coverImagePicked(data))
+                    }
+                },
+                cancelled: {
+                    store.send(.binding(.set(\.isCoverImagePickerPresented, false)))
+                },
+                source: store.coverImageSource == .camera ? .camera : .photoLibrary
+            )
+            .ignoresSafeArea()
+        }
+        .confirmationDialog("Photo source", isPresented: $store.coverImageSourceSheet) {
+            Button("Camera") { store.send(.coverImageSourceChosen(.camera)) }
+            Button("Photo Library") { store.send(.coverImageSourceChosen(.library)) }
+        }
+        .sheet(isPresented: $isMapPickerPresented) {
+            if let lat = store.wipCohouse.latitude,
+               let lng = store.wipCohouse.longitude {
+                CohouseMapPickerView(
+                    cohouseName: store.wipCohouse.name,
+                    latitude: lat,
+                    longitude: lng
+                ) { newLat, newLng in
+                    store.send(.pinDragged(latitude: newLat, longitude: newLng))
+                }
+            }
+        }
+    }
+
+    // MARK: - Cover Image section
+
+    @ViewBuilder
+    private var coverImageSection: some View {
+        Section("Cover photo") {
+            if let imageData = store.coverImageData,
+               let uiImage = UIImage(data: imageData) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(height: 150)
+                        .clipped()
+                        .cornerRadius(8)
+
+                    Button(role: .destructive) {
+                        store.send(.coverImageCleared)
+                    } label: {
+                        Label("Remove photo", systemImage: "trash")
+                            .font(.footnote)
+                    }
+                }
+            } else {
+                Button {
+                    store.send(.coverImagePickTapped)
+                } label: {
+                    Label("Choose a cover photo", systemImage: "photo.on.rectangle")
+                }
+            }
+
+            Text("Optional — personalize your cohouse page.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    // MARK: - ID Card section
+
+    @ViewBuilder
+    private var idCardSection: some View {
+        Section("ID Card") {
+            if let imageData = store.idCardImageData,
+               let uiImage = UIImage(data: imageData) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Image(uiImage: uiImage)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(maxHeight: 200)
+                        .cornerRadius(8)
+
+                    if store.isProcessingIdCard {
+                        HStack(spacing: 8) {
+                            ProgressView()
+                                .scaleEffect(0.7)
+                            Text("Analyzing ID card...")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+
+                    if let scanResult = store.idCardScanResult {
+                        idCardScanResultView(scanResult)
+                    }
+
+                    Button(role: .destructive) {
+                        store.send(.idCardCleared)
+                    } label: {
+                        Label("Remove photo", systemImage: "trash")
+                            .font(.footnote)
+                    }
+                }
+            } else {
+                Button {
+                    store.send(.idCardPickTapped)
+                } label: {
+                    Label("Take a photo of your ID card", systemImage: "camera")
+                }
+            }
+
+            Text("Required to verify your identity when creating a cohouse.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+    }
+
+    @ViewBuilder
+    private func idCardScanResultView(_ result: IdCardScanResult) -> some View {
+        switch result {
+        case .valid:
+            HStack(spacing: 4) {
+                Image(systemName: "checkmark.circle.fill")
+                    .foregroundStyle(.green)
+                Text("ID card detected")
+                    .font(.footnote)
+                    .foregroundStyle(.green)
+            }
+
+        case .notAnIdCard:
+            HStack(spacing: 4) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.orange)
+                Text("This doesn't look like an ID card. Please retake the photo.")
+                    .font(.footnote)
+                    .foregroundStyle(.orange)
+            }
+
+        case .poorQuality:
+            HStack(spacing: 4) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .foregroundStyle(.orange)
+                Text("Image quality is low. Please retake with better lighting.")
+                    .font(.footnote)
+                    .foregroundStyle(.orange)
+            }
+
+        case .error:
+            HStack(spacing: 4) {
+                Image(systemName: "xmark.circle.fill")
+                    .foregroundStyle(.orange)
+                Text("Could not analyze the photo. An admin will verify manually.")
+                    .font(.footnote)
+                    .foregroundStyle(.orange)
+            }
+        }
+    }
+
+    // MARK: - Address validation subview
+
+    @ViewBuilder
+    private var addressValidationView: some View {
+        if store.isValidatingAddress {
+            HStack(spacing: 8) {
+                ProgressView()
+                    .scaleEffect(0.7)
+                Text("Validating address…")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+        }
+
+        if let result = store.addressValidationResult {
+            switch result {
+            case .invalidSyntax:
+                Text("Invalid address (incorrect format).")
+                    .font(.footnote)
+                    .foregroundStyle(.red)
+
+            case .notFound:
+                Text("Address not found or not recognized.")
+                    .font(.footnote)
+                    .foregroundStyle(.orange)
+
+            case .lowConfidence(let validated):
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Address found but uncertain:")
+                        .font(.footnote)
+                        .foregroundStyle(.orange)
+
+                    if let suggestion = formattedSuggestion(from: validated) {
+                        Button {
+                            store.send(.applySuggestedAddress(validated))
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: "location.magnifyingglass")
+                                Text(suggestion)
+                            }
+                            .font(.footnote)
+                        }
+                    }
+                }
+
+            case .valid(let validated):
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Valid address ✅")
+                        .font(.footnote)
+                        .foregroundStyle(.green)
+                    if let suggestion = formattedSuggestion(from: validated) {
+                        Text(suggestion)
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+        }
+    }
+
+    private func formattedSuggestion(from validated: ValidatedAddress) -> String? {
+        let street = validated.normalizedStreet ?? validated.input.street
+        let city = validated.normalizedCity ?? validated.input.city
+        let postalCode = validated.normalizedPostalCode ?? validated.input.postalCode
+        let country = validated.normalizedCountry ?? validated.input.country
+
+        let line1 = street
+        let line2 = [postalCode, city]
+            .filter { !$0.isEmpty }
+            .joined(separator: " ")
+        let line3 = country
+
+        let lines = [line1, line2, line3].filter { !$0.isEmpty }
+
+        return lines.isEmpty ? nil : lines.joined(separator: ", ")
+    }
+
+    // MARK: - Helpers
+
+    func isCurrentUserAdmin() -> Bool {
+        let adminUser = store.wipCohouse.users.first { $0.isAdmin }?.userId
+        let userInfo = store.userInfo?.id.uuidString
+        return adminUser == userInfo
+    }
+}
+
+// MARK: - Map Picker View
+
+struct CohouseMapPickerView: View {
+    let cohouseName: String
+    let latitude: Double
+    let longitude: Double
+    let onConfirm: (Double, Double) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var pinCoordinate: CLLocationCoordinate2D
+    @State private var mapPosition: MapCameraPosition
+
+    init(
+        cohouseName: String,
+        latitude: Double,
+        longitude: Double,
+        onConfirm: @escaping (Double, Double) -> Void
+    ) {
+        self.cohouseName = cohouseName
+        self.latitude = latitude
+        self.longitude = longitude
+        self.onConfirm = onConfirm
+
+        let coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        self._pinCoordinate = State(initialValue: coordinate)
+        self._mapPosition = State(initialValue: .region(
+            MKCoordinateRegion(
+                center: coordinate,
+                span: MKCoordinateSpan(latitudeDelta: 0.008, longitudeDelta: 0.008)
+            )
+        ))
+    }
+
+    var body: some View {
+        NavigationStack {
+            VStack(spacing: 0) {
+                MapReader { reader in
+                    Map(position: $mapPosition) {
+                        Marker(
+                            cohouseName.isEmpty ? "Cohouse" : cohouseName,
+                            coordinate: pinCoordinate
+                        )
+                    }
+                    .mapStyle(.standard)
+                    .onTapGesture { screenCoord in
+                        if let coordinate = reader.convert(screenCoord, from: .local) {
+                            pinCoordinate = coordinate
+                        }
+                    }
+                }
+
+                Text("Tap on the map to adjust the pin location")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .padding(.vertical, 10)
+                    .frame(maxWidth: .infinity)
+                    .background(Color(.systemGroupedBackground))
+            }
+            .navigationTitle("Pin location")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                }
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") {
+                        onConfirm(pinCoordinate.latitude, pinCoordinate.longitude)
+                        dismiss()
+                    }
+                }
+            }
+        }
+    }
+}
+
+#Preview {
+    CohouseFormView(
+        store: Store(
+            initialState: CohouseFormFeature.State(
+                wipCohouse: .mock,
+                isNewCohouse: true
+            )
+        ) {
+            CohouseFormFeature()
+        }
+    )
+}

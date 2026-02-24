@@ -1,6 +1,6 @@
 //
 //  SplashScreenView.swift
-//  colockitchenrace
+//  colocskitchenrace
 //
 //  Created by Julien Rahier on 24/05/2024.
 //

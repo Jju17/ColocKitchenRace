@@ -54,13 +54,13 @@ This report covers a full audit of the Colocs Kitchen Race (CKR) project across 
 
 | ID | Finding | File | Lines | Severity |
 |----|---------|------|-------|----------|
-| iOS-S1 | **Hardcoded Stripe test publishable key** in source code, exposed in repo | `colockitchenraceApp.swift` | 36 | **Critical** |
+| iOS-S1 | **Hardcoded Stripe test publishable key** in source code, exposed in repo | `colocskitchenraceApp.swift` | 36 | **Critical** |
 | iOS-S2 | **Auth state listener never unregistered** — `addStateDidChangeListener` returns a handle that is never saved or removed | `Clients/AuthentificationClient.swift` | 362-370 | **Critical** |
 | iOS-S3 | `@unchecked Sendable` with `nonisolated(unsafe)` on `currentNonce` — race condition possible | `Clients/AuthentificationClient.swift` | 396-398 | **High** |
 | iOS-S4 | `DispatchQueue.main.sync` in `presentationAnchor` callback — potential deadlock | `Clients/AuthentificationClient.swift` | 434 | **High** |
 | iOS-S5 | Email regex too permissive — accepts `a..b@example..com` | `Shared/Utils/UserValidation.swift` | 38-40 | Medium |
 | iOS-S6 | Phone regex accepts strings like `"+++---())(("` (7 chars of noise) | `Shared/Utils/UserValidation.swift` | 45-48 | Medium |
-| iOS-S7 | Deep linking from notification data not implemented — `// TODO` placeholder | `colockitchenraceApp.swift` | 110 | Medium |
+| iOS-S7 | Deep linking from notification data not implemented — `// TODO` placeholder | `colocskitchenraceApp.swift` | 110 | Medium |
 | iOS-S8 | Firebase App Check not implemented (marked as incomplete in TODO.swift) | `TODO.swift` | 11-12 | **High** |
 
 ### 1.3 Memory & Performance
@@ -68,7 +68,7 @@ This report covers a full audit of the Colocs Kitchen Race (CKR) project across 
 | ID | Finding | File | Lines | Severity |
 |----|---------|------|-------|----------|
 | iOS-P1 | **News listener leaked in demo mode** — listener created but never stored when `DemoMode.isActive` returns early | `Clients/NewsClient.swift` | 68 | **Critical** |
-| iOS-P2 | News listener task not properly cancelled in `colockitchenraceApp` | `colockitchenraceApp.swift` | 122, 164-170 | **High** |
+| iOS-P2 | News listener task not properly cancelled in `colocskitchenraceApp` | `colocskitchenraceApp.swift` | 122, 164-170 | **High** |
 | iOS-P3 | JPEG compression loop runs synchronously on main thread — blocks UI during image selection | `Utils/ImagePipeline.swift` | 56-63 | Medium |
 | iOS-P4 | `DispatchQueue.main.asyncAfter` prevents view deallocation | `Views/Global/ConfettiCannon.swift` | 21 | Medium |
 | iOS-P5 | Computed property `filteredTiles` (array filter) called on every `onChange` re-render — should be memoized in state | `Views/Challenge/ChallengeView.swift` | 42-70, 341-343 | Medium |
@@ -79,8 +79,8 @@ This report covers a full audit of the Colocs Kitchen Race (CKR) project across 
 |----|---------|------|-------|----------|
 | iOS-Q1 | Auth sign-in post-processing duplicated 3x (~90 lines) across email, Google, Apple flows | `Clients/AuthentificationClient.swift` | 61-352 | Medium |
 | iOS-Q2 | `contactUser` computed property always returns `nil` — dead code | `Models/Cohouse.swift` | 43-46 | Low |
-| iOS-Q3 | Inconsistent naming: `SigninView` (missing capital I), `AuthentificationClient` (unusual spelling), lowercase `colockitchenraceApp` | Various | — | Low |
-| iOS-Q4 | `print()` statements in AppDelegate instead of `Logger` | `colockitchenraceApp.swift` | 53, 60, 78, 85, 93, 109 | Low |
+| iOS-Q3 | Inconsistent naming: `SigninView` (missing capital I), `AuthentificationClient` (unusual spelling), lowercase `colocskitchenraceApp` | Various | — | Low |
+| iOS-Q4 | `print()` statements in AppDelegate instead of `Logger` | `colocskitchenraceApp.swift` | 53, 60, 78, 85, 93, 109 | Low |
 | iOS-Q5 | 7+ instances of swallowed errors across auth, challenges, CKR, news, and home clients | Various | — | Medium |
 | iOS-Q6 | `ChallengeTileView` is 200+ lines with 5 computed properties — should be decomposed | `Views/Challenge/ChallengeTileView.swift` | 237-444 | Low |
 | iOS-Q7 | Custom `Binding(get:set:)` in `SigninView` instead of `@Bindable` | `Views/Signin/SigninView.swift` | 201-203 | Low |
@@ -356,7 +356,7 @@ This report covers a full audit of the Colocs Kitchen Race (CKR) project across 
 
 ### Immediate (Before Next Release)
 
-1. **Remove hardcoded Stripe keys** from iOS (`colockitchenraceApp.swift:36`) and Android source. Load from Firebase Remote Config or a build-time injected configuration.
+1. **Remove hardcoded Stripe keys** from iOS (`colocskitchenraceApp.swift:36`) and Android source. Load from Firebase Remote Config or a build-time injected configuration.
 
 2. **Fix auth listener memory leak** in `AuthentificationClient.swift:362-370`. Save the `ListenerRegistration` handle returned by `addStateDidChangeListener` and remove it on cleanup.
 
@@ -380,7 +380,7 @@ This report covers a full audit of the Colocs Kitchen Race (CKR) project across 
 
 11. **Add rate limiting** or caching to Nominatim geocoding calls in `cohouse.ts`.
 
-12. **Replace `print()` with `Logger`** in `colockitchenraceApp.swift`.
+12. **Replace `print()` with `Logger`** in `colocskitchenraceApp.swift`.
 
 ### Medium Term
 

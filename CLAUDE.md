@@ -5,7 +5,7 @@
 Colocs Kitchen Race (CKR) is a mobile app for organizing community dining events in Brussels, Belgium. Cohouses (shared living communities) register for game editions and get matched into groups rotating through apero, dinner, and party events. Users earn points via challenges and compete on leaderboards.
 
 **Repo:** https://github.com/Jju17/ColocKitchenRace
-**Bundle IDs:** `dev.rahier.colockitchenrace` (iOS main + Android), `dev.rahier.ckradmin` (iOS admin)
+**Bundle IDs:** `dev.rahier.colocskitchenrace` (iOS main + Android), `dev.rahier.ckradmin` (iOS admin)
 
 ## Tech Stack
 
@@ -66,7 +66,7 @@ ColocKitchenRace/
 │   ├── ColocsKitchenRace.xcodeproj/  # Xcode project
 │   └── ColocsKitchenRaceTests/       # iOS XCTest suite
 ├── android/                          # Android app
-│   ├── app/src/main/java/dev/rahier/colockitchenrace/
+│   ├── app/src/main/java/dev/rahier/colocskitchenrace/
 │   │   ├── data/model/               # Data models (Kotlin)
 │   │   ├── data/repository/          # Repository interfaces + implementations
 │   │   ├── di/                       # Hilt DI modules
@@ -99,10 +99,10 @@ cd ios
 open ColocsKitchenRace.xcodeproj
 
 # Build from CLI
-xcodebuild -project ios/ColocsKitchenRace.xcodeproj -scheme colockitchenrace -destination generic/platform=iOS build
+xcodebuild -project ios/ColocsKitchenRace.xcodeproj -scheme colocskitchenrace -destination generic/platform=iOS build
 ```
 
-Schemes: `colockitchenrace` (main app), `CKRAdmin` (admin app)
+Schemes: `colocskitchenrace` (main app), `CKRAdmin` (admin app)
 
 ### Android App
 ```bash
@@ -133,7 +133,7 @@ firebase deploy --only functions  # Deploy to production
 
 ### iOS Tests
 ```bash
-xcodebuild -project ios/ColocsKitchenRace.xcodeproj -scheme colockitchenrace -derivedDataPath DerivedData test
+xcodebuild -project ios/ColocsKitchenRace.xcodeproj -scheme colocskitchenrace -derivedDataPath DerivedData test
 ```
 
 ## Architecture & Conventions
@@ -164,8 +164,9 @@ xcodebuild -project ios/ColocsKitchenRace.xcodeproj -scheme colockitchenrace -de
 - Android: Android `Log` with tag-based logging
 
 ## Cloud Functions (Key Endpoints)
-- `registerForGame` - Game registration + Stripe PaymentIntent creation
-- `createPaymentIntent` - Server-side price validation
+- `reserveAndCreatePayment` - Atomically reserves a spot (Firestore transaction) + creates Stripe PaymentIntent
+- `confirmRegistration` - Confirms a pending registration after Stripe payment succeeds
+- `releaseExpiredReservation` - Cloud Task handler that frees expired pending reservations
 - `getMyPlanning` - Returns personalized event schedule
 - `matchCohouses` - Runs matching algorithm (groups of 4)
 - `revealPlanning` - Makes matching results visible to users
@@ -173,6 +174,68 @@ xcodebuild -project ios/ColocsKitchenRace.xcodeproj -scheme colockitchenrace -de
 - `deleteAccount` - User account cleanup
 - `checkDuplicateCohouse` - Duplicate detection
 - `validateAddress` - Geocoding via OpenStreetMap
+
+## Registration Flow (Reserve-Then-Pay)
+
+The registration flow uses a **reserve-then-pay** pattern to prevent race conditions when many cohouses register simultaneously (~300 concurrent registrations). A spot is atomically reserved before any payment is attempted, guaranteeing that a paying user will never be refused a place.
+
+### Flow Overview
+
+```
+Client                          Backend                              Stripe
+  │                               │                                    │
+  │  1. reserveAndCreatePayment   │                                    │
+  │──────────────────────────────▶│                                    │
+  │                               │── Firestore Transaction ──────┐   │
+  │                               │  • Validate deadline/capacity │   │
+  │                               │  • Create registration (pending)  │
+  │                               │  • Reserve participant slots  │   │
+  │                               │◀───────────────────────────────┘   │
+  │                               │                                    │
+  │                               │  2. Create PaymentIntent           │
+  │                               │───────────────────────────────────▶│
+  │                               │◀───────────────────────────────────│
+  │                               │                                    │
+  │                               │  3. Schedule Cloud Task (+15min)   │
+  │                               │                                    │
+  │  ◀── PaymentIntent result ────│                                    │
+  │                               │                                    │
+  │  4. Present PaymentSheet ─────────────────────────────────────────▶│
+  │  ◀── Payment succeeded ───────────────────────────────────────────│
+  │                               │                                    │
+  │  5. confirmRegistration       │                                    │
+  │──────────────────────────────▶│                                    │
+  │                               │── Verify payment with Stripe ────▶│
+  │                               │◀──────────────────────────────────│
+  │                               │── Transaction: pending → confirmed │
+  │  ◀── success ─────────────────│                                    │
+```
+
+### Key Mechanisms
+
+- **Atomic reservation** (`reserveAndCreatePayment`): A Firestore transaction validates game constraints (deadline, capacity, duplicate) and creates a `pending` registration with a 15-minute TTL, all atomically. If Stripe PaymentIntent creation fails afterward, the reservation is rolled back immediately.
+
+- **Confirmation** (`confirmRegistration`): After the Stripe PaymentSheet completes, the client calls this to transition the registration from `pending` to `confirmed`. Verifies payment status via Stripe API. If the 15-minute TTL has expired, the confirmation is rejected.
+
+- **Automatic cleanup** (`releaseExpiredReservation`): A Cloud Task is scheduled for each reservation to fire 15 minutes later. If the registration is still `pending` (payment never completed), it deletes the registration doc and frees the reserved spots. Idempotent — skips if already confirmed or deleted.
+
+- **Matching guard**: `matchCohouses` refuses to run if any registrations are still in `pending` status, ensuring all participants have completed payment before groups are formed.
+
+### Registration Document States
+
+| Status | Meaning |
+|--------|---------|
+| `pending` | Spot reserved, awaiting payment. Has `reservedUntil` timestamp. |
+| `confirmed` | Payment verified, registration complete. Cleanup fields removed. |
+| *(deleted)* | Reservation expired or was rolled back. Spots freed on game doc. |
+
+### Files Involved
+
+| Layer | Files |
+|-------|-------|
+| **Backend** | `functions/src/payment.ts`, `functions/src/registration.ts`, `functions/src/cleanup.ts` |
+| **iOS** | `StripeClient.swift` → `CKRClient.swift` → `PaymentSummaryView.swift` |
+| **Android** | `StripeRepository.kt` → `CKRGameRepository.kt` → `PaymentSummaryViewModel.kt` |
 
 ## Firestore Collections
 - `/users/{userId}` - User profiles (authId-bound)

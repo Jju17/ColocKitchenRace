@@ -1,17 +1,22 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { admin, auth, db, REGION, getStripe } from "./config";
+import { getFunctions } from "firebase-admin/functions";
 
 const DEMO_EMAIL = "test_apple@colocskitchenrace.be";
+const RESERVATION_TTL_SECONDS = 15 * 60; // 15 minutes
 
 // ============================================
 // Types
 // ============================================
 
-interface CreatePaymentIntentRequest {
+interface ReserveAndCreatePaymentRequest {
   gameId: string;
   cohouseId: string;
   amountCents: number;
   participantCount: number;
+  attendingUserIds: string[];
+  averageAge: number;
+  cohouseType: string;
 }
 
 interface PaymentIntentResponse {
@@ -19,6 +24,7 @@ interface PaymentIntentResponse {
   customerId: string;
   ephemeralKeySecret: string | undefined;
   paymentIntentId: string;
+  remainingSpots?: number;
 }
 
 // ============================================
@@ -40,7 +46,7 @@ async function isDemoUser(uid: string): Promise<boolean> {
  */
 async function createDemoPaymentIntent(
   uid: string,
-  data: CreatePaymentIntentRequest
+  data: ReserveAndCreatePaymentRequest
 ): Promise<PaymentIntentResponse> {
   const { gameId, cohouseId, amountCents, participantCount } = data;
   const stripe = getStripe();
@@ -80,15 +86,16 @@ async function createDemoPaymentIntent(
 }
 
 /**
- * Validate the game data and return the server-verified amount.
+ * Validate the game data for a reservation attempt.
  * Throws HttpsError on any validation failure.
+ * Returns { expectedAmount, remainingSpots }.
  */
-function validateGame(
+function validateGameForReservation(
   gameData: FirebaseFirestore.DocumentData,
   cohouseId: string,
   amountCents: number,
   participantCount: number
-): number {
+): { expectedAmount: number; remainingSpots: number } {
   const pricePerPersonCents: number = gameData.pricePerPersonCents || 500;
   const expectedAmount = pricePerPersonCents * participantCount;
 
@@ -124,17 +131,19 @@ function validateGame(
     );
   }
 
-  return expectedAmount;
+  const remainingSpots = maxParticipants - (totalRegistered + participantCount);
+  return { expectedAmount, remainingSpots };
 }
 
 /**
  * Get or create a Stripe Customer for the given cohouse.
  * Persists the Stripe customer ID back to Firestore if newly created.
+ * Also returns the cohouse document reference for later updates.
  */
 async function getOrCreateStripeCustomer(
   cohouseId: string,
   firebaseUid: string
-): Promise<string> {
+): Promise<{ stripeCustomerId: string; cohouseDocRef: FirebaseFirestore.DocumentReference }> {
   const cohouseSnapshot = await db
     .collection("cohouses")
     .where("id", "==", cohouseId)
@@ -158,7 +167,7 @@ async function getOrCreateStripeCustomer(
     await cohouseDoc.ref.update({ stripeCustomerId });
   }
 
-  return stripeCustomerId;
+  return { stripeCustomerId, cohouseDocRef: cohouseDoc.ref };
 }
 
 // ============================================
@@ -166,12 +175,19 @@ async function getOrCreateStripeCustomer(
 // ============================================
 
 /**
- * Create a Stripe PaymentIntent for CKR registration.
+ * Reserve a spot for a cohouse in a CKR Game and create a Stripe PaymentIntent.
  *
- * Server-side price validation ensures the client can't tamper with the amount.
- * Creates/retrieves a Stripe Customer per cohouse for tracking.
+ * This function atomically:
+ * 1. Validates game constraints (deadline, capacity, duplicate)
+ * 2. Creates a "pending" registration with a 15-minute TTL
+ * 3. Reserves the participant slots on the game document
+ * 4. Creates Stripe payment objects (Customer + EphemeralKey + PaymentIntent)
+ * 5. Schedules a Cloud Task to release the reservation if payment doesn't complete
+ *
+ * If Stripe creation fails after reservation, the reservation is rolled back immediately.
+ * The Cloud Task is a safety net for cases where the client never calls confirmRegistration.
  */
-export const createPaymentIntent = onCall<CreatePaymentIntentRequest>(
+export const reserveAndCreatePayment = onCall<ReserveAndCreatePaymentRequest>(
   {
     region: REGION,
     secrets: ["STRIPE_SECRET_KEY"],
@@ -181,12 +197,29 @@ export const createPaymentIntent = onCall<CreatePaymentIntentRequest>(
       throw new HttpsError("unauthenticated", "Must be authenticated");
     }
 
-    const { gameId, cohouseId, amountCents, participantCount } = request.data;
+    const {
+      gameId, cohouseId, amountCents, participantCount,
+      attendingUserIds, averageAge, cohouseType,
+    } = request.data;
 
     if (!gameId || !cohouseId || !amountCents || !participantCount) {
       throw new HttpsError(
         "invalid-argument",
         "Missing required fields: gameId, cohouseId, amountCents, participantCount"
+      );
+    }
+
+    if (!attendingUserIds || !Array.isArray(attendingUserIds) || attendingUserIds.length === 0) {
+      throw new HttpsError(
+        "invalid-argument",
+        "attendingUserIds must be a non-empty array"
+      );
+    }
+
+    if (!averageAge || !cohouseType) {
+      throw new HttpsError(
+        "invalid-argument",
+        "Missing required fields: averageAge, cohouseType"
       );
     }
 
@@ -196,61 +229,138 @@ export const createPaymentIntent = onCall<CreatePaymentIntentRequest>(
         return createDemoPaymentIntent(request.auth.uid, request.data);
       }
 
-      // 1. Fetch the game and validate price server-side
-      const gameDoc = await db.collection("ckrGames").doc(gameId).get();
-      if (!gameDoc.exists) {
-        throw new HttpsError("not-found", "CKR Game not found");
-      }
-
-      const expectedAmount = validateGame(
-        gameDoc.data()!,
-        cohouseId,
-        amountCents,
-        participantCount
-      );
-
-      // 2. Get or create Stripe Customer for this cohouse
-      const stripeCustomerId = await getOrCreateStripeCustomer(
+      // 1. Verify cohouse exists + get/create Stripe customer (outside transaction)
+      const { stripeCustomerId, cohouseDocRef } = await getOrCreateStripeCustomer(
         cohouseId,
         request.auth.uid
       );
 
-      // 3. Create Ephemeral Key for the customer
-      const ephemeralKey = await getStripe().ephemeralKeys.create(
-        { customer: stripeCustomerId },
-        { apiVersion: "2025-02-24.acacia" }
-      );
+      // 2. Transactional reservation — atomic read + validate + reserve
+      //    Prevents race conditions where two cohouses pass validation
+      //    simultaneously and exceed capacity or create duplicate registrations.
+      const gameRef = db.collection("ckrGames").doc(gameId);
+      const reservationResult = await db.runTransaction(async (transaction) => {
+        const gameDoc = await transaction.get(gameRef);
 
-      // 4. Create PaymentIntent
-      // Explicit payment methods: card + Bancontact (Belgium).
-      // Link is excluded on purpose (not used in Belgium).
-      const paymentIntent = await getStripe().paymentIntents.create({
-        amount: expectedAmount,
-        currency: "eur",
-        customer: stripeCustomerId,
-        payment_method_types: ["card", "bancontact"],
-        metadata: {
-          gameId,
+        if (!gameDoc.exists) {
+          throw new HttpsError("not-found", "CKR Game not found");
+        }
+
+        const gameData = gameDoc.data()!;
+        const { expectedAmount, remainingSpots } = validateGameForReservation(
+          gameData,
           cohouseId,
-          participantCount: participantCount.toString(),
-          firebaseUid: request.auth.uid,
-        },
+          amountCents,
+          participantCount
+        );
+
+        // Reserve spot: add cohouseId + increment participant count
+        transaction.update(gameRef, {
+          cohouseIDs: admin.firestore.FieldValue.arrayUnion(cohouseId),
+          totalRegisteredParticipants: admin.firestore.FieldValue.increment(attendingUserIds.length),
+        });
+
+        // Create pending registration with TTL
+        const now = new Date();
+        const reservedUntil = new Date(now.getTime() + RESERVATION_TTL_SECONDS * 1000);
+
+        transaction.set(
+          gameRef.collection("registrations").doc(cohouseId),
+          {
+            cohouseId,
+            attendingUserIds,
+            averageAge,
+            cohouseType,
+            status: "pending",
+            reservedAt: admin.firestore.FieldValue.serverTimestamp(),
+            reservedBy: request.auth!.uid,
+            reservedUntil: admin.firestore.Timestamp.fromDate(reservedUntil),
+          }
+        );
+
+        return { expectedAmount, remainingSpots };
       });
 
+      // 3. Create Stripe objects (outside transaction — external API call)
+      //    If this fails, we rollback the reservation.
+      let paymentIntentResponse: PaymentIntentResponse;
+      try {
+        const stripe = getStripe();
+
+        const ephemeralKey = await stripe.ephemeralKeys.create(
+          { customer: stripeCustomerId },
+          { apiVersion: "2025-02-24.acacia" }
+        );
+
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: reservationResult.expectedAmount,
+          currency: "eur",
+          customer: stripeCustomerId,
+          payment_method_types: ["card", "bancontact"],
+          metadata: {
+            gameId,
+            cohouseId,
+            participantCount: participantCount.toString(),
+            firebaseUid: request.auth.uid,
+          },
+        });
+
+        paymentIntentResponse = {
+          clientSecret: paymentIntent.client_secret,
+          customerId: stripeCustomerId,
+          ephemeralKeySecret: ephemeralKey.secret,
+          paymentIntentId: paymentIntent.id,
+          remainingSpots: reservationResult.remainingSpots,
+        };
+
+        // Store paymentIntentId on the registration doc (outside transaction, non-critical)
+        await gameRef.collection("registrations").doc(cohouseId).update({
+          paymentIntentId: paymentIntent.id,
+        });
+      } catch (stripeError) {
+        // Stripe failed after reservation → rollback the reservation
+        console.error("Stripe creation failed, rolling back reservation:", stripeError);
+        await db.runTransaction(async (transaction) => {
+          const regDoc = await transaction.get(
+            gameRef.collection("registrations").doc(cohouseId)
+          );
+          if (regDoc.exists && regDoc.data()?.status === "pending") {
+            transaction.delete(gameRef.collection("registrations").doc(cohouseId));
+            transaction.update(gameRef, {
+              cohouseIDs: admin.firestore.FieldValue.arrayRemove(cohouseId),
+              totalRegisteredParticipants: admin.firestore.FieldValue.increment(-attendingUserIds.length),
+            });
+          }
+        });
+        throw new HttpsError("internal", "Failed to create payment intent");
+      }
+
+      // 4. Update cohouse with cohouseType (outside transaction — non-critical)
+      await cohouseDocRef.update({ cohouseType });
+
+      // 5. Schedule Cloud Task to release reservation if payment doesn't complete
+      try {
+        const queue = getFunctions().taskQueue("releaseExpiredReservation");
+        await queue.enqueue(
+          { gameId, cohouseId },
+          { scheduleDelaySeconds: RESERVATION_TTL_SECONDS }
+        );
+      } catch (taskError) {
+        // Non-critical: if task scheduling fails, the reservation TTL is still
+        // enforced by confirmRegistration (it checks reservedUntil).
+        console.warn("Failed to schedule cleanup task (non-critical):", taskError);
+      }
+
       console.log(
-        `Payment intent ${paymentIntent.id} created for cohouse ${cohouseId}, game ${gameId}, amount ${expectedAmount} cents`
+        `Cohouse ${cohouseId} reserved spot for game ${gameId} with ${attendingUserIds.length} persons. ` +
+        `Remaining spots: ${reservationResult.remainingSpots}. Payment intent: ${paymentIntentResponse.paymentIntentId}`
       );
 
-      return {
-        clientSecret: paymentIntent.client_secret,
-        customerId: stripeCustomerId,
-        ephemeralKeySecret: ephemeralKey.secret,
-        paymentIntentId: paymentIntent.id,
-      };
+      return paymentIntentResponse;
     } catch (error) {
       if (error instanceof HttpsError) throw error;
-      console.error("Error creating payment intent:", error);
-      throw new HttpsError("internal", "Failed to create payment intent");
+      console.error("Error in reserveAndCreatePayment:", error);
+      throw new HttpsError("internal", "Failed to reserve spot and create payment");
     }
   }
 );

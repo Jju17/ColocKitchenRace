@@ -1,17 +1,28 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
-import { admin, db, REGION, getStripe } from "./config";
+import { admin, auth, db, REGION, getStripe } from "./config";
+
+const DEMO_EMAIL = "test_apple@colocskitchenrace.be";
 
 // ============================================
 // Types
 // ============================================
 
-interface RegisterForGameRequest {
+interface ConfirmRegistrationRequest {
   gameId: string;
   cohouseId: string;
-  attendingUserIds: string[];
-  averageAge: number;
-  cohouseType: string;
-  paymentIntentId?: string;
+  paymentIntentId: string;
+}
+
+// ============================================
+// Helpers
+// ============================================
+
+/**
+ * Check whether the calling user is the demo/Apple-review account.
+ */
+async function isDemoUser(uid: string): Promise<boolean> {
+  const userRecord = await auth.getUser(uid);
+  return userRecord.email === DEMO_EMAIL;
 }
 
 // ============================================
@@ -19,173 +30,114 @@ interface RegisterForGameRequest {
 // ============================================
 
 /**
- * Register a cohouse for a CKR Game edition.
+ * Confirm a pending registration after successful Stripe payment.
  *
- * Server-side validations:
- * - Registration deadline not passed
- * - Capacity not reached
- * - Cohouse not already registered
- * - Cohouse exists
+ * Called by the client after the PaymentSheet completes successfully.
+ * Validates the Stripe payment, then transitions the registration
+ * from "pending" to "confirmed" within a transaction.
  *
- * Stores registration metadata in ckrGames/{gameId}/registrations/{cohouseId}
- * and adds the cohouseId to the game's cohouseIDs array.
- * Also increments totalRegisteredParticipants by the number of attending persons.
+ * If the reservation has expired (15-minute TTL), the confirmation
+ * is rejected and the client must restart the registration flow.
  */
-export const registerForGame = onCall<RegisterForGameRequest>(
+export const confirmRegistration = onCall<ConfirmRegistrationRequest>(
   { region: REGION, secrets: ["STRIPE_SECRET_KEY"] },
   async (request) => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Must be authenticated");
     }
 
-    const { gameId, cohouseId, attendingUserIds, averageAge, cohouseType, paymentIntentId } =
-      request.data;
+    const { gameId, cohouseId, paymentIntentId } = request.data;
 
-    if (!gameId || !cohouseId || !attendingUserIds || !averageAge || !cohouseType) {
+    if (!gameId || !cohouseId || !paymentIntentId) {
       throw new HttpsError(
         "invalid-argument",
-        "Missing required fields: gameId, cohouseId, attendingUserIds, averageAge, cohouseType"
-      );
-    }
-
-    if (!Array.isArray(attendingUserIds) || attendingUserIds.length === 0) {
-      throw new HttpsError(
-        "invalid-argument",
-        "attendingUserIds must be a non-empty array"
+        "Missing required fields: gameId, cohouseId, paymentIntentId"
       );
     }
 
     try {
-      // 1. Fetch the CKR game
-      const gameDoc = await db.collection("ckrGames").doc(gameId).get();
-
-      if (!gameDoc.exists) {
-        throw new HttpsError("not-found", "CKR Game not found");
+      // Demo mode: return success directly
+      if (await isDemoUser(request.auth.uid)) {
+        console.log(`[Demo] Confirming registration for ${DEMO_EMAIL}`);
+        return { success: true };
       }
 
-      const gameData = gameDoc.data()!;
-      const cohouseIDs: string[] = gameData.cohouseIDs || [];
-      const maxParticipants: number = gameData.maxParticipants || 100;
-      const totalRegisteredParticipants: number = gameData.totalRegisteredParticipants || 0;
+      // 1. Verify payment via Stripe API (outside transaction — external call)
+      const paymentIntent = await getStripe().paymentIntents.retrieve(paymentIntentId);
 
-      // 2. Check registration deadline
-      const registrationDeadline = (
-        gameData.registrationDeadline as admin.firestore.Timestamp
-      ).toDate();
-
-      if (new Date() >= registrationDeadline) {
+      if (paymentIntent.status !== "succeeded") {
         throw new HttpsError(
           "failed-precondition",
-          "Registration deadline has passed"
+          `Payment not completed (status: ${paymentIntent.status})`
         );
       }
 
-      // 3. Check capacity (based on total persons, not cohouses)
-      if (totalRegisteredParticipants + attendingUserIds.length > maxParticipants) {
+      if (
+        paymentIntent.metadata.gameId !== gameId ||
+        paymentIntent.metadata.cohouseId !== cohouseId
+      ) {
         throw new HttpsError(
-          "failed-precondition",
-          "Maximum number of participants reached"
+          "invalid-argument",
+          "Payment does not match this registration"
         );
       }
 
-      // 4. Check duplicate
-      if (cohouseIDs.includes(cohouseId)) {
-        throw new HttpsError(
-          "already-exists",
-          "This cohouse is already registered for this game"
-        );
-      }
+      // 2. Confirm reservation in a transaction
+      const gameRef = db.collection("ckrGames").doc(gameId);
+      const regRef = gameRef.collection("registrations").doc(cohouseId);
 
-      // 5. Verify cohouse exists
-      const cohouseSnapshot = await db
-        .collection("cohouses")
-        .where("id", "==", cohouseId)
-        .limit(1)
-        .get();
+      await db.runTransaction(async (transaction) => {
+        const regDoc = await transaction.get(regRef);
 
-      if (cohouseSnapshot.empty) {
-        throw new HttpsError("not-found", "Cohouse not found");
-      }
-
-      const cohouseDocRef = cohouseSnapshot.docs[0].ref;
-
-      // 6. Verify payment if required
-      const pricePerPersonCents: number = gameData.pricePerPersonCents || 500;
-      if (pricePerPersonCents > 0) {
-        if (!paymentIntentId) {
-          throw new HttpsError("failed-precondition", "Payment is required");
+        if (!regDoc.exists) {
+          throw new HttpsError("not-found", "Registration not found");
         }
 
-        const paymentIntentObj = await getStripe().paymentIntents.retrieve(paymentIntentId);
+        const regData = regDoc.data()!;
 
-        if (paymentIntentObj.status !== "succeeded") {
+        // Idempotent: already confirmed → success
+        if (regData.status === "confirmed") {
+          return;
+        }
+
+        if (regData.status !== "pending") {
           throw new HttpsError(
             "failed-precondition",
-            `Payment not completed (status: ${paymentIntentObj.status})`
+            `Registration has unexpected status: ${regData.status}`
           );
         }
 
-        // Verify payment metadata matches this registration
-        if (
-          paymentIntentObj.metadata.gameId !== gameId ||
-          paymentIntentObj.metadata.cohouseId !== cohouseId
-        ) {
+        // Check if reservation has expired
+        const reservedUntil = (regData.reservedUntil as admin.firestore.Timestamp).toDate();
+        if (new Date() >= reservedUntil) {
           throw new HttpsError(
-            "invalid-argument",
-            "Payment does not match this registration"
+            "failed-precondition",
+            "Reservation has expired. Please register again."
           );
         }
 
-        const expectedAmount = pricePerPersonCents * attendingUserIds.length;
-        if (paymentIntentObj.amount !== expectedAmount) {
-          throw new HttpsError(
-            "invalid-argument",
-            `Payment amount mismatch: expected ${expectedAmount}, got ${paymentIntentObj.amount}`
-          );
-        }
-      }
-
-      // 7. Add cohouseId to game's cohouseIDs and increment participant count
-      await db.collection("ckrGames").doc(gameId).update({
-        cohouseIDs: admin.firestore.FieldValue.arrayUnion(cohouseId),
-        totalRegisteredParticipants: admin.firestore.FieldValue.increment(attendingUserIds.length),
+        // Transition: pending → confirmed
+        transaction.update(regRef, {
+          status: "confirmed",
+          confirmedAt: admin.firestore.FieldValue.serverTimestamp(),
+          registeredBy: request.auth!.uid,
+          paymentIntentId,
+          // Remove reservation-specific fields
+          reservedUntil: admin.firestore.FieldValue.delete(),
+          reservedAt: admin.firestore.FieldValue.delete(),
+          reservedBy: admin.firestore.FieldValue.delete(),
+        });
       });
 
-      // 8. Store registration metadata
-      const registrationData: Record<string, unknown> = {
-        cohouseId,
-        attendingUserIds,
-        averageAge,
-        cohouseType,
-        registeredAt: admin.firestore.FieldValue.serverTimestamp(),
-        registeredBy: request.auth.uid,
-      };
-
-      if (paymentIntentId) {
-        registrationData.paymentIntentId = paymentIntentId;
-      }
-
-      await db
-        .collection("ckrGames")
-        .doc(gameId)
-        .collection("registrations")
-        .doc(cohouseId)
-        .set(registrationData);
-
-      // 9. Update cohouse with cohouseType
-      await cohouseDocRef.update({ cohouseType });
-
-      const remainingSpots = maxParticipants - (totalRegisteredParticipants + attendingUserIds.length);
-
       console.log(
-        `Cohouse ${cohouseId} registered for game ${gameId} with ${attendingUserIds.length} persons. Remaining spots: ${remainingSpots}`
+        `Registration confirmed for cohouse ${cohouseId} in game ${gameId} (payment: ${paymentIntentId})`
       );
 
-      return { success: true, remainingSpots };
+      return { success: true };
     } catch (error) {
       if (error instanceof HttpsError) throw error;
-      console.error("Error registering for game:", error);
-      throw new HttpsError("internal", "Failed to register for game");
+      console.error("Error confirming registration:", error);
+      throw new HttpsError("internal", "Failed to confirm registration");
     }
   }
 );

@@ -2884,7 +2884,11 @@
         }
       }
     },
+    "Retry confirmation" : {
+
+    },
     "Retry registration" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {

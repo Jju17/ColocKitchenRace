@@ -26,7 +26,7 @@ ColocKitchenRace/
 ```bash
 cd ios
 open ColocsKitchenRace.xcodeproj
-# Build scheme: colockitchenrace (main) or CKRAdmin (admin)
+# Build scheme: colocskitchenrace (main) or CKRAdmin (admin)
 ```
 
 ### Android

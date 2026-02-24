@@ -60,6 +60,23 @@ export const matchCohouses = onCall<MatchCohousesRequest>(
         );
       }
 
+      // Guard: refuse matching if any registrations are still pending payment
+      const pendingRegs = await db
+        .collection("ckrGames")
+        .doc(gameId)
+        .collection("registrations")
+        .where("status", "==", "pending")
+        .limit(1)
+        .get();
+
+      if (!pendingRegs.empty) {
+        throw new HttpsError(
+          "failed-precondition",
+          "Cannot match cohouses while there are pending registrations. " +
+          "Wait for all payments to complete or reservations to expire."
+        );
+      }
+
       // 2. Fetch GPS coordinates for all participating cohouses
       const points: CohousePoint[] = [];
       const missingCoords: string[] = [];

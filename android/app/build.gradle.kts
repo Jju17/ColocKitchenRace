@@ -9,11 +9,11 @@ plugins {
 }
 
 android {
-    namespace = "dev.rahier.colockitchenrace"
+    namespace = "dev.rahier.colocskitchenrace"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "dev.rahier.colockitchenrace"
+        applicationId = "dev.rahier.colocskitchenrace"
         minSdk = 26
         targetSdk = 35
         versionCode = 1
