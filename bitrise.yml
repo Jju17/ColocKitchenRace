@@ -22,13 +22,31 @@ workflows:
     - save-spm-cache@1: {}
     - set-xcode-build-number@2: {}
     - script@1:
-        title: Restore GoogleService-Info.plist
+        title: Restore Firebase config plists
         inputs:
         - content: |
             #!/bin/bash
             set -e
-            echo "$GOOGLE_SERVICE_INFO_PLIST_BASE64" | base64 --decode > "$BITRISE_SOURCE_DIR/ios/ColocKitchenRace/GoogleService-Info.plist"
-            echo "GoogleService-Info.plist restored successfully"
+            FIREBASE_DIR="$BITRISE_SOURCE_DIR/ios/Config/Firebase"
+            mkdir -p "$FIREBASE_DIR"
+            echo "$GOOGLE_SERVICE_INFO_PLIST_STAGING_BASE64" | base64 --decode > "$FIREBASE_DIR/GoogleService-Info-Staging.plist"
+            echo "$GOOGLE_SERVICE_INFO_PLIST_PROD_BASE64" | base64 --decode > "$FIREBASE_DIR/GoogleService-Info-Production.plist"
+            echo "Firebase config plists restored successfully"
+    - script@1:
+        title: Restore Stripe xcconfig files
+        inputs:
+        - content: |
+            #!/bin/bash
+            set -e
+            CONFIG_DIR="$BITRISE_SOURCE_DIR/ios/Config"
+            mkdir -p "$CONFIG_DIR"
+            cat > "$CONFIG_DIR/Debug.xcconfig" << EOF
+            STRIPE_PUBLISHABLE_KEY = $STRIPE_PUBLISHABLE_KEY_TEST
+            EOF
+            cat > "$CONFIG_DIR/Release.xcconfig" << EOF
+            STRIPE_PUBLISHABLE_KEY = $STRIPE_PUBLISHABLE_KEY_LIVE
+            EOF
+            echo "Stripe xcconfig files restored successfully"
     - script@1:
         inputs:
         - content: defaults write com.apple.dt.Xcode
@@ -82,14 +100,35 @@ workflows:
     - save-spm-cache@1: {}
     - set-xcode-build-number@2: {}
     - script@1:
-        title: Restore GoogleService-Info.plist files
+        title: Restore Firebase config plists
         inputs:
         - content: |
             #!/bin/bash
             set -e
-            echo "$GOOGLE_SERVICE_INFO_PLIST_BASE64" | base64 --decode > "$BITRISE_SOURCE_DIR/ios/ColocKitchenRace/GoogleService-Info.plist"
-            echo "$GOOGLE_SERVICE_INFO_PLIST_ADMIN_BASE64" | base64 --decode > "$BITRISE_SOURCE_DIR/ios/CKRAdmin/GoogleService-Info.plist"
-            echo "GoogleService-Info.plist files restored successfully"
+            FIREBASE_DIR="$BITRISE_SOURCE_DIR/ios/Config/Firebase"
+            mkdir -p "$FIREBASE_DIR"
+            # Main app plists (needed because CKRAdmin shares the project)
+            echo "$GOOGLE_SERVICE_INFO_PLIST_STAGING_BASE64" | base64 --decode > "$FIREBASE_DIR/GoogleService-Info-Staging.plist"
+            echo "$GOOGLE_SERVICE_INFO_PLIST_PROD_BASE64" | base64 --decode > "$FIREBASE_DIR/GoogleService-Info-Production.plist"
+            # Admin app plists
+            echo "$GOOGLE_SERVICE_INFO_PLIST_ADMIN_STAGING_BASE64" | base64 --decode > "$FIREBASE_DIR/GoogleService-Info-AdminStaging.plist"
+            echo "$GOOGLE_SERVICE_INFO_PLIST_ADMIN_PROD_BASE64" | base64 --decode > "$FIREBASE_DIR/GoogleService-Info-AdminProduction.plist"
+            echo "Firebase config plists restored successfully"
+    - script@1:
+        title: Restore Stripe xcconfig files
+        inputs:
+        - content: |
+            #!/bin/bash
+            set -e
+            CONFIG_DIR="$BITRISE_SOURCE_DIR/ios/Config"
+            mkdir -p "$CONFIG_DIR"
+            cat > "$CONFIG_DIR/Debug.xcconfig" << EOF
+            STRIPE_PUBLISHABLE_KEY = $STRIPE_PUBLISHABLE_KEY_TEST
+            EOF
+            cat > "$CONFIG_DIR/Release.xcconfig" << EOF
+            STRIPE_PUBLISHABLE_KEY = $STRIPE_PUBLISHABLE_KEY_LIVE
+            EOF
+            echo "Stripe xcconfig files restored successfully"
     - script@1:
         inputs:
         - content: defaults write com.apple.dt.Xcode
@@ -142,18 +181,19 @@ workflows:
     - git-clone@8: {}
     - restore-gradle-cache@1: {}
     - script@1:
-        title: Restore google-services.json
+        title: Restore google-services.json (staging)
         inputs:
         - content: |
             #!/bin/bash
             set -e
-            echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > "$BITRISE_SOURCE_DIR/android/app/google-services.json"
-            echo "google-services.json restored successfully"
+            mkdir -p "$BITRISE_SOURCE_DIR/android/app/src/debug"
+            echo "$GOOGLE_SERVICES_JSON_STAGING_BASE64" | base64 --decode > "$BITRISE_SOURCE_DIR/android/app/src/debug/google-services.json"
+            echo "google-services.json (staging) restored successfully"
     - android-unit-test@1:
         inputs:
         - project_location: "$BITRISE_SOURCE_DIR/android"
         - variant: debug
-        - arguments: "--stacktrace"
+        - arguments: "--stacktrace -PSTRIPE_PUBLISHABLE_KEY=$STRIPE_PUBLISHABLE_KEY_TEST"
     - save-gradle-cache@1: {}
     - deploy-to-bitrise-io@2: {}
 
@@ -169,13 +209,14 @@ workflows:
     - git-clone@8: {}
     - restore-gradle-cache@1: {}
     - script@1:
-        title: Restore google-services.json
+        title: Restore google-services.json (production)
         inputs:
         - content: |
             #!/bin/bash
             set -e
-            echo "$GOOGLE_SERVICES_JSON_BASE64" | base64 --decode > "$BITRISE_SOURCE_DIR/android/app/google-services.json"
-            echo "google-services.json restored successfully"
+            mkdir -p "$BITRISE_SOURCE_DIR/android/app/src/release"
+            echo "$GOOGLE_SERVICES_JSON_PROD_BASE64" | base64 --decode > "$BITRISE_SOURCE_DIR/android/app/src/release/google-services.json"
+            echo "google-services.json (production) restored successfully"
     - script@1:
         title: Restore Android keystore
         inputs:
@@ -188,7 +229,7 @@ workflows:
         inputs:
         - project_location: "$BITRISE_SOURCE_DIR/android"
         - variant: release
-        - arguments: "--stacktrace"
+        - arguments: "--stacktrace -PSTRIPE_PUBLISHABLE_KEY=$STRIPE_PUBLISHABLE_KEY_LIVE"
     - android-build@1:
         inputs:
         - project_location: "$BITRISE_SOURCE_DIR/android"
@@ -200,6 +241,7 @@ workflows:
             -Pandroid.injected.signing.store.password=$ANDROID_KEYSTORE_PASSWORD
             -Pandroid.injected.signing.key.alias=$ANDROID_KEY_ALIAS
             -Pandroid.injected.signing.key.password=$ANDROID_KEY_PASSWORD
+            -PSTRIPE_PUBLISHABLE_KEY=$STRIPE_PUBLISHABLE_KEY_LIVE
     - save-gradle-cache@1: {}
     - deploy-to-bitrise-io@2: {}
     - google-play-deploy@3:

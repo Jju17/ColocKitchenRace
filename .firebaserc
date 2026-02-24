@@ -1,6 +1,7 @@
 {
   "projects": {
-    "staging": "colockitchenrace"
+    "staging": "colockitchenrace",
+    "production": "colocskitchenrace-prod"
   },
   "targets": {},
   "etags": {}

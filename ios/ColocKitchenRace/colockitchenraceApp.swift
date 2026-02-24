@@ -33,7 +33,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: clientID)
         }
 
-        StripeAPI.defaultPublishableKey = "pk_test_51T05RP8QE7tHleZWcImEiKyo3trd5wzQhph8AQ4oxiUzI8G3xcZMXmQxkVCvqf09HRu3fmuSvyO8HE67GsEBypGY00h8CDS7vZ"
+        StripeAPI.defaultPublishableKey = Bundle.main.infoDictionary?["StripePublishableKey"] as? String ?? ""
 
         // Configure notification center
         UNUserNotificationCenter.current().delegate = self

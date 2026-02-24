@@ -1,0 +1,65 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // ──────────────────────────────────────────────
+    // Helper functions
+    // ──────────────────────────────────────────────
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return request.auth.token.admin == true;
+    }
+
+    /// Only allow JPEG/PNG images under 1 MB.
+    function isValidImage() {
+      return request.resource.size < 1 * 1024 * 1024
+          && request.resource.contentType.matches('image/(jpeg|png)');
+    }
+
+    // ──────────────────────────────────────────────
+    // 1. CHALLENGE RESPONSE IMAGES
+    //    Path: challenges/{challengeId}/responses/{responseId}.jpg
+    //
+    //  • Any signed-in user can READ (display in challenge tiles).
+    //  • Any signed-in user can CREATE (submit a photo response).
+    //  • UPDATE: the original uploader can re-submit.
+    //  • DELETE: admin only (or Cloud Functions via Admin SDK).
+    // ──────────────────────────────────────────────
+    match /challenges/{challengeId}/responses/{fileName} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && isValidImage();
+      allow update: if isSignedIn() && isValidImage();
+      allow delete: if isSignedIn() && isAdmin();
+    }
+
+    // ──────────────────────────────────────────────
+    // 2. COHOUSE IMAGES
+    //    Paths: cohouses/{cohouseId}/id_card.jpg
+    //           cohouses/{cohouseId}/cover_image.jpg
+    //
+    //  • Any signed-in user can READ (cohouse display).
+    //  • Any signed-in user can WRITE (upload during
+    //    cohouse creation/editing — same approach as
+    //    Firestore rules where membership check is relaxed).
+    //  • DELETE: admin only (or Cloud Functions via Admin SDK
+    //    during account/cohouse deletion).
+    // ──────────────────────────────────────────────
+    match /cohouses/{cohouseId}/{fileName} {
+      allow read: if isSignedIn();
+      allow create, update: if isSignedIn() && isValidImage();
+      allow delete: if isSignedIn() && isAdmin();
+    }
+
+    // ──────────────────────────────────────────────
+    // CATCH-ALL: deny everything else
+    // ──────────────────────────────────────────────
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

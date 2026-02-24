@@ -41,6 +41,8 @@
 	<string>5</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>StripePublishableKey</key>
+	<string>$(STRIPE_PUBLISHABLE_KEY)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>

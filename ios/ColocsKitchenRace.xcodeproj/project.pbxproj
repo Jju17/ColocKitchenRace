@@ -37,6 +37,11 @@
 		64FE3CE92B8D58B800E6AAAE /* DependenciesMacros in Frameworks */ = {isa = PBXBuildFile; productRef = 64FE3CE82B8D58B800E6AAAE /* DependenciesMacros */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXFileReference (Config) section */
+		64CDE0012F4D000100000001 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
+		64CDE0022F4D000100000002 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
+/* End PBXFileReference (Config) section */
+
 /* Begin PBXContainerItemProxy section */
 		64F17B402AD2A3BE0047F6F3 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -114,6 +119,7 @@
 		64C87C212DEB401800EA27EB /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				GoogleService-Info.plist,
 				Info.plist,
 			);
 			target = 64FBE0242D8860CC00D8A89F /* CKRAdmin */;
@@ -121,6 +127,7 @@
 		64FBE3442D88665300D8A89F /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				GoogleService-Info.plist,
 				Info.plist,
 			);
 			target = 64F17B2E2AD2A3BC0047F6F3 /* ColocsKitchenRace */;
@@ -198,6 +205,7 @@
 		64F17B262AD2A3BC0047F6F3 = {
 			isa = PBXGroup;
 			children = (
+				64CDE0032F4D000100000003 /* Config */,
 				64AA7F9B2F3EE812002D36AF /* TODO.swift */,
 				6478D6BE2F2E30BA00DE69CF /* ColocsKitchenRace.entitlements */,
 				6405CBC82D886B7400BE8B0D /* Shared */,
@@ -220,6 +228,15 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		64CDE0032F4D000100000003 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				64CDE0012F4D000100000001 /* Debug.xcconfig */,
+				64CDE0022F4D000100000002 /* Release.xcconfig */,
+			);
+			path = Config;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -227,6 +244,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 64F17B532AD2A3BE0047F6F3 /* Build configuration list for PBXNativeTarget "ColocsKitchenRace" */;
 			buildPhases = (
+				64CDE0042F4D000100000004 /* Copy Firebase Config */,
 				64F17B2B2AD2A3BC0047F6F3 /* Sources */,
 				64F17B2C2AD2A3BC0047F6F3 /* Frameworks */,
 				64F17B2D2AD2A3BC0047F6F3 /* Resources */,
@@ -304,6 +322,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 64FBE0312D8860CD00D8A89F /* Build configuration list for PBXNativeTarget "CKRAdmin" */;
 			buildPhases = (
+				64CDE0052F4D000100000005 /* Copy Firebase Config (Admin) */,
 				64FBE0212D8860CC00D8A89F /* Sources */,
 				64FBE0222D8860CC00D8A89F /* Frameworks */,
 				64FBE0232D8860CC00D8A89F /* Resources */,
@@ -420,6 +439,44 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		64CDE0042F4D000100000004 /* Copy Firebase Config */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Firebase Config";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Copy the correct GoogleService-Info.plist based on build configuration\n# Debug = Staging, Release = Production\n\nFIREBASE_DIR=\"${SRCROOT}/Config/Firebase\"\nDEST=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist\"\n\nif [ \"${CONFIGURATION}\" == \"Debug\" ]; then\n  SRC=\"${FIREBASE_DIR}/GoogleService-Info-Staging.plist\"\nelse\n  SRC=\"${FIREBASE_DIR}/GoogleService-Info-Production.plist\"\nfi\n\nif [ ! -f \"$SRC\" ]; then\n  echo \"error: Missing Firebase config: $SRC\"\n  echo \"error: Copy the template from Config/Firebase/*.plist.template and fill in your values.\"\n  exit 1\nfi\n\ncp \"$SRC\" \"$DEST\"\necho \"Copied $(basename $SRC) → GoogleService-Info.plist\"\n";
+		};
+		64CDE0052F4D000100000005 /* Copy Firebase Config (Admin) */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Copy Firebase Config (Admin)";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Copy the correct GoogleService-Info.plist for CKRAdmin\n# Debug = Staging, Release = Production (admin-specific plists)\n\nFIREBASE_DIR=\"${SRCROOT}/Config/Firebase\"\nDEST=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist\"\n\nif [ \"${CONFIGURATION}\" == \"Debug\" ]; then\n  SRC=\"${FIREBASE_DIR}/GoogleService-Info-AdminStaging.plist\"\nelse\n  SRC=\"${FIREBASE_DIR}/GoogleService-Info-AdminProduction.plist\"\nfi\n\nif [ ! -f \"$SRC\" ]; then\n  echo \"error: Missing Firebase config: $SRC\"\n  echo \"error: Copy the template from Config/Firebase/*.plist.template and fill in your values.\"\n  exit 1\nfi\n\ncp \"$SRC\" \"$DEST\"\necho \"Copied $(basename $SRC) → GoogleService-Info.plist\"\n";
+		};
 		64FB41C72AD408E800C93A34 /* Crashlytics Accesses */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -498,6 +555,7 @@
 /* Begin XCBuildConfiguration section */
 		64F17B512AD2A3BE0047F6F3 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 64CDE0012F4D000100000001 /* Debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -563,6 +621,7 @@
 		};
 		64F17B522AD2A3BE0047F6F3 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 64CDE0022F4D000100000002 /* Release.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;

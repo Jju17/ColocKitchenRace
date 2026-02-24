@@ -11,6 +11,12 @@ DerivedData/
 *.xcuserstate
 *.xcbkptlist
 
+# iOS build configuration (contains Stripe keys and Firebase configs)
+ios/Config/*.xcconfig
+!ios/Config/*.xcconfig.template
+ios/Config/Firebase/*.plist
+!ios/Config/Firebase/*.plist.template
+
 # Android
 android/.idea/
 android/.gradle/
@@ -18,6 +24,8 @@ android/app/build/
 android/build/
 android/local.properties
 android/app/google-services.json
+android/app/src/debug/google-services.json
+android/app/src/release/google-services.json
 *.apk
 *.aab
 

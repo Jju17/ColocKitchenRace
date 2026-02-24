@@ -23,11 +23,23 @@ android {
     }
 
     buildTypes {
+        debug {
+            buildConfigField(
+                "String",
+                "STRIPE_PUBLISHABLE_KEY",
+                "\"${project.findProperty("STRIPE_PUBLISHABLE_KEY") ?: "pk_test_placeholder"}\""
+            )
+        }
         release {
             isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
+            )
+            buildConfigField(
+                "String",
+                "STRIPE_PUBLISHABLE_KEY",
+                "\"${project.findProperty("STRIPE_PUBLISHABLE_KEY") ?: ""}\""
             )
         }
     }
@@ -43,6 +55,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
