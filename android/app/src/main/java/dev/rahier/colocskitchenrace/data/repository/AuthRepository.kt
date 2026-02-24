@@ -21,4 +21,5 @@ interface AuthRepository {
     fun isEmailVerified(): Boolean
     fun listenAuthState(): Flow<Boolean>
     fun storeFCMToken(token: String)
+    suspend fun restoreSession(): User?
 }

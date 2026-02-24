@@ -193,7 +193,7 @@ workflows:
         inputs:
         - project_location: "$BITRISE_SOURCE_DIR/android"
         - variant: debug
-        - arguments: "--stacktrace -PSTRIPE_PUBLISHABLE_KEY=$STRIPE_PUBLISHABLE_KEY_TEST"
+        - arguments: "--stacktrace -PSTRIPE_PUBLISHABLE_KEY=$STRIPE_PUBLISHABLE_KEY_TEST -PMAPS_API_KEY=$MAPS_API_KEY"
     - save-gradle-cache@1: {}
     - deploy-to-bitrise-io@2: {}
 
@@ -229,7 +229,7 @@ workflows:
         inputs:
         - project_location: "$BITRISE_SOURCE_DIR/android"
         - variant: release
-        - arguments: "--stacktrace -PSTRIPE_PUBLISHABLE_KEY=$STRIPE_PUBLISHABLE_KEY_LIVE"
+        - arguments: "--stacktrace -PSTRIPE_PUBLISHABLE_KEY=$STRIPE_PUBLISHABLE_KEY_LIVE -PMAPS_API_KEY=$MAPS_API_KEY"
     - android-build@1:
         inputs:
         - project_location: "$BITRISE_SOURCE_DIR/android"
@@ -242,6 +242,7 @@ workflows:
             -Pandroid.injected.signing.key.alias=$ANDROID_KEY_ALIAS
             -Pandroid.injected.signing.key.password=$ANDROID_KEY_PASSWORD
             -PSTRIPE_PUBLISHABLE_KEY=$STRIPE_PUBLISHABLE_KEY_LIVE
+            -PMAPS_API_KEY=$MAPS_API_KEY
     - save-gradle-cache@1: {}
     - deploy-to-bitrise-io@2: {}
     - google-play-deploy@3:

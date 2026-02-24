@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,6 +8,12 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
+}
+
+// Read local.properties for API keys
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) load(file.inputStream())
 }
 
 android {
@@ -20,6 +28,12 @@ android {
         versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Google Maps API key: local.properties first, then gradle property (for CI)
+        val mapsApiKey = localProperties.getProperty("MAPS_API_KEY")
+            ?: project.findProperty("MAPS_API_KEY")?.toString()
+            ?: ""
+        manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
     buildTypes {
@@ -62,6 +76,7 @@ android {
 dependencies {
     // AndroidX Core
     implementation(libs.core.ktx)
+    implementation(libs.core.splashscreen)
     implementation(libs.activity.compose)
 
     // Compose
@@ -101,6 +116,12 @@ dependencies {
 
     // Stripe
     implementation(libs.stripe.android)
+
+    // ML Kit
+    implementation(libs.mlkit.text.recognition)
+
+    // Google Maps
+    implementation(libs.maps.compose)
 
     // Image loading
     implementation(libs.coil.compose)

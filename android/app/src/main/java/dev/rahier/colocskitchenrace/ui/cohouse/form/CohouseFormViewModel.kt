@@ -3,12 +3,17 @@ package dev.rahier.colocskitchenrace.ui.cohouse.form
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.rahier.colocskitchenrace.data.model.AddressValidationResult
 import dev.rahier.colocskitchenrace.data.model.Cohouse
 import dev.rahier.colocskitchenrace.data.model.CohouseUser
 import dev.rahier.colocskitchenrace.data.model.PostalAddress
+import dev.rahier.colocskitchenrace.data.model.ValidatedAddress
+import dev.rahier.colocskitchenrace.data.repository.AddressValidatorRepository
 import dev.rahier.colocskitchenrace.data.repository.AuthRepository
 import dev.rahier.colocskitchenrace.data.repository.CohouseRepository
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,9 +34,65 @@ data class CohouseFormState(
     val newMemberName: String = "",
     val isSaving: Boolean = false,
     val error: String? = null,
+    // Address validation
+    val isValidatingAddress: Boolean = false,
+    val addressValidationResult: AddressValidationResult? = null,
+    // Cover image
+    val coverImageData: ByteArray? = null,
+    // Coordinates from validation
+    val latitude: Double? = null,
+    val longitude: Double? = null,
 ) {
     val canSave: Boolean
         get() = name.isNotBlank() && street.isNotBlank() && postalCode.isNotBlank() && city.isNotBlank()
+
+    val addressValidationLabel: String?
+        get() = when (addressValidationResult) {
+            is AddressValidationResult.Valid -> "Adresse validee"
+            is AddressValidationResult.LowConfidence -> "Adresse incertaine — verifiez"
+            is AddressValidationResult.NotFound -> "Adresse introuvable"
+            is AddressValidationResult.InvalidSyntax -> null
+            null -> null
+        }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is CohouseFormState) return false
+        return isEditMode == other.isEditMode &&
+            cohouseId == other.cohouseId &&
+            name == other.name &&
+            street == other.street &&
+            postalCode == other.postalCode &&
+            city == other.city &&
+            members == other.members &&
+            newMemberName == other.newMemberName &&
+            isSaving == other.isSaving &&
+            error == other.error &&
+            isValidatingAddress == other.isValidatingAddress &&
+            addressValidationResult == other.addressValidationResult &&
+            (coverImageData?.contentEquals(other.coverImageData ?: byteArrayOf()) ?: (other.coverImageData == null)) &&
+            latitude == other.latitude &&
+            longitude == other.longitude
+    }
+
+    override fun hashCode(): Int {
+        var result = isEditMode.hashCode()
+        result = 31 * result + (cohouseId?.hashCode() ?: 0)
+        result = 31 * result + name.hashCode()
+        result = 31 * result + street.hashCode()
+        result = 31 * result + postalCode.hashCode()
+        result = 31 * result + city.hashCode()
+        result = 31 * result + members.hashCode()
+        result = 31 * result + newMemberName.hashCode()
+        result = 31 * result + isSaving.hashCode()
+        result = 31 * result + (error?.hashCode() ?: 0)
+        result = 31 * result + isValidatingAddress.hashCode()
+        result = 31 * result + (addressValidationResult?.hashCode() ?: 0)
+        result = 31 * result + (coverImageData?.contentHashCode() ?: 0)
+        result = 31 * result + (latitude?.hashCode() ?: 0)
+        result = 31 * result + (longitude?.hashCode() ?: 0)
+        return result
+    }
 }
 
 sealed class CohouseFormIntent {
@@ -42,6 +103,9 @@ sealed class CohouseFormIntent {
     data class NewMemberNameChanged(val name: String) : CohouseFormIntent()
     data object AddMember : CohouseFormIntent()
     data class RemoveMember(val memberId: String) : CohouseFormIntent()
+    data class CoverImagePicked(val imageData: ByteArray) : CohouseFormIntent()
+    data object CoverImageCleared : CohouseFormIntent()
+    data class ApplySuggestedAddress(val address: ValidatedAddress) : CohouseFormIntent()
     data object Save : CohouseFormIntent()
 }
 
@@ -53,6 +117,7 @@ sealed class CohouseFormEffect {
 class CohouseFormViewModel @Inject constructor(
     private val cohouseRepository: CohouseRepository,
     private val authRepository: AuthRepository,
+    private val addressValidatorRepository: AddressValidatorRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CohouseFormState())
@@ -60,6 +125,8 @@ class CohouseFormViewModel @Inject constructor(
 
     private val _effect = Channel<CohouseFormEffect>()
     val effect = _effect.receiveAsFlow()
+
+    private var addressValidationJob: Job? = null
 
     fun initForEdit() {
         val cohouse = cohouseRepository.currentCohouse.value ?: return
@@ -72,7 +139,18 @@ class CohouseFormViewModel @Inject constructor(
                 postalCode = cohouse.address.postalCode,
                 city = cohouse.address.city,
                 members = cohouse.users,
+                latitude = cohouse.latitude,
+                longitude = cohouse.longitude,
             )
+        }
+        // Load cover image if exists
+        cohouse.coverImagePath?.let { path ->
+            viewModelScope.launch {
+                try {
+                    val data = cohouseRepository.loadCoverImage(path)
+                    _state.update { it.copy(coverImageData = data) }
+                } catch (_: Exception) {}
+            }
         }
     }
 
@@ -90,13 +168,78 @@ class CohouseFormViewModel @Inject constructor(
     fun onIntent(intent: CohouseFormIntent) {
         when (intent) {
             is CohouseFormIntent.NameChanged -> _state.update { it.copy(name = intent.name) }
-            is CohouseFormIntent.StreetChanged -> _state.update { it.copy(street = intent.street) }
-            is CohouseFormIntent.PostalCodeChanged -> _state.update { it.copy(postalCode = intent.postalCode) }
-            is CohouseFormIntent.CityChanged -> _state.update { it.copy(city = intent.city) }
+            is CohouseFormIntent.StreetChanged -> {
+                _state.update { it.copy(street = intent.street) }
+                debouncedValidateAddress()
+            }
+            is CohouseFormIntent.PostalCodeChanged -> {
+                _state.update { it.copy(postalCode = intent.postalCode) }
+                debouncedValidateAddress()
+            }
+            is CohouseFormIntent.CityChanged -> {
+                _state.update { it.copy(city = intent.city) }
+                debouncedValidateAddress()
+            }
             is CohouseFormIntent.NewMemberNameChanged -> _state.update { it.copy(newMemberName = intent.name) }
             CohouseFormIntent.AddMember -> addMember()
             is CohouseFormIntent.RemoveMember -> removeMember(intent.memberId)
+            is CohouseFormIntent.CoverImagePicked -> _state.update { it.copy(coverImageData = intent.imageData) }
+            CohouseFormIntent.CoverImageCleared -> _state.update { it.copy(coverImageData = null) }
+            is CohouseFormIntent.ApplySuggestedAddress -> applySuggestedAddress(intent.address)
             CohouseFormIntent.Save -> save()
+        }
+    }
+
+    private fun debouncedValidateAddress() {
+        addressValidationJob?.cancel()
+        addressValidationJob = viewModelScope.launch {
+            delay(ADDRESS_VALIDATION_DEBOUNCE_MS)
+            validateAddress()
+        }
+    }
+
+    private suspend fun validateAddress() {
+        val s = _state.value
+        if (s.street.isBlank() || s.city.isBlank()) {
+            _state.update { it.copy(addressValidationResult = null, isValidatingAddress = false) }
+            return
+        }
+
+        _state.update { it.copy(isValidatingAddress = true) }
+        try {
+            val address = PostalAddress(
+                street = s.street,
+                postalCode = s.postalCode,
+                city = s.city,
+            )
+            val result = addressValidatorRepository.validate(address)
+            _state.update { it.copy(isValidatingAddress = false, addressValidationResult = result) }
+
+            // Extract coordinates from validated address
+            when (result) {
+                is AddressValidationResult.Valid -> _state.update {
+                    it.copy(latitude = result.address.latitude, longitude = result.address.longitude)
+                }
+                is AddressValidationResult.LowConfidence -> _state.update {
+                    it.copy(latitude = result.address.latitude, longitude = result.address.longitude)
+                }
+                else -> {}
+            }
+        } catch (_: Exception) {
+            _state.update { it.copy(isValidatingAddress = false) }
+        }
+    }
+
+    private fun applySuggestedAddress(address: ValidatedAddress) {
+        _state.update {
+            it.copy(
+                street = address.street,
+                postalCode = address.postalCode,
+                city = address.city,
+                latitude = address.latitude,
+                longitude = address.longitude,
+                addressValidationResult = AddressValidationResult.Valid(address),
+            )
         }
     }
 
@@ -118,7 +261,6 @@ class CohouseFormViewModel @Inject constructor(
     }
 
     private fun removeMember(memberId: String) {
-        // Don't allow removing admin users
         val member = _state.value.members.find { it.id == memberId }
         if (member?.isAdmin == true) return
 
@@ -140,13 +282,23 @@ class CohouseFormViewModel @Inject constructor(
 
                 if (s.isEditMode && s.cohouseId != null) {
                     val existing = cohouseRepository.currentCohouse.value ?: return@launch
+                    // Strip empty non-admin users (like iOS)
+                    val cleanMembers = s.members.filter { it.surname.isNotBlank() || it.isAdmin }
                     val updated = existing.copy(
                         name = s.name,
                         address = address,
-                        users = s.members,
+                        users = cleanMembers,
+                        latitude = s.latitude,
+                        longitude = s.longitude,
                     )
                     cohouseRepository.set(s.cohouseId, updated)
-                    cohouseRepository.setCurrentCohouse(updated)
+
+                    // Upload cover image if changed
+                    s.coverImageData?.let { imageData ->
+                        val path = cohouseRepository.uploadCoverImage(s.cohouseId, imageData)
+                        cohouseRepository.set(s.cohouseId, updated.copy(coverImagePath = path))
+                        cohouseRepository.setCurrentCohouse(updated.copy(coverImagePath = path))
+                    } ?: cohouseRepository.setCurrentCohouse(updated)
                 } else {
                     // Check for duplicates
                     val duplicateResult = cohouseRepository.checkDuplicate(s.name, s.street, s.city)
@@ -156,14 +308,25 @@ class CohouseFormViewModel @Inject constructor(
                     }
 
                     val code = generateCode()
+                    val cleanMembers = s.members.filter { it.surname.isNotBlank() || it.isAdmin }
                     val cohouse = Cohouse(
                         name = s.name,
                         address = address,
                         code = code,
-                        users = s.members,
+                        users = cleanMembers,
+                        latitude = s.latitude,
+                        longitude = s.longitude,
                     )
                     cohouseRepository.add(cohouse)
-                    cohouseRepository.setCurrentCohouse(cohouse)
+
+                    // Upload cover image
+                    var finalCohouse = cohouse
+                    s.coverImageData?.let { imageData ->
+                        val path = cohouseRepository.uploadCoverImage(cohouse.id, imageData)
+                        finalCohouse = cohouse.copy(coverImagePath = path)
+                        cohouseRepository.set(cohouse.id, finalCohouse)
+                    }
+                    cohouseRepository.setCurrentCohouse(finalCohouse)
 
                     // Update user's cohouseId
                     val user = authRepository.currentUser.value
@@ -183,5 +346,9 @@ class CohouseFormViewModel @Inject constructor(
     private fun generateCode(): String {
         val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
         return (1..6).map { chars.random() }.joinToString("")
+    }
+
+    companion object {
+        private const val ADDRESS_VALIDATION_DEBOUNCE_MS = 600L
     }
 }

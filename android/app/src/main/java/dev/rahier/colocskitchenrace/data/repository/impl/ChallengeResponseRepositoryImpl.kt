@@ -2,6 +2,7 @@ package dev.rahier.colocskitchenrace.data.repository.impl
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import dev.rahier.colocskitchenrace.data.model.ChallengeResponse
 import dev.rahier.colocskitchenrace.data.model.ChallengeResponseContent
 import dev.rahier.colocskitchenrace.data.model.ChallengeResponseStatus
@@ -18,7 +19,20 @@ import javax.inject.Singleton
 @Singleton
 class ChallengeResponseRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore,
+    private val storage: FirebaseStorage,
 ) : ChallengeResponseRepository {
+
+    @Suppress("UNCHECKED_CAST")
+    override suspend fun getAll(): List<ChallengeResponse> {
+        val snapshot = firestore.collectionGroup(Constants.RESPONSES_SUBCOLLECTION)
+            .get()
+            .await()
+
+        return snapshot.documents.mapNotNull { doc ->
+            val data = doc.data ?: return@mapNotNull null
+            mapToResponse(data, doc.id)
+        }
+    }
 
     @Suppress("UNCHECKED_CAST")
     override suspend fun getAllForCohouse(cohouseId: String): List<ChallengeResponse> {
@@ -31,6 +45,19 @@ class ChallengeResponseRepositoryImpl @Inject constructor(
             val data = doc.data ?: return@mapNotNull null
             mapToResponse(data, doc.id)
         }
+    }
+
+    override suspend fun updateStatus(
+        challengeId: String,
+        cohouseId: String,
+        status: ChallengeResponseStatus,
+    ) {
+        firestore.collection(Constants.CHALLENGES_COLLECTION)
+            .document(challengeId)
+            .collection(Constants.RESPONSES_SUBCOLLECTION)
+            .document(cohouseId)
+            .update("status", status.name.lowercase())
+            .await()
     }
 
     override suspend fun submit(response: ChallengeResponse): ChallengeResponse {
@@ -56,6 +83,17 @@ class ChallengeResponseRepositoryImpl @Inject constructor(
         awaitClose { registration.remove() }
     }
 
+    override fun watchAllResponses(): Flow<List<ChallengeResponse>> = callbackFlow {
+        val registration = firestore.collectionGroup(Constants.RESPONSES_SUBCOLLECTION)
+            .addSnapshotListener { snapshot, _ ->
+                val responses = snapshot?.documents?.mapNotNull { doc ->
+                    doc.data?.let { mapToResponse(it, doc.id) }
+                } ?: emptyList()
+                trySend(responses)
+            }
+        awaitClose { registration.remove() }
+    }
+
     override fun watchAllValidatedResponses(): Flow<List<ChallengeResponse>> = callbackFlow {
         val registration = firestore.collectionGroup(Constants.RESPONSES_SUBCOLLECTION)
             .whereEqualTo("status", "validated")
@@ -66,6 +104,12 @@ class ChallengeResponseRepositoryImpl @Inject constructor(
                 trySend(responses)
             }
         awaitClose { registration.remove() }
+    }
+
+    override suspend fun uploadImage(challengeId: String, cohouseId: String, imageData: ByteArray): String {
+        val ref = storage.reference.child("challenges/$challengeId/responses/$cohouseId.jpg")
+        ref.putBytes(imageData).await()
+        return ref.path
     }
 
     companion object {

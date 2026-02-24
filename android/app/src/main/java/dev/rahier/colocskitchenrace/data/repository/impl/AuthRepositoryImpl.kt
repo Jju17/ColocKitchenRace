@@ -180,6 +180,40 @@ class AuthRepositoryImpl @Inject constructor(
             .addOnFailureListener { Log.e("AuthRepo", "Failed to store FCM token", it) }
     }
 
+    override suspend fun restoreSession(): User? {
+        val firebaseUser = auth.currentUser ?: return null
+        val authId = firebaseUser.uid
+
+        // Query Firestore for user profile by authId
+        val snapshot = firestore.collection(Constants.USERS_COLLECTION)
+            .whereEqualTo("authId", authId)
+            .limit(1)
+            .get()
+            .await()
+
+        if (snapshot.documents.isEmpty()) return null
+
+        val user = mapToUser(snapshot.documents[0].data!!, snapshot.documents[0].id)
+        _currentUser.value = user
+
+        // Load cohouse if user has one
+        if (user.cohouseId != null) {
+            try {
+                val cohouse = cohouseRepository.get(user.cohouseId)
+                cohouseRepository.setCurrentCohouse(cohouse)
+            } catch (e: Exception) {
+                Log.e("AuthRepo", "Failed to load cohouse during session restore", e)
+            }
+        }
+
+        // Refresh FCM token
+        messaging.token.addOnSuccessListener { token ->
+            storeFCMToken(token)
+        }
+
+        return user
+    }
+
     // --- Private helpers ---
 
     private suspend fun loadOrCreateProfile(

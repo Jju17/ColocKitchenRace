@@ -21,10 +21,32 @@ import javax.inject.Inject
 data class HomeState(
     val game: CKRGame? = null,
     val cohouse: Cohouse? = null,
+    val coverImageData: ByteArray? = null,
     val news: List<News> = emptyList(),
     val isRegistered: Boolean = false,
     val isLoading: Boolean = false,
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is HomeState) return false
+        return game == other.game &&
+            cohouse == other.cohouse &&
+            (coverImageData?.contentEquals(other.coverImageData ?: byteArrayOf()) ?: (other.coverImageData == null)) &&
+            news == other.news &&
+            isRegistered == other.isRegistered &&
+            isLoading == other.isLoading
+    }
+
+    override fun hashCode(): Int {
+        var result = game?.hashCode() ?: 0
+        result = 31 * result + (cohouse?.hashCode() ?: 0)
+        result = 31 * result + (coverImageData?.contentHashCode() ?: 0)
+        result = 31 * result + news.hashCode()
+        result = 31 * result + isRegistered.hashCode()
+        result = 31 * result + isLoading.hashCode()
+        return result
+    }
+}
 
 sealed class HomeIntent {
     data object RegisterClicked : HomeIntent()
@@ -67,11 +89,27 @@ class HomeViewModel @Inject constructor(
                 _state.update {
                     it.copy(game = game, cohouse = cohouse, isRegistered = isRegistered)
                 }
+                loadCoverImage(cohouse)
             }.collect {}
         }
         viewModelScope.launch {
             val news = try { newsRepository.getLatest() } catch (_: Exception) { emptyList() }
             _state.update { it.copy(news = news) }
+        }
+    }
+
+    private fun loadCoverImage(cohouse: Cohouse?) {
+        val path = cohouse?.coverImagePath ?: run {
+            _state.update { it.copy(coverImageData = null) }
+            return
+        }
+        viewModelScope.launch {
+            try {
+                val data = cohouseRepository.loadCoverImage(path)
+                _state.update { it.copy(coverImageData = data) }
+            } catch (_: Exception) {
+                _state.update { it.copy(coverImageData = null) }
+            }
         }
     }
 

@@ -1,8 +1,10 @@
 package dev.rahier.colocskitchenrace.ui.auth.signin
 
 import android.app.Activity
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -12,12 +14,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.rahier.colocskitchenrace.ui.components.CKRButton
@@ -66,9 +71,10 @@ fun SignInScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(CkrMintLight)
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 32.dp)
-            .padding(top = 80.dp),
+            .padding(top = 80.dp, bottom = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         // Logo / Title
@@ -76,42 +82,36 @@ fun SignInScreen(
             text = "Colocs\nKitchen Race",
             style = MaterialTheme.typography.displayMedium,
             textAlign = TextAlign.Center,
-            color = CkrLavender,
+            color = CkrDark,
         )
 
         Spacer(modifier = Modifier.height(48.dp))
 
-        // Email field
-        OutlinedTextField(
+        // Email field - iOS style with white background
+        CKRTextField(
             value = state.email,
             onValueChange = { viewModel.onIntent(SignInIntent.EmailChanged(it)) },
-            label = { Text("Email") },
-            leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
+            label = "Email",
+            leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = CkrGray) },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
                 imeAction = ImeAction.Next,
             ),
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.medium,
         )
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Password field
-        OutlinedTextField(
+        // Password field - iOS style with white background
+        CKRTextField(
             value = state.password,
             onValueChange = { viewModel.onIntent(SignInIntent.PasswordChanged(it)) },
-            label = { Text("Mot de passe") },
-            leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+            label = "Mot de passe",
+            leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = CkrGray) },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Password,
                 imeAction = ImeAction.Done,
             ),
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.medium,
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -137,40 +137,94 @@ fun SignInScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Divider
+        // Divider with "ou"
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth(),
         ) {
-            HorizontalDivider(modifier = Modifier.weight(1f))
+            HorizontalDivider(
+                modifier = Modifier.weight(1f),
+                color = CkrGray.copy(alpha = 0.4f),
+            )
             Text(
                 text = "  ou  ",
                 style = MaterialTheme.typography.bodySmall,
                 color = CkrGray,
             )
-            HorizontalDivider(modifier = Modifier.weight(1f))
+            HorizontalDivider(
+                modifier = Modifier.weight(1f),
+                color = CkrGray.copy(alpha = 0.4f),
+            )
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Google Sign-In
-        OutlinedButton(
+        // Google Sign-In - white button with border
+        Button(
             onClick = { activity?.let { viewModel.signInWithGoogle(it) } },
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.medium,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+            shape = RoundedCornerShape(15.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = CkrWhite,
+                contentColor = CkrDark,
+            ),
+            elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp),
         ) {
-            Text("Continuer avec Google")
+            Text(
+                text = "Se connecter avec Google",
+                style = MaterialTheme.typography.labelLarge,
+            )
         }
 
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Apple Sign-In
-        OutlinedButton(
+        // Apple Sign-In - black button
+        Button(
             onClick = { activity?.let { viewModel.signInWithApple(it) } },
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.medium,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(52.dp),
+            shape = RoundedCornerShape(15.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = CkrDark,
+                contentColor = CkrWhite,
+            ),
         ) {
-            Text("Continuer avec Apple")
+            Text(
+                text = "Se connecter avec Apple",
+                style = MaterialTheme.typography.labelLarge,
+            )
         }
     }
+}
+
+@Composable
+private fun CKRTextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    modifier: Modifier = Modifier,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    visualTransformation: androidx.compose.ui.text.input.VisualTransformation = androidx.compose.ui.text.input.VisualTransformation.None,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        leadingIcon = leadingIcon,
+        visualTransformation = visualTransformation,
+        keyboardOptions = keyboardOptions,
+        singleLine = true,
+        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(15.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedContainerColor = CkrWhite,
+            unfocusedContainerColor = CkrWhite,
+            focusedBorderColor = CkrMint,
+            unfocusedBorderColor = Color.Transparent,
+        ),
+    )
 }

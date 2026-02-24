@@ -29,9 +29,8 @@ fun LeaderboardBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .padding(bottom = 32.dp)
-                .verticalScroll(rememberScrollState()),
+                .fillMaxHeight(0.9f)
+                .padding(horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
@@ -42,30 +41,48 @@ fun LeaderboardBottomSheet(
             Spacer(modifier = Modifier.height(16.dp))
 
             if (state.isLoading) {
-                CircularProgressIndicator(color = CkrLavender)
-            } else if (state.entries.isEmpty()) {
-                Text(
-                    text = "Aucun classement pour le moment",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = CkrGray,
-                )
-            } else {
-                // Top 3 podium
-                val top3 = state.entries.take(3)
-                if (top3.isNotEmpty()) {
-                    PodiumSection(
-                        entries = top3,
-                        myCohouseId = state.myCohouseId,
-                    )
-                    Spacer(modifier = Modifier.height(24.dp))
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CircularProgressIndicator(color = CkrLavender)
                 }
-
-                // Remaining entries
-                state.entries.drop(3).forEach { entry ->
-                    LeaderboardRow(
-                        entry = entry,
-                        isMyCohouse = entry.cohouseId == state.myCohouseId,
+            } else if (state.entries.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Text(
+                        text = "Aucun classement pour le moment",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = CkrGray,
                     )
+                }
+            } else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .padding(bottom = 32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    // Top 3 podium
+                    val top3 = state.entries.take(3)
+                    if (top3.isNotEmpty()) {
+                        PodiumSection(
+                            entries = top3,
+                            myCohouseId = state.myCohouseId,
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+                    }
+
+                    // Remaining entries
+                    state.entries.drop(3).forEach { entry ->
+                        LeaderboardRow(
+                            entry = entry,
+                            isMyCohouse = entry.cohouseId == state.myCohouseId,
+                        )
+                    }
                 }
             }
         }

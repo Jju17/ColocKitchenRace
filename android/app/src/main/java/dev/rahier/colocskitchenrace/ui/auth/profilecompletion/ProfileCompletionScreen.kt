@@ -1,11 +1,16 @@
 package dev.rahier.colocskitchenrace.ui.auth.profilecompletion
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -13,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.rahier.colocskitchenrace.ui.components.CKRButton
-import dev.rahier.colocskitchenrace.ui.theme.CkrLavender
+import dev.rahier.colocskitchenrace.ui.theme.*
 
 @Composable
 fun ProfileCompletionScreen(
@@ -33,6 +38,8 @@ fun ProfileCompletionScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(CkrMintLight)
+            .verticalScroll(rememberScrollState())
             .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -42,7 +49,7 @@ fun ProfileCompletionScreen(
             text = "Colocs\nKitchen Race",
             style = MaterialTheme.typography.displaySmall,
             textAlign = TextAlign.Center,
-            color = CkrLavender,
+            color = CkrDark,
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -50,6 +57,16 @@ fun ProfileCompletionScreen(
         Text(
             text = "Completez votre profil",
             style = MaterialTheme.typography.headlineSmall,
+            color = CkrDark,
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "Ces informations sont necessaires pour participer",
+            style = MaterialTheme.typography.bodyMedium,
+            color = CkrGray,
+            textAlign = TextAlign.Center,
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -60,7 +77,13 @@ fun ProfileCompletionScreen(
             label = { Text("Prenom") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.medium,
+            shape = RoundedCornerShape(15.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = CkrWhite,
+                unfocusedContainerColor = CkrWhite,
+                focusedBorderColor = CkrMint,
+                unfocusedBorderColor = Color.Transparent,
+            ),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         )
 
@@ -72,7 +95,13 @@ fun ProfileCompletionScreen(
             label = { Text("Nom") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.medium,
+            shape = RoundedCornerShape(15.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = CkrWhite,
+                unfocusedContainerColor = CkrWhite,
+                focusedBorderColor = CkrMint,
+                unfocusedBorderColor = Color.Transparent,
+            ),
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
         )
 
@@ -84,7 +113,13 @@ fun ProfileCompletionScreen(
             label = { Text("Numero de telephone") },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.medium,
+            shape = RoundedCornerShape(15.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedContainerColor = CkrWhite,
+                unfocusedContainerColor = CkrWhite,
+                focusedBorderColor = CkrMint,
+                unfocusedBorderColor = Color.Transparent,
+            ),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Phone,
                 imeAction = ImeAction.Done,

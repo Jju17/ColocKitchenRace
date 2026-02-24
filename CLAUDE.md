@@ -237,6 +237,93 @@ Client                          Backend                              Stripe
 | **iOS** | `StripeClient.swift` → `CKRClient.swift` → `PaymentSummaryView.swift` |
 | **Android** | `StripeRepository.kt` → `CKRGameRepository.kt` → `PaymentSummaryViewModel.kt` |
 
+## Challenge Participation Flow
+
+Challenges are community tasks that cohouses can complete to earn points. Each challenge has a type that determines the UI and submission content. Participation is **inline on the challenge card** — no separate modal or screen.
+
+### Challenge Types
+
+| Type | Content Model | User Input | Response Content |
+|------|---------------|------------|------------------|
+| `NoChoice` | No extra data | Single "I've done it!" button tap | `ChallengeResponseContent.NoChoice` |
+| `SingleAnswer` | No extra data | Free-text input field | `ChallengeResponseContent.SingleAnswer(text)` |
+| `MultipleChoice` | `choices: [String]`, `correctAnswerIndex?`, `shuffleAnswers` | Select one choice from a grid/list | `ChallengeResponseContent.MultipleChoice([selectedIndex])` |
+| `Picture` | No extra data | Camera or gallery photo | `ChallengeResponseContent.Picture(storagePath)` |
+
+### Card States (Inline on Challenge Tile)
+
+```
+1. Challenge not yet started     → "A venir" badge, no action
+2. Challenge active, no response → "Participer" button
+3. Participating (form visible)  → Inline form based on challenge type + Submit + Cancel
+4. Response submitted, waiting   → Hourglass icon + "En attente de validation"
+5. Validated by admin            → Checkmark icon + "Valide !"
+6. Invalidated by admin          → X icon + "Invalide"
+7. Challenge ended               → "Termine" badge
+```
+
+### Submission Flow
+
+```
+User taps "Participer"
+  ↓
+Inline form appears on card (type-specific UI)
+  ↓
+User fills form + taps "Envoyer"
+  ↓
+[Picture only] Upload image to Firebase Storage
+  → Path: challenges/{challengeId}/responses/{cohouseId}.jpg
+  → Image compressed to <1MB JPEG before upload
+  ↓
+Create ChallengeResponse document in Firestore
+  → Path: /challenges/{challengeId}/responses/{cohouseId}
+  → Status: "waiting"
+  ↓
+Card switches to "En attente de validation" state
+  ↓
+Admin validates/invalidates via CKRAdmin app
+  ↓
+[iOS] Real-time listener updates card status instantly
+[Android] Status reflected on next load
+```
+
+### iOS Implementation (TCA)
+
+- **`ChallengeTileFeature.swift`** — TCA Reducer managing the full participation lifecycle per tile. Handles `startTapped`, `submitTapped(ChallengeSubmitPayload)`, real-time status watching via `responseClient.watchStatus()`, and nested `PictureChoiceFeature` for camera/gallery.
+- **`ChallengeContentView.swift`** — Router view switching between `NoChoiceView`, `SingleAnswerView`, `MultipleChoiceView`, `PictureChoiceView`.
+- **`PictureChoiceFeature.swift`** — Nested TCA reducer for image picking (UIImagePickerController) + compression (`ImagePipeline.compress`).
+- **`WaitingReviewView.swift`** / **`FinalStatusView.swift`** — Status display composables.
+- **State fields:** `response: ChallengeResponse?`, `isSubmitting`, `submitError`, `liveStatus` (real-time from Firestore listener).
+- **Real-time updates:** Each tile watches `responseClient.watchStatus(challengeId, cohouseId)` for instant admin decisions.
+
+### Android Implementation (MVI)
+
+- **`ChallengesViewModel.kt`** — Single ViewModel manages all challenges + participation state. Shared state fields: `participatingChallengeId`, `selectedChoiceIndex`, `textAnswer`, `capturedImageData: ByteArray?`, `isSubmitting`, `submitError`.
+- **`ChallengesScreen.kt`** — `ChallengeTileCard` composable renders inline forms: `NoChoiceForm`, `SingleAnswerForm`, `MultipleChoiceForm`, `PictureForm`, `WaitingReviewSection`, `FinalStatusSection`.
+- **`ChallengeResponseRepository.kt`** — `submit(response)` writes to Firestore, `uploadImage(challengeId, cohouseId, imageData)` uploads to Firebase Storage.
+- **Photo handling:** `ActivityResultContracts.TakePicture` (camera via FileProvider) + `ActivityResultContracts.GetContent` (gallery). Images compressed in ViewModel before storage in state.
+- **Intents:** `StartChallenge(id)`, `CancelParticipation`, `SelectChoice(index)`, `TextAnswerChanged(text)`, `PhotoCaptured(bytes)`, `SubmitResponse`.
+
+### Key Differences iOS vs Android
+
+| Aspect | iOS | Android |
+|--------|-----|---------|
+| Architecture | Per-tile TCA reducer (`ChallengeTileFeature`) | Shared `ChallengesViewModel` with `participatingChallengeId` |
+| Real-time status | `watchStatus()` listener per tile | Loaded on screen init (no real-time listener yet) |
+| Image picker | UIImagePickerController (camera/library) | `ActivityResultContracts.TakePicture` / `GetContent` |
+| Image compression | `ImagePipeline.compress` (custom) | `Bitmap.compress(JPEG, quality, stream)` loop |
+| Text input | Bottom sheet modal for SingleAnswer | Inline `OutlinedTextField` |
+
+### Files Involved
+
+| Layer | Files |
+|-------|-------|
+| **Firestore** | `/challenges/{challengeId}/responses/{cohouseId}` |
+| **Storage** | `challenges/{challengeId}/responses/{cohouseId}.jpg` (pictures only) |
+| **iOS** | `ChallengeTileFeature.swift`, `ChallengeContentView.swift`, `NoChoiceView.swift`, `SingleAnswerView.swift`, `MultipleChoiceView.swift`, `PictureChoiceView.swift` |
+| **Android** | `ChallengesViewModel.kt`, `ChallengesScreen.kt`, `ChallengeResponseRepository.kt`, `ChallengeResponseRepositoryImpl.kt` |
+| **Models** | `Challenge.kt`/`Challenge.swift`, `ChallengeContent.kt`/`ChallengeContent.swift`, `ChallengeResponse.kt`/`ChallengeResponse.swift` |
+
 ## Firestore Collections
 - `/users/{userId}` - User profiles (authId-bound)
 - `/cohouses/{cohouseId}` - Communities with `/users` subcollection

@@ -1,7 +1,10 @@
 package dev.rahier.colocskitchenrace.ui.cohouse
 
+import android.graphics.BitmapFactory
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -9,12 +12,28 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
+import dev.rahier.colocskitchenrace.R
+import dev.rahier.colocskitchenrace.data.model.Cohouse
 import dev.rahier.colocskitchenrace.ui.components.CKRButton
 import dev.rahier.colocskitchenrace.ui.theme.*
 
@@ -77,7 +96,6 @@ private fun NoCohouseContent(
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        // Join by code
         OutlinedTextField(
             value = joinCode,
             onValueChange = onJoinCodeChanged,
@@ -139,87 +157,52 @@ private fun CohouseDetailContent(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(16.dp),
+            .padding(horizontal = 16.dp),
     ) {
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Title row: cohouse name + edit button (like iOS)
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(text = "Ma coloc", style = MaterialTheme.typography.headlineLarge, color = CkrLavender)
+            Text(
+                text = cohouse.name,
+                style = MaterialTheme.typography.displaySmall,
+                modifier = Modifier.weight(1f),
+            )
             IconButton(onClick = onNavigateToEdit) {
                 Icon(Icons.Default.Edit, contentDescription = "Modifier")
             }
         }
-        Spacer(modifier = Modifier.height(16.dp))
 
-        // Cohouse name + code
-        Card(
-            modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(containerColor = CkrMintLight),
-        ) {
-            Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = cohouse.name, style = MaterialTheme.typography.headlineMedium)
+        Spacer(modifier = Modifier.height(12.dp))
 
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = "Code: ${cohouse.code}", style = MaterialTheme.typography.titleMedium)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    IconButton(
-                        onClick = {
-                            clipboardManager.setText(AnnotatedString(cohouse.code))
-                            showCopied = true
-                        },
-                        modifier = Modifier.size(24.dp),
-                    ) {
-                        Icon(Icons.Default.ContentCopy, contentDescription = "Copier", modifier = Modifier.size(16.dp))
-                    }
-                    if (showCopied) {
-                        Text(text = "Copie !", style = MaterialTheme.typography.bodySmall, color = CkrMint)
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = cohouse.address.formatted,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = CkrGray,
-                )
-            }
-        }
+        // Cover image (like iOS: full width, rounded, default if no cover)
+        CoverImageSection(state)
 
         Spacer(modifier = Modifier.height(16.dp))
+
+        // Code card (lavender background, matching iOS purple card)
+        CodeCard(
+            code = cohouse.code,
+            onCopy = {
+                clipboardManager.setText(AnnotatedString(cohouse.code))
+                showCopied = true
+            },
+            showCopied = showCopied,
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Localisation section (table rows like iOS)
+        LocalisationSection(cohouse)
+
+        Spacer(modifier = Modifier.height(24.dp))
 
         // Members section
-        Text(text = "Membres (${cohouse.totalUsers})", style = MaterialTheme.typography.headlineSmall)
-        Spacer(modifier = Modifier.height(8.dp))
-
-        cohouse.users.forEach { user ->
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-            ) {
-                Row(
-                    modifier = Modifier.padding(12.dp).fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(text = user.surname, style = MaterialTheme.typography.bodyLarge)
-                    if (user.isAdmin) {
-                        Surface(color = CkrGold, shape = MaterialTheme.shapes.small) {
-                            Text(
-                                text = "Admin",
-                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = CkrWhite,
-                            )
-                        }
-                    }
-                }
-            }
-        }
+        MembersSection(cohouse)
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -229,6 +212,214 @@ private fun CohouseDetailContent(
             colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
         ) {
             Text("Quitter la coloc")
+        }
+
+        Spacer(modifier = Modifier.height(32.dp))
+    }
+}
+
+@Composable
+private fun CoverImageSection(state: CohouseState) {
+    val imageData = state.coverImageData
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(200.dp)
+            .clip(RoundedCornerShape(16.dp)),
+    ) {
+        if (imageData != null) {
+            val bitmap = remember(imageData) {
+                BitmapFactory.decodeByteArray(imageData, 0, imageData.size)
+            }
+            if (bitmap != null) {
+                Image(
+                    bitmap = bitmap.asImageBitmap(),
+                    contentDescription = "Photo de la coloc",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop,
+                )
+            }
+        } else {
+            Image(
+                painter = painterResource(id = R.drawable.default_coloc_background),
+                contentDescription = "Photo par defaut",
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop,
+            )
+        }
+    }
+}
+
+@Composable
+private fun CodeCard(
+    code: String,
+    onCopy: () -> Unit,
+    showCopied: Boolean,
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = CkrLavender),
+        shape = RoundedCornerShape(16.dp),
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "Code : $code",
+                    style = MaterialTheme.typography.headlineSmall,
+                    color = CkrWhite,
+                )
+                IconButton(
+                    onClick = onCopy,
+                    modifier = Modifier.size(32.dp),
+                ) {
+                    Icon(
+                        Icons.Default.ContentCopy,
+                        contentDescription = "Copier",
+                        tint = CkrWhite.copy(alpha = 0.8f),
+                        modifier = Modifier.size(20.dp),
+                    )
+                }
+            }
+            Text(
+                text = if (showCopied) "Code copie !" else "Partager ce code avec tes colocs",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold,
+                color = CkrWhite.copy(alpha = 0.85f),
+            )
+        }
+    }
+}
+
+@Composable
+private fun LocalisationSection(cohouse: Cohouse) {
+    Text(
+        text = "LOCALISATION",
+        style = MaterialTheme.typography.labelLarge,
+        color = CkrGray,
+        letterSpacing = 1.sp,
+    )
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = CkrWhite),
+        shape = RoundedCornerShape(12.dp),
+    ) {
+        Column {
+            AddressRow(label = "Address", value = cohouse.address.street)
+            HorizontalDivider(color = CkrOffWhite)
+            AddressRow(label = "ZIP Code", value = cohouse.address.postalCode)
+            HorizontalDivider(color = CkrOffWhite)
+            AddressRow(label = "City", value = cohouse.address.city)
+        }
+    }
+
+    // Map (if coordinates available — like iOS Map with marker)
+    if (cohouse.latitude != null && cohouse.longitude != null) {
+        Spacer(modifier = Modifier.height(12.dp))
+        val position = LatLng(cohouse.latitude, cohouse.longitude)
+        val cameraPositionState = rememberCameraPositionState {
+            this.position = CameraPosition.fromLatLngZoom(position, 15f)
+        }
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .clip(RoundedCornerShape(16.dp)),
+        ) {
+            GoogleMap(
+                modifier = Modifier.fillMaxSize(),
+                cameraPositionState = cameraPositionState,
+                uiSettings = MapUiSettings(
+                    zoomControlsEnabled = false,
+                    scrollGesturesEnabled = false,
+                    zoomGesturesEnabled = false,
+                    tiltGesturesEnabled = false,
+                    rotationGesturesEnabled = false,
+                    mapToolbarEnabled = false,
+                ),
+                properties = MapProperties(isMyLocationEnabled = false),
+            ) {
+                Marker(
+                    state = MarkerState(position = position),
+                    title = cohouse.name,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun AddressRow(label: String, value: String) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Medium,
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyMedium,
+            color = CkrGray,
+        )
+    }
+}
+
+@Composable
+private fun MembersSection(cohouse: Cohouse) {
+    Text(
+        text = "MEMBERS",
+        style = MaterialTheme.typography.labelLarge,
+        color = CkrGray,
+        letterSpacing = 1.sp,
+    )
+
+    Spacer(modifier = Modifier.height(8.dp))
+
+    cohouse.users.forEach { user ->
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 3.dp),
+            colors = CardDefaults.cardColors(containerColor = CkrWhite),
+            shape = RoundedCornerShape(12.dp),
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 14.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = user.surname,
+                    style = MaterialTheme.typography.bodyLarge,
+                )
+                if (user.isAdmin) {
+                    Surface(
+                        color = CkrGold,
+                        shape = RoundedCornerShape(8.dp),
+                    ) {
+                        Text(
+                            text = "Admin",
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = CkrWhite,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                }
+            }
         }
     }
 }

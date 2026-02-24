@@ -15,6 +15,7 @@ interface CohouseRepository {
     suspend fun quitCohouse()
     suspend fun checkDuplicate(name: String, street: String, city: String): DuplicateResult
     suspend fun uploadCoverImage(cohouseId: String, imageData: ByteArray): String
+    suspend fun uploadIdCard(cohouseId: String, imageData: ByteArray): String
     suspend fun loadCoverImage(path: String): ByteArray
     fun setCurrentCohouse(cohouse: Cohouse?)
 }

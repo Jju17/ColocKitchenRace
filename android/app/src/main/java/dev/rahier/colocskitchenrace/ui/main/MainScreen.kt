@@ -27,7 +27,9 @@ import dev.rahier.colocskitchenrace.ui.home.registration.RegistrationFormScreen
 import dev.rahier.colocskitchenrace.ui.planning.PlanningScreen
 import dev.rahier.colocskitchenrace.ui.profile.UserProfileFormScreen
 import dev.rahier.colocskitchenrace.ui.profile.UserProfileScreen
+import dev.rahier.colocskitchenrace.ui.theme.CkrGray
 import dev.rahier.colocskitchenrace.ui.theme.CkrLavender
+import dev.rahier.colocskitchenrace.ui.theme.CkrWhite
 
 enum class Tab(val route: String, val label: String, val icon: ImageVector) {
     HOME("tab_home", "Accueil", Icons.Default.Home),
@@ -73,13 +75,15 @@ fun MainScreen(
     Scaffold(
         bottomBar = {
             if (isOnTab) {
-                NavigationBar {
+                NavigationBar(
+                    containerColor = CkrWhite,
+                ) {
                     val currentDestination = navBackStackEntry?.destination
 
                     tabs.forEach { tab ->
                         NavigationBarItem(
                             icon = { Icon(tab.icon, contentDescription = tab.label) },
-                            label = { Text(tab.label) },
+                            label = { Text(tab.label, style = MaterialTheme.typography.labelSmall) },
                             selected = currentDestination?.hierarchy?.any { it.route == tab.route } == true,
                             onClick = {
                                 navController.navigate(tab.route) {
@@ -93,6 +97,9 @@ fun MainScreen(
                             colors = NavigationBarItemDefaults.colors(
                                 selectedIconColor = CkrLavender,
                                 selectedTextColor = CkrLavender,
+                                unselectedIconColor = CkrGray,
+                                unselectedTextColor = CkrGray,
+                                indicatorColor = CkrLavender.copy(alpha = 0.12f),
                             ),
                         )
                     }
@@ -110,6 +117,15 @@ fun MainScreen(
                 HomeScreen(
                     onNavigateToProfile = { navController.navigate(MainRoutes.PROFILE) },
                     onNavigateToRegistration = { navController.navigate(MainRoutes.REGISTRATION_FORM) },
+                    onNavigateToCohouse = {
+                        navController.navigate(Tab.COHOUSE.route) {
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    },
                 )
             }
             composable(Tab.CHALLENGES.route) {

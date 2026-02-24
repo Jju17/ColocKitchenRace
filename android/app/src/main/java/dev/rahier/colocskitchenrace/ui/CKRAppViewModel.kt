@@ -51,22 +51,20 @@ class CKRAppViewModel @Inject constructor(
                 return@launch
             }
 
-            // Load user profile
+            // Load user profile from Firestore using persisted Firebase auth
             try {
                 val user = authRepository.currentUser.value
-                    ?: run {
-                        // Try to load from Firestore
-                        authRepository.signIn(firebaseUser.email ?: "", "")
-                        authRepository.currentUser.value
-                    }
+                    ?: authRepository.restoreSession()
 
-                if (user?.needsProfileCompletion == true) {
+                if (user == null) {
+                    _authState.value = AuthState.UNAUTHENTICATED
+                } else if (user.needsProfileCompletion) {
                     _authState.value = AuthState.NEEDS_PROFILE_COMPLETION
                 } else {
                     _authState.value = AuthState.AUTHENTICATED
                 }
             } catch (_: Exception) {
-                _authState.value = AuthState.AUTHENTICATED
+                _authState.value = AuthState.UNAUTHENTICATED
             }
         }
     }

@@ -43,4 +43,16 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindUserRepository(impl: UserRepositoryImpl): UserRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindNotificationRepository(impl: NotificationRepositoryImpl): NotificationRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindAddressValidatorRepository(impl: AddressValidatorRepositoryImpl): AddressValidatorRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindIdCardScannerRepository(impl: IdCardScannerRepositoryImpl): IdCardScannerRepository
 }

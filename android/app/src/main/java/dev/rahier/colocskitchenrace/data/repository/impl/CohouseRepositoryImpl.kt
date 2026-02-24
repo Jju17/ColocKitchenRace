@@ -136,6 +136,12 @@ class CohouseRepositoryImpl @Inject constructor(
         return ref.path
     }
 
+    override suspend fun uploadIdCard(cohouseId: String, imageData: ByteArray): String {
+        val ref = storage.reference.child("cohouses/$cohouseId/id_card.jpg")
+        ref.putBytes(imageData).await()
+        return ref.path
+    }
+
     override suspend fun loadCoverImage(path: String): ByteArray {
         return storage.reference.child(path).getBytes(5 * 1024 * 1024).await()
     }
