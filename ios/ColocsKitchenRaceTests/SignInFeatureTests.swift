@@ -1,5 +1,5 @@
 //
-//  SigninFeatureTests.swift
+//  SignInFeatureTests.swift
 //  ColocsKitchenRaceTests
 //
 //  Created by Tests on 08/02/2026.
@@ -11,14 +11,14 @@ import Testing
 @testable import ColocsKitchenRace
 
 @MainActor
-struct SigninFeatureTests {
+struct SignInFeatureTests {
 
     // MARK: - Successful Sign In
 
     @Test("Successful signin does not set error")
     func successfulSignin() async {
-        let store = TestStore(initialState: SigninFeature.State(email: "test@test.com", password: "password123")) {
-            SigninFeature()
+        let store = TestStore(initialState: SignInFeature.State(email: "test@test.com", password: "password123")) {
+            SignInFeature()
         } withDependencies: {
             $0.authenticationClient.signIn = { _, _ in .mockUser }
         }
@@ -30,8 +30,8 @@ struct SigninFeatureTests {
 
     @Test("Failed signin sets error message")
     func failedSignin_setsError() async {
-        let store = TestStore(initialState: SigninFeature.State(email: "bad@test.com", password: "wrong")) {
-            SigninFeature()
+        let store = TestStore(initialState: SignInFeature.State(email: "bad@test.com", password: "wrong")) {
+            SignInFeature()
         } withDependencies: {
             $0.authenticationClient.signIn = { _, _ in
                 throw AuthError.failedWithError("Invalid credentials")
@@ -48,8 +48,8 @@ struct SigninFeatureTests {
 
     @Test("Email and password fields bind correctly")
     func fieldsBinding() async {
-        let store = TestStore(initialState: SigninFeature.State()) {
-            SigninFeature()
+        let store = TestStore(initialState: SignInFeature.State()) {
+            SignInFeature()
         }
 
         await store.send(\.binding.email, "user@example.com") {
@@ -67,8 +67,8 @@ struct SigninFeatureTests {
     func signinWithEmptyFields_showsError() async {
         var signinCalled = false
 
-        let store = TestStore(initialState: SigninFeature.State(email: "", password: "")) {
-            SigninFeature()
+        let store = TestStore(initialState: SignInFeature.State(email: "", password: "")) {
+            SignInFeature()
         } withDependencies: {
             $0.authenticationClient.signIn = { _, _ in
                 signinCalled = true
@@ -88,8 +88,8 @@ struct SigninFeatureTests {
     func signinWithWhitespaceEmail_showsError() async {
         var signinCalled = false
 
-        let store = TestStore(initialState: SigninFeature.State(email: "   ", password: "password123")) {
-            SigninFeature()
+        let store = TestStore(initialState: SignInFeature.State(email: "   ", password: "password123")) {
+            SignInFeature()
         } withDependencies: {
             $0.authenticationClient.signIn = { _, _ in
                 signinCalled = true
@@ -106,8 +106,8 @@ struct SigninFeatureTests {
 
     @Test("Signin with email but empty password shows validation error")
     func signinWithEmptyPassword_showsError() async {
-        let store = TestStore(initialState: SigninFeature.State(email: "test@test.com", password: "")) {
-            SigninFeature()
+        let store = TestStore(initialState: SignInFeature.State(email: "test@test.com", password: "")) {
+            SignInFeature()
         }
 
         await store.send(.signinButtonTapped) {
@@ -119,8 +119,8 @@ struct SigninFeatureTests {
 
     @Test("Google signin success does not show error")
     func googleSignin_success() async {
-        let store = TestStore(initialState: SigninFeature.State()) {
-            SigninFeature()
+        let store = TestStore(initialState: SignInFeature.State()) {
+            SignInFeature()
         } withDependencies: {
             $0.authenticationClient.signInWithGoogle = { .mockUser }
         }
@@ -130,8 +130,8 @@ struct SigninFeatureTests {
 
     @Test("Google signin failure shows error")
     func googleSignin_failure() async {
-        let store = TestStore(initialState: SigninFeature.State()) {
-            SigninFeature()
+        let store = TestStore(initialState: SignInFeature.State()) {
+            SignInFeature()
         } withDependencies: {
             $0.authenticationClient.signInWithGoogle = {
                 throw AuthError.failedWithError("Cancelled")
@@ -149,8 +149,8 @@ struct SigninFeatureTests {
 
     @Test("Apple signin success does not show error")
     func appleSignin_success() async {
-        let store = TestStore(initialState: SigninFeature.State()) {
-            SigninFeature()
+        let store = TestStore(initialState: SignInFeature.State()) {
+            SignInFeature()
         } withDependencies: {
             $0.authenticationClient.signInWithApple = { .mockUser }
         }
@@ -160,8 +160,8 @@ struct SigninFeatureTests {
 
     @Test("Apple signin failure shows error")
     func appleSignin_failure() async {
-        let store = TestStore(initialState: SigninFeature.State()) {
-            SigninFeature()
+        let store = TestStore(initialState: SignInFeature.State()) {
+            SignInFeature()
         } withDependencies: {
             $0.authenticationClient.signInWithApple = {
                 throw AuthError.failedWithError("Cancelled")
@@ -179,8 +179,8 @@ struct SigninFeatureTests {
 
     @Test("signinErrorTriggered sets error message")
     func signinErrorTriggered_setsMessage() async {
-        let store = TestStore(initialState: SigninFeature.State()) {
-            SigninFeature()
+        let store = TestStore(initialState: SignInFeature.State()) {
+            SignInFeature()
         }
 
         await store.send(.signinErrorTriggered("Network timeout")) {
@@ -192,8 +192,8 @@ struct SigninFeatureTests {
 
     @Test("Signin with non-existent account shows create account confirmation")
     func signinAccountNotFound_showsConfirmation() async {
-        let store = TestStore(initialState: SigninFeature.State(email: "new@test.com", password: "password123")) {
-            SigninFeature()
+        let store = TestStore(initialState: SignInFeature.State(email: "new@test.com", password: "password123")) {
+            SignInFeature()
         } withDependencies: {
             $0.authenticationClient.signIn = { _, _ in
                 throw AuthError.accountNotFound
@@ -213,13 +213,13 @@ struct SigninFeatureTests {
         var createEmail: String?
 
         let store = TestStore(
-            initialState: SigninFeature.State(
+            initialState: SignInFeature.State(
                 email: "new@test.com",
                 password: "password123",
                 showCreateAccountConfirmation: true
             )
         ) {
-            SigninFeature()
+            SignInFeature()
         } withDependencies: {
             $0.authenticationClient.createAccount = { email, _ in
                 createCalled = true
@@ -241,13 +241,13 @@ struct SigninFeatureTests {
         var createCalled = false
 
         let store = TestStore(
-            initialState: SigninFeature.State(
+            initialState: SignInFeature.State(
                 email: "new@test.com",
                 password: "password123",
                 showCreateAccountConfirmation: true
             )
         ) {
-            SigninFeature()
+            SignInFeature()
         } withDependencies: {
             $0.authenticationClient.createAccount = { _, _ in
                 createCalled = true
@@ -265,13 +265,13 @@ struct SigninFeatureTests {
     @Test("Create account failure shows error message")
     func createAccountFails_showsError() async {
         let store = TestStore(
-            initialState: SigninFeature.State(
+            initialState: SignInFeature.State(
                 email: "new@test.com",
                 password: "weak",
                 showCreateAccountConfirmation: true
             )
         ) {
-            SigninFeature()
+            SignInFeature()
         } withDependencies: {
             $0.authenticationClient.createAccount = { _, _ in
                 throw AuthError.failedWithError("Password must be at least 6 characters")

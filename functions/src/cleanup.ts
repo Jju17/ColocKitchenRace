@@ -134,6 +134,14 @@ export const cancelReservation = onCall<CancelReservationRequest>(
 
       const regData = regDoc.data()!;
 
+      // Verify the caller is the one who reserved this spot
+      if (regData.reservedBy && regData.reservedBy !== request.auth!.uid) {
+        throw new HttpsError(
+          "permission-denied",
+          "You can only cancel your own reservation"
+        );
+      }
+
       if (regData.status !== "pending") {
         console.log(
           `cancelReservation: registration ${cohouseId} in game ${gameId} has status "${regData.status}", skipping`

@@ -16,14 +16,14 @@ struct AppFeature {
     @ObservableState
     enum State {
         case tab(TabFeature.State)
-        case signin(SigninFeature.State)
+        case signin(SignInFeature.State)
         case splashScreen(SplashScreenFeature.State)
     }
 
     enum Action {
         case onTask
         case tab(TabFeature.Action)
-        case signin(SigninFeature.Action)
+        case signin(SignInFeature.Action)
         case splashScreen(SplashScreenFeature.Action)
         case newAuthStateTrigger(FirebaseAuth.User?)
         case adminCheckCompleted(isAdmin: Bool)
@@ -57,14 +57,14 @@ struct AppFeature {
                     if case let .signin(signinState) = state, signinState.error != nil {
                         return .none
                     }
-                    state = .signin(SigninFeature.State())
+                    state = .signin(SignInFeature.State())
                     return .none
                 }
             case let .adminCheckCompleted(isAdmin):
                 if isAdmin {
                     state = .tab(TabFeature.State())
                 } else {
-                    state = .signin(SigninFeature.State(error: AuthError.notAdmin))
+                    state = .signin(SignInFeature.State(error: AuthError.notAdmin))
                     return .run { _ in
                         try? await self.authenticationClient.signOut()
                     }
@@ -78,7 +78,7 @@ struct AppFeature {
             TabFeature()
         }
         .ifCaseLet(\.signin, action: \.signin) {
-            SigninFeature()
+            SignInFeature()
         }
         .ifCaseLet(\.splashScreen, action: \.splashScreen) {
             SplashScreenFeature()
@@ -98,7 +98,7 @@ struct AppView: View {
                 }
             case .signin:
                 if let signinStore = store.scope(state: \.signin, action: \.signin) {
-                    SigninView(store: signinStore)
+                    SignInView(store: signinStore)
                 }
             case .splashScreen:
                 if let splashScreenStore = store.scope(state: \.splashScreen, action: \.splashScreen) {

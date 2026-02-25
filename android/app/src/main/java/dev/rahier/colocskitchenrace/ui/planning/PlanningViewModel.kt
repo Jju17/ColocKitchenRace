@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import dev.rahier.colocskitchenrace.util.ErrorMapper
 import javax.inject.Inject
 
 data class PlanningState(
@@ -54,7 +55,7 @@ class PlanningViewModel @Inject constructor(
                 val planning = gameRepository.getMyPlanning(game.id, cohouse.id)
                 _state.update { it.copy(planning = planning, isLoading = false) }
             } catch (e: Exception) {
-                _state.update { it.copy(isLoading = false, error = e.message) }
+                _state.update { it.copy(isLoading = false, error = ErrorMapper.toUserMessage(e)) }
             }
         }
     }

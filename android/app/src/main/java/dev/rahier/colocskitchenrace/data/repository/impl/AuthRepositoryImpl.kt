@@ -313,8 +313,9 @@ class AuthRepositoryImpl @Inject constructor(
         // Read default_web_client_id from strings resource (auto-generated from google-services.json)
         val resId = context.resources.getIdentifier("default_web_client_id", "string", context.packageName)
         if (resId != 0) return context.getString(resId)
-        // Fallback: hardcoded from google-services.json (client_type: 3 = web)
-        return "1030034975653-r9beetrg8e3ijj43a30k3uan4oj5ifdc.apps.googleusercontent.com"
+        throw IllegalStateException(
+            "default_web_client_id not found. Ensure google-services.json is properly configured."
+        )
     }
 
     companion object {

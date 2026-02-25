@@ -110,9 +110,25 @@ export const confirmRegistration = onCall<ConfirmRegistrationRequest>(
         // Check if reservation has expired
         const reservedUntil = (regData.reservedUntil as admin.firestore.Timestamp).toDate();
         if (new Date() >= reservedUntil) {
+          // Reservation expired but payment succeeded — issue automatic refund
+          try {
+            await getStripe().refunds.create({
+              payment_intent: paymentIntentId,
+              reason: "requested_by_customer",
+            });
+            console.warn(
+              `Auto-refunded payment ${paymentIntentId} for expired reservation ` +
+              `(cohouse ${cohouseId}, game ${gameId})`
+            );
+          } catch (refundError) {
+            console.error(
+              `CRITICAL: Failed to auto-refund payment ${paymentIntentId} for expired reservation:`,
+              refundError
+            );
+          }
           throw new HttpsError(
             "failed-precondition",
-            "Reservation has expired. Please register again."
+            "Reservation has expired. Your payment has been refunded. Please register again."
           );
         }
 

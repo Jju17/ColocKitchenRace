@@ -17,17 +17,17 @@
   },
   "main": "lib/index.js",
   "dependencies": {
-    "firebase-admin": "^13.6.0",
-    "firebase-functions": "^7.0.5",
-    "stripe": "^17.0.0"
+    "firebase-admin": "13.6.0",
+    "firebase-functions": "7.0.5",
+    "stripe": "17.7.0"
   },
   "devDependencies": {
-    "@types/jest": "^30.0.0",
-    "@types/node": "^25.3.0",
-    "firebase-functions-test": "^3.1.0",
-    "jest": "^29.7.0",
-    "ts-jest": "^29.4.6",
-    "typescript": "^5.3.0"
+    "@types/jest": "30.0.0",
+    "@types/node": "25.3.0",
+    "firebase-functions-test": "3.4.1",
+    "jest": "29.7.0",
+    "ts-jest": "29.4.6",
+    "typescript": "5.9.3"
   },
   "private": true
 }

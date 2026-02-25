@@ -306,10 +306,12 @@ struct CohouseFormView: View {
         .fullScreenCover(isPresented: $store.isIdCardPickerPresented) {
             ImagePicker(
                 selected: { image in
-                    if let data = ImagePipeline.compress(image: image) {
-                        store.send(.idCardPicked(data))
-                    } else {
-                        store.send(.idCardCleared)
+                    Task {
+                        if let data = await ImagePipeline.compress(image: image) {
+                            store.send(.idCardPicked(data))
+                        } else {
+                            store.send(.idCardCleared)
+                        }
                     }
                 },
                 cancelled: {
@@ -322,8 +324,10 @@ struct CohouseFormView: View {
         .fullScreenCover(isPresented: $store.isCoverImagePickerPresented) {
             ImagePicker(
                 selected: { image in
-                    if let data = ImagePipeline.compress(image: image) {
-                        store.send(.coverImagePicked(data))
+                    Task {
+                        if let data = await ImagePipeline.compress(image: image) {
+                            store.send(.coverImagePicked(data))
+                        }
                     }
                 },
                 cancelled: {

@@ -168,6 +168,12 @@ function callWith(fn: any, data: any) {
   return wrapped({ data, auth: { uid: "test-user" } } as any);
 }
 
+/** Helper: call wrapped function with admin auth (token.admin = true). */
+function adminCallWith(fn: any, data: any) {
+  const wrapped = testEnv.wrap(fn);
+  return wrapped({ data, auth: { uid: "test-admin", token: { admin: true } } } as any);
+}
+
 // ── Setup / teardown ────────────────────────────────────────────────────────────
 
 beforeEach(() => {
@@ -184,7 +190,7 @@ afterAll(() => testEnv.cleanup());
 describe("sendNotificationToCohouse", () => {
   it("throws invalid-argument when fields missing", async () => {
     await expect(
-      callWith(sendNotificationToCohouse, { cohouseId: "", notification: { title: "", body: "" } })
+      adminCallWith(sendNotificationToCohouse, { cohouseId: "", notification: { title: "", body: "" } })
     ).rejects.toThrow(/invalid-argument|missing/i);
   });
 
@@ -199,7 +205,7 @@ describe("sendNotificationToCohouse", () => {
       },
     };
 
-    const result = await callWith(
+    const result = await adminCallWith(
       sendNotificationToCohouse,
       { cohouseId: "c1", notification: { title: "Hi", body: "Msg" } }
     );
@@ -211,7 +217,7 @@ describe("sendNotificationToCohouse", () => {
   it("returns success false with message when cohouse has no users", async () => {
     firestoreSubcollections = { cohouses: { c1: { users: [] } } };
 
-    const result = await callWith(
+    const result = await adminCallWith(
       sendNotificationToCohouse,
       { cohouseId: "c1", notification: { title: "Hi", body: "Msg" } }
     );
@@ -238,7 +244,7 @@ describe("sendNotificationToCohouse", () => {
       responses: [{ success: false, error: { code: "messaging/invalid-registration-token" } }],
     });
 
-    const result = await callWith(
+    const result = await adminCallWith(
       sendNotificationToCohouse,
       { cohouseId: "c1", notification: { title: "Hi", body: "Msg" } }
     );
@@ -260,7 +266,7 @@ describe("sendNotificationToCohouse", () => {
       },
     };
 
-    const result = await callWith(
+    const result = await adminCallWith(
       sendNotificationToCohouse,
       { cohouseId: "c1", notification: { title: "Hi", body: "Msg" } }
     );
@@ -279,14 +285,14 @@ describe("sendNotificationToCohouse", () => {
 describe("sendNotificationToEdition", () => {
   it("throws invalid-argument when fields missing", async () => {
     await expect(
-      callWith(sendNotificationToEdition, { editionId: "", notification: { title: "", body: "" } })
+      adminCallWith(sendNotificationToEdition, { editionId: "", notification: { title: "", body: "" } })
     ).rejects.toThrow(/invalid-argument|missing/i);
   });
 
   it("returns success false with message when no participants", async () => {
     firestoreData = { ckrGames: { e1: { cohouseIDs: [] } } };
 
-    const result = await callWith(
+    const result = await adminCallWith(
       sendNotificationToEdition,
       { editionId: "e1", notification: { title: "T", body: "B" } }
     );
@@ -304,12 +310,12 @@ describe("sendNotificationToEdition", () => {
 describe("sendNotificationToAll", () => {
   it("throws invalid-argument when fields missing", async () => {
     await expect(
-      callWith(sendNotificationToAll, { notification: { title: "", body: "" } })
+      adminCallWith(sendNotificationToAll, { notification: { title: "", body: "" } })
     ).rejects.toThrow(/invalid-argument|missing/i);
   });
 
   it("sends to all_users topic and returns messageId", async () => {
-    const result = await callWith(
+    const result = await adminCallWith(
       sendNotificationToAll,
       { notification: { title: "News", body: "Body" } }
     );
@@ -326,7 +332,7 @@ describe("sendNotificationToAll", () => {
   });
 
   it("forwards optional data payload", async () => {
-    await callWith(
+    await adminCallWith(
       sendNotificationToAll,
       { notification: { title: "T", body: "B", data: { key: "val" } } }
     );
@@ -376,20 +382,20 @@ describe("validateAddress", () => {
 describe("matchCohouses", () => {
   it("throws invalid-argument when gameId missing", async () => {
     await expect(
-      callWith(matchCohouses, { gameId: "" })
+      adminCallWith(matchCohouses, { gameId: "" })
     ).rejects.toThrow(/invalid-argument|missing/i);
   });
 
   it("throws not-found when game does not exist", async () => {
     await expect(
-      callWith(matchCohouses, { gameId: "nope" })
+      adminCallWith(matchCohouses, { gameId: "nope" })
     ).rejects.toThrow(/not.found/i);
   });
 
   it("throws failed-precondition when no participants", async () => {
     firestoreData = { ckrGames: { g1: { cohouseIDs: [] } } };
     await expect(
-      callWith(matchCohouses, { gameId: "g1" })
+      adminCallWith(matchCohouses, { gameId: "g1" })
     ).rejects.toThrow(/no cohouses/i);
   });
 
@@ -405,7 +411,7 @@ describe("matchCohouses", () => {
       },
     };
     await expect(
-      callWith(matchCohouses, { gameId: "g1" })
+      adminCallWith(matchCohouses, { gameId: "g1" })
     ).rejects.toThrow(/multiple of 4/i);
   });
 
@@ -420,7 +426,7 @@ describe("matchCohouses", () => {
       },
     };
 
-    const result = await callWith(matchCohouses, { gameId: "g1" });
+    const result = await adminCallWith(matchCohouses, { gameId: "g1" });
 
     expect(result.success).toBe(true);
     expect(result.groupCount).toBe(1);
@@ -452,7 +458,7 @@ describe("matchCohouses", () => {
       },
     };
 
-    const result = await callWith(matchCohouses, { gameId: "g2" });
+    const result = await adminCallWith(matchCohouses, { gameId: "g2" });
 
     expect(result.success).toBe(true);
     expect(result.groupCount).toBe(2);
@@ -476,7 +482,7 @@ describe("matchCohouses", () => {
       },
     };
 
-    const result = await callWith(matchCohouses, { gameId: "g3" });
+    const result = await adminCallWith(matchCohouses, { gameId: "g3" });
 
     expect(result.success).toBe(true);
     expect(result.groupCount).toBe(1);
@@ -507,7 +513,7 @@ describe("matchCohouses", () => {
     };
 
     await expect(
-      callWith(matchCohouses, { gameId: "g4" })
+      adminCallWith(matchCohouses, { gameId: "g4" })
     ).rejects.toThrow(/at least 4/i);
 
     // Verify cohouseIDs was cleaned up and old matching was cleared
@@ -537,7 +543,7 @@ describe("matchCohouses", () => {
     };
 
     await expect(
-      callWith(matchCohouses, { gameId: "g6" })
+      adminCallWith(matchCohouses, { gameId: "g6" })
     ).rejects.toThrow(/multiple of 4/i);
 
     // Verify cohouseIDs was cleaned up and old matching was cleared
@@ -559,7 +565,7 @@ describe("matchCohouses", () => {
     };
 
     await expect(
-      callWith(matchCohouses, { gameId: "g5" })
+      adminCallWith(matchCohouses, { gameId: "g5" })
     ).rejects.toThrow(/no cohouses remaining/i);
 
     // Verify cohouseIDs was cleaned to empty and old matching was cleared
@@ -645,13 +651,13 @@ describe("getCohousesForMap", () => {
 describe("updateEventSettings", () => {
   it("throws invalid-argument when required fields missing", async () => {
     await expect(
-      callWith(updateEventSettings, { gameId: "", aperoStartTime: "" })
+      adminCallWith(updateEventSettings, { gameId: "", aperoStartTime: "" })
     ).rejects.toThrow(/invalid-argument|missing/i);
   });
 
   it("throws not-found when game does not exist", async () => {
     await expect(
-      callWith(updateEventSettings, {
+      adminCallWith(updateEventSettings, {
         gameId: "nope",
         aperoStartTime: "2026-03-15T18:30:00Z",
         aperoEndTime: "2026-03-15T20:30:00Z",
@@ -670,7 +676,7 @@ describe("updateEventSettings", () => {
       ckrGames: { g1: { cohouseIDs: ["c1", "c2", "c3", "c4"] } },
     };
 
-    const result = await callWith(updateEventSettings, {
+    const result = await adminCallWith(updateEventSettings, {
       gameId: "g1",
       aperoStartTime: "2026-03-15T18:30:00Z",
       aperoEndTime: "2026-03-15T20:30:00Z",
@@ -698,7 +704,7 @@ describe("updateEventSettings", () => {
       ckrGames: { g1: { cohouseIDs: [] } },
     };
 
-    const result = await callWith(updateEventSettings, {
+    const result = await adminCallWith(updateEventSettings, {
       gameId: "g1",
       aperoStartTime: "2026-03-15T18:30:00Z",
       aperoEndTime: "2026-03-15T20:30:00Z",
@@ -729,20 +735,20 @@ describe("updateEventSettings", () => {
 describe("confirmMatching", () => {
   it("throws invalid-argument when gameId missing", async () => {
     await expect(
-      callWith(confirmMatching, { gameId: "" })
+      adminCallWith(confirmMatching, { gameId: "" })
     ).rejects.toThrow(/invalid-argument|missing/i);
   });
 
   it("throws not-found when game does not exist", async () => {
     await expect(
-      callWith(confirmMatching, { gameId: "nope" })
+      adminCallWith(confirmMatching, { gameId: "nope" })
     ).rejects.toThrow(/not.found/i);
   });
 
   it("throws failed-precondition when no matched groups", async () => {
     firestoreData = { ckrGames: { g1: { matchedGroups: [], eventSettings: {} } } };
     await expect(
-      callWith(confirmMatching, { gameId: "g1" })
+      adminCallWith(confirmMatching, { gameId: "g1" })
     ).rejects.toThrow(/no matched groups|matching first/i);
   });
 
@@ -755,7 +761,7 @@ describe("confirmMatching", () => {
       },
     };
     await expect(
-      callWith(confirmMatching, { gameId: "g1" })
+      adminCallWith(confirmMatching, { gameId: "g1" })
     ).rejects.toThrow(/event settings|configured/i);
   });
 
@@ -769,7 +775,7 @@ describe("confirmMatching", () => {
       },
     };
 
-    const result = await callWith(confirmMatching, { gameId: "g1" });
+    const result = await adminCallWith(confirmMatching, { gameId: "g1" });
 
     expect(result.success).toBe(true);
     expect(result.groupCount).toBe(1);
@@ -804,7 +810,7 @@ describe("confirmMatching", () => {
       },
     };
 
-    const result = await callWith(confirmMatching, { gameId: "g2" });
+    const result = await adminCallWith(confirmMatching, { gameId: "g2" });
 
     expect(result.success).toBe(true);
     expect(result.groupCount).toBe(2);
@@ -837,20 +843,20 @@ describe("confirmMatching", () => {
 describe("revealPlanning", () => {
   it("throws invalid-argument when gameId missing", async () => {
     await expect(
-      callWith(revealPlanning, { gameId: "" })
+      adminCallWith(revealPlanning, { gameId: "" })
     ).rejects.toThrow(/invalid-argument|missing/i);
   });
 
   it("throws not-found when game does not exist", async () => {
     await expect(
-      callWith(revealPlanning, { gameId: "nope" })
+      adminCallWith(revealPlanning, { gameId: "nope" })
     ).rejects.toThrow(/not.found/i);
   });
 
   it("throws failed-precondition when no group plannings", async () => {
     firestoreData = { ckrGames: { g1: { groupPlannings: [] } } };
     await expect(
-      callWith(revealPlanning, { gameId: "g1" })
+      adminCallWith(revealPlanning, { gameId: "g1" })
     ).rejects.toThrow(/confirmed|matching/i);
   });
 
@@ -866,7 +872,7 @@ describe("revealPlanning", () => {
       },
     };
 
-    const result = await callWith(revealPlanning, { gameId: "g1" });
+    const result = await adminCallWith(revealPlanning, { gameId: "g1" });
 
     expect(result.success).toBe(true);
     expect(mockUpdate).toHaveBeenCalledWith(
@@ -900,7 +906,7 @@ describe("revealPlanning", () => {
       },
     };
 
-    const result = await callWith(revealPlanning, { gameId: "g1" });
+    const result = await adminCallWith(revealPlanning, { gameId: "g1" });
 
     expect(result.success).toBe(true);
     // Notification should have been sent

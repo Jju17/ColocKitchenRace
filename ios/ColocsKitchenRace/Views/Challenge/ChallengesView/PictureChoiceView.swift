@@ -64,7 +64,7 @@ struct PictureChoiceFeature {
         state.isProcessing = true
         state.error = nil
         return .run { send in
-          let data = ImagePipeline.compress(image: uiImage)
+          let data = await ImagePipeline.compress(image: uiImage)
           await send(._finishProcessing(data))
         }
 

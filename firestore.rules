@@ -133,6 +133,12 @@ service cloud.firestore {
         // Writes happen exclusively via Cloud Functions (Admin SDK).
         allow create, update, delete: if false;
       }
+
+      // ── Notification markers (Cloud Functions only) ──
+      match /notifications/{notifId} {
+        allow read: if false;
+        allow write: if false;
+      }
     }
 
     // ──────────────────────────────────────────────
@@ -161,7 +167,10 @@ service cloud.firestore {
         allow read: if isSignedIn();
 
         // Any signed-in user can create a response (submit).
-        allow create: if isSignedIn();
+        // Enforce that submittedByAuthId matches the caller's auth UID
+        // to prevent impersonation.
+        allow create: if isSignedIn()
+                      && request.resource.data.submittedByAuthId == authUid();
 
         // Updates allowed for admins (status change) or the
         // original submitter (re-submit before validation).
@@ -241,12 +250,18 @@ service cloud.firestore {
     // ──────────────────────────────────────────────
 
     // Allow collectionGroup("responses") queries for signed-in users.
+    // NOTE: This matches any subcollection named "responses" at any depth.
+    // Currently only challenges/{id}/responses exists. If new "responses"
+    // subcollections are added, they will inherit this rule.
     match /{path=**}/responses/{responseId} {
       allow read: if isSignedIn();
     }
 
     // Allow collectionGroup("users") queries for signed-in users
     // (cohouse users subcollection).
+    // NOTE: This matches any subcollection named "users" at any depth.
+    // Currently only cohouses/{id}/users exists. If new "users"
+    // subcollections are added, they will inherit this rule.
     match /{path=**}/users/{userId} {
       allow read: if isSignedIn();
     }

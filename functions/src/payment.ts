@@ -4,6 +4,7 @@ import { getFunctions } from "firebase-admin/functions";
 
 const DEMO_EMAIL = "test_apple@colocskitchenrace.be";
 const RESERVATION_TTL_SECONDS = 15 * 60; // 15 minutes
+const STRIPE_API_VERSION = "2025-02-24.acacia" as const;
 
 // ============================================
 // Types
@@ -60,7 +61,7 @@ async function createDemoPaymentIntent(
 
   const ephemeralKey = await stripe.ephemeralKeys.create(
     { customer: customer.id },
-    { apiVersion: "2025-02-24.acacia" }
+    { apiVersion: STRIPE_API_VERSION }
   );
 
   const paymentIntent = await stripe.paymentIntents.create({
@@ -224,8 +225,12 @@ export const reserveAndCreatePayment = onCall<ReserveAndCreatePaymentRequest>(
     }
 
     try {
-      // Demo mode: real Stripe objects, no Firestore validation
+      // Demo mode: creates a Stripe PaymentIntent in test mode for
+      // App Store / Play Store review. Bypasses Firestore validation
+      // (no real game required) but still goes through Stripe test flow.
+      // Only the designated demo account can trigger this path.
       if (await isDemoUser(request.auth.uid)) {
+        console.warn(`Demo mode payment bypass for user ${request.auth.uid}`);
         return createDemoPaymentIntent(request.auth.uid, request.data);
       }
 
@@ -289,7 +294,7 @@ export const reserveAndCreatePayment = onCall<ReserveAndCreatePaymentRequest>(
 
         const ephemeralKey = await stripe.ephemeralKeys.create(
           { customer: stripeCustomerId },
-          { apiVersion: "2025-02-24.acacia" }
+          { apiVersion: STRIPE_API_VERSION }
         );
 
         const paymentIntent = await stripe.paymentIntents.create({

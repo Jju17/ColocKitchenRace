@@ -2,6 +2,18 @@ import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { db, auth, REGION } from "./config";
 
 // ============================================
+// Nominatim geocoding cache (in-memory, per Cloud Function instance)
+// ============================================
+
+interface GeocodeCacheEntry {
+  result: unknown;
+  expiresAt: number;
+}
+
+const geocodeCache = new Map<string, GeocodeCacheEntry>();
+const GEOCODE_CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes
+
+// ============================================
 // Types
 // ============================================
 
@@ -104,6 +116,12 @@ export const validateAddress = onCall<ValidateAddressRequest>(
     }
 
     try {
+      const cacheKey = `${street}|${city}|${postalCode || ""}|${country || ""}`;
+      const cached = geocodeCache.get(cacheKey);
+      if (cached && cached.expiresAt > Date.now()) {
+        return cached.result;
+      }
+
       const params = new URLSearchParams({
         format: "json",
         street: street,
@@ -154,7 +172,7 @@ export const validateAddress = onCall<ValidateAddressRequest>(
         ? (addr.house_number ? `${addr.road} ${addr.house_number}` : addr.road)
         : null;
 
-      return {
+      const validResult = {
         isValid: true,
         normalizedStreet: normalizedStreet,
         normalizedCity: normalizedCity,
@@ -163,6 +181,14 @@ export const validateAddress = onCall<ValidateAddressRequest>(
         latitude: result.lat ? parseFloat(result.lat) : null,
         longitude: result.lon ? parseFloat(result.lon) : null,
       };
+
+      // Cache successful result
+      geocodeCache.set(cacheKey, {
+        result: validResult,
+        expiresAt: Date.now() + GEOCODE_CACHE_TTL_MS,
+      });
+
+      return validResult;
     } catch (error) {
       console.error("Error validating address:", error);
       throw new HttpsError("internal", "Failed to validate address");

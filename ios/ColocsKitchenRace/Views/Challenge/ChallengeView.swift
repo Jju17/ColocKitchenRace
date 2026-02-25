@@ -357,6 +357,7 @@ struct ChallengeView: View {
                     } label: {
                         Image(systemName: "trophy.fill")
                     }
+                    .accessibilityLabel("Leaderboard")
                 }
             }
             .sheet(item: $store.scope(state: \.leaderboard, action: \.leaderboard)) { leaderboardStore in

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.rahier.colocskitchenrace.data.model.DietaryPreference
 import dev.rahier.colocskitchenrace.data.repository.AuthRepository
+import dev.rahier.colocskitchenrace.util.ErrorMapper
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -114,7 +115,7 @@ class UserProfileFormViewModel @Inject constructor(
                 _state.update { it.copy(isSaving = false) }
                 _effect.send(UserProfileFormEffect.Saved)
             } catch (e: Exception) {
-                _state.update { it.copy(isSaving = false, error = e.message ?: "Erreur lors de la sauvegarde") }
+                _state.update { it.copy(isSaving = false, error = ErrorMapper.toUserMessage(e, "Erreur lors de la sauvegarde")) }
             }
         }
     }

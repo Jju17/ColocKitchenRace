@@ -156,9 +156,11 @@ async function saveNotificationHistory(entry: NotificationHistoryEntry): Promise
 export const sendNotificationToCohouse = onCall<SendToCohouseRequest>(
   { region: REGION },
   async (request) => {
-    // Verify caller is authenticated (optional: add admin check)
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Must be authenticated");
+    }
+    if (!request.auth.token.admin) {
+      throw new HttpsError("permission-denied", "Admin access required");
     }
 
     const { cohouseId, notification } = request.data;
@@ -219,7 +221,7 @@ export const sendNotificationToCohouse = onCall<SendToCohouseRequest>(
       };
     } catch (error) {
       console.error("Error sending to cohouse:", error);
-      throw new HttpsError("internal", `Failed to send notifications: ${error}`);
+      throw new HttpsError("internal", "Failed to send notifications");
     }
   }
 );
@@ -235,6 +237,9 @@ export const sendNotificationToEdition = onCall<SendToEditionRequest>(
   async (request) => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Must be authenticated");
+    }
+    if (!request.auth.token.admin) {
+      throw new HttpsError("permission-denied", "Admin access required");
     }
 
     const { editionId, notification } = request.data;
@@ -269,23 +274,23 @@ export const sendNotificationToEdition = onCall<SendToEditionRequest>(
         return { success: false, sent: 0, failed: 0, message };
       }
 
-      // Collect all user IDs from all participating cohouses
-      const allUserIds: string[] = [];
+      // Collect all user IDs from all participating cohouses (parallel fetch)
+      const userIdSet = new Set<string>();
 
-      for (const cohouseId of cohouseIDs) {
-        const cohouseUsersSnapshot = await db
-          .collection("cohouses")
-          .doc(cohouseId)
-          .collection("users")
-          .get();
+      const cohouseUserSnapshots = await Promise.all(
+        cohouseIDs.map((cohouseId) =>
+          db.collection("cohouses").doc(cohouseId).collection("users").get()
+        )
+      );
 
-        cohouseUsersSnapshot.docs.forEach((doc) => {
+      for (const snapshot of cohouseUserSnapshots) {
+        for (const doc of snapshot.docs) {
           const userId = doc.data().userId;
-          if (userId && !allUserIds.includes(userId)) {
-            allUserIds.push(userId);
-          }
-        });
+          if (userId) userIdSet.add(userId);
+        }
       }
+
+      const allUserIds = Array.from(userIdSet);
 
       // Get FCM tokens
       const tokens = await getFCMTokensForUsers(allUserIds);
@@ -342,6 +347,9 @@ export const sendNotificationToAll = onCall<SendToAllRequest>(
   async (request) => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Must be authenticated");
+    }
+    if (!request.auth.token.admin) {
+      throw new HttpsError("permission-denied", "Admin access required");
     }
 
     const { notification } = request.data;

@@ -1,5 +1,5 @@
 //
-//  SigninField.swift
+//  SignInField.swift
 //  AdminCKR
 //
 //  Created by Julien Rahier on 3/15/25.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum SigninField: Int, Hashable, CaseIterable {
+enum SignInField: Int, Hashable, CaseIterable {
     case email
     case password
 }

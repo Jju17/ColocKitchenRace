@@ -48,40 +48,48 @@ workflows:
             EOF
             echo "Stripe xcconfig files restored successfully"
     - script@1:
+        title: Trust SPM plugins for headless CI
         inputs:
-        - content: defaults write com.apple.dt.Xcode
-            IDESkipPackagePluginFingerprintValidatation -bool YES
+        - content: |-
+            # Xcode cannot show interactive trust dialogs on CI.
+            # This plist flag pre-trusts SPM plugin fingerprints so the build proceeds.
+            defaults write com.apple.dt.Xcode IDESkipPackagePluginFingerprintValidatation -bool YES
     - script@1:
         title: Configure code signing for CI
         inputs:
         - content: |
             #!/bin/bash
             set -e
+            # Switch from Automatic (local dev) to Manual signing for CI distribution.
+            # This sed approach is scoped to exact patterns that only appear in app targets
+            # (SPM packages use DONT_CODE_SIGN and are unaffected).
+            # Alternatives like .xcconfig for signing were considered but add complexity
+            # since Xcode auto-generates signing settings per developer machine.
             PBXPROJ="$BITRISE_SOURCE_DIR/ios/ColocsKitchenRace.xcodeproj/project.pbxproj"
 
-            # Switch from Automatic to Manual signing (app targets only — no SPM affected)
             sed -i '' 's/CODE_SIGN_STYLE = Automatic/CODE_SIGN_STYLE = Manual/g' "$PBXPROJ"
-
-            # Switch from Development to Distribution identity (only main app target has this)
             sed -i '' 's/CODE_SIGN_IDENTITY = "Apple Development"/CODE_SIGN_IDENTITY = "Apple Distribution"/g' "$PBXPROJ"
-
-            # Set provisioning profile to the one uploaded on Bitrise (only main app target has this)
             sed -i '' 's/PROVISIONING_PROFILE_SPECIFIER = ""/PROVISIONING_PROFILE_SPECIFIER = "CKR"/g' "$PBXPROJ"
 
             echo "Code signing configured for CI distribution"
+    - xcode-test@5:
+        inputs:
+        - project_path: "$BITRISE_PROJECT_PATH"
+        - scheme: "$BITRISE_SCHEME"
+        - xcodebuild_options: "-skipPackagePluginValidation -skipMacroValidation"
     - xcode-archive@5:
         inputs:
         - project_path: "$BITRISE_PROJECT_PATH"
         - scheme: "$BITRISE_SCHEME"
+        # -skipPackagePluginValidation: SPM plugins can't display trust dialogs on headless CI
+        # -skipMacroValidation: Swift macros (TCA @Reducer etc.) require the same treatment
         - xcodebuild_options: "-skipPackagePluginValidation -skipMacroValidation"
         - distribution_method: app-store
         - automatic_code_signing: api-key
     - deploy-to-bitrise-io@2: {}
     - deploy-to-itunesconnect-application-loader@1:
         inputs:
-        - itunescon_user: "$apple_id_email"
-        - password: "$apple_id_password"
-        - app_password: "$apple_app_specific"
+        - connection: api_key
 
   # ─────────────────────────────────────────────
   # iOS – CKRAdmin → TestFlight
@@ -130,9 +138,10 @@ workflows:
             EOF
             echo "Stripe xcconfig files restored successfully"
     - script@1:
+        title: Trust SPM plugins for headless CI
         inputs:
-        - content: defaults write com.apple.dt.Xcode
-            IDESkipPackagePluginFingerprintValidatation -bool YES
+        - content: |-
+            defaults write com.apple.dt.Xcode IDESkipPackagePluginFingerprintValidatation -bool YES
     - script@1:
         title: Configure code signing for CI
         inputs:
@@ -141,20 +150,22 @@ workflows:
             set -e
             PBXPROJ="$BITRISE_SOURCE_DIR/ios/ColocsKitchenRace.xcodeproj/project.pbxproj"
 
-            # Switch from Automatic to Manual signing (all targets)
+            # Switch from Automatic to Manual signing (see deploy_testflight for rationale)
             sed -i '' 's/CODE_SIGN_STYLE = Automatic/CODE_SIGN_STYLE = Manual/g' "$PBXPROJ"
-
-            # Main app target: switch identity and set profile
             sed -i '' 's/CODE_SIGN_IDENTITY = "Apple Development"/CODE_SIGN_IDENTITY = "Apple Distribution"/g' "$PBXPROJ"
             sed -i '' 's/PROVISIONING_PROFILE_SPECIFIER = ""/PROVISIONING_PROFILE_SPECIFIER = "CKR"/g' "$PBXPROJ"
 
-            # CKRAdmin target: insert identity and profile (not present in pbxproj)
-            # Uses tabs to match Xcode pbxproj formatting
+            # CKRAdmin target: insert identity and profile (not present in pbxproj by default)
             sed -i '' "/PRODUCT_BUNDLE_IDENTIFIER = dev.rahier.ckradmin;/a\\
             $(printf '\t\t\t\t')CODE_SIGN_IDENTITY = \"Apple Distribution\";\\
             $(printf '\t\t\t\t')PROVISIONING_PROFILE_SPECIFIER = \"CKRAdmin\";" "$PBXPROJ"
 
             echo "Code signing configured for CI distribution (CKRAdmin)"
+    - xcode-test@5:
+        inputs:
+        - project_path: "$BITRISE_PROJECT_PATH"
+        - scheme: "$BITRISE_SCHEME"
+        - xcodebuild_options: "-skipPackagePluginValidation -skipMacroValidation"
     - xcode-archive@5:
         inputs:
         - project_path: "$BITRISE_PROJECT_PATH"
@@ -165,9 +176,7 @@ workflows:
     - deploy-to-bitrise-io@2: {}
     - deploy-to-itunesconnect-application-loader@1:
         inputs:
-        - itunescon_user: "$apple_id_email"
-        - password: "$apple_id_password"
-        - app_password: "$apple_app_specific"
+        - connection: api_key
 
   # ─────────────────────────────────────────────
   # Android – Run unit tests

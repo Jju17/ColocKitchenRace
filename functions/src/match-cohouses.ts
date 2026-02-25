@@ -35,6 +35,9 @@ export const matchCohouses = onCall<MatchCohousesRequest>(
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Must be authenticated");
     }
+    if (!request.auth.token.admin) {
+      throw new HttpsError("permission-denied", "Admin access required");
+    }
 
     const { gameId } = request.data;
 

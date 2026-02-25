@@ -147,8 +147,10 @@ struct HomeFeature {
                     state.destination = nil
                     state.currentGame = newGame
 
-                    return .run { _ in
-                        _ = self.ckrClient.newGame(newGame)
+                    return .run { send in
+                        try await self.ckrClient.newGame(newGame)
+                    } catch: { error, send in
+                        await send(.errorOccurred("Failed to create game: \(error.localizedDescription)"))
                     }
                 case .confirmEditCKRGameButtonTapped:
                     guard case let .some(.editCKRGame(formState)) = state.destination
@@ -158,8 +160,10 @@ struct HomeFeature {
                     state.destination = nil
                     state.currentGame = updatedGame
 
-                    return .run { _ in
-                        _ = self.ckrClient.updateGame(updatedGame)
+                    return .run { send in
+                        try await self.ckrClient.updateGame(updatedGame)
+                    } catch: { error, send in
+                        await send(.errorOccurred("Failed to update game: \(error.localizedDescription)"))
                     }
                 case .deleteGameButtonTapped:
                     guard let game = state.currentGame else { return .none }

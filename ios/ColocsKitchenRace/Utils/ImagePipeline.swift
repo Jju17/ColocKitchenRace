@@ -29,22 +29,43 @@ enum ImagePipeline {
     // MARK: - Public API
 
     /// Resize + iteratively compress a `UIImage` to JPEG data that fits within `maxBytes`.
+    /// Runs on a background thread to avoid blocking the UI during image selection.
     ///
     /// Usage — zero config for most call sites:
     /// ```swift
-    /// guard let data = ImagePipeline.compress(image: photo) else { … }
+    /// guard let data = await ImagePipeline.compress(image: photo) else { … }
     /// ```
     ///
     /// Override for a specific use-case:
     /// ```swift
-    /// ImagePipeline.compress(image: photo, maxDimension: 800, maxBytes: 200_000)
+    /// await ImagePipeline.compress(image: photo, maxDimension: 800, maxBytes: 200_000)
     /// ```
+    @Sendable
     static func compress(
         image: UIImage,
         maxDimension: CGFloat = defaultMaxDimension,
         maxBytes: Int = defaultMaxBytes,
         startQuality: CGFloat = defaultStartQuality,
         minQuality: CGFloat = defaultMinQuality
+    ) async -> Data? {
+        await Task.detached(priority: .userInitiated) {
+            compressSync(
+                image: image,
+                maxDimension: maxDimension,
+                maxBytes: maxBytes,
+                startQuality: startQuality,
+                minQuality: minQuality
+            )
+        }.value
+    }
+
+    /// Synchronous implementation — always prefer the `async` wrapper above.
+    private static func compressSync(
+        image: UIImage,
+        maxDimension: CGFloat,
+        maxBytes: Int,
+        startQuality: CGFloat,
+        minQuality: CGFloat
     ) -> Data? {
         // 1. Resize
         guard let resized = resize(image, maxDimension: maxDimension) else { return nil }

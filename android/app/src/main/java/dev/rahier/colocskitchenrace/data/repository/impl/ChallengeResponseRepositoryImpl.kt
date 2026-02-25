@@ -29,6 +29,7 @@ class ChallengeResponseRepositoryImpl @Inject constructor(
         if (DemoMode.isActive) return DemoMode.demoChallengeResponses
 
         val snapshot = firestore.collectionGroup(Constants.RESPONSES_SUBCOLLECTION)
+            .limit(500)
             .get()
             .await()
 
@@ -46,6 +47,7 @@ class ChallengeResponseRepositoryImpl @Inject constructor(
 
         val snapshot = firestore.collectionGroup(Constants.RESPONSES_SUBCOLLECTION)
             .whereEqualTo("cohouseId", cohouseId)
+            .limit(200)
             .get()
             .await()
 

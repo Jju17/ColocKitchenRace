@@ -47,6 +47,9 @@ export const updateEventSettings = onCall<UpdateEventSettingsRequest>(
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Must be authenticated");
     }
+    if (!request.auth.token.admin) {
+      throw new HttpsError("permission-denied", "Admin access required");
+    }
 
     const {
       gameId,
@@ -111,6 +114,9 @@ export const confirmMatching = onCall<ConfirmMatchingRequest>(
   async (request) => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Must be authenticated");
+    }
+    if (!request.auth.token.admin) {
+      throw new HttpsError("permission-denied", "Admin access required");
     }
 
     const { gameId } = request.data;
@@ -187,6 +193,9 @@ export const revealPlanning = onCall<RevealPlanningRequest>(
   async (request) => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Must be authenticated");
+    }
+    if (!request.auth.token.admin) {
+      throw new HttpsError("permission-denied", "Admin access required");
     }
 
     const { gameId } = request.data;

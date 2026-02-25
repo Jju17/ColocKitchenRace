@@ -231,11 +231,6 @@ struct CohouseModelTests {
         #expect(code.allSatisfy { $0.isHexDigit })
     }
 
-    @Test("contactUser always returns nil (commented out)")
-    func contactUser() {
-        let cohouse = Cohouse.mock
-        #expect(cohouse.contactUser == nil)
-    }
 }
 
 // MARK: - CohouseUser Model Tests

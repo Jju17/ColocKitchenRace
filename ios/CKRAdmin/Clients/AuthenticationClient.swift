@@ -93,8 +93,11 @@ extension AuthenticationClient: DependencyKey {
         listenAuthState: {
             AsyncStream { continuation in
                 DispatchQueue.main.async {
-                    let _ = Auth.auth().addStateDidChangeListener { _, user in
+                    let handle = Auth.auth().addStateDidChangeListener { _, user in
                         continuation.yield(user)
+                    }
+                    continuation.onTermination = { _ in
+                        Auth.auth().removeStateDidChangeListener(handle)
                     }
                 }
             }

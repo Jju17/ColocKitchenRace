@@ -63,14 +63,14 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     private func requestNotificationPermission(_ application: UIApplication) async {
         do {
             let granted = try await UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound])
-            print("🔔 Notification permission granted: \(granted)")
+            Logger.globalLog.info("Notification permission granted: \(granted)")
             if granted {
                 await MainActor.run {
                     application.registerForRemoteNotifications()
                 }
             }
         } catch {
-            print("🔔 Error requesting notification permission: \(error)")
+            Logger.globalLog.error("Error requesting notification permission: \(error)")
         }
     }
 
@@ -88,14 +88,14 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     }
 
     func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        print("🔔 Failed to register for remote notifications: \(error)")
+        Logger.globalLog.error("Failed to register for remote notifications: \(error)")
     }
 
     // MARK: - MessagingDelegate
 
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
         guard let fcmToken = fcmToken else { return }
-        print("🔔 FCM Token: \(fcmToken)")
+        Logger.globalLog.info("FCM Token received")
 
         // Store FCM token and subscribe to topic
         Task {
@@ -121,12 +121,21 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         return [.banner, .badge, .sound]
     }
 
-    // Handle notification tap
+    // Handle notification tap — extract deep link type from payload and post to NotificationCenter
     func userNotificationCenter(_ center: UNUserNotificationCenter,
                                 didReceive response: UNNotificationResponse) async {
         let userInfo = response.notification.request.content.userInfo
-        print("🔔 Notification tapped with data: \(userInfo)")
-        // TODO: Handle deep linking based on notification data
+        Logger.globalLog.info("Notification tapped with data: \(userInfo)")
+
+        guard let type = userInfo["type"] as? String else { return }
+
+        await MainActor.run {
+            NotificationCenter.default.post(
+                name: .ckrDeepLink,
+                object: nil,
+                userInfo: ["type": type, "data": userInfo]
+            )
+        }
     }
 }
 

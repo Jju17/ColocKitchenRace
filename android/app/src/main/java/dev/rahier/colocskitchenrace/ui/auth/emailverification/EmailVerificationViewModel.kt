@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import dev.rahier.colocskitchenrace.util.ErrorMapper
 import javax.inject.Inject
 
 data class EmailVerificationState(
@@ -65,7 +66,7 @@ class EmailVerificationViewModel @Inject constructor(
                     _state.update { it.copy(isLoading = false, errorMessage = "Email pas encore verifie") }
                 }
             } catch (e: Exception) {
-                _state.update { it.copy(isLoading = false, errorMessage = e.message) }
+                _state.update { it.copy(isLoading = false, errorMessage = ErrorMapper.toUserMessage(e)) }
             }
         }
     }

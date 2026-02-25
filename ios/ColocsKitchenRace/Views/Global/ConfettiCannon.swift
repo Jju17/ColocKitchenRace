@@ -9,18 +9,17 @@ import SwiftUI
 
 struct ConfettiCannon: View {
     @State private var fire = false
-    
+
     var body: some View {
         ZStack {
             if fire {
                 ConfettiView()
             }
         }
-        .onAppear {
+        .task {
             fire = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                fire = false
-            }
+            try? await Task.sleep(for: .seconds(3))
+            fire = false
         }
     }
 }

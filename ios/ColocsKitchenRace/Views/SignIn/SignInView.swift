@@ -1,5 +1,5 @@
 //
-//  SigninView.swift
+//  SignInView.swift
 //  colocskitchenrace
 //
 //  Created by Julien Rahier on 19/10/2023.
@@ -10,13 +10,13 @@ import SwiftUI
 import os
 
 @Reducer
-struct SigninFeature {
+struct SignInFeature {
 
     @ObservableState
     struct State: Equatable {
         var email: String = ""
         var errorMessage: String?
-        var focusedField: SigninField?
+        var focusedField: SignInField?
         var password: String = ""
         var showCreateAccountConfirmation: Bool = false
     }
@@ -94,9 +94,9 @@ struct SigninFeature {
     }
 }
 
-struct SigninView: View {
-    @Bindable var store: StoreOf<SigninFeature>
-    @FocusState var focusedField: SigninField?
+struct SignInView: View {
+    @Bindable var store: StoreOf<SignInFeature>
+    @FocusState var focusedField: SignInField?
 
     var body: some View {
         GeometryReader { geo in
@@ -105,6 +105,7 @@ struct SigninView: View {
                     Image("logo")
                         .resizable()
                         .frame(width: 150, height: 150, alignment: .center)
+                        .accessibilityLabel("Colocs Kitchen Race logo")
 
                     VStack(spacing: 10) {
                         CKRTextField(title: "EMAIL", value: $store.email,
@@ -154,6 +155,7 @@ struct SigninView: View {
                                 )
                             }
                             .buttonStyle(.plain)
+                            .accessibilityLabel("Sign in with Google")
 
                             Button {
                                 self.store.send(.appleSigninButtonTapped)
@@ -173,6 +175,7 @@ struct SigninView: View {
                                 )
                             }
                             .buttonStyle(.plain)
+                            .accessibilityLabel("Sign in with Apple")
                         }
                         .padding(.top)
                     }
@@ -198,10 +201,7 @@ struct SigninView: View {
             }
             .scrollDismissesKeyboard(.interactively)
             .background { Color.ckrMintLight.ignoresSafeArea() }
-            .alert("Create account", isPresented: Binding(
-                get: { store.showCreateAccountConfirmation },
-                set: { if !$0 { store.send(.createAccountCancelled) } }
-            )) {
+            .alert("Create account", isPresented: $store.showCreateAccountConfirmation) {
                 Button("Create") {
                     store.send(.createAccountConfirmed)
                 }
@@ -215,24 +215,24 @@ struct SigninView: View {
     }
 }
 
-extension SigninView {
+extension SignInView {
     private func focusPreviousField() {
         focusedField = focusedField.map {
-            SigninField(rawValue: $0.rawValue - 1) ?? .password
+            SignInField(rawValue: $0.rawValue - 1) ?? .password
         }
     }
 
     private func focusNextField() {
         focusedField = focusedField.map {
-            SigninField(rawValue: $0.rawValue + 1) ?? .email
+            SignInField(rawValue: $0.rawValue + 1) ?? .email
         }
     }
 }
 
 #Preview {
-    SigninView(
-        store: Store(initialState: SigninFeature.State()) {
-            SigninFeature()
+    SignInView(
+        store: Store(initialState: SignInFeature.State()) {
+            SignInFeature()
         }
     )
 }

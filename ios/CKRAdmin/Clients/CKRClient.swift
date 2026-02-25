@@ -38,8 +38,8 @@ struct MatchResult: Equatable {
 
 @DependencyClient
 struct CKRClient {
-    var newGame: (_ newGame: CKRGame) -> Result<Bool, CKRError> = { _ in .success(true) }
-    var updateGame: (_ game: CKRGame) -> Result<Bool, CKRError> = { _ in .success(true) }
+    var newGame: @Sendable (_ newGame: CKRGame) async throws -> Void
+    var updateGame: @Sendable (_ game: CKRGame) async throws -> Void
     var getGame: @Sendable () async -> Result<CKRGame?, CKRError> = { .success(nil) }
     var watchGame: @Sendable () -> AsyncStream<CKRGame?> = { AsyncStream { $0.finish() } }
     var deleteGame: @Sendable (_ gameId: String) async -> Result<Bool, CKRError> = { _ in .success(true) }
@@ -54,22 +54,12 @@ struct CKRClient {
 extension CKRClient: DependencyKey {
     static let liveValue = Self(
         newGame: { newGame in
-            do {
-                let ckrGameRef = Firestore.firestore().collection("ckrGames").document(newGame.id.uuidString)
-                try ckrGameRef.setData(from: newGame)
-                return .success(true)
-            } catch {
-                return .failure(CKRError.fromFirestoreError(error))
-            }
+            let ckrGameRef = Firestore.firestore().collection("ckrGames").document(newGame.id.uuidString)
+            try await ckrGameRef.setData(from: newGame)
         },
         updateGame: { game in
-            do {
-                let ckrGameRef = Firestore.firestore().collection("ckrGames").document(game.id.uuidString)
-                try ckrGameRef.setData(from: game, merge: true)
-                return .success(true)
-            } catch {
-                return .failure(CKRError.fromFirestoreError(error))
-            }
+            let ckrGameRef = Firestore.firestore().collection("ckrGames").document(game.id.uuidString)
+            try await ckrGameRef.setData(from: game, merge: true)
         },
         getGame: {
             do {
@@ -225,8 +215,8 @@ extension CKRClient: DependencyKey {
 
     static var previewValue: CKRClient {
         Self(
-            newGame: { _ in .success(true) },
-            updateGame: { _ in .success(true) },
+            newGame: { _ in },
+            updateGame: { _ in },
             getGame: { .success(nil) },
             watchGame: { AsyncStream { $0.finish() } },
             deleteGame: { _ in .success(true) },
@@ -240,8 +230,8 @@ extension CKRClient: DependencyKey {
 
     static var testValue: CKRClient {
         Self(
-            newGame: { _ in .success(true) },
-            updateGame: { _ in .success(true) },
+            newGame: { _ in },
+            updateGame: { _ in },
             getGame: { .success(nil) },
             watchGame: { AsyncStream { $0.finish() } },
             deleteGame: { _ in .success(true) },

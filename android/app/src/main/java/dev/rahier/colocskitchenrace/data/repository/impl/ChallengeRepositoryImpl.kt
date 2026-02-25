@@ -33,6 +33,7 @@ class ChallengeRepositoryImpl @Inject constructor(
 
         val snapshot = firestore.collection(Constants.CHALLENGES_COLLECTION)
             .orderBy("endDate", Query.Direction.ASCENDING)
+            .limit(50)
             .get()
             .await()
 

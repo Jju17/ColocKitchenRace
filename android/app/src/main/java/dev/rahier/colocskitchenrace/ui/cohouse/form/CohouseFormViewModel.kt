@@ -11,6 +11,7 @@ import dev.rahier.colocskitchenrace.data.model.ValidatedAddress
 import dev.rahier.colocskitchenrace.data.repository.AddressValidatorRepository
 import dev.rahier.colocskitchenrace.data.repository.AuthRepository
 import dev.rahier.colocskitchenrace.data.repository.CohouseRepository
+import dev.rahier.colocskitchenrace.util.ErrorMapper
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -338,7 +339,7 @@ class CohouseFormViewModel @Inject constructor(
                 _state.update { it.copy(isSaving = false) }
                 _effect.send(CohouseFormEffect.Saved)
             } catch (e: Exception) {
-                _state.update { it.copy(isSaving = false, error = e.message ?: "Erreur lors de la sauvegarde") }
+                _state.update { it.copy(isSaving = false, error = ErrorMapper.toUserMessage(e, "Erreur lors de la sauvegarde")) }
             }
         }
     }

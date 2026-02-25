@@ -1,5 +1,5 @@
 //
-//  SigninView.swift
+//  SignInView.swift
 //  AdminCKR
 //
 //  Created by Julien Rahier on 3/15/25.
@@ -11,13 +11,13 @@ import SwiftUI
 import os
 
 @Reducer
-struct SigninFeature {
+struct SignInFeature {
 
     @ObservableState
     struct State {
         var email: String = ""
         var error: Error?
-        var focusedField: SigninField?
+        var focusedField: SignInField?
         var password: String = ""
     }
 
@@ -50,9 +50,9 @@ struct SigninFeature {
     }
 }
 
-struct SigninView: View {
-    @Bindable var store: StoreOf<SigninFeature>
-    @FocusState var focusedField: SigninField?
+struct SignInView: View {
+    @Bindable var store: StoreOf<SignInFeature>
+    @FocusState var focusedField: SignInField?
 
     var body: some View {
         VStack(spacing: 10) {
@@ -108,24 +108,24 @@ struct SigninView: View {
     }
 }
 
-extension SigninView {
+extension SignInView {
     private func focusPreviousField() {
         focusedField = focusedField.map {
-            SigninField(rawValue: $0.rawValue - 1) ?? .password
+            SignInField(rawValue: $0.rawValue - 1) ?? .password
         }
     }
 
     private func focusNextField() {
         focusedField = focusedField.map {
-            SigninField(rawValue: $0.rawValue + 1) ?? .email
+            SignInField(rawValue: $0.rawValue + 1) ?? .email
         }
     }
 }
 
 #Preview {
-    SigninView(
-        store: Store(initialState: SigninFeature.State()) {
-            SigninFeature()
+    SignInView(
+        store: Store(initialState: SignInFeature.State()) {
+            SignInFeature()
         }
     )
 }

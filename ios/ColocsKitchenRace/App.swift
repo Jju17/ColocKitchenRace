@@ -14,7 +14,7 @@ struct AppFeature {
     @CasePathable
     enum State: Equatable {
         case tab(TabFeature.State)
-        case signin(SigninFeature.State)
+        case signin(SignInFeature.State)
         case profileCompletion(ProfileCompletionFeature.State)
         case emailVerification(EmailVerificationFeature.State)
         case splashScreen(SplashScreenFeature.State)
@@ -24,7 +24,7 @@ struct AppFeature {
     enum Action {
         case onTask
         case tab(TabFeature.Action)
-        case signin(SigninFeature.Action)
+        case signin(SignInFeature.Action)
         case profileCompletion(ProfileCompletionFeature.Action)
         case emailVerification(EmailVerificationFeature.Action)
         case splashScreen(SplashScreenFeature.Action)
@@ -70,7 +70,7 @@ struct AppFeature {
                         state = .emailVerification(EmailVerificationFeature.State())
                     }
                 } else {
-                    state = .signin(SigninFeature.State())
+                    state = .signin(SignInFeature.State())
                 }
                 return .none
             case .profileCompletion(.delegate(.profileCompleted)):
@@ -89,7 +89,7 @@ struct AppFeature {
             }
         }
         .ifCaseLet(\.tab, action: \.tab) { TabFeature() }
-        .ifCaseLet(\.signin, action: \.signin) { SigninFeature() }
+        .ifCaseLet(\.signin, action: \.signin) { SignInFeature() }
         .ifCaseLet(\.profileCompletion, action: \.profileCompletion) { ProfileCompletionFeature() }
         .ifCaseLet(\.emailVerification, action: \.emailVerification) { EmailVerificationFeature() }
         .ifCaseLet(\.splashScreen, action: \.splashScreen) { SplashScreenFeature() }
@@ -108,7 +108,7 @@ struct AppView: View {
                 }
             case .signin:
                 if let signinStore = store.scope(state: \.signin, action: \.signin) {
-                    SigninView(store: signinStore)
+                    SignInView(store: signinStore)
                 }
             case .profileCompletion:
                 if let profileStore = store.scope(state: \.profileCompletion, action: \.profileCompletion) {

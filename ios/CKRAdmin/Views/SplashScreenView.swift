@@ -10,18 +10,11 @@ import SwiftUI
 
 @Reducer
 struct SplashScreenFeature {
-    struct State {}
-    enum Action {
-        case onAppear
-    }
-    
+    struct State: Equatable {}
+    enum Action {}
+
     var body: some ReducerOf<Self> {
-        Reduce { state, action in
-            switch action {
-            case .onAppear:
-                return .none
-            }
-        }
+        EmptyReducer()
     }
 }
 

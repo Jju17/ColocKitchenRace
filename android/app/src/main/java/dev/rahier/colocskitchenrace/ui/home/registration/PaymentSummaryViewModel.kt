@@ -15,10 +15,12 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Currency
 import java.util.Locale
+import dev.rahier.colocskitchenrace.util.ErrorMapper
 import javax.inject.Inject
 
 data class PaymentSummaryState(
@@ -131,7 +133,7 @@ class PaymentSummaryViewModel @Inject constructor(
                 )
                 _state.update { it.copy(paymentResult = result, isCreatingPaymentIntent = false) }
             } catch (e: Exception) {
-                _state.update { it.copy(error = e.message ?: "Erreur lors de la reservation", isCreatingPaymentIntent = false) }
+                _state.update { it.copy(error = ErrorMapper.toUserMessage(e, "Erreur lors de la réservation"), isCreatingPaymentIntent = false) }
             }
         }
     }
@@ -184,7 +186,10 @@ class PaymentSummaryViewModel @Inject constructor(
             // immediately reflects "not registered".
             gameRepository.removeCohouseLocally(s.cohouseId)
 
-            CoroutineScope(Dispatchers.IO).launch {
+            // Use an independent scope so the cancellation request outlives
+            // this ViewModel (viewModelScope is already cancelled in onCleared).
+            // SupervisorJob prevents failure propagation from child coroutines.
+            CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
                 try {
                     gameRepository.cancelReservation(s.gameId, s.cohouseId)
                 } catch (e: Exception) {

@@ -145,18 +145,19 @@ async function deleteEntireCohouse(
     `cohouses/${cohouseId}/cover_image.jpg`,
   ];
 
-  for (const filePath of filesToDelete) {
-    try {
-      await bucket.file(filePath).delete();
-      console.log(`Deleted storage file: ${filePath}`);
-    } catch (error: unknown) {
-      // File might not exist — that's fine
-      const code = (error as { code?: number }).code;
-      if (code !== 404) {
-        console.warn(`Failed to delete storage file ${filePath}:`, error);
+  await Promise.allSettled(
+    filesToDelete.map(async (filePath) => {
+      try {
+        await bucket.file(filePath).delete();
+        console.log(`Deleted storage file: ${filePath}`);
+      } catch (error: unknown) {
+        const code = (error as { code?: number }).code;
+        if (code !== 404) {
+          console.warn(`Failed to delete storage file ${filePath}:`, error);
+        }
       }
-    }
-  }
+    })
+  );
 
   // 4. Clean up game registrations
   await cleanupGameRegistrations(cohouseId);

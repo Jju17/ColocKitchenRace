@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import dev.rahier.colocskitchenrace.util.ErrorMapper
 import javax.inject.Inject
 
 @HiltViewModel
@@ -55,7 +56,7 @@ class SignInViewModel @Inject constructor(
             } catch (e: NoAccountException) {
                 _state.update { it.copy(isLoading = false, showCreateAccountDialog = true) }
             } catch (e: Exception) {
-                _state.update { it.copy(isLoading = false, errorMessage = e.message ?: "Erreur de connexion") }
+                _state.update { it.copy(isLoading = false, errorMessage = ErrorMapper.toUserMessage(e, "Erreur de connexion")) }
             }
         }
     }
@@ -71,7 +72,7 @@ class SignInViewModel @Inject constructor(
                 authRepository.createAccount(email, password)
                 _effect.send(SignInEffect.NavigateToEmailVerification)
             } catch (e: Exception) {
-                _state.update { it.copy(isLoading = false, errorMessage = e.message ?: "Erreur de creation") }
+                _state.update { it.copy(isLoading = false, errorMessage = ErrorMapper.toUserMessage(e, "Erreur de création")) }
             }
         }
     }
@@ -83,7 +84,7 @@ class SignInViewModel @Inject constructor(
                 val user = authRepository.signInWithGoogle(activity)
                 navigateAfterAuth(user)
             } catch (e: Exception) {
-                _state.update { it.copy(isLoading = false, errorMessage = e.message) }
+                _state.update { it.copy(isLoading = false, errorMessage = ErrorMapper.toUserMessage(e, "Erreur de connexion Google")) }
             }
         }
     }
@@ -95,7 +96,7 @@ class SignInViewModel @Inject constructor(
                 val user = authRepository.signInWithApple(activity)
                 navigateAfterAuth(user)
             } catch (e: Exception) {
-                _state.update { it.copy(isLoading = false, errorMessage = e.message) }
+                _state.update { it.copy(isLoading = false, errorMessage = ErrorMapper.toUserMessage(e, "Erreur de connexion Apple")) }
             }
         }
     }

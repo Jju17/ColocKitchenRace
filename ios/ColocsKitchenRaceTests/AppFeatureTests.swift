@@ -25,7 +25,7 @@ struct AppFeatureTests {
         }
 
         await store.send(.newAuthStateTrigger(nil)) {
-            $0 = .signin(SigninFeature.State())
+            $0 = .signin(SignInFeature.State())
         }
     }
 
@@ -38,7 +38,7 @@ struct AppFeatureTests {
         }
 
         await store.send(.newAuthStateTrigger(nil)) {
-            $0 = .signin(SigninFeature.State())
+            $0 = .signin(SignInFeature.State())
         }
     }
 
