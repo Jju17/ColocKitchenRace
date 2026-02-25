@@ -182,8 +182,10 @@ struct HomeFeature {
                     )
                     return .none
                 case .confirmDeleteGameButtonTapped:
+                    guard let game = state.currentGame else { return .none }
+                    let gameId = game.id.uuidString
                     return .run { send in
-                        let result = await self.ckrClient.deleteGame()
+                        let result = await self.ckrClient.deleteGame(gameId)
                         switch result {
                         case .success:
                             await send(.deleteGameCompleted)

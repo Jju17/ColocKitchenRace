@@ -1,6 +1,7 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { admin, db, REGION } from "./config";
 import { getFCMTokensForUsers, sendToTokens } from "./notifications";
+import { scheduleEventReminders } from "./pushNotifications";
 
 // ============================================
 // Types
@@ -245,6 +246,15 @@ export const revealPlanning = onCall<RevealPlanningRequest>(
             title: "🎉 Votre planning CKR est disponible !",
             body: "Découvrez chez qui vous allez cuisiner ce soir !",
           });
+        }
+      }
+
+      // Schedule event step reminders (apéro, dîner, party — 15 min before each)
+      if (gameData.eventSettings) {
+        try {
+          await scheduleEventReminders(gameId, gameData.eventSettings);
+        } catch (error) {
+          console.warn("Failed to schedule event reminders (non-critical):", error);
         }
       }
 

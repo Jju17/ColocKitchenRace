@@ -62,19 +62,19 @@ This report covers a full audit of the Colocs Kitchen Race (CKR) project across 
 | ID | Finding | File | Lines | Severity |
 |----|---------|------|-------|----------|
 | iOS-A1 | `SplashScreenFeature` has empty State and no-op `onAppear` action — dead code | `Views/SplashScreenView.swift` | 12-25 | Low |
-| iOS-A2 | ~~`onChange(of: selectedFilter)` on View layer instead of reducer action — breaks single source of truth~~ | `Views/Challenge/ChallengeView.swift` | 341 | ✅ Resolved |
-| iOS-A3 | ~~`refresh` action silently fails with `try?` — no error state in `HomeFeature.State`~~ | `Views/Home/HomeView.swift` | 84-92 | ✅ Resolved |
+| iOS-A2 | ~~`onChange(of: selectedFilter)` on View layer instead of reducer action — breaks single source of truth~~ | `Views/Challenge/ChallengeView.swift` | 341 | ✅ Resolved — `currentPage` moved to reducer state |
+| iOS-A3 | ~~`refresh` action silently fails with `try?` — no error state in `HomeFeature.State`~~ | `Views/Home/HomeView.swift` | 84-92 | ✅ Resolved — errors surfaced in `refreshError` state |
 
 ### 1.2 Security
 
 | ID | Finding | File | Lines | Severity |
 |----|---------|------|-------|----------|
-| iOS-S1 | **Hardcoded Stripe test publishable key** in source code, exposed in repo | `colocskitchenraceApp.swift` | 36 | **Critical** |
-| iOS-S2 | **Auth state listener never unregistered** — `addStateDidChangeListener` returns a handle that is never saved or removed | `Clients/AuthentificationClient.swift` | 362-370 | **Critical** |
-| iOS-S3 | `@unchecked Sendable` with `nonisolated(unsafe)` on `currentNonce` — race condition possible | `Clients/AuthentificationClient.swift` | 396-398 | **High** |
-| iOS-S4 | `DispatchQueue.main.sync` in `presentationAnchor` callback — potential deadlock | `Clients/AuthentificationClient.swift` | 434 | **High** |
-| iOS-S5 | ~~Email regex too permissive — accepts `a..b@example..com`~~ | `Shared/Utils/UserValidation.swift` | 38-40 | ✅ Resolved |
-| iOS-S6 | ~~Phone regex accepts strings like `"+++---())(("` (7 chars of noise)~~ | `Shared/Utils/UserValidation.swift` | 45-48 | ✅ Resolved |
+| iOS-S1 | ~~**Hardcoded Stripe test publishable key** in source code, exposed in repo~~ | `colocskitchenraceApp.swift` | 36 | ✅ Resolved — loaded from `Info.plist` |
+| iOS-S2 | ~~**Auth state listener never unregistered** — `addStateDidChangeListener` returns a handle that is never saved or removed~~ | `Clients/AuthentificationClient.swift` | 362-370 | ✅ Resolved — handle saved + removed on termination |
+| iOS-S3 | ~~`@unchecked Sendable` with `nonisolated(unsafe)` on `currentNonce` — race condition possible~~ | `Clients/AuthentificationClient.swift` | 396-398 | ✅ Resolved — class marked `@MainActor` |
+| iOS-S4 | ~~`DispatchQueue.main.sync` in `presentationAnchor` callback — potential deadlock~~ | `Clients/AuthentificationClient.swift` | 434 | ✅ Resolved — removed sync dispatch, class is `@MainActor` |
+| iOS-S5 | ~~Email regex too permissive — accepts `a..b@example..com`~~ | `Shared/Utils/UserValidation.swift` | 38-40 | ✅ Resolved — regex hardened |
+| iOS-S6 | ~~Phone regex accepts strings like `"+++---())(("` (7 chars of noise)~~ | `Shared/Utils/UserValidation.swift` | 45-48 | ✅ Resolved — regex hardened |
 | iOS-S7 | Deep linking from notification data not implemented — `// TODO` placeholder | `colocskitchenraceApp.swift` | 110 | Medium |
 | iOS-S8 | Firebase App Check not implemented (marked as incomplete in TODO.swift) | `TODO.swift` | 11-12 | **High** |
 
@@ -82,8 +82,8 @@ This report covers a full audit of the Colocs Kitchen Race (CKR) project across 
 
 | ID | Finding | File | Lines | Severity |
 |----|---------|------|-------|----------|
-| iOS-P1 | **News listener leaked in demo mode** — listener created but never stored when `DemoMode.isActive` returns early | `Clients/NewsClient.swift` | 68 | **Critical** |
-| iOS-P2 | ~~News listener task not properly cancelled in `colocskitchenraceApp`~~ | `colocskitchenraceApp.swift` | 122, 164-170 | ✅ Resolved |
+| iOS-P1 | ~~**News listener leaked in demo mode** — listener created but never stored when `DemoMode.isActive` returns early~~ | `Clients/NewsClient.swift` | 68 | ✅ Resolved — early return before listener creation |
+| iOS-P2 | ~~News listener task not properly cancelled in `colocskitchenraceApp`~~ | `colocskitchenraceApp.swift` | 122, 164-170 | ✅ Resolved — task assigned to `newsListenerTask` |
 | iOS-P3 | JPEG compression loop runs synchronously on main thread — blocks UI during image selection | `Utils/ImagePipeline.swift` | 56-63 | Medium |
 | iOS-P4 | `DispatchQueue.main.asyncAfter` prevents view deallocation | `Views/Global/ConfettiCannon.swift` | 21 | Medium |
 | iOS-P5 | Computed property `filteredTiles` (array filter) called on every `onChange` re-render — should be memoized in state | `Views/Challenge/ChallengeView.swift` | 42-70, 341-343 | Medium |
@@ -92,11 +92,11 @@ This report covers a full audit of the Colocs Kitchen Race (CKR) project across 
 
 | ID | Finding | File | Lines | Severity |
 |----|---------|------|-------|----------|
-| iOS-Q1 | ~~Auth sign-in post-processing duplicated 3x (~90 lines) across email, Google, Apple flows~~ | `Clients/AuthentificationClient.swift` | 61-352 | ✅ Resolved |
+| iOS-Q1 | ~~Auth sign-in post-processing duplicated 3x (~90 lines) across email, Google, Apple flows~~ | `Clients/AuthentificationClient.swift` | 61-352 | ✅ Resolved — extracted to shared `completeSignIn` helper |
 | iOS-Q2 | `contactUser` computed property always returns `nil` — dead code | `Models/Cohouse.swift` | 43-46 | Low |
 | iOS-Q3 | Inconsistent naming: `SigninView` (missing capital I), `AuthentificationClient` (unusual spelling), lowercase `colocskitchenraceApp` | Various | — | Low |
 | iOS-Q4 | `print()` statements in AppDelegate instead of `Logger` | `colocskitchenraceApp.swift` | 53, 60, 78, 85, 93, 109 | Low |
-| iOS-Q5 | ~~7+ instances of swallowed errors across auth, challenges, CKR, news, and home clients~~ | Various | — | ✅ Resolved |
+| iOS-Q5 | ~~7+ instances of swallowed errors across auth, challenges, CKR, news, and home clients~~ | Various | — | ✅ Resolved — `do/catch` + `Logger` across all clients |
 | iOS-Q6 | `ChallengeTileView` is 200+ lines with 5 computed properties — should be decomposed | `Views/Challenge/ChallengeTileView.swift` | 237-444 | Low |
 | iOS-Q7 | Custom `Binding(get:set:)` in `SigninView` instead of `@Bindable` | `Views/Signin/SigninView.swift` | 201-203 | Low |
 | iOS-Q8 | Most views missing `.accessibilityLabel()` and `.accessibilityHint()` | Various | — | Medium |

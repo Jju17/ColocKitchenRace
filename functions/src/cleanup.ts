@@ -16,6 +16,10 @@ interface CancelReservationRequest {
   cohouseId: string;
 }
 
+interface DeleteCKRGameRequest {
+  gameId: string;
+}
+
 // ============================================
 // Cloud Task Handlers
 // ============================================
@@ -151,6 +155,91 @@ export const cancelReservation = onCall<CancelReservationRequest>(
       );
     });
 
+    return { success: true };
+  }
+);
+
+// ============================================
+// Game Deletion
+// ============================================
+
+/**
+ * Delete a CKR game and all associated data.
+ *
+ * Cleans up:
+ * - All registration documents (ckrGames/{gameId}/registrations/*)
+ * - All notification marker documents (ckrGames/{gameId}/notifications/*)
+ * - The game document itself
+ *
+ * Any previously scheduled Cloud Tasks (game reminders, event reminders)
+ * will gracefully no-op when they fire, because the task handlers
+ * already check `if (!gameDoc.exists) return;`.
+ *
+ * Admin-only — requires the `admin` custom claim.
+ */
+export const deleteCKRGame = onCall<DeleteCKRGameRequest>(
+  { region: REGION },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Must be authenticated");
+    }
+
+    if (!request.auth.token.admin) {
+      throw new HttpsError("permission-denied", "Admin access required");
+    }
+
+    const { gameId } = request.data;
+
+    if (!gameId) {
+      throw new HttpsError("invalid-argument", "Missing required field: gameId");
+    }
+
+    const gameRef = db.collection("ckrGames").doc(gameId);
+    const gameDoc = await gameRef.get();
+
+    if (!gameDoc.exists) {
+      throw new HttpsError("not-found", "CKR Game not found");
+    }
+
+    // Delete all documents in subcollections using batched writes.
+    // Firestore does not cascade deletes to subcollections.
+    const subcollections = ["registrations", "notifications"];
+
+    for (const subcollection of subcollections) {
+      const snapshot = await gameRef.collection(subcollection).get();
+
+      if (snapshot.empty) continue;
+
+      // Batch delete (max 500 per batch)
+      const batches: FirebaseFirestore.WriteBatch[] = [];
+      let currentBatch = db.batch();
+      let count = 0;
+
+      for (const doc of snapshot.docs) {
+        currentBatch.delete(doc.ref);
+        count++;
+
+        if (count % 500 === 0) {
+          batches.push(currentBatch);
+          currentBatch = db.batch();
+        }
+      }
+
+      batches.push(currentBatch);
+
+      for (const batch of batches) {
+        await batch.commit();
+      }
+
+      console.log(
+        `Deleted ${snapshot.size} documents from ${subcollection} subcollection`
+      );
+    }
+
+    // Delete the game document
+    await gameRef.delete();
+
+    console.log(`CKR Game ${gameId} and all associated data deleted`);
     return { success: true };
   }
 );

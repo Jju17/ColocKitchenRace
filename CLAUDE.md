@@ -164,16 +164,38 @@ xcodebuild -project ios/ColocsKitchenRace.xcodeproj -scheme colocskitchenrace -d
 - Android: Android `Log` with tag-based logging
 
 ## Cloud Functions (Key Endpoints)
+
+### Registration & Payment
 - `reserveAndCreatePayment` - Atomically reserves a spot (Firestore transaction) + creates Stripe PaymentIntent
 - `confirmRegistration` - Confirms a pending registration after Stripe payment succeeds
 - `releaseExpiredReservation` - Cloud Task handler that frees expired pending reservations
-- `getMyPlanning` - Returns personalized event schedule
+- `cancelReservation` - Immediately cancels a pending reservation (called on PaymentSheet dismiss)
+
+### Game Management
 - `matchCohouses` - Runs matching algorithm (groups of 4)
-- `revealPlanning` - Makes matching results visible to users
-- `sendNotification*` - FCM notification distribution
+- `updateEventSettings` - Saves event time slots + party info
+- `confirmMatching` - Assigns A/B/C/D roles within each group
+- `revealPlanning` - Makes matching results visible + schedules event reminder Cloud Tasks
+- `getMyPlanning` - Returns personalized event schedule for a cohouse
+- `deleteCKRGame` - Admin-only: deletes a game + all subcollections (registrations, notification markers)
+
+### Push Notifications
+- `onCKRGameCreated` - Firestore trigger: sends "registrations open" + schedules game start reminders
+- `sendGameReminder24h` - Cloud Task: "La CKR, c'est demain !" (24h before)
+- `sendGameReminder1h` - Cloud Task: "La CKR, c'est dans 1 heure !" (1h before)
+- `sendAperoReminder` - Cloud Task: personalized host/visitor apero reminder (15 min before)
+- `sendDinerReminder` - Cloud Task: personalized host/visitor dinner reminder (15 min before)
+- `sendPartyReminder` - Cloud Task: party reminder to all registered (15 min before)
+- `onNewsCreated` - Firestore trigger: notifies all users when news is published
+- `onChallengeCreated` - Firestore trigger: notifies all users when a challenge is created
+- `checkChallengeSchedules` - Scheduler (every 5 min): challenge start/end reminders
+- `sendNotificationToCohouse` / `sendNotificationToEdition` / `sendNotificationToAll` - Admin manual FCM distribution
+
+### Other
 - `deleteAccount` - User account cleanup
 - `checkDuplicateCohouse` - Duplicate detection
 - `validateAddress` - Geocoding via OpenStreetMap
+- `setCohouseClaim` / `setAdminClaim` - Custom claims management
 
 ## Registration Flow (Reserve-Then-Pay)
 
@@ -236,6 +258,114 @@ Client                          Backend                              Stripe
 | **Backend** | `functions/src/payment.ts`, `functions/src/registration.ts`, `functions/src/cleanup.ts` |
 | **iOS** | `StripeClient.swift` → `CKRClient.swift` → `PaymentSummaryView.swift` |
 | **Android** | `StripeRepository.kt` → `CKRGameRepository.kt` → `PaymentSummaryViewModel.kt` |
+
+## Push Notifications System
+
+The app uses **Firebase Cloud Messaging (FCM)** with two delivery patterns:
+- **Topic-based** (`"all_users"`) — for broadcast notifications (news, challenge, registration open)
+- **Token-based** (`sendToTokens`) — for targeted per-cohouse notifications (game reminders, event step reminders)
+
+All scheduled notifications use **Cloud Tasks** (one-shot, fire-and-forget) rather than a permanently running scheduler. This is the same pattern as `releaseExpiredReservation`.
+
+### Notification Types
+
+| # | Type | Trigger | Target | Timing |
+|---|------|---------|--------|--------|
+| 1 | Registration open | `onCKRGameCreated` (Firestore trigger) | All users (topic) | Immediate |
+| 2 | Game in 24h | `sendGameReminder24h` (Cloud Task) | Registered users (tokens) | 24h before `nextGameDate` |
+| 3 | Game in 1h | `sendGameReminder1h` (Cloud Task) | Registered users (tokens) | 1h before `nextGameDate` |
+| 4 | Apero reminder | `sendAperoReminder` (Cloud Task) | Per-cohouse, personalized host/visitor (tokens) | 15 min before `aperoStartTime` |
+| 5 | Diner reminder | `sendDinerReminder` (Cloud Task) | Per-cohouse, personalized host/visitor (tokens) | 15 min before `dinerStartTime` |
+| 6 | Party reminder | `sendPartyReminder` (Cloud Task) | Registered users (tokens) | 15 min before `partyStartTime` |
+| 7 | News published | `onNewsCreated` (Firestore trigger) | All users (topic) | Immediate |
+| 8 | Challenge created | `onChallengeCreated` (Firestore trigger) | All users (topic) | Immediate |
+| 9 | Challenge started | `checkChallengeSchedules` (Scheduler) | All users (topic) | Within 5 min of `startDate` |
+| 10 | Challenge ending soon | `checkChallengeSchedules` (Scheduler) | All users (topic) | ~30 min before `endDate` |
+
+### Cloud Tasks Scheduling Flow
+
+```
+Game created (onCKRGameCreated)
+  ├── Send "registration open" notification (immediate, topic)
+  ├── Schedule sendGameReminder24h (Cloud Task, 24h before nextGameDate)
+  └── Schedule sendGameReminder1h  (Cloud Task, 1h before nextGameDate)
+
+Planning revealed (revealPlanning)
+  └── scheduleEventReminders()
+        ├── Schedule sendAperoReminder (Cloud Task, 15 min before aperoStartTime)
+        ├── Schedule sendDinerReminder (Cloud Task, 15 min before dinerStartTime)
+        └── Schedule sendPartyReminder (Cloud Task, 15 min before partyStartTime)
+```
+
+Cloud Tasks are scheduled via `getFunctions().taskQueue("taskName").enqueue(data, { scheduleDelaySeconds })`. Max delay: 30 days.
+
+### Personalized Event Reminders (Host/Visitor)
+
+Apero and diner reminders are **personalized per cohouse** based on the A/B/C/D role schema:
+
+| Step | Host pairs | Host message | Visitor message |
+|------|-----------|--------------|-----------------|
+| Apero | B hosts A, D hosts C | "Vous recevez {visitor} chez vous" | "Direction chez {host} pour l'apero !" |
+| Diner | A hosts C, B hosts D | "Vous recevez {visitor} chez vous" | "Direction chez {host} pour le diner !" |
+| Party | *(all users)* | — | "Direction {partyName} pour la suite !" |
+
+### Deduplication Strategy
+
+| Notification type | Deduplication method |
+|---|---|
+| Registration open, News, Challenge created | `onDocumentCreated` fires exactly once |
+| Game 24h/1h, Apero/Diner/Party reminders | Cloud Tasks fire exactly once (no marker needed) |
+| Challenge started/ending soon | Marker documents in `challenges/{id}/notifications/{type}` |
+
+### Deletion Safety
+
+All Cloud Task handlers check `if (!gameDoc.exists) return;` at the start. If a CKR game is deleted, any previously scheduled tasks become **no-ops** — no stale notifications are ever sent.
+
+### Files Involved
+
+| Layer | Files |
+|-------|-------|
+| **Backend (game notifications)** | `functions/src/pushNotifications.ts` |
+| **Backend (challenge/news notifications)** | `functions/src/triggers.ts` |
+| **Backend (manual admin notifications)** | `functions/src/notifications.ts` |
+| **Backend (barrel exports)** | `functions/src/index.ts` |
+
+## CKR Game Deletion
+
+Game deletion is handled **server-side** via the `deleteCKRGame` Cloud Function to ensure complete cleanup. The iOS admin app calls this function instead of deleting the Firestore document directly.
+
+### What Gets Cleaned Up
+
+| Data | Path | Method |
+|------|------|--------|
+| Registration documents | `ckrGames/{gameId}/registrations/*` | Batched delete (500/batch) |
+| Notification markers | `ckrGames/{gameId}/notifications/*` | Batched delete (500/batch) |
+| Game document | `ckrGames/{gameId}` | Single delete |
+| Scheduled Cloud Tasks | *(game reminders, event reminders)* | Graceful no-op (handlers check `gameDoc.exists`) |
+
+### Flow
+
+```
+CKRAdmin (iOS)                          Cloud Function
+  │                                        │
+  │  deleteCKRGame({ gameId })             │
+  │───────────────────────────────────────▶│
+  │                                        │── Verify admin claim
+  │                                        │── Delete registrations subcollection
+  │                                        │── Delete notifications subcollection
+  │                                        │── Delete game document
+  │  ◀── { success: true } ───────────────│
+  │                                        │
+  │  (Later: scheduled Cloud Tasks fire)   │
+  │                                        │── gameDoc.exists? → false → return (no-op)
+```
+
+### Files Involved
+
+| Layer | Files |
+|-------|-------|
+| **Backend** | `functions/src/cleanup.ts` (`deleteCKRGame`) |
+| **iOS Admin** | `CKRAdmin/Clients/CKRClient.swift` (`deleteGame`), `CKRAdmin/Views/HomeView.swift` |
 
 ## Challenge Participation Flow
 
@@ -327,8 +457,8 @@ Admin validates/invalidates via CKRAdmin app
 ## Firestore Collections
 - `/users/{userId}` - User profiles (authId-bound)
 - `/cohouses/{cohouseId}` - Communities with `/users` subcollection
-- `/ckrGames/{gameId}` - Game editions with `/registrations` subcollection
-- `/challenges/{challengeId}` - Challenges with `/responses` subcollection
+- `/ckrGames/{gameId}` - Game editions with `/registrations` and `/notifications` subcollections
+- `/challenges/{challengeId}` - Challenges with `/responses` and `/notifications` subcollections
 - `/news/{newsId}` - In-app news
 - `/notificationHistory/{docId}` - Admin notification logs
 

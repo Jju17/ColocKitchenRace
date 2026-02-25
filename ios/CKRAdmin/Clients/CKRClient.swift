@@ -42,7 +42,7 @@ struct CKRClient {
     var updateGame: (_ game: CKRGame) -> Result<Bool, CKRError> = { _ in .success(true) }
     var getGame: @Sendable () async -> Result<CKRGame?, CKRError> = { .success(nil) }
     var watchGame: @Sendable () -> AsyncStream<CKRGame?> = { AsyncStream { $0.finish() } }
-    var deleteGame: @Sendable () async -> Result<Bool, CKRError> = { .success(true) }
+    var deleteGame: @Sendable (_ gameId: String) async -> Result<Bool, CKRError> = { _ in .success(true) }
     var matchCohouses: @Sendable (_ gameId: String) async -> Result<MatchResult, CKRError> = { _ in .success(MatchResult(success: true, groupCount: 0, groups: [])) }
     var resetMatches: @Sendable (_ gameId: String) async -> Result<Bool, CKRError> = { _ in .success(true) }
     var updateEventSettings: @Sendable (_ gameId: String, _ settings: CKREventSettings) async -> Result<Bool, CKRError> = { _, _ in .success(true) }
@@ -106,26 +106,16 @@ extension CKRClient: DependencyKey {
                 continuation.onTermination = { _ in listener.remove() }
             }
         },
-        deleteGame: {
+        deleteGame: { gameId in
             do {
-                    let db = Firestore.firestore()
-                    let ckrGameRef = db.collection("ckrGames")
-                    let snapshot = try await ckrGameRef.getDocuments()
-
-                    guard !snapshot.documents.isEmpty else {
-                        return .success(true)
-                    }
-
-                    let batch = db.batch()
-                    for document in snapshot.documents {
-                        batch.deleteDocument(document.reference)
-                    }
-
-                    try await batch.commit()
-                    return .success(true)
-                } catch {
-                    return .failure(CKRError.fromFirestoreError(error))
-                }
+                let functions = Functions.functions(region: "europe-west1")
+                _ = try await functions.httpsCallable("deleteCKRGame").call([
+                    "gameId": gameId
+                ])
+                return .success(true)
+            } catch {
+                return .failure(CKRError.fromFirestoreError(error))
+            }
         },
         matchCohouses: { gameId in
             do {
@@ -239,7 +229,7 @@ extension CKRClient: DependencyKey {
             updateGame: { _ in .success(true) },
             getGame: { .success(nil) },
             watchGame: { AsyncStream { $0.finish() } },
-            deleteGame: { .success(true) },
+            deleteGame: { _ in .success(true) },
             matchCohouses: { _ in .success(MatchResult(success: true, groupCount: 0, groups: [])) },
             resetMatches: { _ in .success(true) },
             updateEventSettings: { _, _ in .success(true) },
@@ -254,7 +244,7 @@ extension CKRClient: DependencyKey {
             updateGame: { _ in .success(true) },
             getGame: { .success(nil) },
             watchGame: { AsyncStream { $0.finish() } },
-            deleteGame: { .success(true) },
+            deleteGame: { _ in .success(true) },
             matchCohouses: { _ in .success(MatchResult(success: true, groupCount: 0, groups: [])) },
             resetMatches: { _ in .success(true) },
             updateEventSettings: { _, _ in .success(true) },
