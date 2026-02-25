@@ -1,5 +1,5 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
-import { db, REGION } from "./config";
+import { db, auth, REGION } from "./config";
 
 // ============================================
 // Types
@@ -238,6 +238,59 @@ export const getCohousesForMap = onCall<GetCohousesForMapRequest>(
     } catch (error) {
       console.error("Error fetching cohouses for map:", error);
       throw new HttpsError("internal", "Failed to fetch cohouse data");
+    }
+  }
+);
+
+/**
+ * Set the "cohouseId" custom claim on the caller's Auth token.
+ *
+ * Reads the caller's Firestore user doc (matched by authId) to get their
+ * current cohouseId, then sets it as a custom claim. This is used by
+ * Firestore security rules to validate cohouse membership via
+ * `request.auth.token.cohouseId`.
+ *
+ * Should be called after joining, creating, or leaving a cohouse.
+ * The client must force a token refresh after calling this.
+ */
+export const setCohouseClaim = onCall(
+  { region: REGION },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Must be authenticated");
+    }
+
+    const callerUid = request.auth.uid;
+
+    try {
+      // Look up the user's Firestore doc by authId
+      const userSnapshot = await db
+        .collection("users")
+        .where("authId", "==", callerUid)
+        .limit(1)
+        .get();
+
+      if (userSnapshot.empty) {
+        throw new HttpsError("not-found", "User document not found");
+      }
+
+      const userData = userSnapshot.docs[0].data();
+      const cohouseId = (userData.cohouseId as string) || null;
+
+      // Preserve existing custom claims (e.g. admin) and set cohouseId
+      const currentUser = await auth.getUser(callerUid);
+      const existingClaims = currentUser.customClaims || {};
+      await auth.setCustomUserClaims(callerUid, { ...existingClaims, cohouseId });
+
+      console.log(
+        `Cohouse claim set to "${cohouseId ?? "null"}" for Auth UID: ${callerUid}`
+      );
+
+      return { success: true, cohouseId };
+    } catch (error) {
+      if (error instanceof HttpsError) throw error;
+      console.error("Error setting cohouse claim:", error);
+      throw new HttpsError("internal", "Failed to set cohouse claim");
     }
   }
 );

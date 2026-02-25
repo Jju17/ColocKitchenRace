@@ -35,16 +35,19 @@ enum UserValidation {
     }
 
     /// Checks whether the given string looks like a valid email address.
+    /// Disallows consecutive dots in both local part and domain.
     static func isValidEmail(_ email: String) -> Bool {
-        let pattern = #"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"#
-        return email.range(of: pattern, options: .regularExpression) != nil
+        let pattern = #"^[A-Za-z0-9]([A-Za-z0-9._%+-]*[A-Za-z0-9])?@([A-Za-z0-9]([A-Za-z0-9-]*[A-Za-z0-9])?\.)+[A-Za-z]{2,}$"#
+        guard email.range(of: pattern, options: .regularExpression) != nil else { return false }
+        return !email.contains("..")
     }
 
     /// Checks whether the given string looks like a valid phone number.
-    /// Accepts optional leading `+`, digits, spaces, hyphens and parentheses, minimum 7 characters.
+    /// Requires at least 7 digits. Allows optional `+`, spaces, hyphens and parentheses as formatting.
     static func isValidPhone(_ phone: String) -> Bool {
         let trimmed = phone.trimmingCharacters(in: .whitespaces)
-        let pattern = #"^\+?[0-9\s\-()]{7,}$"#
-        return trimmed.range(of: pattern, options: .regularExpression) != nil
+        guard trimmed.range(of: #"^\+?[0-9\s\-()]{7,}$"#, options: .regularExpression) != nil else { return false }
+        let digitCount = trimmed.filter(\.isNumber).count
+        return digitCount >= 7
     }
 }

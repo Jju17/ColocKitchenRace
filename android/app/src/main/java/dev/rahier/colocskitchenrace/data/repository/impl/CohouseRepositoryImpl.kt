@@ -1,5 +1,6 @@
 package dev.rahier.colocskitchenrace.data.repository.impl
 
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.functions.FirebaseFunctions
 import com.google.firebase.storage.FirebaseStorage
@@ -46,6 +47,7 @@ class CohouseRepositoryImpl @Inject constructor(
         }
         batch.commit().await()
         _currentCohouse.value = cohouse
+        refreshCohouseClaim()
     }
 
     override suspend fun get(id: String): Cohouse {
@@ -115,6 +117,7 @@ class CohouseRepositoryImpl @Inject constructor(
             .document(user.id)
             .set(cohouseUserToMap(user))
             .await()
+        refreshCohouseClaim()
     }
 
     override suspend fun removeUser(cohouseUserId: String, cohouseId: String) {
@@ -128,6 +131,7 @@ class CohouseRepositoryImpl @Inject constructor(
 
     override suspend fun quitCohouse() {
         _currentCohouse.value = null
+        refreshCohouseClaim()
     }
 
     override suspend fun checkDuplicate(name: String, street: String, city: String): DuplicateResult {
@@ -160,6 +164,21 @@ class CohouseRepositoryImpl @Inject constructor(
 
     override fun setCurrentCohouse(cohouse: Cohouse?) {
         _currentCohouse.value = cohouse
+    }
+
+    /**
+     * Calls the setCohouseClaim Cloud Function and forces a token refresh
+     * so that Firestore security rules see the updated cohouseId claim.
+     */
+    private suspend fun refreshCohouseClaim() {
+        try {
+            functions.getHttpsCallable("setCohouseClaim").call().await()
+            FirebaseAuth.getInstance().currentUser?.getIdToken(true)?.await()
+        } catch (e: Exception) {
+            // Non-blocking: claim refresh failure shouldn't break the main flow.
+            // The claim will be set on next app launch or token refresh.
+            android.util.Log.w("CohouseRepository", "Failed to refresh cohouse claim", e)
+        }
     }
 
     companion object {

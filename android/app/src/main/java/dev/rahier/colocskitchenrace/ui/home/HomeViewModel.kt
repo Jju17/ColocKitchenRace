@@ -66,6 +66,10 @@ class HomeViewModel @Inject constructor(
     val state: StateFlow<HomeState> = _state.asStateFlow()
 
     init {
+        // Start real-time game listener — updates currentGame StateFlow automatically
+        viewModelScope.launch {
+            gameRepository.listenToGame().collect {}
+        }
         observeData()
     }
 

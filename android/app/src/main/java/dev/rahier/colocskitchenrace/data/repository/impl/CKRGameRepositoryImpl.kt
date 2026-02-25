@@ -8,9 +8,12 @@ import dev.rahier.colocskitchenrace.data.model.*
 import dev.rahier.colocskitchenrace.data.repository.CKRGameRepository
 import dev.rahier.colocskitchenrace.util.Constants
 import dev.rahier.colocskitchenrace.util.DemoMode
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 import java.util.Date
 import javax.inject.Inject
@@ -48,6 +51,31 @@ class CKRGameRepositoryImpl @Inject constructor(
         return game
     }
 
+    @Suppress("UNCHECKED_CAST")
+    override fun listenToGame(): Flow<CKRGame?> = callbackFlow {
+        if (DemoMode.isActive) {
+            val game = DemoMode.demoCKRGame
+            _currentGame.value = game
+            trySend(game)
+            awaitClose {}
+            return@callbackFlow
+        }
+
+        val registration = firestore.collection(Constants.CKR_GAMES_COLLECTION)
+            .orderBy("publishedTimestamp", Query.Direction.DESCENDING)
+            .limit(1)
+            .addSnapshotListener { snapshot, error ->
+                if (error != null || snapshot == null) return@addSnapshotListener
+
+                val doc = snapshot.documents.firstOrNull()
+                val game = doc?.data?.let { mapToGame(it, doc.id) }
+                _currentGame.value = game
+                trySend(game)
+            }
+
+        awaitClose { registration.remove() }
+    }
+
     override suspend fun confirmRegistration(
         gameId: String,
         cohouseId: String,
@@ -61,6 +89,22 @@ class CKRGameRepositoryImpl @Inject constructor(
             "paymentIntentId" to paymentIntentId,
         )
         functions.getHttpsCallable("confirmRegistration").call(params).await()
+    }
+
+    override suspend fun cancelReservation(gameId: String, cohouseId: String) {
+        if (DemoMode.isActive) return
+
+        val params = hashMapOf<String, Any>(
+            "gameId" to gameId,
+            "cohouseId" to cohouseId,
+        )
+        functions.getHttpsCallable("cancelReservation").call(params).await()
+    }
+
+    override fun removeCohouseLocally(cohouseId: String) {
+        _currentGame.update { game ->
+            game?.copy(cohouseIDs = game.cohouseIDs.filterNot { it == cohouseId })
+        }
     }
 
     @Suppress("UNCHECKED_CAST")

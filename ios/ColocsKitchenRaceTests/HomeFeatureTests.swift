@@ -119,7 +119,7 @@ struct HomeFeatureTests {
 
     // MARK: - Refresh
 
-    @Test("refresh re-fetches CKR game, news, and cover image")
+    @Test("refresh re-fetches game, news, and cover image")
     func refresh() async {
         var ckrCalled = false
         var newsCalled = false

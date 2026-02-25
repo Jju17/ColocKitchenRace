@@ -1,20 +1,35 @@
 # Colocs Kitchen Race — Comprehensive Code Audit Report
 
 **Date:** 2026-02-22
+**Last updated:** 2026-02-25
 **Scope:** Full codebase — iOS, Android, Cloud Functions, Firestore Rules, Web, CI/CD
 
 ---
 
 ## Executive Summary
 
-This report covers a full audit of the Colocs Kitchen Race (CKR) project across all platforms and infrastructure. The codebase demonstrates solid architectural foundations — proper use of TCA on iOS, clean MVI on Android, and well-structured Cloud Functions. However, the audit identified **5 critical**, **12 high**, and **20+ medium** severity findings that should be addressed.
+This report covers a full audit of the Colocs Kitchen Race (CKR) project across all platforms and infrastructure. The codebase demonstrates solid architectural foundations — proper use of TCA on iOS, clean MVI on Android, and well-structured Cloud Functions. The audit initially identified **5 critical**, **12 high**, and **20+ medium** severity findings. **All 5 critical issues, 5 high issues, and 6 medium issues have since been resolved** (see updates below).
 
-**Top priorities:**
-1. Hardcoded Stripe publishable key in iOS source
-2. Firebase Auth listener memory leak (iOS)
-3. Firestore security rules logic bug in challenge response updates
-4. Weak cohouse membership validation in Firestore rules
-5. Race condition in game registration (Cloud Functions)
+**~~Top priorities~~ Critical issues — All resolved (2026-02-25):**
+1. ~~Hardcoded Stripe publishable key in iOS source~~ — ✅ Now loaded from `Info.plist`
+2. ~~Firebase Auth listener memory leak (iOS)~~ — ✅ Handle saved + removed on termination
+3. ~~News listener leaked in demo mode (iOS)~~ — ✅ Early return before listener creation
+4. ~~Hardcoded Stripe publishable key in Android source~~ — ✅ Now loaded from `BuildConfig`
+5. ~~Race condition in game registration (Cloud Functions)~~ — ✅ Wrapped in `db.runTransaction()`
+
+**Remaining top priorities:**
+1. ~~Firestore security rules logic bug in challenge response updates (High)~~ — ✅ Fixed with `submittedByAuthId`
+2. ~~Weak cohouse membership validation in Firestore rules (High)~~ — ✅ Fixed with `cohouseId` custom claim
+3. ~~`@unchecked Sendable` race condition + `DispatchQueue.main.sync` deadlock (High)~~ — ✅ Fixed with `@MainActor`
+4. Firebase App Check not implemented (High)
+5. ~~News listener task not cancelled (High)~~ — ✅ Fixed: task assigned to `newsListenerTask` property
+
+**Medium issues resolved (2026-02-25):**
+- iOS-S5/S6: Email and phone validation regex hardened
+- iOS-Q1: Auth sign-in post-processing extracted to shared `completeSignIn` helper
+- iOS-Q5: Swallowed `try?` errors replaced with `do/catch` + `Logger` across all clients
+- iOS-A3: `HomeFeature.refresh` now surfaces errors in `refreshError` state
+- iOS-A2: `currentPage` moved from view `@State` to reducer state
 
 ---
 
@@ -47,8 +62,8 @@ This report covers a full audit of the Colocs Kitchen Race (CKR) project across 
 | ID | Finding | File | Lines | Severity |
 |----|---------|------|-------|----------|
 | iOS-A1 | `SplashScreenFeature` has empty State and no-op `onAppear` action — dead code | `Views/SplashScreenView.swift` | 12-25 | Low |
-| iOS-A2 | `onChange(of: selectedFilter)` on View layer instead of reducer action — breaks single source of truth | `Views/Challenge/ChallengeView.swift` | 341 | Medium |
-| iOS-A3 | `refresh` action silently fails with `try?` — no error state in `HomeFeature.State` | `Views/Home/HomeView.swift` | 84-92 | Medium |
+| iOS-A2 | ~~`onChange(of: selectedFilter)` on View layer instead of reducer action — breaks single source of truth~~ | `Views/Challenge/ChallengeView.swift` | 341 | ✅ Resolved |
+| iOS-A3 | ~~`refresh` action silently fails with `try?` — no error state in `HomeFeature.State`~~ | `Views/Home/HomeView.swift` | 84-92 | ✅ Resolved |
 
 ### 1.2 Security
 
@@ -58,8 +73,8 @@ This report covers a full audit of the Colocs Kitchen Race (CKR) project across 
 | iOS-S2 | **Auth state listener never unregistered** — `addStateDidChangeListener` returns a handle that is never saved or removed | `Clients/AuthentificationClient.swift` | 362-370 | **Critical** |
 | iOS-S3 | `@unchecked Sendable` with `nonisolated(unsafe)` on `currentNonce` — race condition possible | `Clients/AuthentificationClient.swift` | 396-398 | **High** |
 | iOS-S4 | `DispatchQueue.main.sync` in `presentationAnchor` callback — potential deadlock | `Clients/AuthentificationClient.swift` | 434 | **High** |
-| iOS-S5 | Email regex too permissive — accepts `a..b@example..com` | `Shared/Utils/UserValidation.swift` | 38-40 | Medium |
-| iOS-S6 | Phone regex accepts strings like `"+++---())(("` (7 chars of noise) | `Shared/Utils/UserValidation.swift` | 45-48 | Medium |
+| iOS-S5 | ~~Email regex too permissive — accepts `a..b@example..com`~~ | `Shared/Utils/UserValidation.swift` | 38-40 | ✅ Resolved |
+| iOS-S6 | ~~Phone regex accepts strings like `"+++---())(("` (7 chars of noise)~~ | `Shared/Utils/UserValidation.swift` | 45-48 | ✅ Resolved |
 | iOS-S7 | Deep linking from notification data not implemented — `// TODO` placeholder | `colocskitchenraceApp.swift` | 110 | Medium |
 | iOS-S8 | Firebase App Check not implemented (marked as incomplete in TODO.swift) | `TODO.swift` | 11-12 | **High** |
 
@@ -68,7 +83,7 @@ This report covers a full audit of the Colocs Kitchen Race (CKR) project across 
 | ID | Finding | File | Lines | Severity |
 |----|---------|------|-------|----------|
 | iOS-P1 | **News listener leaked in demo mode** — listener created but never stored when `DemoMode.isActive` returns early | `Clients/NewsClient.swift` | 68 | **Critical** |
-| iOS-P2 | News listener task not properly cancelled in `colocskitchenraceApp` | `colocskitchenraceApp.swift` | 122, 164-170 | **High** |
+| iOS-P2 | ~~News listener task not properly cancelled in `colocskitchenraceApp`~~ | `colocskitchenraceApp.swift` | 122, 164-170 | ✅ Resolved |
 | iOS-P3 | JPEG compression loop runs synchronously on main thread — blocks UI during image selection | `Utils/ImagePipeline.swift` | 56-63 | Medium |
 | iOS-P4 | `DispatchQueue.main.asyncAfter` prevents view deallocation | `Views/Global/ConfettiCannon.swift` | 21 | Medium |
 | iOS-P5 | Computed property `filteredTiles` (array filter) called on every `onChange` re-render — should be memoized in state | `Views/Challenge/ChallengeView.swift` | 42-70, 341-343 | Medium |
@@ -77,11 +92,11 @@ This report covers a full audit of the Colocs Kitchen Race (CKR) project across 
 
 | ID | Finding | File | Lines | Severity |
 |----|---------|------|-------|----------|
-| iOS-Q1 | Auth sign-in post-processing duplicated 3x (~90 lines) across email, Google, Apple flows | `Clients/AuthentificationClient.swift` | 61-352 | Medium |
+| iOS-Q1 | ~~Auth sign-in post-processing duplicated 3x (~90 lines) across email, Google, Apple flows~~ | `Clients/AuthentificationClient.swift` | 61-352 | ✅ Resolved |
 | iOS-Q2 | `contactUser` computed property always returns `nil` — dead code | `Models/Cohouse.swift` | 43-46 | Low |
 | iOS-Q3 | Inconsistent naming: `SigninView` (missing capital I), `AuthentificationClient` (unusual spelling), lowercase `colocskitchenraceApp` | Various | — | Low |
 | iOS-Q4 | `print()` statements in AppDelegate instead of `Logger` | `colocskitchenraceApp.swift` | 53, 60, 78, 85, 93, 109 | Low |
-| iOS-Q5 | 7+ instances of swallowed errors across auth, challenges, CKR, news, and home clients | Various | — | Medium |
+| iOS-Q5 | ~~7+ instances of swallowed errors across auth, challenges, CKR, news, and home clients~~ | Various | — | ✅ Resolved |
 | iOS-Q6 | `ChallengeTileView` is 200+ lines with 5 computed properties — should be decomposed | `Views/Challenge/ChallengeTileView.swift` | 237-444 | Low |
 | iOS-Q7 | Custom `Binding(get:set:)` in `SigninView` instead of `@Bindable` | `Views/Signin/SigninView.swift` | 201-203 | Low |
 | iOS-Q8 | Most views missing `.accessibilityLabel()` and `.accessibilityHint()` | Various | — | Medium |
@@ -295,32 +310,32 @@ This report covers a full audit of the Colocs Kitchen Race (CKR) project across 
 
 ## 8. Consolidated Findings Table
 
-### Critical (5)
+### Critical (5) — ✅ All resolved (2026-02-25)
 
-| ID | Platform | Finding |
-|----|----------|---------|
-| iOS-S1 | iOS | Hardcoded Stripe publishable key in source |
-| iOS-S2 | iOS | Auth state listener never unregistered — memory leak |
-| iOS-P1 | iOS | News listener leaked in demo mode |
-| AND-S1 | Android | Hardcoded Stripe publishable key in source |
-| CF-S1 | Functions | Registration race condition — no transaction |
+| ID | Platform | Finding | Status |
+|----|----------|---------|--------|
+| iOS-S1 | iOS | Hardcoded Stripe publishable key in source | ✅ Fixed — loaded from `Info.plist` |
+| iOS-S2 | iOS | Auth state listener never unregistered — memory leak | ✅ Fixed — handle saved + removed on termination |
+| iOS-P1 | iOS | News listener leaked in demo mode | ✅ Fixed — early return before listener creation |
+| AND-S1 | Android | Hardcoded Stripe publishable key in source | ✅ Fixed — loaded from `BuildConfig` |
+| CF-S1 | Functions | Registration race condition — no transaction | ✅ Fixed — wrapped in `db.runTransaction()` |
 
-### High (12)
+### High (12) — 5 resolved (2026-02-25)
 
-| ID | Platform | Finding |
-|----|----------|---------|
-| iOS-S3 | iOS | `@unchecked Sendable` race condition on `currentNonce` |
-| iOS-S4 | iOS | `DispatchQueue.main.sync` potential deadlock |
-| iOS-S8 | iOS | Firebase App Check not implemented |
-| iOS-P2 | iOS | News listener task not cancelled |
-| FR-S1 | Firestore | Challenge response update rule logic bug |
-| FR-S2 | Firestore | `isCohouseMember()` only checks `isSignedIn()` |
-| AND-S3 | Android | WebView JavaScript not explicitly disabled |
-| AND-E1 | Android | Generic exception catching in ViewModels |
-| AND-P2 | Android | Snapshot listeners not cleaned up on `onCleared()` |
-| CF-S3 | Functions | No input validation library |
-| CF-S4 | Functions | No rate limiting on callable functions |
-| CFG-1 | Config | No security headers on Firebase Hosting |
+| ID | Platform | Finding | Status |
+|----|----------|---------|--------|
+| iOS-S3 | iOS | `@unchecked Sendable` race condition on `currentNonce` | ✅ Fixed — class marked `@MainActor` |
+| iOS-S4 | iOS | `DispatchQueue.main.sync` potential deadlock | ✅ Fixed — removed sync dispatch, class is `@MainActor` |
+| iOS-S8 | iOS | Firebase App Check not implemented | |
+| iOS-P2 | iOS | News listener task not cancelled | ✅ Fixed — task assigned to `newsListenerTask` |
+| FR-S1 | Firestore | Challenge response update rule logic bug | ✅ Fixed — validates `submittedByAuthId == authUid()` |
+| FR-S2 | Firestore | `isCohouseMember()` only checks `isSignedIn()` | ✅ Fixed — validates `cohouseId` custom claim |
+| AND-S3 | Android | WebView JavaScript not explicitly disabled | |
+| AND-E1 | Android | Generic exception catching in ViewModels | |
+| AND-P2 | Android | Snapshot listeners not cleaned up on `onCleared()` | |
+| CF-S3 | Functions | No input validation library | |
+| CF-S4 | Functions | No rate limiting on callable functions | |
+| CFG-1 | Config | No security headers on Firebase Hosting | |
 
 ### Medium (20+)
 
@@ -356,17 +371,17 @@ This report covers a full audit of the Colocs Kitchen Race (CKR) project across 
 
 ### Immediate (Before Next Release)
 
-1. **Remove hardcoded Stripe keys** from iOS (`colocskitchenraceApp.swift:36`) and Android source. Load from Firebase Remote Config or a build-time injected configuration.
+1. ~~**Remove hardcoded Stripe keys** from iOS and Android source.~~ ✅ **Done** — iOS loads from `Info.plist`, Android from `BuildConfig`.
 
-2. **Fix auth listener memory leak** in `AuthentificationClient.swift:362-370`. Save the `ListenerRegistration` handle returned by `addStateDidChangeListener` and remove it on cleanup.
+2. ~~**Fix auth listener memory leak** in `AuthentificationClient.swift`.~~ ✅ **Done** — handle saved and removed via `continuation.onTermination`.
 
-3. **Fix news listener leak in demo mode** in `NewsClient.swift:68`. Check `DemoMode.isActive` **before** creating the Firestore snapshot listener.
+3. ~~**Fix news listener leak in demo mode** in `NewsClient.swift`.~~ ✅ **Done** — early return before creating Firestore listener.
 
-4. **Fix Firestore rules — challenge response update** (`firestore.rules:180`). Replace `resource.data.cohouseId == responseId` with a correct ownership check.
+4. ~~**Fix Firestore rules — challenge response update** (`firestore.rules:180`).~~ ✅ **Done** — added `submittedByAuthId` field to responses, rule now checks `submittedByAuthId == authUid()`.
 
-5. **Fix Firestore rules — cohouse member validation** (`firestore.rules:101-118`). Replace `isSignedIn()` with actual membership verification using `exists()` on the cohouse's users subcollection.
+5. ~~**Fix Firestore rules — cohouse member validation** (`firestore.rules:101-118`).~~ ✅ **Done** — added `setCohouseClaim` Cloud Function + `cohouseId` custom claim on auth token. Rule now checks `request.auth.token.cohouseId == cohouseId`.
 
-6. **Wrap game registration in a Firestore transaction** (`registration.ts:68-73`). The `cohouseIDs` array update and registration document create should be atomic.
+6. ~~**Wrap game registration in a Firestore transaction** (`registration.ts`).~~ ✅ **Done** — both operations now in a single `db.runTransaction()`.
 
 ### Soon (Next Sprint)
 
@@ -374,7 +389,7 @@ This report covers a full audit of the Colocs Kitchen Race (CKR) project across 
 
 8. **Add security headers** to `firebase.json` hosting configuration (X-Content-Type-Options, X-Frame-Options, HSTS).
 
-9. **Fix `@unchecked Sendable` thread safety** in `AuthentificationClient.swift:396-398`. Use `@MainActor` or a proper lock for `currentNonce`.
+9. ~~**Fix `@unchecked Sendable` thread safety** in `AuthentificationClient.swift`.~~ ✅ **Done** — `AppleSignInHelper` marked `@MainActor`, removed `@unchecked Sendable` and `nonisolated(unsafe)`. Also fixed `DispatchQueue.main.sync` deadlock in `presentationAnchor`.
 
 10. **Add input validation library** (Zod) to Cloud Functions for consistent request validation.
 

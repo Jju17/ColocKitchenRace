@@ -1,4 +1,5 @@
 import { onTaskDispatched } from "firebase-functions/v2/tasks";
+import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { admin, db, REGION } from "./config";
 
 // ============================================
@@ -6,6 +7,11 @@ import { admin, db, REGION } from "./config";
 // ============================================
 
 interface ReleaseExpiredReservationData {
+  gameId: string;
+  cohouseId: string;
+}
+
+interface CancelReservationRequest {
   gameId: string;
   cohouseId: string;
 }
@@ -80,5 +86,71 @@ export const releaseExpiredReservation = onTaskDispatched(
         `(${attendingCount} spots freed)`
       );
     });
+  }
+);
+
+/**
+ * Client-callable function to immediately cancel a pending reservation.
+ *
+ * Called when the user cancels the Stripe PaymentSheet or dismisses the
+ * payment summary screen. Does the same cleanup as `releaseExpiredReservation`
+ * but on-demand instead of after the 15-minute TTL.
+ *
+ * Idempotent — safe to call multiple times or after the Cloud Task has
+ * already cleaned up.
+ */
+export const cancelReservation = onCall<CancelReservationRequest>(
+  { region: REGION },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Must be authenticated");
+    }
+
+    const { gameId, cohouseId } = request.data;
+
+    if (!gameId || !cohouseId) {
+      throw new HttpsError(
+        "invalid-argument",
+        "Missing required fields: gameId, cohouseId"
+      );
+    }
+
+    const gameRef = db.collection("ckrGames").doc(gameId);
+    const regRef = gameRef.collection("registrations").doc(cohouseId);
+
+    await db.runTransaction(async (transaction) => {
+      const regDoc = await transaction.get(regRef);
+
+      if (!regDoc.exists) {
+        console.log(
+          `cancelReservation: registration ${cohouseId} in game ${gameId} already deleted`
+        );
+        return;
+      }
+
+      const regData = regDoc.data()!;
+
+      if (regData.status !== "pending") {
+        console.log(
+          `cancelReservation: registration ${cohouseId} in game ${gameId} has status "${regData.status}", skipping`
+        );
+        return;
+      }
+
+      const attendingCount = (regData.attendingUserIds as string[])?.length || 0;
+
+      transaction.delete(regRef);
+      transaction.update(gameRef, {
+        cohouseIDs: admin.firestore.FieldValue.arrayRemove(cohouseId),
+        totalRegisteredParticipants: admin.firestore.FieldValue.increment(-attendingCount),
+      });
+
+      console.log(
+        `Cancelled reservation for cohouse ${cohouseId} in game ${gameId} ` +
+        `(${attendingCount} spots freed)`
+      );
+    });
+
+    return { success: true };
   }
 );

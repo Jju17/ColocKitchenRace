@@ -7,6 +7,7 @@
 
 import ComposableArchitecture
 import FirebaseFirestore
+import os
 
 // MARK: - Error
 
@@ -48,7 +49,12 @@ extension NewsClient: DependencyKey {
                     .getDocuments()
 
                 let lastNews = snapshot.documents.compactMap { document in
-                    try? document.data(as: News.self)
+                    do {
+                        return try document.data(as: News.self)
+                    } catch {
+                        Logger.newsLog.error("Failed to decode news \(document.documentID): \(error)")
+                        return nil
+                    }
                 }
 
                 $news.withLock { $0 = lastNews }
@@ -75,7 +81,12 @@ extension NewsClient: DependencyKey {
                         guard let snapshot, error == nil else { return }
 
                         let news = snapshot.documents.compactMap { document in
-                            try? document.data(as: News.self)
+                            do {
+                                return try document.data(as: News.self)
+                            } catch {
+                                Logger.newsLog.error("Failed to decode news \(document.documentID): \(error)")
+                                return nil
+                            }
                         }
 
                         @Shared(.news) var sharedNews

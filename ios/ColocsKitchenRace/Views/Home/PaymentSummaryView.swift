@@ -33,6 +33,7 @@ struct PaymentSummaryFeature {
         var paymentIntentId: String?
         var isPaymentInProgress: Bool = false
         var isConfirming: Bool = false
+        var isConfirmed: Bool = false
         var errorMessage: String?
 
         var paymentSheetReady: Bool {
@@ -92,13 +93,14 @@ struct PaymentSummaryFeature {
 
                 return .run { send in
                     do {
+                        Logger.paymentLog.info("reserveAndCreatePayment: gameId=\(gameId), cohouseId=\(cohouseId), amount=\(totalCents), participants=\(participantCount)")
                         let result = try await stripeClient.reserveAndCreatePayment(
                             gameId, cohouseId, totalCents, participantCount,
                             attendingUserIds, averageAge, cohouseType
                         )
                         await send(._paymentIntentCreated(result))
                     } catch {
-                        Logger.paymentLog.error("Failed to reserve spot: \(error.localizedDescription)")
+                        Logger.paymentLog.error("Failed to reserve spot: \(error)")
                         await send(._paymentIntentFailed(error.localizedDescription))
                     }
                 }
@@ -135,6 +137,7 @@ struct PaymentSummaryFeature {
 
             case ._confirmationSucceeded:
                 state.isConfirming = false
+                state.isConfirmed = true
 
                 // Update local game state to reflect the confirmed registration
                 let cohouseId = state.cohouse.id.uuidString

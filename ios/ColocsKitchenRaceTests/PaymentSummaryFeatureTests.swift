@@ -144,6 +144,7 @@ struct PaymentSummaryFeatureTests {
 
         await store.receive(\._confirmationSucceeded) {
             $0.isConfirming = false
+            $0.isConfirmed = true
         }
 
         await store.receive(\.delegate.registrationSucceeded)
@@ -221,6 +222,7 @@ struct PaymentSummaryFeatureTests {
 
         await store.receive(\._confirmationSucceeded) {
             $0.isConfirming = false
+            $0.isConfirmed = true
         }
 
         await store.receive(\.delegate.registrationSucceeded)

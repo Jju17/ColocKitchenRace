@@ -98,23 +98,12 @@ service cloud.firestore {
     ///
     /// NOTE: This performs a get() which counts toward your daily reads.
     /// For a small app this is fine; for scale you could denormalize.
+    /// Check whether the caller is a member of the given cohouse.
+    /// Uses a custom claim set by the setCohouseClaim Cloud Function
+    /// (same pattern as isAdmin() using request.auth.token.admin).
     function isCohouseMember(cohouseId) {
-      // We look for any CohouseUser doc where userId != null.
-      // Since we can't query in rules, we rely on the user doc's
-      // cohouseId field instead: if the user's own doc has
-      // cohouseId == this cohouseId, they're a member.
-      //
-      // But we don't have the user doc ID here... so we use a
-      // simpler approach: allow if signed in and the cohouse doc
-      // exists. For stronger security, see the note below.
-      //
-      // PRACTICAL APPROACH: Since all write operations that truly
-      // matter (registration, payment, matching) go through Cloud
-      // Functions with their own validation, we keep cohouse writes
-      // to signed-in users. The risk is minimal: a malicious user
-      // could only modify cohouse metadata, not game registrations
-      // or payments.
-      return isSignedIn();
+      return isSignedIn()
+        && request.auth.token.cohouseId == cohouseId;
     }
 
     // ──────────────────────────────────────────────
@@ -176,8 +165,10 @@ service cloud.firestore {
 
         // Updates allowed for admins (status change) or the
         // original submitter (re-submit before validation).
+        // We check submittedByAuthId to verify the caller is the
+        // user who originally submitted the response.
         allow update: if isSignedIn()
-                      && (isAdmin() || resource.data.cohouseId == responseId);
+                      && (isAdmin() || resource.data.submittedByAuthId == authUid());
 
         allow delete: if false;
       }

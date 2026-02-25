@@ -1,5 +1,6 @@
 package dev.rahier.colocskitchenrace.ui.home.registration
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,6 +13,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Currency
@@ -169,6 +172,24 @@ class PaymentSummaryViewModel @Inject constructor(
                 _effect.send(PaymentSummaryEffect.RegistrationComplete)
             } catch (e: Exception) {
                 _state.update { it.copy(isConfirming = false, error = "Paiement reussi mais confirmation echouee. Reessayez.") }
+            }
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        val s = _state.value
+        if (s.paymentResult != null && !s.registrationComplete) {
+            // Optimistically update local state so home screen
+            // immediately reflects "not registered".
+            gameRepository.removeCohouseLocally(s.cohouseId)
+
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    gameRepository.cancelReservation(s.gameId, s.cohouseId)
+                } catch (e: Exception) {
+                    Log.e("PaymentSummary", "Failed to cancel reservation", e)
+                }
             }
         }
     }

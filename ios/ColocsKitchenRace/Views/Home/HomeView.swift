@@ -26,6 +26,7 @@ struct HomeFeature {
         @Shared(.news) var news
         @Shared(.userInfo) var userInfo
         var coverImageData: Data?
+        var refreshError: String?
         @Presents var registrationForm: CKRRegistrationFormFeature.State?
 
         var coverImage: UIImage? {
@@ -46,6 +47,7 @@ struct HomeFeature {
         case coverImageLoaded(Data?)
         case openRegisterForm
         case refresh
+        case refreshFailed(String)
         case path(StackActionOf<Path>)
         case registrationForm(PresentationAction<CKRRegistrationFormFeature.Action>)
         case delegate(Delegate)
@@ -80,20 +82,66 @@ struct HomeFeature {
                     )
                     return .none
                 case .refresh:
+                    state.refreshError = nil
                     let coverImagePath = state.cohouse?.coverImagePath
                     return .run { [ckrClient, newsClient, cohouseClient] send in
-                        let _ = try? await ckrClient.getLast()
-                        let _ = try? await newsClient.getLast()
+                        do {
+                            let _ = try await ckrClient.getLast()
+                        } catch {
+                            Logger.ckrLog.error("Home refresh — game fetch failed: \(error)")
+                        }
+
+                        do {
+                            let _ = try await newsClient.getLast()
+                        } catch {
+                            Logger.newsLog.error("Home refresh — news fetch failed: \(error)")
+                            await send(.refreshFailed("Failed to load news"))
+                        }
+
                         if let path = coverImagePath {
-                            let data = try? await cohouseClient.loadCoverImage(path)
-                            await send(.coverImageLoaded(data))
+                            do {
+                                let data = try await cohouseClient.loadCoverImage(path)
+                                await send(.coverImageLoaded(data))
+                            } catch {
+                                Logger.cohouseLog.error("Home refresh — cover image failed: \(error)")
+                                await send(.coverImageLoaded(nil))
+                            }
                         } else {
                             await send(.coverImageLoaded(nil))
                         }
                     }
+                case let .refreshFailed(message):
+                    state.refreshError = message
+                    return .none
                 case .registrationForm(.presented(.delegate(.registrationSucceeded))):
                     state.registrationForm = nil
                     return .send(.refresh)
+                case .registrationForm(.dismiss):
+                    // Cancel any pending reservation when the form is dismissed
+                    // without a successful registration. cancelReservation is
+                    // idempotent — safe even if no reservation was created.
+                    if let formState = state.registrationForm {
+                        let gameId = formState.gameId
+                        let cohouseId = formState.cohouse.id.uuidString
+
+                        // Optimistically update local state so the home screen
+                        // immediately reflects "not registered".
+                        @Shared(.ckrGame) var ckrGame
+                        $ckrGame.withLock { game in
+                            if game != nil {
+                                game!.cohouseIDs.removeAll { $0 == cohouseId }
+                            }
+                        }
+
+                        return .run { [ckrClient] _ in
+                            do {
+                                try await ckrClient.cancelReservation(gameId, cohouseId)
+                            } catch {
+                                Logger.ckrLog.error("Failed to cancel reservation: \(error)")
+                            }
+                        }
+                    }
+                    return .none
                 case .registrationForm:
                     return .none
                 case .path:
@@ -118,6 +166,13 @@ struct HomeView: View {
         NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
             ScrollView {
                 VStack(spacing: 15) {
+                    if let error = store.refreshError {
+                        Text(error)
+                            .font(.custom("BaksoSapi", size: 14))
+                            .foregroundStyle(.red)
+                            .padding(.horizontal)
+                    }
+
                     Button {
                         store.send(.delegate(.switchToCohouseButtonTapped))
                     } label: {

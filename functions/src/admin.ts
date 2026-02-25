@@ -79,8 +79,10 @@ export const setAdminClaim = onCall<SetAdminClaimRequest>(
     }
 
     try {
-      // Set the custom claim
-      await auth.setCustomUserClaims(targetAuthUid, { admin: isAdmin });
+      // Preserve existing custom claims (e.g. cohouseId) and set admin
+      const targetUser = await auth.getUser(targetAuthUid);
+      const existingClaims = targetUser.customClaims || {};
+      await auth.setCustomUserClaims(targetAuthUid, { ...existingClaims, admin: isAdmin });
 
       console.log(
         `Admin claim ${isAdmin ? "set" : "removed"} for Auth UID: ${targetAuthUid} (by: ${callerUid})`

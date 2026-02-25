@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import FirebaseAuth
 import FirebaseFirestore
 import FirebaseStorage
 import os
@@ -133,7 +134,10 @@ extension ChallengeResponseClient: DependencyKey {
                     .document(response.cohouseId)
 
                 try doc.setData(from: response, merge: true)
-                try await doc.updateData(["serverTS": FieldValue.serverTimestamp()])
+                try await doc.updateData([
+                    "serverTS": FieldValue.serverTimestamp(),
+                    "submittedByAuthId": Auth.auth().currentUser?.uid ?? ""
+                ])
                 return response
             } catch let error as NSError {
                 throw ChallengeResponseError(from: error)

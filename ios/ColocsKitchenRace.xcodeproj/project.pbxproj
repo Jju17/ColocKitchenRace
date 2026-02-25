@@ -116,7 +116,6 @@
 		64C87C212DEB401800EA27EB /* PBXFileSystemSynchronizedBuildFileExceptionSet */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				"GoogleService-Info.plist",
 				Info.plist,
 			);
 			target = 64FBE0242D8860CC00D8A89F /* CKRAdmin */;
@@ -310,7 +309,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 64FBE0312D8860CD00D8A89F /* Build configuration list for PBXNativeTarget "CKRAdmin" */;
 			buildPhases = (
-				64CDE0052F4D000100000005 /* Copy Firebase Config (Admin) */,
 				64FBE0212D8860CC00D8A89F /* Sources */,
 				64FBE0222D8860CC00D8A89F /* Frameworks */,
 				64FBE0232D8860CC00D8A89F /* Resources */,
@@ -427,44 +425,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		64CDE0042F4D000100000004 /* Copy Firebase Config */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Copy Firebase Config";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Copy the correct GoogleService-Info.plist based on build configuration\n# Debug = Staging, Release = Production\n\nFIREBASE_DIR=\"${SRCROOT}/Config/Firebase\"\nDEST=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist\"\n\nif [ \"${CONFIGURATION}\" == \"Debug\" ]; then\n  SRC=\"${FIREBASE_DIR}/GoogleService-Info-Staging.plist\"\nelse\n  SRC=\"${FIREBASE_DIR}/GoogleService-Info-Production.plist\"\nfi\n\nif [ ! -f \"$SRC\" ]; then\n  echo \"error: Missing Firebase config: $SRC\"\n  echo \"error: Copy the template from Config/Firebase/*.plist.template and fill in your values.\"\n  exit 1\nfi\n\ncp \"$SRC\" \"$DEST\"\necho \"Copied $(basename $SRC) → GoogleService-Info.plist\"\n";
-		};
-		64CDE0052F4D000100000005 /* Copy Firebase Config (Admin) */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Copy Firebase Config (Admin)";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/GoogleService-Info.plist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Copy the correct GoogleService-Info.plist for CKRAdmin\n# Debug = Staging, Release = Production (admin-specific plists)\n\nFIREBASE_DIR=\"${SRCROOT}/Config/Firebase\"\nDEST=\"${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/GoogleService-Info.plist\"\n\nif [ \"${CONFIGURATION}\" == \"Debug\" ]; then\n  SRC=\"${FIREBASE_DIR}/GoogleService-Info-AdminStaging.plist\"\nelse\n  SRC=\"${FIREBASE_DIR}/GoogleService-Info-AdminProduction.plist\"\nfi\n\nif [ ! -f \"$SRC\" ]; then\n  echo \"error: Missing Firebase config: $SRC\"\n  echo \"error: Copy the template from Config/Firebase/*.plist.template and fill in your values.\"\n  exit 1\nfi\n\ncp \"$SRC\" \"$DEST\"\necho \"Copied $(basename $SRC) → GoogleService-Info.plist\"\n";
-		};
 		64FB41C72AD408E800C93A34 /* Crashlytics Accesses */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;

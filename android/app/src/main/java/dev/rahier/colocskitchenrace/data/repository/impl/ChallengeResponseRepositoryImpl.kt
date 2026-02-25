@@ -1,6 +1,7 @@
 package dev.rahier.colocskitchenrace.data.repository.impl
 
 import com.google.firebase.Timestamp
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
 import dev.rahier.colocskitchenrace.data.model.ChallengeResponse
@@ -180,6 +181,7 @@ class ChallengeResponseRepositoryImpl @Inject constructor(
                 "content" to contentMap,
                 "status" to response.status.name.lowercase(),
                 "submissionDate" to com.google.firebase.firestore.FieldValue.serverTimestamp(),
+                "submittedByAuthId" to (FirebaseAuth.getInstance().currentUser?.uid.orEmpty()),
             )
         }
     }

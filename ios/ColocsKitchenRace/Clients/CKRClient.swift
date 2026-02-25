@@ -22,10 +22,15 @@ enum CKRError: Error {
 @DependencyClient
 struct CKRClient {
     var getLast: @Sendable () async throws -> Result<CKRGame?, CKRError>
+    var listenToGame: @Sendable () -> AsyncStream<CKRGame?> = { .never }
     var confirmRegistration: @Sendable (
         _ gameId: String,
         _ cohouseId: String,
         _ paymentIntentId: String
+    ) async throws -> Void
+    var cancelReservation: @Sendable (
+        _ gameId: String,
+        _ cohouseId: String
     ) async throws -> Void
     var getMyPlanning: @Sendable (
         _ gameId: String,
@@ -67,11 +72,60 @@ extension CKRClient: DependencyKey {
                     return .failure(.noDocumentAvailable)
                 }
 
-                let game = try? document.data(as: CKRGame.self)
+                let game: CKRGame?
+                do {
+                    game = try document.data(as: CKRGame.self)
+                } catch {
+                    Logger.ckrLog.error("Failed to decode CKRGame document \(document.documentID): \(error)")
+                    game = nil
+                }
                 $ckrGame.withLock { $0 = game }
                 return .success(game)
             } catch {
                 return .failure(.firebaseError(error.localizedDescription))
+            }
+        },
+        listenToGame: {
+            AsyncStream { continuation in
+                if DemoMode.isActive {
+                    @Shared(.ckrGame) var ckrGame
+                    $ckrGame.withLock { $0 = DemoMode.demoCKRGame }
+                    continuation.yield(DemoMode.demoCKRGame)
+                    return
+                }
+
+                let listener = Firestore.firestore()
+                    .collection("ckrGames")
+                    .order(by: "publishedTimestamp", descending: true)
+                    .limit(to: 1)
+                    .addSnapshotListener { snapshot, error in
+                        guard let snapshot, error == nil else {
+                            if let error {
+                                Logger.ckrLog.error("Game listener error: \(error)")
+                            }
+                            return
+                        }
+
+                        let game: CKRGame?
+                        if let document = snapshot.documents.first {
+                            do {
+                                game = try document.data(as: CKRGame.self)
+                            } catch {
+                                Logger.ckrLog.error("Failed to decode CKRGame in listener: \(error)")
+                                game = nil
+                            }
+                        } else {
+                            game = nil
+                        }
+
+                        @Shared(.ckrGame) var ckrGame
+                        $ckrGame.withLock { $0 = game }
+                        continuation.yield(game)
+                    }
+
+                continuation.onTermination = { _ in
+                    listener.remove()
+                }
             }
         },
         confirmRegistration: { gameId, cohouseId, paymentIntentId in
@@ -92,6 +146,20 @@ extension CKRClient: DependencyKey {
             ]
 
             _ = try await callable.call(data)
+        },
+        cancelReservation: { gameId, cohouseId in
+            if DemoMode.isActive {
+                Logger.ckrLog.info("[Demo] Simulating reservation cancellation")
+                return
+            }
+
+            let functions = Functions.functions(region: "europe-west1")
+            let callable = functions.httpsCallable("cancelReservation")
+
+            _ = try await callable.call([
+                "gameId": gameId,
+                "cohouseId": cohouseId
+            ] as [String: Any])
         },
         getMyPlanning: { gameId, cohouseId in
             // Demo mode: return mock planning without calling Cloud Function
@@ -146,13 +214,6 @@ extension CKRClient: DependencyKey {
         }
     )
 
-    // MARK: Test
-
-    static let testValue = Self()
-
-    // MARK: Preview
-
-    static let previewValue: CKRClient = .testValue
 }
 
 // MARK: - Registration

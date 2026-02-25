@@ -7,6 +7,7 @@
 
 import ComposableArchitecture
 import FirebaseFirestore
+import os
 
 // MARK: - Error
 
@@ -44,7 +45,12 @@ extension ChallengesClient: DependencyKey {
                 .getDocuments()
 
             let allChallenges = snapshot.documents.compactMap { document in
-                try? document.data(as: Challenge.self)
+                do {
+                    return try document.data(as: Challenge.self)
+                } catch {
+                    Logger.challengeLog.error("Failed to decode challenge \(document.documentID): \(error)")
+                    return nil
+                }
             }
             .sorted { $0.endDate < $1.endDate }
 

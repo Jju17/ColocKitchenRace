@@ -35,6 +35,7 @@ struct ChallengeFeature {
         var isLoading = false
         var errorMessage: String?
         @Presents var leaderboard: LeaderboardFeature.State?
+        var currentPage: UUID?
         var pinnedTileIDs: Set<UUID> = []
 
         // MARK: - Filtered & Sorted tiles
@@ -76,6 +77,7 @@ struct ChallengeFeature {
         case challengesAndResponsesLoaded(Result<([Challenge], [ChallengeResponse]), Error>)
         case failed(String)
         case filterChanged(ChallengeFilter)
+        case currentPageChanged(UUID?)
         case challengeTiles(IdentifiedActionOf<ChallengeTileFeature>)
         case leaderboardButtonTapped
         case leaderboard(PresentationAction<LeaderboardFeature.Action>)
@@ -188,6 +190,11 @@ struct ChallengeFeature {
             case let .filterChanged(filter):
                 state.selectedFilter = filter
                 state.pinnedTileIDs = []
+                state.currentPage = state.filteredTiles.first?.id
+                return .none
+
+            case let .currentPageChanged(page):
+                state.currentPage = page
                 return .none
 
             // MARK: - Explicit failure
@@ -242,7 +249,6 @@ struct ChallengeFeature {
 
 struct ChallengeView: View {
     @Bindable var store: StoreOf<ChallengeFeature>
-    @State private var currentPage: UUID?
 
     var body: some View {
         NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
@@ -320,7 +326,10 @@ struct ChallengeView: View {
                         }
                         Spacer()
                     } else {
-                        SnapPagingContainer(itemWidth: UIScreen.main.bounds.width - 32, currentPage: $currentPage) {
+                        SnapPagingContainer(itemWidth: UIScreen.main.bounds.width - 32, currentPage: Binding(
+                            get: { store.currentPage },
+                            set: { store.send(.currentPageChanged($0)) }
+                        )) {
                             ForEach(Array(store.filteredTiles.enumerated()), id: \.element.id) { _, tileState in
                                 if let tileStore = store.scope(state: \.challengeTiles[id: tileState.id], action: \.challengeTiles[id: tileState.id]) {
                                     ChallengeTileView(store: tileStore, colorIndex: stableColorIndex(for: tileState.id))
@@ -331,16 +340,13 @@ struct ChallengeView: View {
                         // Page dots
                         PageDotsView(
                             total: store.filteredTiles.count,
-                            currentIndex: store.filteredTiles.firstIndex(where: { $0.id == currentPage }) ?? 0
+                            currentIndex: store.filteredTiles.firstIndex(where: { $0.id == store.currentPage }) ?? 0
                         )
                         .padding(.bottom, 8)
                     }
                 }
             }
             .background(Color(.systemBackground))
-            .onChange(of: store.selectedFilter) { _, _ in
-                currentPage = store.filteredTiles.first?.id
-            }
             .navigationTitle("Challenges")
             .navigationBarTitleDisplayMode(.large)
             .font(.custom("BaksoSapi", size: 32))

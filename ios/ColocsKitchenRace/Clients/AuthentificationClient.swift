@@ -60,9 +60,6 @@ extension AuthenticationClient: DependencyKey {
 
     static let liveValue = Self(
         signIn: { email, password in
-            @Shared(.userInfo) var userInfo
-            @Shared(.cohouse) var cohouse
-
             let db = Firestore.firestore()
 
             // Try signing in. If the user doesn't exist, throw .accountNotFound
@@ -105,23 +102,7 @@ extension AuthenticationClient: DependencyKey {
                 loggedUser = newUser
             }
 
-            try? await Messaging.messaging().subscribe(toTopic: "all_users")
-            $userInfo.withLock { $0 = loggedUser }
-
-            // Demo mode: seed all @Shared with mock data and skip Firestore cohouse loading
-            if loggedUser.email == DemoMode.demoEmail {
-                DemoMode.seedSharedState(for: loggedUser)
-                return loggedUser
-            }
-
-            // Auto-load user's cohouse if they have one
-            if let cohouseId = loggedUser.cohouseId {
-                let cohouseRef = db.collection("cohouses").document(cohouseId)
-                if let loaded = try? await FirestoreHelpers.fetchCohouseWithUsers(from: cohouseRef) {
-                    $cohouse.withLock { $0 = loaded }
-                }
-            }
-
+            await completeSignIn(loggedUser)
             return loggedUser
         },
         createAccount: { email, password in
@@ -144,12 +125,20 @@ extension AuthenticationClient: DependencyKey {
                 .document(newUser.id.uuidString)
                 .setData(from: newUser)
 
-            try? await Messaging.messaging().subscribe(toTopic: "all_users")
+            do {
+                try await Messaging.messaging().subscribe(toTopic: "all_users")
+            } catch {
+                Logger.authLog.error("Failed to subscribe to FCM topic on account creation: \(error)")
+            }
             $userInfo.withLock { $0 = newUser }
             return newUser
         },
         signOut: {
-            try? await Messaging.messaging().unsubscribe(fromTopic: "all_users")
+            do {
+                try await Messaging.messaging().unsubscribe(fromTopic: "all_users")
+            } catch {
+                Logger.authLog.error("Failed to unsubscribe from FCM topic on sign-out: \(error)")
+            }
             try Auth.auth().signOut()
 
             @Shared(.userInfo) var user
@@ -176,7 +165,11 @@ extension AuthenticationClient: DependencyKey {
             }
 
             // 1. Unsubscribe from FCM topic before account is deleted
-            try? await Messaging.messaging().unsubscribe(fromTopic: "all_users")
+            do {
+                try await Messaging.messaging().unsubscribe(fromTopic: "all_users")
+            } catch {
+                Logger.authLog.error("Failed to unsubscribe from FCM topic on delete: \(error)")
+            }
 
             // 2. Call Cloud Function to delete all server-side data
             let functions = Functions.functions(region: "europe-west1")
@@ -185,7 +178,11 @@ extension AuthenticationClient: DependencyKey {
             ])
 
             // 3. Sign out locally (Auth account already deleted server-side)
-            try? Auth.auth().signOut()
+            do {
+                try Auth.auth().signOut()
+            } catch {
+                Logger.authLog.error("Failed to sign out locally after account deletion: \(error)")
+            }
 
             // 4. Clear all local shared state
             $user.withLock { $0 = nil }
@@ -208,9 +205,6 @@ extension AuthenticationClient: DependencyKey {
             try await user.sendEmailVerification()
         },
         signInWithGoogle: {
-            @Shared(.userInfo) var userInfo
-            @Shared(.cohouse) var cohouse
-
             // 1. Get the root view controller to present Google Sign-In
             guard let windowScene = await UIApplication.shared.connectedScenes.first as? UIWindowScene,
                   let rootVC = await windowScene.windows.first?.rootViewController
@@ -260,31 +254,19 @@ extension AuthenticationClient: DependencyKey {
                 user = newUser
             }
 
-            try? await Messaging.messaging().subscribe(toTopic: "all_users")
-            $userInfo.withLock { $0 = user }
-
-            // Auto-load user's cohouse if they have one
-            if let cohouseId = user.cohouseId {
-                let cohouseRef = db.collection("cohouses").document(cohouseId)
-                if let loaded = try? await FirestoreHelpers.fetchCohouseWithUsers(from: cohouseRef) {
-                    $cohouse.withLock { $0 = loaded }
-                }
-            }
-
+            await completeSignIn(user)
             return user
         },
         signInWithApple: {
-            @Shared(.userInfo) var userInfo
-            @Shared(.cohouse) var cohouse
-
             // 1. Run Apple Sign-In flow on the main actor
             let helper = await MainActor.run { AppleSignInHelper() }
             let authorization = try await helper.signIn()
+            let nonce = await helper.currentNonce
 
             guard let appleIDCredential = authorization.credential as? ASAuthorizationAppleIDCredential,
                   let identityToken = appleIDCredential.identityToken,
                   let tokenString = String(data: identityToken, encoding: .utf8),
-                  let nonce = helper.currentNonce
+                  let nonce
             else { throw AuthError.failedWithError("Failed to get Apple ID token") }
 
             // 2. Create Firebase credential and sign in
@@ -337,17 +319,7 @@ extension AuthenticationClient: DependencyKey {
                 user = newUser
             }
 
-            try? await Messaging.messaging().subscribe(toTopic: "all_users")
-            $userInfo.withLock { $0 = user }
-
-            // Auto-load user's cohouse if they have one
-            if let cohouseId = user.cohouseId {
-                let cohouseRef = db.collection("cohouses").document(cohouseId)
-                if let loaded = try? await FirestoreHelpers.fetchCohouseWithUsers(from: cohouseRef) {
-                    $cohouse.withLock { $0 = loaded }
-                }
-            }
-
+            await completeSignIn(user)
             return user
         },
         sendVerificationEmail: { newEmail in
@@ -374,6 +346,37 @@ extension AuthenticationClient: DependencyKey {
         }
     )
 
+    // MARK: - Sign-In Helper
+
+    /// Shared post-sign-in setup: FCM subscription, shared state, demo mode, cohouse loading.
+    private static func completeSignIn(_ user: User) async {
+        @Shared(.userInfo) var userInfo
+        @Shared(.cohouse) var cohouse
+
+        do {
+            try await Messaging.messaging().subscribe(toTopic: "all_users")
+        } catch {
+            Logger.authLog.error("Failed to subscribe to FCM topic: \(error)")
+        }
+        $userInfo.withLock { $0 = user }
+
+        if user.email == DemoMode.demoEmail {
+            DemoMode.seedSharedState(for: user)
+            return
+        }
+
+        if let cohouseId = user.cohouseId {
+            let db = Firestore.firestore()
+            let cohouseRef = db.collection("cohouses").document(cohouseId)
+            do {
+                let loaded = try await FirestoreHelpers.fetchCohouseWithUsers(from: cohouseRef)
+                $cohouse.withLock { $0 = loaded }
+            } catch {
+                Logger.authLog.error("Failed to load cohouse \(cohouseId) after sign-in: \(error)")
+            }
+        }
+    }
+
     // MARK: Test
 
     static let testValue = Self(
@@ -397,11 +400,11 @@ extension AuthenticationClient: DependencyKey {
 
 // MARK: - Apple Sign-In Helper
 
-final class AppleSignInHelper: NSObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding, @unchecked Sendable {
+@MainActor
+final class AppleSignInHelper: NSObject, ASAuthorizationControllerDelegate, ASAuthorizationControllerPresentationContextProviding {
     private var continuation: CheckedContinuation<ASAuthorization, Error>?
-    nonisolated(unsafe) private(set) var currentNonce: String?
+    private(set) var currentNonce: String?
 
-    @MainActor
     func signIn() async throws -> ASAuthorization {
         let nonce = Self.randomNonceString()
         currentNonce = nonce
@@ -435,12 +438,10 @@ final class AppleSignInHelper: NSObject, ASAuthorizationControllerDelegate, ASAu
     // MARK: - ASAuthorizationControllerPresentationContextProviding
 
     func presentationAnchor(for controller: ASAuthorizationController) -> ASPresentationAnchor {
-        DispatchQueue.main.sync {
-            UIApplication.shared.connectedScenes
-                .compactMap { $0 as? UIWindowScene }
-                .flatMap { $0.windows }
-                .first { $0.isKeyWindow } ?? ASPresentationAnchor()
-        }
+        UIApplication.shared.connectedScenes
+            .compactMap { $0 as? UIWindowScene }
+            .flatMap { $0.windows }
+            .first { $0.isKeyWindow } ?? ASPresentationAnchor()
     }
 
     // MARK: - Nonce Helpers

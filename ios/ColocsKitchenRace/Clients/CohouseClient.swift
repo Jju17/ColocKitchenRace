@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import FirebaseAuth
 import FirebaseFirestore
 import FirebaseFunctions
 import FirebaseStorage
@@ -72,6 +73,7 @@ extension CohouseClient: DependencyKey {
                 }
 
                 $currentCohouse.withLock { $0 = newCohouse }
+                try await refreshCohouseClaim()
             } catch {
                 throw CohouseClientError.failedWithError(error.localizedDescription)
             }
@@ -228,6 +230,7 @@ extension CohouseClient: DependencyKey {
             }
 
             try FirestoreHelpers.updateUserCohouseId(cohouseId, for: userInfo)
+            try await refreshCohouseClaim()
         },
         quitCohouse: {
             @Shared(.cohouse) var cohouse
@@ -246,10 +249,21 @@ extension CohouseClient: DependencyKey {
 
             try await usersRef.document(document.documentID).delete()
             try FirestoreHelpers.updateUserCohouseId(nil, for: userInfo)
+            try await refreshCohouseClaim()
 
             $cohouse.withLock { $0 = nil }
         }
     )
+
+    // MARK: - Cohouse Claim Helper
+
+    /// Calls the setCohouseClaim Cloud Function and forces a token refresh
+    /// so that Firestore security rules see the updated cohouseId claim.
+    private static func refreshCohouseClaim() async throws {
+        let functions = Functions.functions(region: "europe-west1")
+        _ = try await functions.httpsCallable("setCohouseClaim").call()
+        _ = try await Auth.auth().currentUser?.getIDTokenResult(forcingRefresh: true)
+    }
 
     // MARK: Test
 

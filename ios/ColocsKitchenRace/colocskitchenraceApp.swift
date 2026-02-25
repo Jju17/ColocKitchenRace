@@ -9,6 +9,7 @@ import ComposableArchitecture
 import Firebase
 import FirebaseMessaging
 import GoogleSignIn
+import os
 import StripePaymentSheet
 import SwiftUI
 import MijickPopups
@@ -17,6 +18,8 @@ import UserNotifications
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
 
     @Dependency(\.notificationClient) var notificationClient
+    @Dependency(\.ckrClient) var ckrClient
+    @Dependency(\.newsClient) var newsClient
 
     private var isTesting: Bool {
         NSClassFromString("XCTestCase") != nil || ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
@@ -27,6 +30,16 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         guard !isTesting else { return true }
 
         FirebaseApp.configure()
+
+        // Start real-time Firestore listeners (must be after FirebaseApp.configure)
+        let ckr = ckrClient
+        let news = newsClient
+        Task {
+            for await _ in ckr.listenToGame() {}
+        }
+        Task {
+            for await _ in news.listenToNews() {}
+        }
 
         // Configure Google Sign-In
         if let clientID = FirebaseApp.app()?.options.clientID {
@@ -86,11 +99,17 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
         // Store FCM token and subscribe to topic
         Task {
-            try? await notificationClient.storeFCMToken(fcmToken)
+            do {
+                try await notificationClient.storeFCMToken(fcmToken)
+            } catch {
+                Logger.globalLog.error("Failed to store FCM token: \(error)")
+            }
 
-            // Always subscribe to all_users topic when we have a token
-            try? await Messaging.messaging().subscribe(toTopic: "all_users")
-            print("🔔 Subscribed to 'all_users' topic")
+            do {
+                try await Messaging.messaging().subscribe(toTopic: "all_users")
+            } catch {
+                Logger.globalLog.error("Failed to subscribe to all_users topic: \(error)")
+            }
         }
     }
 
@@ -116,21 +135,6 @@ struct colocskitchenraceApp: App {
 
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
-    @Dependency(\.ckrClient) var ckrClient
-    @Dependency(\.newsClient) var newsClient
-
-    private var newsListenerTask: Task<Void, Never>?
-
-    private var isTesting: Bool {
-        NSClassFromString("XCTestCase") != nil || ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
-    }
-
-    init() {
-        guard !isTesting else { return }
-        self.performFetchs()
-        self.startNewsListener()
-    }
-
     var body: some Scene {
         WindowGroup {
             AppView(
@@ -155,17 +159,4 @@ struct colocskitchenraceApp: App {
         }
     }
 
-    private func performFetchs() {
-        Task {
-            let _ = try? await self.ckrClient.getLast()
-        }
-    }
-
-    private func startNewsListener() {
-        Task {
-            for await _ in newsClient.listenToNews() {
-                // News are automatically updated in shared state by the listener
-            }
-        }
-    }
 }
