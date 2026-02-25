@@ -8,7 +8,7 @@
 
 ## Executive Summary
 
-This report covers a full audit of the Colocs Kitchen Race (CKR) project across all platforms and infrastructure. The codebase demonstrates solid architectural foundations — proper use of TCA on iOS, clean MVI on Android, and well-structured Cloud Functions. The audit initially identified **5 critical**, **12 high**, and **20+ medium** severity findings. **All 5 critical issues, 5 high issues, and 6 medium issues have since been resolved** (see updates below).
+This report covers a full audit of the Colocs Kitchen Race (CKR) project across all platforms and infrastructure. The codebase demonstrates solid architectural foundations — proper use of TCA on iOS, clean MVI on Android, and well-structured Cloud Functions. The audit initially identified **5 critical**, **12 high**, and **20+ medium** severity findings. **All 5 critical issues, 5 high issues, and 7 medium issues have since been resolved** (see updates below).
 
 **~~Top priorities~~ Critical issues — All resolved (2026-02-25):**
 1. ~~Hardcoded Stripe publishable key in iOS source~~ — ✅ Now loaded from `Info.plist`
@@ -337,33 +337,33 @@ This report covers a full audit of the Colocs Kitchen Race (CKR) project across 
 | CF-S4 | Functions | No rate limiting on callable functions | |
 | CFG-1 | Config | No security headers on Firebase Hosting | |
 
-### Medium (20+)
+### Medium (20+) — 7 resolved (2026-02-25)
 
-| ID | Platform | Finding |
-|----|----------|---------|
-| iOS-A2 | iOS | View-layer `onChange` instead of reducer action |
-| iOS-A3 | iOS | Silent error swallowing in refresh |
-| iOS-S5 | iOS | Permissive email validation regex |
-| iOS-S6 | iOS | Permissive phone validation regex |
-| iOS-S7 | iOS | Unimplemented notification deep linking |
-| iOS-P3 | iOS | Synchronous JPEG compression on main thread |
-| iOS-P4 | iOS | DispatchQueue delays prevent deallocation |
-| iOS-P5 | iOS | Un-memoized computed property in view onChange |
-| iOS-Q1 | iOS | 90 lines of auth sign-in duplication |
-| iOS-Q5 | iOS | 7+ swallowed errors across clients |
-| iOS-Q8 | iOS | Missing accessibility labels |
-| AND-A1 | Android | Deprecated Google Sign-In API |
-| AND-S2 | Android | No certificate pinning |
-| AND-S4 | Android | ProGuard rules not verified |
-| AND-P3 | Android | No pagination on list queries |
-| AND-Q1 | Android | Duplicate Firestore mapping logic |
-| CF-S2 | Functions | Demo mode bypasses payment validation |
-| CF-P1 | Functions | N+1 query in edition notifications |
-| CF-P2 | Functions | No Nominatim rate limiting/caching |
-| CI-1 | CI/CD | Fragile `sed` modifications for code signing |
-| CI-2 | CI/CD | Swift package validation skipped |
-| CFG-4 | Config | No production Firebase project configured |
-| WEB-2 | Web | No CSP or security headers |
+| ID | Platform | Finding | Status |
+|----|----------|---------|--------|
+| iOS-A2 | iOS | View-layer `onChange` instead of reducer action | ✅ Fixed — `currentPage` moved to reducer state |
+| iOS-A3 | iOS | Silent error swallowing in refresh | ✅ Fixed — errors surfaced in `refreshError` state |
+| iOS-S5 | iOS | Permissive email validation regex | ✅ Fixed — regex hardened |
+| iOS-S6 | iOS | Permissive phone validation regex | ✅ Fixed — regex hardened |
+| iOS-S7 | iOS | Unimplemented notification deep linking | |
+| iOS-P3 | iOS | Synchronous JPEG compression on main thread | |
+| iOS-P4 | iOS | DispatchQueue delays prevent deallocation | |
+| iOS-P5 | iOS | Un-memoized computed property in view onChange | |
+| iOS-Q1 | iOS | 90 lines of auth sign-in duplication | ✅ Fixed — extracted to shared `completeSignIn` helper |
+| iOS-Q5 | iOS | 7+ swallowed errors across clients | ✅ Fixed — `do/catch` + `Logger` across all clients |
+| iOS-Q8 | iOS | Missing accessibility labels | |
+| AND-A1 | Android | Deprecated Google Sign-In API | |
+| AND-S2 | Android | No certificate pinning | |
+| AND-S4 | Android | ProGuard rules not verified | |
+| AND-P3 | Android | No pagination on list queries | |
+| AND-Q1 | Android | Duplicate Firestore mapping logic | |
+| CF-S2 | Functions | Demo mode bypasses payment validation | |
+| CF-P1 | Functions | N+1 query in edition notifications | |
+| CF-P2 | Functions | No Nominatim rate limiting/caching | |
+| CI-1 | CI/CD | Fragile `sed` modifications for code signing | |
+| CI-2 | CI/CD | Swift package validation skipped | |
+| CFG-4 | Config | No production Firebase project configured | ✅ Fixed — `.firebaserc` now has staging + production projects |
+| WEB-2 | Web | No CSP or security headers | |
 
 ---
 
@@ -399,9 +399,9 @@ This report covers a full audit of the Colocs Kitchen Race (CKR) project across 
 
 ### Medium Term
 
-13. **Extract shared auth sign-in logic** into a helper function to reduce 90 lines of duplication in `AuthentificationClient.swift`.
+13. ~~**Extract shared auth sign-in logic** into a helper function to reduce 90 lines of duplication in `AuthentificationClient.swift`.~~ ✅ **Done** — extracted to shared `completeSignIn` helper.
 
-14. **Configure separate Firebase production project** in `.firebaserc`.
+14. ~~**Configure separate Firebase production project** in `.firebaserc`.~~ ✅ **Done** — `.firebaserc` now has `staging` (`colockitchenrace`) and `production` (`colocskitchenrace-prod`).
 
 15. **Move JPEG compression off main thread** in `ImagePipeline.swift`.
 
