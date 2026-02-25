@@ -5,6 +5,7 @@ import {
   computeCubicDistances,
   doubleMatchingHeuristic,
 } from "./matching";
+import { parseRequest, requireAdmin, gameIdSchema } from "./schemas";
 
 // ============================================
 // Types
@@ -32,18 +33,8 @@ interface MatchCohousesRequest {
 export const matchCohouses = onCall<MatchCohousesRequest>(
   { region: REGION, timeoutSeconds: 120 },
   async (request) => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "Must be authenticated");
-    }
-    if (!request.auth.token.admin) {
-      throw new HttpsError("permission-denied", "Admin access required");
-    }
-
-    const { gameId } = request.data;
-
-    if (!gameId) {
-      throw new HttpsError("invalid-argument", "Missing required field: gameId");
-    }
+    requireAdmin(request);
+    const { gameId } = parseRequest(gameIdSchema, request.data);
 
     try {
       // 1. Fetch the CKR game

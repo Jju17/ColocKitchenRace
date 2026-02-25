@@ -14,6 +14,8 @@ import dev.rahier.colocskitchenrace.data.model.ChallengeState
 import dev.rahier.colocskitchenrace.data.repository.ChallengeRepository
 import dev.rahier.colocskitchenrace.data.repository.ChallengeResponseRepository
 import dev.rahier.colocskitchenrace.data.repository.CohouseRepository
+import dev.rahier.colocskitchenrace.util.ErrorMapper
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -231,7 +233,7 @@ class ChallengesViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 Log.e("ChallengesVM", "Failed to submit response", e)
-                _state.update { it.copy(isSubmitting = false, submitError = "Erreur lors de l'envoi. Reessayez.") }
+                _state.update { it.copy(isSubmitting = false, submitError = ErrorMapper.toUserMessage(e, "Erreur lors de l'envoi. Réessayez.")) }
             }
         }
     }
@@ -261,7 +263,11 @@ class ChallengesViewModel @Inject constructor(
                     val responses = responseRepository.getAllForCohouse(cohouse.id)
                     _state.update { it.copy(responses = responses) }
                 }
-            } catch (_: Exception) {}
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.w("ChallengesVM", "Failed to load challenges", e)
+            }
             _state.update { it.copy(isLoading = false) }
         }
     }

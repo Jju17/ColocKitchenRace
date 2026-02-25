@@ -8,6 +8,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.stripe.android.PaymentConfiguration
 import dagger.hilt.android.AndroidEntryPoint
 import dev.rahier.colocskitchenrace.ui.CKRApp
+import dev.rahier.colocskitchenrace.ui.components.ErrorBoundary
 import dev.rahier.colocskitchenrace.ui.theme.CKRTheme
 
 @AndroidEntryPoint
@@ -25,7 +26,9 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             CKRTheme {
-                CKRApp()
+                ErrorBoundary {
+                    CKRApp()
+                }
             }
         }
     }

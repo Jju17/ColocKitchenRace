@@ -150,7 +150,7 @@ class UserProfileFormViewModelTest {
         viewModel.onIntent(UserProfileFormIntent.Save)
         advanceUntilIdle()
 
-        assertEquals("Network error", viewModel.state.value.error)
+        assertEquals("Erreur lors de la sauvegarde", viewModel.state.value.error)
         assertFalse(viewModel.state.value.isSaving)
     }
 }

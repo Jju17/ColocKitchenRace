@@ -1,5 +1,6 @@
 package dev.rahier.colocskitchenrace.ui.main
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -7,6 +8,7 @@ import dev.rahier.colocskitchenrace.data.repository.CKRGameRepository
 import dev.rahier.colocskitchenrace.data.repository.ChallengeRepository
 import dev.rahier.colocskitchenrace.data.repository.CohouseRepository
 import dev.rahier.colocskitchenrace.data.repository.NewsRepository
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,7 +38,11 @@ class MainViewModel @Inject constructor(
                 gameRepository.getLatest()
                 challengeRepository.getAll()
                 newsRepository.getLatest()
-            } catch (_: Exception) {}
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.w("Main", "Failed to load initial data", e)
+            }
         }
     }
 

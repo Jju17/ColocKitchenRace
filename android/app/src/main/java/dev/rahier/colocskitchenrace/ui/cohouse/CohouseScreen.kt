@@ -20,6 +20,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -34,6 +35,8 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import dev.rahier.colocskitchenrace.R
 import dev.rahier.colocskitchenrace.data.model.Cohouse
+import dev.rahier.colocskitchenrace.data.model.CohouseUser
+import dev.rahier.colocskitchenrace.data.model.PostalAddress
 import dev.rahier.colocskitchenrace.ui.components.CKRButton
 import dev.rahier.colocskitchenrace.ui.theme.*
 
@@ -428,6 +431,64 @@ private fun MembersSection(cohouse: Cohouse) {
                     }
                 }
             }
+        }
+    }
+}
+
+// ─── Previews ────────────────────────────────────────────────────────
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun NoCohouseContentPreview() {
+    CKRTheme {
+        NoCohouseContent(
+            joinCode = "",
+            isLoading = false,
+            error = null,
+            onJoinCodeChanged = {},
+            onJoinClicked = {},
+            onCreateClicked = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun CohouseDetailContentPreview() {
+    CKRTheme {
+        CohouseDetailContent(
+            state = CohouseState(
+                cohouse = Cohouse(
+                    name = "Les Colocs du Soleil",
+                    address = PostalAddress(
+                        street = "Rue de la Loi 16",
+                        city = "Bruxelles",
+                        postalCode = "1000",
+                    ),
+                    code = "CKR-2024",
+                    users = listOf(
+                        CohouseUser(surname = "Alice Dupont", isAdmin = true),
+                        CohouseUser(surname = "Bob Martin", isAdmin = false),
+                        CohouseUser(surname = "Charlie Leroy", isAdmin = false),
+                    ),
+                ),
+            ),
+            onIntent = {},
+            onNavigateToEdit = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CodeCardPreview() {
+    CKRTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            CodeCard(
+                code = "CKR-2024",
+                onCopy = {},
+                showCopied = false,
+            )
         }
     }
 }

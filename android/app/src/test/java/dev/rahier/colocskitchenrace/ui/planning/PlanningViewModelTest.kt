@@ -106,7 +106,7 @@ class PlanningViewModelTest {
         val viewModel = createViewModel()
         advanceUntilIdle()
 
-        assertEquals("Network error", viewModel.state.value.error)
+        assertEquals("Une erreur s'est produite. Réessayez.", viewModel.state.value.error)
         assertFalse(viewModel.state.value.isLoading)
     }
 }

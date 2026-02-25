@@ -31,6 +31,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -43,6 +44,7 @@ import dev.rahier.colocskitchenrace.data.model.ChallengeState
 import dev.rahier.colocskitchenrace.ui.theme.*
 import dev.rahier.colocskitchenrace.util.DateUtils
 import java.io.File
+import java.util.Date
 import kotlin.math.absoluteValue
 
 enum class ChallengeFilter(val label: String) {
@@ -208,72 +210,14 @@ private fun ChallengeTileCard(
         colors = CardDefaults.cardColors(containerColor = CkrWhite),
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
-            // ── Colored Header ──
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(headerColor)
-                    .padding(20.dp),
-            ) {
-                Column {
-                    // Title
-                    Text(
-                        text = challenge.title.uppercase(),
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = CkrWhite,
-                        fontWeight = FontWeight.Bold,
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Date range
-                    Text(
-                        text = "${DateUtils.formatDate(challenge.startDate)} - ${DateUtils.formatDate(challenge.endDate)}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = CkrWhite.copy(alpha = 0.85f),
-                    )
-
-                    Spacer(modifier = Modifier.height(8.dp))
-
-                    // Badges row
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        // Points badge
-                        challenge.points?.let { pts ->
-                            Surface(
-                                shape = RoundedCornerShape(50),
-                                color = CkrWhite.copy(alpha = 0.25f),
-                            ) {
-                                Text(
-                                    text = "$pts pts",
-                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = CkrWhite,
-                                    fontWeight = FontWeight.Bold,
-                                )
-                            }
-                        }
-
-                        // State badge
-                        val stateLabel = when (challenge.state) {
-                            ChallengeState.ONGOING -> "En cours"
-                            ChallengeState.DONE -> "Termine"
-                            ChallengeState.NOT_STARTED -> "A venir"
-                        }
-                        Surface(
-                            shape = RoundedCornerShape(50),
-                            color = CkrWhite.copy(alpha = 0.25f),
-                        ) {
-                            Text(
-                                text = stateLabel,
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = CkrWhite,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        }
-                    }
-                }
-            }
+            ChallengeCardHeader(
+                title = challenge.title,
+                startDate = challenge.startDate,
+                endDate = challenge.endDate,
+                points = challenge.points,
+                state = challenge.state,
+                headerColor = headerColor,
+            )
 
             // ── White Body ── (description top, actions bottom)
             Column(
@@ -292,80 +236,196 @@ private fun ChallengeTileCard(
                 // Push action area to bottom
                 Spacer(modifier = Modifier.weight(1f))
 
-                // Action area at bottom
-                when {
-                    // Already reviewed
-                    response != null && response.status != ChallengeResponseStatus.WAITING -> {
-                        FinalStatusSection(response)
-                    }
-                    // Waiting for admin review
-                    response != null -> {
-                        WaitingReviewSection()
-                    }
-                    // Currently participating — inline form
-                    isParticipating -> {
-                        Column(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                        ) {
-                            when (challenge.content) {
-                                is ChallengeContent.NoChoice -> NoChoiceForm(
-                                    isSubmitting = isSubmitting,
-                                    onSubmit = onSubmit,
-                                )
-                                is ChallengeContent.SingleAnswer -> SingleAnswerForm(
-                                    textAnswer = textAnswer,
-                                    isSubmitting = isSubmitting,
-                                    onTextChanged = onTextChanged,
-                                    onSubmit = onSubmit,
-                                )
-                                is ChallengeContent.MultipleChoice -> MultipleChoiceForm(
-                                    choices = challenge.content.choices,
-                                    selectedIndex = selectedChoiceIndex,
-                                    isSubmitting = isSubmitting,
-                                    onSelectChoice = onSelectChoice,
-                                    onSubmit = onSubmit,
-                                )
-                                is ChallengeContent.Picture -> PictureForm(
-                                    capturedImageData = capturedImageData,
-                                    isSubmitting = isSubmitting,
-                                    onPhotoCaptured = onPhotoCaptured,
-                                    onSubmit = onSubmit,
-                                )
-                            }
+                ChallengeActionArea(
+                    challengeState = challenge.state,
+                    challengeContent = challenge.content,
+                    hasCohouse = hasCohouse,
+                    isParticipating = isParticipating,
+                    response = response,
+                    selectedChoiceIndex = selectedChoiceIndex,
+                    textAnswer = textAnswer,
+                    capturedImageData = capturedImageData,
+                    isSubmitting = isSubmitting,
+                    submitError = submitError,
+                    onParticipate = onParticipate,
+                    onCancel = onCancel,
+                    onSelectChoice = onSelectChoice,
+                    onTextChanged = onTextChanged,
+                    onPhotoCaptured = onPhotoCaptured,
+                    onSubmit = onSubmit,
+                )
+            }
+        }
+    }
+}
 
-                            submitError?.let {
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = it,
-                                    color = MaterialTheme.colorScheme.error,
-                                    style = MaterialTheme.typography.bodySmall,
-                                )
-                            }
+// ─── Extracted Card Sections ─────────────────────────────────────────
 
-                            Spacer(modifier = Modifier.height(4.dp))
+@Composable
+private fun ChallengeCardHeader(
+    title: String,
+    startDate: Date,
+    endDate: Date,
+    points: Int?,
+    state: ChallengeState,
+    headerColor: Color,
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(headerColor)
+            .padding(20.dp),
+    ) {
+        Column {
+            // Title
+            Text(
+                text = title.uppercase(),
+                style = MaterialTheme.typography.headlineMedium,
+                color = CkrWhite,
+                fontWeight = FontWeight.Bold,
+            )
 
-                            TextButton(onClick = onCancel) {
-                                Text("Annuler", color = CkrGray)
-                            }
-                        }
-                    }
-                    // Can participate
-                    challenge.state == ChallengeState.ONGOING && hasCohouse -> {
-                        Button(
-                            onClick = onParticipate,
-                            modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(15.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = CkrMint),
-                        ) {
-                            Text(
-                                text = "Participer",
-                                color = CkrWhite,
-                                style = MaterialTheme.typography.labelLarge,
-                            )
-                        }
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Date range
+            Text(
+                text = "${DateUtils.formatDate(startDate)} - ${DateUtils.formatDate(endDate)}",
+                style = MaterialTheme.typography.bodySmall,
+                color = CkrWhite.copy(alpha = 0.85f),
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Badges row
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                // Points badge
+                points?.let { pts ->
+                    Surface(
+                        shape = RoundedCornerShape(50),
+                        color = CkrWhite.copy(alpha = 0.25f),
+                    ) {
+                        Text(
+                            text = "$pts pts",
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = CkrWhite,
+                            fontWeight = FontWeight.Bold,
+                        )
                     }
                 }
+
+                // State badge
+                val stateLabel = when (state) {
+                    ChallengeState.ONGOING -> "En cours"
+                    ChallengeState.DONE -> "Termine"
+                    ChallengeState.NOT_STARTED -> "A venir"
+                }
+                Surface(
+                    shape = RoundedCornerShape(50),
+                    color = CkrWhite.copy(alpha = 0.25f),
+                ) {
+                    Text(
+                        text = stateLabel,
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
+                        style = MaterialTheme.typography.labelSmall,
+                        color = CkrWhite,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChallengeActionArea(
+    challengeState: ChallengeState,
+    challengeContent: ChallengeContent,
+    hasCohouse: Boolean,
+    isParticipating: Boolean,
+    response: ChallengeResponse?,
+    selectedChoiceIndex: Int?,
+    textAnswer: String,
+    capturedImageData: ByteArray?,
+    isSubmitting: Boolean,
+    submitError: String?,
+    onParticipate: () -> Unit,
+    onCancel: () -> Unit,
+    onSelectChoice: (Int) -> Unit,
+    onTextChanged: (String) -> Unit,
+    onPhotoCaptured: (ByteArray) -> Unit,
+    onSubmit: () -> Unit,
+) {
+    when {
+        // Already reviewed
+        response != null && response.status != ChallengeResponseStatus.WAITING -> {
+            FinalStatusSection(response)
+        }
+        // Waiting for admin review
+        response != null -> {
+            WaitingReviewSection()
+        }
+        // Currently participating — inline form
+        isParticipating -> {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                when (challengeContent) {
+                    is ChallengeContent.NoChoice -> NoChoiceForm(
+                        isSubmitting = isSubmitting,
+                        onSubmit = onSubmit,
+                    )
+                    is ChallengeContent.SingleAnswer -> SingleAnswerForm(
+                        textAnswer = textAnswer,
+                        isSubmitting = isSubmitting,
+                        onTextChanged = onTextChanged,
+                        onSubmit = onSubmit,
+                    )
+                    is ChallengeContent.MultipleChoice -> MultipleChoiceForm(
+                        choices = challengeContent.choices,
+                        selectedIndex = selectedChoiceIndex,
+                        isSubmitting = isSubmitting,
+                        onSelectChoice = onSelectChoice,
+                        onSubmit = onSubmit,
+                    )
+                    is ChallengeContent.Picture -> PictureForm(
+                        capturedImageData = capturedImageData,
+                        isSubmitting = isSubmitting,
+                        onPhotoCaptured = onPhotoCaptured,
+                        onSubmit = onSubmit,
+                    )
+                }
+
+                submitError?.let {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = it,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                TextButton(onClick = onCancel) {
+                    Text("Annuler", color = CkrGray)
+                }
+            }
+        }
+        // Can participate
+        challengeState == ChallengeState.ONGOING && hasCohouse -> {
+            Button(
+                onClick = onParticipate,
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(15.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = CkrMint),
+            ) {
+                Text(
+                    text = "Participer",
+                    color = CkrWhite,
+                    style = MaterialTheme.typography.labelLarge,
+                )
             }
         }
     }
@@ -728,5 +788,119 @@ private fun FinalStatusSection(response: ChallengeResponse) {
             style = MaterialTheme.typography.bodySmall,
             color = CkrGray,
         )
+    }
+}
+
+// ─── Previews ────────────────────────────────────────────────────────
+
+@Preview(showBackground = true)
+@Composable
+private fun ChallengeTileCardOngoingPreview() {
+    CKRTheme {
+        Box(modifier = Modifier.padding(16.dp).height(500.dp)) {
+            ChallengeTileCard(
+                challenge = Challenge(
+                    id = "preview-1",
+                    title = "Photo de groupe",
+                    body = "Prenez une photo de tous les membres de votre coloc dans la cuisine !",
+                    startDate = Date(System.currentTimeMillis() - 24 * 3600 * 1000L),
+                    endDate = Date(System.currentTimeMillis() + 3 * 24 * 3600 * 1000L),
+                    content = ChallengeContent.Picture(),
+                    points = 50,
+                ),
+                hasCohouse = true,
+                isParticipating = false,
+                response = null,
+                selectedChoiceIndex = null,
+                textAnswer = "",
+                capturedImageData = null,
+                isSubmitting = false,
+                submitError = null,
+                onParticipate = {},
+                onCancel = {},
+                onSelectChoice = {},
+                onTextChanged = {},
+                onPhotoCaptured = {},
+                onSubmit = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ChallengeTileCardMultipleChoicePreview() {
+    CKRTheme {
+        Box(modifier = Modifier.padding(16.dp).height(500.dp)) {
+            ChallengeTileCard(
+                challenge = Challenge(
+                    id = "preview-2",
+                    title = "Quiz Cuisine",
+                    body = "Quel est l'ingredient principal du houmous ?",
+                    startDate = Date(System.currentTimeMillis() - 24 * 3600 * 1000L),
+                    endDate = Date(System.currentTimeMillis() + 3 * 24 * 3600 * 1000L),
+                    content = ChallengeContent.MultipleChoice(
+                        choices = listOf("Pois chiches", "Lentilles", "Haricots rouges", "Feves"),
+                    ),
+                    points = 30,
+                ),
+                hasCohouse = true,
+                isParticipating = true,
+                response = null,
+                selectedChoiceIndex = 0,
+                textAnswer = "",
+                capturedImageData = null,
+                isSubmitting = false,
+                submitError = null,
+                onParticipate = {},
+                onCancel = {},
+                onSelectChoice = {},
+                onTextChanged = {},
+                onPhotoCaptured = {},
+                onSubmit = {},
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun WaitingReviewSectionPreview() {
+    CKRTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            WaitingReviewSection()
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun FinalStatusValidatedPreview() {
+    CKRTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            FinalStatusSection(
+                response = ChallengeResponse(
+                    status = ChallengeResponseStatus.VALIDATED,
+                    challengeTitle = "Photo de groupe",
+                    cohouseName = "Les Colocs",
+                ),
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun FinalStatusInvalidatedPreview() {
+    CKRTheme {
+        Box(modifier = Modifier.padding(16.dp)) {
+            FinalStatusSection(
+                response = ChallengeResponse(
+                    status = ChallengeResponseStatus.INVALIDATED,
+                    challengeTitle = "Photo de groupe",
+                    cohouseName = "Les Colocs",
+                ),
+            )
+        }
     }
 }

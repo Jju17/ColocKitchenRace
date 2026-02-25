@@ -1,11 +1,14 @@
 package dev.rahier.colocskitchenrace.ui.cohouse
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.rahier.colocskitchenrace.data.model.Cohouse
 import dev.rahier.colocskitchenrace.data.repository.AuthRepository
 import dev.rahier.colocskitchenrace.data.repository.CohouseRepository
+import dev.rahier.colocskitchenrace.util.ErrorMapper
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -91,7 +94,10 @@ class CohouseViewModel @Inject constructor(
             try {
                 val data = cohouseRepository.loadCoverImage(path)
                 _state.update { it.copy(coverImageData = data) }
-            } catch (_: Exception) {
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.w("Cohouse", "Failed to load cover image", e)
                 _state.update { it.copy(coverImageData = null) }
             }
         }
@@ -103,7 +109,11 @@ class CohouseViewModel @Inject constructor(
             try {
                 val refreshed = cohouseRepository.get(cohouse.id)
                 cohouseRepository.setCurrentCohouse(refreshed)
-            } catch (_: Exception) {}
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.w("Cohouse", "Failed to refresh cohouse", e)
+            }
         }
     }
 
@@ -124,7 +134,7 @@ class CohouseViewModel @Inject constructor(
 
                 _state.update { it.copy(isLoading = false, cohouse = cohouse) }
             } catch (e: Exception) {
-                _state.update { it.copy(isLoading = false, error = "Code invalide ou coloc introuvable") }
+                _state.update { it.copy(isLoading = false, error = ErrorMapper.toUserMessage(e, "Code invalide ou coloc introuvable")) }
             }
         }
     }
@@ -146,7 +156,10 @@ class CohouseViewModel @Inject constructor(
                     // Clear cohouseId on user doc
                     authRepository.updateUser(user.copy(cohouseId = null))
                 }
-            } catch (_: Exception) {}
+            } catch (e: Exception) {
+                Log.e("Cohouse", "Failed to quit cohouse", e)
+                _state.update { it.copy(error = ErrorMapper.toUserMessage(e, "Erreur lors du départ de la coloc")) }
+            }
         }
     }
 }

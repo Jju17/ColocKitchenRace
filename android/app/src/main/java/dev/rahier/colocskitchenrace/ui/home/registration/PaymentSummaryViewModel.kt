@@ -21,6 +21,7 @@ import java.text.NumberFormat
 import java.util.Currency
 import java.util.Locale
 import dev.rahier.colocskitchenrace.util.ErrorMapper
+import kotlin.coroutines.cancellation.CancellationException
 import javax.inject.Inject
 
 data class PaymentSummaryState(
@@ -173,7 +174,7 @@ class PaymentSummaryViewModel @Inject constructor(
                 _state.update { it.copy(isConfirming = false, registrationComplete = true) }
                 _effect.send(PaymentSummaryEffect.RegistrationComplete)
             } catch (e: Exception) {
-                _state.update { it.copy(isConfirming = false, error = "Paiement reussi mais confirmation echouee. Reessayez.") }
+                _state.update { it.copy(isConfirming = false, error = ErrorMapper.toUserMessage(e, "Paiement réussi mais confirmation échouée. Réessayez.")) }
             }
         }
     }
@@ -192,6 +193,8 @@ class PaymentSummaryViewModel @Inject constructor(
             CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
                 try {
                     gameRepository.cancelReservation(s.gameId, s.cohouseId)
+                } catch (e: CancellationException) {
+                    throw e
                 } catch (e: Exception) {
                     Log.e("PaymentSummary", "Failed to cancel reservation", e)
                 }

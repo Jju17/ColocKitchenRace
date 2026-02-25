@@ -1,6 +1,8 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { admin, auth, db, REGION, getStripe } from "./config";
 import { getFunctions } from "firebase-admin/functions";
+import { parseRequest, requireAuth, reserveAndCreatePaymentSchema } from "./schemas";
+import { checkRateLimit } from "./rate-limiter";
 
 const DEMO_EMAIL = "test_apple@colocskitchenrace.be";
 const RESERVATION_TTL_SECONDS = 15 * 60; // 15 minutes
@@ -194,50 +196,27 @@ export const reserveAndCreatePayment = onCall<ReserveAndCreatePaymentRequest>(
     secrets: ["STRIPE_SECRET_KEY"],
   },
   async (request) => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "Must be authenticated");
-    }
-
+    requireAuth(request);
     const {
       gameId, cohouseId, amountCents, participantCount,
       attendingUserIds, averageAge, cohouseType,
-    } = request.data;
-
-    if (!gameId || !cohouseId || !amountCents || !participantCount) {
-      throw new HttpsError(
-        "invalid-argument",
-        "Missing required fields: gameId, cohouseId, amountCents, participantCount"
-      );
-    }
-
-    if (!attendingUserIds || !Array.isArray(attendingUserIds) || attendingUserIds.length === 0) {
-      throw new HttpsError(
-        "invalid-argument",
-        "attendingUserIds must be a non-empty array"
-      );
-    }
-
-    if (!averageAge || !cohouseType) {
-      throw new HttpsError(
-        "invalid-argument",
-        "Missing required fields: averageAge, cohouseType"
-      );
-    }
+    } = parseRequest(reserveAndCreatePaymentSchema, request.data);
+    checkRateLimit(request.auth!.uid, "reserveAndCreatePayment", 5, 60_000);
 
     try {
       // Demo mode: creates a Stripe PaymentIntent in test mode for
       // App Store / Play Store review. Bypasses Firestore validation
       // (no real game required) but still goes through Stripe test flow.
       // Only the designated demo account can trigger this path.
-      if (await isDemoUser(request.auth.uid)) {
-        console.warn(`Demo mode payment bypass for user ${request.auth.uid}`);
-        return createDemoPaymentIntent(request.auth.uid, request.data);
+      if (await isDemoUser(request.auth!.uid)) {
+        console.warn(`Demo mode payment bypass for user ${request.auth!.uid}`);
+        return createDemoPaymentIntent(request.auth!.uid, request.data);
       }
 
       // 1. Verify cohouse exists + get/create Stripe customer (outside transaction)
       const { stripeCustomerId, cohouseDocRef } = await getOrCreateStripeCustomer(
         cohouseId,
-        request.auth.uid
+        request.auth!.uid
       );
 
       // 2. Transactional reservation — atomic read + validate + reserve
@@ -306,7 +285,7 @@ export const reserveAndCreatePayment = onCall<ReserveAndCreatePaymentRequest>(
             gameId,
             cohouseId,
             participantCount: participantCount.toString(),
-            firebaseUid: request.auth.uid,
+            firebaseUid: request.auth!.uid,
           },
         });
 

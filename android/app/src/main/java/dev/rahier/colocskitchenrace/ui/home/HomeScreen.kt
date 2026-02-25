@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.toUpperCase
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -37,8 +38,10 @@ import dev.rahier.colocskitchenrace.R
 import dev.rahier.colocskitchenrace.data.model.CKRGame
 import dev.rahier.colocskitchenrace.data.model.Cohouse
 import dev.rahier.colocskitchenrace.data.model.News
+import dev.rahier.colocskitchenrace.data.model.PostalAddress
 import dev.rahier.colocskitchenrace.ui.theme.*
 import dev.rahier.colocskitchenrace.util.DateUtils
+import java.util.Date
 import kotlinx.coroutines.delay
 
 @Composable
@@ -519,5 +522,108 @@ private fun NewsTile(news: List<News>) {
                 }
             }
         }
+    }
+}
+
+// ─── Previews ────────────────────────────────────────────────────────
+
+@Preview(showBackground = true)
+@Composable
+private fun CohouseTileWithCohousePreview() {
+    CKRTheme {
+        CohouseTile(
+            cohouse = Cohouse(
+                name = "Les Colocs du Soleil",
+                address = PostalAddress(street = "Rue de la Loi 16", city = "Bruxelles", postalCode = "1000"),
+                code = "ABC123",
+            ),
+            coverImageData = null,
+            onClick = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CohouseTileNoCohousePreview() {
+    CKRTheme {
+        CohouseTile(
+            cohouse = null,
+            coverImageData = null,
+            onClick = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun RegistrationTileOpenPreview() {
+    CKRTheme {
+        RegistrationTile(
+            game = CKRGame(
+                registrationDeadline = Date(System.currentTimeMillis() + 7 * 24 * 3600 * 1000L),
+                maxParticipants = 100,
+                totalRegisteredParticipants = 42,
+            ),
+            isRegistered = false,
+            onRegisterClick = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun RegistrationTileRegisteredPreview() {
+    CKRTheme {
+        RegistrationTile(
+            game = CKRGame(),
+            isRegistered = true,
+            onRegisterClick = {},
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CountdownTileComingSoonPreview() {
+    CKRTheme {
+        CountdownTile(
+            nextGameDate = null,
+            countdownStart = null,
+            hasCountdownStarted = false,
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun CountdownTileActivePreview() {
+    CKRTheme {
+        CountdownTile(
+            nextGameDate = Date(System.currentTimeMillis() + 3 * 24 * 3600 * 1000L),
+            countdownStart = Date(System.currentTimeMillis() - 1000L),
+            hasCountdownStarted = true,
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun NewsTileWithNewsPreview() {
+    CKRTheme {
+        NewsTile(
+            news = listOf(
+                News(id = "1", title = "Nouvelle edition !", body = "La prochaine edition de la CKR arrive bientot. Restez connectes pour plus d'infos.", publicationDate = Date()),
+                News(id = "2", title = "Resultats CKR #5", body = "Felicitations a tous les participants ! Decouvrez les resultats.", publicationDate = Date()),
+            ),
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun NewsTileEmptyPreview() {
+    CKRTheme {
+        NewsTile(news = emptyList())
     }
 }

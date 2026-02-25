@@ -1,10 +1,12 @@
 package dev.rahier.colocskitchenrace.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.rahier.colocskitchenrace.data.repository.AuthRepository
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -44,7 +46,11 @@ class CKRAppViewModel @Inject constructor(
             // Reload to get fresh email verification status
             try {
                 firebaseUser.reload()
-            } catch (_: Exception) {}
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.w("CKRApp", "Failed to reload Firebase user", e)
+            }
 
             if (!firebaseUser.isEmailVerified) {
                 _authState.value = AuthState.NEEDS_EMAIL_VERIFICATION
@@ -63,7 +69,10 @@ class CKRAppViewModel @Inject constructor(
                 } else {
                     _authState.value = AuthState.AUTHENTICATED
                 }
-            } catch (_: Exception) {
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.w("CKRApp", "Failed to restore session", e)
                 _authState.value = AuthState.UNAUTHENTICATED
             }
         }

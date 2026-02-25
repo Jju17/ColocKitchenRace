@@ -1,5 +1,6 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { admin, db, REGION } from "./config";
+import { parseRequest, requireAuth, deleteAccountSchema } from "./schemas";
 
 // ============================================
 // Types
@@ -30,15 +31,8 @@ interface DeleteAccountRequest {
 export const deleteAccount = onCall<DeleteAccountRequest>(
   { region: REGION },
   async (request) => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "Must be authenticated");
-    }
-
-    const { userId } = request.data;
-
-    if (!userId) {
-      throw new HttpsError("invalid-argument", "Missing required field: userId");
-    }
+    requireAuth(request);
+    const { userId } = parseRequest(deleteAccountSchema, request.data);
 
     try {
       // 1. Fetch the user document and verify ownership
@@ -52,7 +46,7 @@ export const deleteAccount = onCall<DeleteAccountRequest>(
       const authUid = userData.authId as string;
 
       // Security: only the account owner can delete their own account
-      if (authUid !== request.auth.uid) {
+      if (authUid !== request.auth!.uid) {
         throw new HttpsError("permission-denied", "You can only delete your own account");
       }
 

@@ -1,6 +1,8 @@
 import { onTaskDispatched } from "firebase-functions/v2/tasks";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { admin, db, REGION } from "./config";
+import { parseRequest, requireAuth, requireAdmin, cancelReservationSchema, deleteCKRGameSchema } from "./schemas";
+import { checkRateLimit } from "./rate-limiter";
 
 // ============================================
 // Types
@@ -106,18 +108,9 @@ export const releaseExpiredReservation = onTaskDispatched(
 export const cancelReservation = onCall<CancelReservationRequest>(
   { region: REGION },
   async (request) => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "Must be authenticated");
-    }
-
-    const { gameId, cohouseId } = request.data;
-
-    if (!gameId || !cohouseId) {
-      throw new HttpsError(
-        "invalid-argument",
-        "Missing required fields: gameId, cohouseId"
-      );
-    }
+    requireAuth(request);
+    const { gameId, cohouseId } = parseRequest(cancelReservationSchema, request.data);
+    checkRateLimit(request.auth!.uid, "cancelReservation", 5, 60_000);
 
     const gameRef = db.collection("ckrGames").doc(gameId);
     const regRef = gameRef.collection("registrations").doc(cohouseId);
@@ -188,19 +181,8 @@ export const cancelReservation = onCall<CancelReservationRequest>(
 export const deleteCKRGame = onCall<DeleteCKRGameRequest>(
   { region: REGION },
   async (request) => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "Must be authenticated");
-    }
-
-    if (!request.auth.token.admin) {
-      throw new HttpsError("permission-denied", "Admin access required");
-    }
-
-    const { gameId } = request.data;
-
-    if (!gameId) {
-      throw new HttpsError("invalid-argument", "Missing required field: gameId");
-    }
+    requireAdmin(request);
+    const { gameId } = parseRequest(deleteCKRGameSchema, request.data);
 
     const gameRef = db.collection("ckrGames").doc(gameId);
     const gameDoc = await gameRef.get();

@@ -2,6 +2,7 @@ import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { admin, db, REGION } from "./config";
 import { getFCMTokensForUsers, sendToTokens } from "./notifications";
 import { scheduleEventReminders } from "./pushNotifications";
+import { parseRequest, requireAuth, requireAdmin, updateEventSettingsSchema, gameIdSchema, getMyPlanningSchema } from "./schemas";
 
 // ============================================
 // Types
@@ -44,27 +45,14 @@ interface GetMyPlanningRequest {
 export const updateEventSettings = onCall<UpdateEventSettingsRequest>(
   { region: REGION },
   async (request) => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "Must be authenticated");
-    }
-    if (!request.auth.token.admin) {
-      throw new HttpsError("permission-denied", "Admin access required");
-    }
-
+    requireAdmin(request);
     const {
       gameId,
       aperoStartTime, aperoEndTime,
       dinerStartTime, dinerEndTime,
       partyStartTime, partyEndTime,
       partyAddress, partyName, partyNote,
-    } = request.data;
-
-    if (!gameId || !aperoStartTime || !aperoEndTime ||
-        !dinerStartTime || !dinerEndTime ||
-        !partyStartTime || !partyEndTime ||
-        !partyAddress || !partyName) {
-      throw new HttpsError("invalid-argument", "Missing required fields");
-    }
+    } = parseRequest(updateEventSettingsSchema, request.data);
 
     try {
       const gameDoc = await db.collection("ckrGames").doc(gameId).get();
@@ -112,18 +100,8 @@ export const updateEventSettings = onCall<UpdateEventSettingsRequest>(
 export const confirmMatching = onCall<ConfirmMatchingRequest>(
   { region: REGION },
   async (request) => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "Must be authenticated");
-    }
-    if (!request.auth.token.admin) {
-      throw new HttpsError("permission-denied", "Admin access required");
-    }
-
-    const { gameId } = request.data;
-
-    if (!gameId) {
-      throw new HttpsError("invalid-argument", "Missing required field: gameId");
-    }
+    requireAdmin(request);
+    const { gameId } = parseRequest(gameIdSchema, request.data);
 
     try {
       const gameDoc = await db.collection("ckrGames").doc(gameId).get();
@@ -191,18 +169,8 @@ export const confirmMatching = onCall<ConfirmMatchingRequest>(
 export const revealPlanning = onCall<RevealPlanningRequest>(
   { region: REGION },
   async (request) => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "Must be authenticated");
-    }
-    if (!request.auth.token.admin) {
-      throw new HttpsError("permission-denied", "Admin access required");
-    }
-
-    const { gameId } = request.data;
-
-    if (!gameId) {
-      throw new HttpsError("invalid-argument", "Missing required field: gameId");
-    }
+    requireAdmin(request);
+    const { gameId } = parseRequest(gameIdSchema, request.data);
 
     try {
       const gameDoc = await db.collection("ckrGames").doc(gameId).get();
@@ -288,15 +256,8 @@ export const revealPlanning = onCall<RevealPlanningRequest>(
 export const getMyPlanning = onCall<GetMyPlanningRequest>(
   { region: REGION },
   async (request) => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "Must be authenticated");
-    }
-
-    const { gameId, cohouseId } = request.data;
-
-    if (!gameId || !cohouseId) {
-      throw new HttpsError("invalid-argument", "Missing required fields: gameId, cohouseId");
-    }
+    requireAuth(request);
+    const { gameId, cohouseId } = parseRequest(getMyPlanningSchema, request.data);
 
     try {
       const gameDoc = await db.collection("ckrGames").doc(gameId).get();

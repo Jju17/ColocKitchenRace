@@ -1,5 +1,6 @@
 package dev.rahier.colocskitchenrace.ui.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -10,6 +11,7 @@ import dev.rahier.colocskitchenrace.data.repository.AuthRepository
 import dev.rahier.colocskitchenrace.data.repository.CKRGameRepository
 import dev.rahier.colocskitchenrace.data.repository.CohouseRepository
 import dev.rahier.colocskitchenrace.data.repository.NewsRepository
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -97,7 +99,14 @@ class HomeViewModel @Inject constructor(
             }.collect {}
         }
         viewModelScope.launch {
-            val news = try { newsRepository.getLatest() } catch (_: Exception) { emptyList() }
+            val news = try {
+                newsRepository.getLatest()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.w("Home", "Failed to load news", e)
+                emptyList()
+            }
             _state.update { it.copy(news = news) }
         }
     }
@@ -111,7 +120,10 @@ class HomeViewModel @Inject constructor(
             try {
                 val data = cohouseRepository.loadCoverImage(path)
                 _state.update { it.copy(coverImageData = data) }
-            } catch (_: Exception) {
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.w("Home", "Failed to load cover image", e)
                 _state.update { it.copy(coverImageData = null) }
             }
         }
@@ -123,7 +135,11 @@ class HomeViewModel @Inject constructor(
             try {
                 gameRepository.getLatest()
                 newsRepository.getLatest()
-            } catch (_: Exception) {}
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.w("Home", "Failed to refresh data", e)
+            }
             _state.update { it.copy(isLoading = false) }
         }
     }

@@ -1,11 +1,12 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { admin, db, messaging, REGION } from "./config";
+import { parseRequest, requireAdmin, sendToCohouseSchema, sendToEditionSchema, sendToAllSchema } from "./schemas";
 
 // ============================================
 // Types
 // ============================================
 
-interface NotificationPayload {
+export interface NotificationPayload {
   title: string;
   body: string;
   data?: Record<string, string>;
@@ -156,18 +157,10 @@ async function saveNotificationHistory(entry: NotificationHistoryEntry): Promise
 export const sendNotificationToCohouse = onCall<SendToCohouseRequest>(
   { region: REGION },
   async (request) => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "Must be authenticated");
-    }
-    if (!request.auth.token.admin) {
-      throw new HttpsError("permission-denied", "Admin access required");
-    }
-
-    const { cohouseId, notification } = request.data;
-
-    if (!cohouseId || !notification?.title || !notification?.body) {
-      throw new HttpsError("invalid-argument", "Missing required fields");
-    }
+    requireAdmin(request);
+    const parsed = parseRequest(sendToCohouseSchema, request.data);
+    const cohouseId = parsed.cohouseId;
+    const notification = parsed.notification as NotificationPayload;
 
     try {
       // Get cohouse users
@@ -208,7 +201,7 @@ export const sendNotificationToCohouse = onCall<SendToCohouseRequest>(
         sent: result.success,
         failed: result.failure,
         ...(message && { message }),
-        sentBy: request.auth.uid,
+        sentBy: request.auth!.uid,
         sentAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
@@ -235,18 +228,10 @@ export const sendNotificationToCohouse = onCall<SendToCohouseRequest>(
 export const sendNotificationToEdition = onCall<SendToEditionRequest>(
   { region: REGION },
   async (request) => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "Must be authenticated");
-    }
-    if (!request.auth.token.admin) {
-      throw new HttpsError("permission-denied", "Admin access required");
-    }
-
-    const { editionId, notification } = request.data;
-
-    if (!editionId || !notification?.title || !notification?.body) {
-      throw new HttpsError("invalid-argument", "Missing required fields");
-    }
+    requireAdmin(request);
+    const parsedEdition = parseRequest(sendToEditionSchema, request.data);
+    const editionId = parsedEdition.editionId;
+    const notification = parsedEdition.notification as NotificationPayload;
 
     try {
       // Get edition to find participating cohouses
@@ -268,7 +253,7 @@ export const sendNotificationToEdition = onCall<SendToEditionRequest>(
           sent: 0,
           failed: 0,
           message,
-          sentBy: request.auth.uid,
+          sentBy: request.auth!.uid,
           sentAt: admin.firestore.FieldValue.serverTimestamp(),
         });
         return { success: false, sent: 0, failed: 0, message };
@@ -315,7 +300,7 @@ export const sendNotificationToEdition = onCall<SendToEditionRequest>(
         sent: result.success,
         failed: result.failure,
         ...(message && { message }),
-        sentBy: request.auth.uid,
+        sentBy: request.auth!.uid,
         sentAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 
@@ -345,18 +330,8 @@ export const sendNotificationToEdition = onCall<SendToEditionRequest>(
 export const sendNotificationToAll = onCall<SendToAllRequest>(
   { region: REGION },
   async (request) => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "Must be authenticated");
-    }
-    if (!request.auth.token.admin) {
-      throw new HttpsError("permission-denied", "Admin access required");
-    }
-
-    const { notification } = request.data;
-
-    if (!notification?.title || !notification?.body) {
-      throw new HttpsError("invalid-argument", "Missing required fields");
-    }
+    requireAdmin(request);
+    const notification = parseRequest(sendToAllSchema, request.data).notification as NotificationPayload;
 
     try {
       const message: admin.messaging.Message = {
@@ -386,7 +361,7 @@ export const sendNotificationToAll = onCall<SendToAllRequest>(
         body: notification.body,
         sent: 0,  // Topic-based, exact count unknown
         failed: 0,
-        sentBy: request.auth.uid,
+        sentBy: request.auth!.uid,
         sentAt: admin.firestore.FieldValue.serverTimestamp(),
       });
 

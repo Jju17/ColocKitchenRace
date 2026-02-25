@@ -1,5 +1,6 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { db, auth, REGION } from "./config";
+import { parseRequest, requireAuth, setAdminClaimSchema } from "./schemas";
 
 // ============================================
 // Types
@@ -28,22 +29,13 @@ interface SetAdminClaimRequest {
 export const setAdminClaim = onCall<SetAdminClaimRequest>(
   { region: REGION },
   async (request) => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "Must be authenticated");
-    }
+    requireAuth(request);
+    const { targetAuthUid, isAdmin } = parseRequest(setAdminClaimSchema, request.data);
 
-    const callerUid = request.auth.uid;
-    const { targetAuthUid, isAdmin } = request.data;
-
-    if (!targetAuthUid || typeof isAdmin !== "boolean") {
-      throw new HttpsError(
-        "invalid-argument",
-        "Missing required fields: targetAuthUid (string), isAdmin (boolean)"
-      );
-    }
+    const callerUid = request.auth!.uid;
 
     // Verify the caller is already an admin (or is the target — for bootstrap)
-    const callerToken = request.auth.token;
+    const callerToken = request.auth!.token;
     const callerIsAdmin = callerToken.admin === true;
 
     if (!callerIsAdmin) {

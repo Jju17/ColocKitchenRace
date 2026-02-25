@@ -1,5 +1,6 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { admin, auth, db, REGION, getStripe } from "./config";
+import { parseRequest, requireAuth, confirmRegistrationSchema } from "./schemas";
 
 const DEMO_EMAIL = "test_apple@colocskitchenrace.be";
 
@@ -42,22 +43,12 @@ async function isDemoUser(uid: string): Promise<boolean> {
 export const confirmRegistration = onCall<ConfirmRegistrationRequest>(
   { region: REGION, secrets: ["STRIPE_SECRET_KEY"] },
   async (request) => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "Must be authenticated");
-    }
-
-    const { gameId, cohouseId, paymentIntentId } = request.data;
-
-    if (!gameId || !cohouseId || !paymentIntentId) {
-      throw new HttpsError(
-        "invalid-argument",
-        "Missing required fields: gameId, cohouseId, paymentIntentId"
-      );
-    }
+    requireAuth(request);
+    const { gameId, cohouseId, paymentIntentId } = parseRequest(confirmRegistrationSchema, request.data);
 
     try {
       // Demo mode: return success directly
-      if (await isDemoUser(request.auth.uid)) {
+      if (await isDemoUser(request.auth!.uid)) {
         console.log(`[Demo] Confirming registration for ${DEMO_EMAIL}`);
         return { success: true };
       }

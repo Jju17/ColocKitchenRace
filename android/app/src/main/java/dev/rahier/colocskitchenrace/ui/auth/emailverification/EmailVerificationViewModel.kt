@@ -3,6 +3,7 @@ package dev.rahier.colocskitchenrace.ui.auth.emailverification
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import android.util.Log
 import dev.rahier.colocskitchenrace.data.repository.AuthRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import dev.rahier.colocskitchenrace.util.ErrorMapper
+import kotlin.coroutines.cancellation.CancellationException
 import javax.inject.Inject
 
 data class EmailVerificationState(
@@ -75,7 +77,11 @@ class EmailVerificationViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 authRepository.resendVerificationEmail()
-            } catch (_: Exception) {}
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.w("EmailVerification", "Failed to resend verification email", e)
+            }
         }
     }
 

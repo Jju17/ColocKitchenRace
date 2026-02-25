@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -19,6 +20,7 @@ import dev.rahier.colocskitchenrace.data.model.StepRole
 import dev.rahier.colocskitchenrace.ui.components.CKRButton
 import dev.rahier.colocskitchenrace.ui.theme.*
 import dev.rahier.colocskitchenrace.util.DateUtils
+import java.util.Date
 
 @Composable
 fun PlanningScreen(
@@ -203,6 +205,124 @@ private fun PartyItem(party: PartyInfo) {
                     Text(text = it, style = MaterialTheme.typography.bodySmall, color = CkrGray)
                 }
             }
+        }
+    }
+}
+
+// ─── Previews ────────────────────────────────────────────────────────
+
+@Preview(showBackground = true)
+@Composable
+private fun TimelineItemHostPreview() {
+    CKRTheme {
+        TimelineItem(
+            label = "Apero",
+            color = CkrCoral,
+            lightColor = CkrCoralLight,
+            step = PlanningStep(
+                role = StepRole.HOST,
+                cohouseName = "Les Joyeux Colocs",
+                address = "Rue de la Loi 16, 1000 Bruxelles",
+                hostPhone = "+32 470 12 34 56",
+                visitorPhone = "+32 475 98 76 54",
+                totalPeople = 8,
+                dietarySummary = mapOf("Vegetarien" to 2, "Sans gluten" to 1),
+                startTime = Date(),
+                endTime = Date(System.currentTimeMillis() + 2 * 3600 * 1000L),
+            ),
+            isLast = false,
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TimelineItemVisitorPreview() {
+    CKRTheme {
+        TimelineItem(
+            label = "Diner",
+            color = CkrMint,
+            lightColor = CkrMintLight,
+            step = PlanningStep(
+                role = StepRole.VISITOR,
+                cohouseName = "La Coloc du Bonheur",
+                address = "Avenue Louise 42, 1050 Ixelles",
+                totalPeople = 6,
+                startTime = Date(),
+                endTime = Date(System.currentTimeMillis() + 2 * 3600 * 1000L),
+            ),
+            isLast = true,
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun PartyItemPreview() {
+    CKRTheme {
+        PartyItem(
+            party = PartyInfo(
+                name = "Le Fuse",
+                address = "Rue Blaes 208, 1000 Bruxelles",
+                startTime = Date(),
+                endTime = Date(System.currentTimeMillis() + 4 * 3600 * 1000L),
+                note = "Entree gratuite pour les participants CKR !",
+            ),
+        )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun PlanningScreenContentPreview() {
+    CKRTheme {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+        ) {
+            Text(text = "Planning", style = MaterialTheme.typography.headlineLarge, color = CkrLavender)
+            Spacer(modifier = Modifier.height(24.dp))
+
+            TimelineItem(
+                label = "Apero",
+                color = CkrCoral,
+                lightColor = CkrCoralLight,
+                step = PlanningStep(
+                    role = StepRole.HOST,
+                    cohouseName = "Les Joyeux Colocs",
+                    address = "Rue de la Loi 16, 1000 Bruxelles",
+                    totalPeople = 8,
+                    startTime = Date(),
+                    endTime = Date(System.currentTimeMillis() + 2 * 3600 * 1000L),
+                ),
+                isLast = false,
+            )
+
+            TimelineItem(
+                label = "Diner",
+                color = CkrMint,
+                lightColor = CkrMintLight,
+                step = PlanningStep(
+                    role = StepRole.VISITOR,
+                    cohouseName = "La Coloc du Bonheur",
+                    address = "Avenue Louise 42, 1050 Ixelles",
+                    totalPeople = 6,
+                    startTime = Date(),
+                    endTime = Date(System.currentTimeMillis() + 2 * 3600 * 1000L),
+                ),
+                isLast = false,
+            )
+
+            PartyItem(
+                party = PartyInfo(
+                    name = "Le Fuse",
+                    address = "Rue Blaes 208, 1000 Bruxelles",
+                    startTime = Date(),
+                    endTime = Date(System.currentTimeMillis() + 4 * 3600 * 1000L),
+                    note = "Entree gratuite pour les participants CKR !",
+                ),
+            )
         }
     }
 }

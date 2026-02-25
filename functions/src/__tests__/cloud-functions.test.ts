@@ -191,7 +191,7 @@ describe("sendNotificationToCohouse", () => {
   it("throws invalid-argument when fields missing", async () => {
     await expect(
       adminCallWith(sendNotificationToCohouse, { cohouseId: "", notification: { title: "", body: "" } })
-    ).rejects.toThrow(/invalid-argument|missing/i);
+    ).rejects.toThrow(/invalid-argument|missing|invalid request|required/i);
   });
 
   it("sends notifications to cohouse users and returns success", async () => {
@@ -286,7 +286,7 @@ describe("sendNotificationToEdition", () => {
   it("throws invalid-argument when fields missing", async () => {
     await expect(
       adminCallWith(sendNotificationToEdition, { editionId: "", notification: { title: "", body: "" } })
-    ).rejects.toThrow(/invalid-argument|missing/i);
+    ).rejects.toThrow(/invalid-argument|missing|invalid request|required/i);
   });
 
   it("returns success false with message when no participants", async () => {
@@ -311,7 +311,7 @@ describe("sendNotificationToAll", () => {
   it("throws invalid-argument when fields missing", async () => {
     await expect(
       adminCallWith(sendNotificationToAll, { notification: { title: "", body: "" } })
-    ).rejects.toThrow(/invalid-argument|missing/i);
+    ).rejects.toThrow(/invalid-argument|missing|invalid request|required/i);
   });
 
   it("sends to all_users topic and returns messageId", async () => {
@@ -351,7 +351,7 @@ describe("checkDuplicateCohouse", () => {
   it("throws invalid-argument when fields missing", async () => {
     await expect(
       callWith(checkDuplicateCohouse, { name: "", street: "", city: "" })
-    ).rejects.toThrow(/invalid-argument|missing/i);
+    ).rejects.toThrow(/invalid-argument|missing|invalid request|required/i);
   });
 
   it("returns isDuplicate: false when no match in Firestore", async () => {
@@ -371,7 +371,7 @@ describe("validateAddress", () => {
   it("throws invalid-argument when street or city missing", async () => {
     await expect(
       callWith(validateAddress, { street: "", city: "", postalCode: "", country: "" })
-    ).rejects.toThrow(/invalid-argument|missing/i);
+    ).rejects.toThrow(/invalid-argument|missing|invalid request|required/i);
   });
 });
 
@@ -383,7 +383,7 @@ describe("matchCohouses", () => {
   it("throws invalid-argument when gameId missing", async () => {
     await expect(
       adminCallWith(matchCohouses, { gameId: "" })
-    ).rejects.toThrow(/invalid-argument|missing/i);
+    ).rejects.toThrow(/invalid-argument|missing|invalid request|required/i);
   });
 
   it("throws not-found when game does not exist", async () => {
@@ -587,7 +587,7 @@ describe("getCohousesForMap", () => {
   it("throws invalid-argument when cohouseIds missing", async () => {
     await expect(
       callWith(getCohousesForMap, { cohouseIds: [] })
-    ).rejects.toThrow(/invalid-argument|missing/i);
+    ).rejects.toThrow(/invalid-argument|missing|invalid request|required/i);
   });
 
   it("returns cohouse data with user names", async () => {
@@ -652,7 +652,7 @@ describe("updateEventSettings", () => {
   it("throws invalid-argument when required fields missing", async () => {
     await expect(
       adminCallWith(updateEventSettings, { gameId: "", aperoStartTime: "" })
-    ).rejects.toThrow(/invalid-argument|missing/i);
+    ).rejects.toThrow(/invalid-argument|missing|invalid request|required/i);
   });
 
   it("throws not-found when game does not exist", async () => {
@@ -736,7 +736,7 @@ describe("confirmMatching", () => {
   it("throws invalid-argument when gameId missing", async () => {
     await expect(
       adminCallWith(confirmMatching, { gameId: "" })
-    ).rejects.toThrow(/invalid-argument|missing/i);
+    ).rejects.toThrow(/invalid-argument|missing|invalid request|required/i);
   });
 
   it("throws not-found when game does not exist", async () => {
@@ -844,7 +844,7 @@ describe("revealPlanning", () => {
   it("throws invalid-argument when gameId missing", async () => {
     await expect(
       adminCallWith(revealPlanning, { gameId: "" })
-    ).rejects.toThrow(/invalid-argument|missing/i);
+    ).rejects.toThrow(/invalid-argument|missing|invalid request|required/i);
   });
 
   it("throws not-found when game does not exist", async () => {
@@ -922,7 +922,7 @@ describe("getMyPlanning", () => {
   it("throws invalid-argument when fields missing", async () => {
     await expect(
       callWith(getMyPlanning, { gameId: "", cohouseId: "" })
-    ).rejects.toThrow(/invalid-argument|missing/i);
+    ).rejects.toThrow(/invalid-argument|missing|invalid request|required/i);
   });
 
   it("throws not-found when game does not exist", async () => {

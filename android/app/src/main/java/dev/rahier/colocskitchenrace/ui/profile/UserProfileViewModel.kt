@@ -1,10 +1,12 @@
 package dev.rahier.colocskitchenrace.ui.profile
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.rahier.colocskitchenrace.data.model.User
 import dev.rahier.colocskitchenrace.data.repository.AuthRepository
+import dev.rahier.colocskitchenrace.util.ErrorMapper
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,6 +20,7 @@ data class UserProfileState(
     val user: User? = null,
     val showDeleteConfirmation: Boolean = false,
     val isLoading: Boolean = false,
+    val error: String? = null,
 )
 
 sealed class UserProfileIntent {
@@ -71,8 +74,9 @@ class UserProfileViewModel @Inject constructor(
             try {
                 authRepository.deleteAccount(user.id)
                 _effect.send(UserProfileEffect.SignedOut)
-            } catch (_: Exception) {
-                _state.update { it.copy(isLoading = false) }
+            } catch (e: Exception) {
+                Log.e("UserProfile", "Failed to delete account", e)
+                _state.update { it.copy(isLoading = false, error = ErrorMapper.toUserMessage(e, "Erreur lors de la suppression du compte")) }
             }
         }
     }

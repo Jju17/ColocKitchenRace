@@ -146,7 +146,7 @@ class SignInViewModelTest {
         viewModel.onIntent(SignInIntent.SignInClicked)
         advanceUntilIdle()
 
-        assertEquals("Auth failed", viewModel.state.value.errorMessage)
+        assertEquals("Erreur de connexion", viewModel.state.value.errorMessage)
         assertFalse(viewModel.state.value.isLoading)
     }
 

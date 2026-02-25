@@ -21,6 +21,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -137,6 +138,20 @@ fun SignInScreen(
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        SocialAuthButtons(
+            onGoogleSignIn = { activity?.let { viewModel.signInWithGoogle(it) } },
+            onAppleSignIn = { activity?.let { viewModel.signInWithApple(it) } },
+        )
+    }
+}
+
+@Composable
+private fun SocialAuthButtons(
+    modifier: Modifier = Modifier,
+    onGoogleSignIn: () -> Unit,
+    onAppleSignIn: () -> Unit,
+) {
+    Column(modifier = modifier) {
         // Divider with "ou"
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -161,7 +176,7 @@ fun SignInScreen(
 
         // Google Sign-In - white button with border
         Button(
-            onClick = { activity?.let { viewModel.signInWithGoogle(it) } },
+            onClick = onGoogleSignIn,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
@@ -182,7 +197,7 @@ fun SignInScreen(
 
         // Apple Sign-In - black button
         Button(
-            onClick = { activity?.let { viewModel.signInWithApple(it) } },
+            onClick = onAppleSignIn,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(52.dp),
@@ -227,4 +242,90 @@ private fun CKRTextField(
             unfocusedBorderColor = Color.Transparent,
         ),
     )
+}
+
+// ─── Previews ────────────────────────────────────────────────────────
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun SignInScreenPreview() {
+    CKRTheme {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(CkrMintLight)
+                .padding(horizontal = 32.dp)
+                .padding(top = 80.dp, bottom = 32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = "Colocs\nKitchen Race",
+                style = MaterialTheme.typography.displayMedium,
+                textAlign = TextAlign.Center,
+                color = CkrDark,
+            )
+
+            Spacer(modifier = Modifier.height(48.dp))
+
+            CKRTextField(
+                value = "test@example.com",
+                onValueChange = {},
+                label = "Email",
+                leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = CkrGray) },
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            CKRTextField(
+                value = "password123",
+                onValueChange = {},
+                label = "Mot de passe",
+                leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = CkrGray) },
+                visualTransformation = PasswordVisualTransformation(),
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            CKRButton(
+                text = "Se connecter",
+                isLoading = false,
+                onClick = {},
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                HorizontalDivider(modifier = Modifier.weight(1f), color = CkrGray.copy(alpha = 0.4f))
+                Text(text = "  ou  ", style = MaterialTheme.typography.bodySmall, color = CkrGray)
+                HorizontalDivider(modifier = Modifier.weight(1f), color = CkrGray.copy(alpha = 0.4f))
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            Button(
+                onClick = {},
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                shape = RoundedCornerShape(15.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = CkrWhite, contentColor = CkrDark),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp),
+            ) {
+                Text(text = "Se connecter avec Google", style = MaterialTheme.typography.labelLarge)
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Button(
+                onClick = {},
+                modifier = Modifier.fillMaxWidth().height(52.dp),
+                shape = RoundedCornerShape(15.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = CkrDark, contentColor = CkrWhite),
+            ) {
+                Text(text = "Se connecter avec Apple", style = MaterialTheme.typography.labelLarge)
+            }
+        }
+    }
 }

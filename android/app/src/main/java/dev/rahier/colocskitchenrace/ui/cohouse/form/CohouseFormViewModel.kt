@@ -1,5 +1,6 @@
 package dev.rahier.colocskitchenrace.ui.cohouse.form
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -12,6 +13,7 @@ import dev.rahier.colocskitchenrace.data.repository.AddressValidatorRepository
 import dev.rahier.colocskitchenrace.data.repository.AuthRepository
 import dev.rahier.colocskitchenrace.data.repository.CohouseRepository
 import dev.rahier.colocskitchenrace.util.ErrorMapper
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
@@ -150,7 +152,11 @@ class CohouseFormViewModel @Inject constructor(
                 try {
                     val data = cohouseRepository.loadCoverImage(path)
                     _state.update { it.copy(coverImageData = data) }
-                } catch (_: Exception) {}
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    Log.w("CohouseForm", "Failed to load cover image", e)
+                }
             }
         }
     }
@@ -226,7 +232,10 @@ class CohouseFormViewModel @Inject constructor(
                 }
                 else -> {}
             }
-        } catch (_: Exception) {
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Log.w("CohouseForm", "Failed to validate address", e)
             _state.update { it.copy(isValidatingAddress = false) }
         }
     }

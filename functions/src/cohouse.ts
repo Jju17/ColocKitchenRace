@@ -1,5 +1,7 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { db, auth, REGION } from "./config";
+import { parseRequest, requireAuth, checkDuplicateSchema, validateAddressSchema, getCohousesForMapSchema } from "./schemas";
+import { checkRateLimit } from "./rate-limiter";
 
 // ============================================
 // Nominatim geocoding cache (in-memory, per Cloud Function instance)
@@ -52,15 +54,9 @@ interface CohouseMapData {
 export const checkDuplicateCohouse = onCall<CheckDuplicateRequest>(
   { region: REGION },
   async (request) => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "Must be authenticated");
-    }
-
-    const { name, street, city } = request.data;
-
-    if (!name || !street || !city) {
-      throw new HttpsError("invalid-argument", "Missing required fields: name, street, city");
-    }
+    requireAuth(request);
+    const { name, street, city } = parseRequest(checkDuplicateSchema, request.data);
+    checkRateLimit(request.auth!.uid, "checkDuplicateCohouse", 10, 60_000);
 
     try {
       const nameLower = name.trim().toLowerCase();
@@ -105,15 +101,9 @@ export const checkDuplicateCohouse = onCall<CheckDuplicateRequest>(
 export const validateAddress = onCall<ValidateAddressRequest>(
   { region: REGION },
   async (request) => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "Must be authenticated");
-    }
-
-    const { street, city, postalCode, country } = request.data;
-
-    if (!street || !city) {
-      throw new HttpsError("invalid-argument", "Missing required fields: street, city");
-    }
+    requireAuth(request);
+    const { street, city, postalCode, country } = parseRequest(validateAddressSchema, request.data);
+    checkRateLimit(request.auth!.uid, "validateAddress", 20, 60_000);
 
     try {
       const cacheKey = `${street}|${city}|${postalCode || ""}|${country || ""}`;
@@ -205,15 +195,8 @@ export const validateAddress = onCall<ValidateAddressRequest>(
 export const getCohousesForMap = onCall<GetCohousesForMapRequest>(
   { region: REGION },
   async (request) => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "Must be authenticated");
-    }
-
-    const { cohouseIds } = request.data;
-
-    if (!cohouseIds || !Array.isArray(cohouseIds) || cohouseIds.length === 0) {
-      throw new HttpsError("invalid-argument", "Missing required field: cohouseIds (non-empty array)");
-    }
+    requireAuth(request);
+    const { cohouseIds } = parseRequest(getCohousesForMapSchema, request.data);
 
     try {
       const results: CohouseMapData[] = [];
@@ -282,11 +265,9 @@ export const getCohousesForMap = onCall<GetCohousesForMapRequest>(
 export const setCohouseClaim = onCall(
   { region: REGION },
   async (request) => {
-    if (!request.auth) {
-      throw new HttpsError("unauthenticated", "Must be authenticated");
-    }
+    requireAuth(request);
 
-    const callerUid = request.auth.uid;
+    const callerUid = request.auth!.uid;
 
     try {
       // Look up the user's Firestore doc by authId

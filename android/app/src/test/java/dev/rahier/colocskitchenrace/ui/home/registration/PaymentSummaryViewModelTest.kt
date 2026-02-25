@@ -140,7 +140,7 @@ class PaymentSummaryViewModelTest {
         viewModel.onIntent(PaymentSummaryIntent.PaymentSucceeded)
         advanceUntilIdle()
 
-        assertEquals("Paiement reussi mais confirmation echouee. Reessayez.", viewModel.state.value.error)
+        assertEquals("Paiement réussi mais confirmation échouée. Réessayez.", viewModel.state.value.error)
         assertFalse(viewModel.state.value.isConfirming)
     }
 }
