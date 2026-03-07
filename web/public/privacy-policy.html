@@ -90,12 +90,13 @@
         <div class="lang-switcher">
             <button id="btn-fr" class="active" onclick="switchLang('fr')">🇫🇷 Français</button>
             <button id="btn-en" onclick="switchLang('en')">🇬🇧 English</button>
+            <button id="btn-nl" onclick="switchLang('nl')">🇳🇱 Nederlands</button>
         </div>
 
         <!-- FRENCH VERSION -->
         <div id="lang-fr">
             <h1>Politique de Confidentialité</h1>
-            <p class="subtitle">ColocKitchenRace — Dernière mise à jour : 10 février 2026</p>
+            <p class="subtitle">ColocKitchenRace — Dernière mise à jour : 7 mars 2026</p>
 
             <p>
                 ColocKitchenRace est une application mobile qui organise des événements culinaires sociaux
@@ -185,14 +186,22 @@
                 avec des règles d'accès restreintes.
             </p>
 
-            <h2>5. Notifications push</h2>
+            <h2>5. Paiements</h2>
+            <p>
+                Les paiements sont traités par <strong>Stripe</strong>, un prestataire de services de paiement
+                certifié PCI DSS. Nous ne stockons jamais vos informations de carte bancaire. Stripe collecte
+                et traite vos données de paiement conformément à sa propre
+                <a href="https://stripe.com/privacy" target="_blank">politique de confidentialité</a>.
+            </p>
+
+            <h2>6. Notifications push</h2>
             <p>
                 L'application utilise Firebase Cloud Messaging pour vous envoyer des notifications
                 relatives aux événements, défis et actualités. Vous pouvez désactiver les notifications
                 à tout moment dans les réglages de votre appareil iOS.
             </p>
 
-            <h2>6. Vos droits (RGPD)</h2>
+            <h2>7. Vos droits (RGPD)</h2>
             <p>
                 Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez
                 des droits suivants :
@@ -210,20 +219,20 @@
                 Pour exercer ces droits, contactez-nous à l'adresse ci-dessous.
             </p>
 
-            <h2>7. Conservation des données</h2>
+            <h2>8. Conservation des données</h2>
             <p>
                 Vos données personnelles sont conservées tant que votre compte est actif. Si vous
                 supprimez votre compte, vos données seront effacées dans un délai de 30 jours.
             </p>
 
-            <h2>8. Modifications de cette politique</h2>
+            <h2>9. Modifications de cette politique</h2>
             <p>
                 Nous pouvons mettre à jour cette politique de confidentialité. En cas de modification
                 significative, nous vous en informerons via l'application ou par e-mail.
             </p>
 
             <div class="contact">
-                <h2>9. Contact</h2>
+                <h2>10. Contact</h2>
                 <p>
                     Pour toute question concernant cette politique de confidentialité ou vos données
                     personnelles, contactez-nous :
@@ -240,7 +249,7 @@
         <!-- ENGLISH VERSION -->
         <div id="lang-en" style="display: none;">
             <h1>Privacy Policy</h1>
-            <p class="subtitle">ColocKitchenRace — Last updated: February 10, 2026</p>
+            <p class="subtitle">ColocKitchenRace — Last updated: March 7, 2026</p>
 
             <p>
                 ColocKitchenRace is a mobile application that organizes social cooking events
@@ -330,14 +339,22 @@
                 with restricted access rules.
             </p>
 
-            <h2>5. Push notifications</h2>
+            <h2>5. Payments</h2>
+            <p>
+                Payments are processed by <strong>Stripe</strong>, a PCI DSS certified payment service provider.
+                We never store your credit card information. Stripe collects and processes your payment data
+                in accordance with its own
+                <a href="https://stripe.com/privacy" target="_blank">privacy policy</a>.
+            </p>
+
+            <h2>6. Push notifications</h2>
             <p>
                 The application uses Firebase Cloud Messaging to send you notifications
                 about events, challenges and news. You can disable notifications
                 at any time in your iOS device settings.
             </p>
 
-            <h2>6. Your rights (GDPR)</h2>
+            <h2>7. Your rights (GDPR)</h2>
             <p>
                 In accordance with the General Data Protection Regulation (GDPR), you have
                 the following rights:
@@ -355,20 +372,20 @@
                 To exercise these rights, contact us at the address below.
             </p>
 
-            <h2>7. Data retention</h2>
+            <h2>8. Data retention</h2>
             <p>
                 Your personal data is retained as long as your account is active. If you
                 delete your account, your data will be erased within 30 days.
             </p>
 
-            <h2>8. Changes to this policy</h2>
+            <h2>9. Changes to this policy</h2>
             <p>
                 We may update this privacy policy. In the event of a significant change,
                 we will notify you via the application or by email.
             </p>
 
             <div class="contact">
-                <h2>9. Contact</h2>
+                <h2>10. Contact</h2>
                 <p>
                     For any questions regarding this privacy policy or your personal data,
                     please contact us:
@@ -378,6 +395,159 @@
                 </p>
                 <p>
                     Julien Rahier — Brussels, Belgium
+                </p>
+            </div>
+        </div>
+
+        <!-- DUTCH VERSION -->
+        <div id="lang-nl" style="display: none;">
+            <h1>Privacybeleid</h1>
+            <p class="subtitle">ColocKitchenRace — Laatst bijgewerkt: 7 maart 2026</p>
+
+            <p>
+                ColocKitchenRace is een mobiele applicatie die sociale kookevenementen organiseert
+                tussen gedeelde huishoudens (colocaties) in Brussel. Dit privacybeleid beschrijft
+                welke persoonsgegevens we verzamelen, hoe we ze gebruiken en wat je rechten zijn.
+            </p>
+            <p>
+                Door de applicatie te gebruiken, ga je akkoord met de praktijken beschreven in dit beleid.
+            </p>
+
+            <h2>1. Verzamelde persoonsgegevens</h2>
+
+            <p><strong>Identiteitsgegevens (bij registratie):</strong></p>
+            <ul>
+                <li>Voornaam en achternaam</li>
+                <li>E-mailadres</li>
+                <li>Telefoonnummer (optioneel)</li>
+                <li>Geslacht</li>
+                <li>Wachtwoord (versleuteld opgeslagen door Firebase Authentication)</li>
+            </ul>
+
+            <p><strong>Identiteitsverificatie (bij het aanmaken van een huishouden):</strong></p>
+            <ul>
+                <li>Foto van de identiteitskaart</li>
+                <li>Volledige naam, geboortedatum en nationaliteit afgeleid van de identiteitskaart</li>
+            </ul>
+            <p>
+                De scan van de identiteitskaart wordt lokaal op je apparaat verwerkt met Apple Vision-technologie.
+                De afbeelding wordt vervolgens veilig op onze servers opgeslagen.
+            </p>
+
+            <p><strong>Locatiegegevens:</strong></p>
+            <ul>
+                <li>Postadres van het huishouden (straat, stad, postcode, land)</li>
+                <li>GPS-coordinaten afgeleid van het adres (breedtegraad/lengtegraad) voor nabijheidsmatching</li>
+            </ul>
+
+            <p><strong>Voorkeuren:</strong></p>
+            <ul>
+                <li>Dieetvoorkeuren (vegetarisch, veganistisch, glutenvrij, lactosevrij, notenvrij)</li>
+                <li>Nieuwsbriefinschrijving (opt-in)</li>
+            </ul>
+
+            <p><strong>Door gebruikers gegenereerde inhoud:</strong></p>
+            <ul>
+                <li>Challenge-antwoorden (tekst, foto's, meerkeuzevragen)</li>
+                <li>Indieningsdata</li>
+            </ul>
+
+            <p><strong>Technische gegevens:</strong></p>
+            <ul>
+                <li>Push-notificatietoken (FCM-token) voor het verzenden van meldingen</li>
+                <li>Firebase-authenticatie-identificator</li>
+            </ul>
+
+            <h2>2. Gegevens die we NIET verzamelen</h2>
+            <ul>
+                <li>Geen analyse- of gedragsvolggegevens</li>
+                <li>Geen advertentie-identificatoren</li>
+                <li>Geen browsegeschiedenis</li>
+                <li>Geen gegevens die worden verkocht of gedeeld met derden voor advertentiedoeleinden</li>
+            </ul>
+
+            <h2>3. Gebruik van gegevens</h2>
+            <p>Je gegevens worden uitsluitend gebruikt om:</p>
+            <ul>
+                <li>Je gebruikersaccount aan te maken en te beheren</li>
+                <li>Je te koppelen aan je huishouden</li>
+                <li>Huishoudens te matchen op basis van geografische nabijheid</li>
+                <li>Identiteit te verifieren bij het aanmaken van een huishouden</li>
+                <li>Challenges te beheren en antwoorden te valideren</li>
+                <li>Je push-notificaties te sturen gerelateerd aan het evenement</li>
+                <li>Je nieuws te sturen als je bent ingeschreven voor de nieuwsbrief</li>
+            </ul>
+
+            <h2>4. Opslag en beveiliging</h2>
+            <p>
+                Alle gegevens worden opgeslagen op <strong>Firebase</strong> (Google Cloud Platform),
+                met servers in Europa (regio europe-west1).
+            </p>
+            <p>
+                Wachtwoorden worden beheerd door Firebase Authentication en worden nooit in leesbare tekst opgeslagen.
+                Communicatie tussen de applicatie en servers is versleuteld via HTTPS/TLS.
+            </p>
+            <p>
+                Foto's van identiteitskaarten en challenge-afbeeldingen worden opgeslagen op Firebase Storage
+                met beperkte toegangsregels.
+            </p>
+
+            <h2>5. Betalingen</h2>
+            <p>
+                Betalingen worden verwerkt door <strong>Stripe</strong>, een PCI DSS-gecertificeerde
+                betalingsdienstverlener. We slaan nooit je creditcardgegevens op. Stripe verzamelt
+                en verwerkt je betalingsgegevens in overeenstemming met hun eigen
+                <a href="https://stripe.com/privacy" target="_blank">privacybeleid</a>.
+            </p>
+
+            <h2>6. Push-notificaties</h2>
+            <p>
+                De applicatie gebruikt Firebase Cloud Messaging om je meldingen te sturen
+                over evenementen, challenges en nieuws. Je kunt meldingen op elk moment
+                uitschakelen in de instellingen van je apparaat.
+            </p>
+
+            <h2>7. Je rechten (AVG)</h2>
+            <p>
+                In overeenstemming met de Algemene Verordening Gegevensbescherming (AVG) heb je
+                de volgende rechten:
+            </p>
+            <ul>
+                <li><strong>Recht op inzage:</strong> een kopie van je persoonsgegevens verkrijgen</li>
+                <li><strong>Recht op rectificatie:</strong> je onjuiste gegevens corrigeren</li>
+                <li><strong>Recht op verwijdering:</strong> verzoeken om verwijdering van je gegevens</li>
+                <li><strong>Recht op overdraagbaarheid:</strong> je gegevens ontvangen in een gestructureerd formaat</li>
+                <li><strong>Recht van bezwaar:</strong> bezwaar maken tegen de verwerking van je gegevens</li>
+                <li><strong>Recht om toestemming in te trekken:</strong> op elk moment, zonder de rechtmatigheid
+                    van de verwerking voor de intrekking aan te tasten</li>
+            </ul>
+            <p>
+                Om deze rechten uit te oefenen, neem contact met ons op via het onderstaande adres.
+            </p>
+
+            <h2>8. Bewaring van gegevens</h2>
+            <p>
+                Je persoonsgegevens worden bewaard zolang je account actief is. Als je
+                je account verwijdert, worden je gegevens binnen 30 dagen gewist.
+            </p>
+
+            <h2>9. Wijzigingen in dit beleid</h2>
+            <p>
+                We kunnen dit privacybeleid bijwerken. Bij een belangrijke wijziging
+                zullen we je informeren via de applicatie of per e-mail.
+            </p>
+
+            <div class="contact">
+                <h2>10. Contact</h2>
+                <p>
+                    Voor vragen over dit privacybeleid of je persoonsgegevens,
+                    neem contact met ons op:
+                </p>
+                <p>
+                    📧 <a href="mailto:julien@rahier.dev">julien@rahier.dev</a>
+                </p>
+                <p>
+                    Julien Rahier — Brussel, Belgie
                 </p>
             </div>
         </div>
@@ -391,8 +561,10 @@
         function switchLang(lang) {
             document.getElementById('lang-fr').style.display = lang === 'fr' ? 'block' : 'none';
             document.getElementById('lang-en').style.display = lang === 'en' ? 'block' : 'none';
+            document.getElementById('lang-nl').style.display = lang === 'nl' ? 'block' : 'none';
             document.getElementById('btn-fr').classList.toggle('active', lang === 'fr');
             document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            document.getElementById('btn-nl').classList.toggle('active', lang === 'nl');
             document.documentElement.lang = lang;
         }
     </script>

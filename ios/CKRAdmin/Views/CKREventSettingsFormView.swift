@@ -15,6 +15,15 @@ struct CKREventSettingsFormFeature {
     struct State {
         var settings: CKREventSettings
 
+        var isValid: Bool {
+            settings.aperoEndTime > settings.aperoStartTime
+            && settings.dinerStartTime >= settings.aperoEndTime
+            && settings.dinerEndTime > settings.dinerStartTime
+            && settings.partyStartTime >= settings.dinerEndTime
+            && settings.partyEndTime > settings.partyStartTime
+            && !settings.partyName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        }
+
         /// Create mode — new settings with defaults based on game date.
         init(gameDate: Date) {
             let calendar = Calendar.current
@@ -46,10 +55,20 @@ struct CKREventSettingsFormFeature {
 
     enum Action: BindableAction {
         case binding(BindingAction<State>)
+        case partyNoteChanged(String)
     }
 
     var body: some ReducerOf<Self> {
         BindingReducer()
+        Reduce { state, action in
+            switch action {
+            case let .partyNoteChanged(note):
+                state.settings.partyNote = note.isEmpty ? nil : note
+                return .none
+            case .binding:
+                return .none
+            }
+        }
     }
 }
 
@@ -67,6 +86,7 @@ struct CKREventSettingsFormView: View {
                 DatePicker(
                     "End",
                     selection: $store.settings.aperoEndTime,
+                    in: store.settings.aperoStartTime...,
                     displayedComponents: [.date, .hourAndMinute]
                 )
             }
@@ -75,11 +95,13 @@ struct CKREventSettingsFormView: View {
                 DatePicker(
                     "Start",
                     selection: $store.settings.dinerStartTime,
+                    in: store.settings.aperoEndTime...,
                     displayedComponents: [.date, .hourAndMinute]
                 )
                 DatePicker(
                     "End",
                     selection: $store.settings.dinerEndTime,
+                    in: store.settings.dinerStartTime...,
                     displayedComponents: [.date, .hourAndMinute]
                 )
             }
@@ -90,18 +112,20 @@ struct CKREventSettingsFormView: View {
                 DatePicker(
                     "Start",
                     selection: $store.settings.partyStartTime,
+                    in: store.settings.dinerEndTime...,
                     displayedComponents: [.date, .hourAndMinute]
                 )
                 DatePicker(
                     "End",
                     selection: $store.settings.partyEndTime,
+                    in: store.settings.partyStartTime...,
                     displayedComponents: [.date, .hourAndMinute]
                 )
                 TextField(
                     "Note (optional)",
                     text: Binding(
                         get: { store.settings.partyNote ?? "" },
-                        set: { store.settings.partyNote = $0.isEmpty ? nil : $0 }
+                        set: { store.send(.partyNoteChanged($0)) }
                     )
                 )
             }

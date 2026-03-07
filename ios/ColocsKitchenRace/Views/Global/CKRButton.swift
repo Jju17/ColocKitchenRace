@@ -9,12 +9,10 @@ import SwiftUI
 
 struct CKRButton: View {
     var titleKey: LocalizedStringKey
-    var color: Color
     var action: () -> Void
 
-    init(_ titleKey: LocalizedStringKey, color: Color = .black, action: @escaping () -> Void) {
+    init(_ titleKey: LocalizedStringKey, action: @escaping () -> Void) {
         self.titleKey = titleKey
-        self.color = color
         self.action = action
     }
 

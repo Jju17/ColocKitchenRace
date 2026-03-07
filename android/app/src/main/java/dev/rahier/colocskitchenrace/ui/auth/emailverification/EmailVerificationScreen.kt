@@ -7,10 +7,12 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.rahier.colocskitchenrace.R
 import dev.rahier.colocskitchenrace.ui.components.CKRButton
 import dev.rahier.colocskitchenrace.ui.theme.CkrLavender
 
@@ -50,14 +52,14 @@ fun EmailVerificationScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Verifiez votre email",
+            text = stringResource(R.string.verify_email_title),
             style = MaterialTheme.typography.headlineMedium,
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Nous avons envoye un email de verification. Cliquez sur le lien dans l'email pour continuer.",
+            text = stringResource(R.string.verify_email_message_short),
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -66,7 +68,7 @@ fun EmailVerificationScreen(
         Spacer(modifier = Modifier.height(32.dp))
 
         CKRButton(
-            text = "J'ai verifie mon email",
+            text = stringResource(R.string.check_verification),
             isLoading = state.isLoading,
             onClick = { viewModel.onIntent(EmailVerificationIntent.CheckVerification) },
             modifier = Modifier.fillMaxWidth(),
@@ -75,7 +77,7 @@ fun EmailVerificationScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         TextButton(onClick = { viewModel.onIntent(EmailVerificationIntent.ResendEmail) }) {
-            Text("Renvoyer l'email")
+            Text(stringResource(R.string.resend_email))
         }
 
         state.errorMessage?.let { error ->
@@ -86,7 +88,7 @@ fun EmailVerificationScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         TextButton(onClick = { viewModel.onIntent(EmailVerificationIntent.SignOut) }) {
-            Text("Se deconnecter", color = MaterialTheme.colorScheme.error)
+            Text(stringResource(R.string.sign_out), color = MaterialTheme.colorScheme.error)
         }
     }
 }

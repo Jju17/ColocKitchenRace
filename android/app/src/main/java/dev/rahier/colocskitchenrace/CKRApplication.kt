@@ -4,8 +4,8 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.util.Log
-import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.HiltAndroidApp
+import dev.rahier.colocskitchenrace.util.Constants
 
 @HiltAndroidApp
 class CKRApplication : Application() {
@@ -14,7 +14,7 @@ class CKRApplication : Application() {
         super.onCreate()
         setupUncaughtExceptionHandler()
         createNotificationChannel()
-        subscribeToTopics()
+        // Topic subscription should happen after user authentication, not at app startup
     }
 
     private fun setupUncaughtExceptionHandler() {
@@ -27,17 +27,13 @@ class CKRApplication : Application() {
 
     private fun createNotificationChannel() {
         val channel = NotificationChannel(
-            "ckr_default",
+            Constants.NOTIFICATION_CHANNEL_ID,
             "Colocs Kitchen Race",
-            NotificationManager.IMPORTANCE_DEFAULT
+            NotificationManager.IMPORTANCE_HIGH
         ).apply {
             description = "Notifications de Colocs Kitchen Race"
         }
         val manager = getSystemService(NotificationManager::class.java)
         manager.createNotificationChannel(channel)
-    }
-
-    private fun subscribeToTopics() {
-        FirebaseMessaging.getInstance().subscribeToTopic("all_users")
     }
 }

@@ -14,12 +14,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.rahier.colocskitchenrace.data.model.CohouseType
 import dev.rahier.colocskitchenrace.data.model.CohouseUser
+import dev.rahier.colocskitchenrace.R
 import dev.rahier.colocskitchenrace.ui.components.CKRButton
 import dev.rahier.colocskitchenrace.ui.theme.*
 
@@ -51,10 +53,10 @@ fun RegistrationFormScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Inscription") },
+                title = { Text(stringResource(R.string.registration_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Retour")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -80,14 +82,14 @@ fun RegistrationFormScreen(
 
             // Average age
             Text(
-                text = "Age moyen de la coloc",
+                text = stringResource(R.string.average_age_title),
                 style = MaterialTheme.typography.titleMedium,
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = state.averageAge,
                 onValueChange = { viewModel.onIntent(RegistrationFormIntent.AverageAgeChanged(it)) },
-                label = { Text("Age moyen") },
+                label = { Text(stringResource(R.string.average_age_label)) },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
@@ -98,7 +100,7 @@ fun RegistrationFormScreen(
 
             // Cohouse type
             Text(
-                text = "Type de coloc",
+                text = stringResource(R.string.cohouse_type_title),
                 style = MaterialTheme.typography.titleMedium,
             )
             Spacer(modifier = Modifier.height(8.dp))
@@ -128,7 +130,7 @@ fun RegistrationFormScreen(
 
             // Continue button
             CKRButton(
-                text = "Continuer vers le paiement",
+                text = stringResource(R.string.continue_to_payment),
                 onClick = { viewModel.onIntent(RegistrationFormIntent.ContinueToPayment) },
                 enabled = state.canContinue,
                 modifier = Modifier.fillMaxWidth(),
@@ -144,7 +146,7 @@ private fun ParticipantSelector(
     onToggleUser: (String) -> Unit,
 ) {
     Text(
-        text = "Qui participe ?",
+        text = stringResource(R.string.who_participates),
         style = MaterialTheme.typography.headlineSmall,
         color = CkrLavender,
     )
@@ -190,12 +192,12 @@ private fun PriceSummaryCard(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
-                text = "$selectedCount participant(s)",
+                text = stringResource(R.string.participants_count, selectedCount),
                 style = MaterialTheme.typography.bodyLarge,
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Total: $formattedTotal",
+                text = stringResource(R.string.total_price, formattedTotal),
                 style = MaterialTheme.typography.headlineSmall,
             )
         }

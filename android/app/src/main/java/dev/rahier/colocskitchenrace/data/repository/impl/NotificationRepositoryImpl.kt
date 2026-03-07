@@ -18,10 +18,13 @@ class NotificationRepositoryImpl @Inject constructor(
 
     override suspend fun storeFCMToken(token: String) {
         val userId = auth.currentUser?.uid ?: return
-        firestore.collection(Constants.USERS_COLLECTION)
-            .document(userId)
-            .update("fcmToken", token)
+        val snapshot = firestore.collection(Constants.USERS_COLLECTION)
+            .whereEqualTo("authId", userId)
+            .limit(1)
+            .get()
             .await()
+        val userDoc = snapshot.documents.firstOrNull() ?: return
+        userDoc.reference.update("fcmToken", token).await()
     }
 
     override suspend fun subscribeToAllUsers() {

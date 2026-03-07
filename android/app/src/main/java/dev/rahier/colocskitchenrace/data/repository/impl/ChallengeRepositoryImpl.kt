@@ -74,7 +74,7 @@ class ChallengeRepositoryImpl @Inject constructor(
 
             // The content is stored as a discriminated union with type key
             return when {
-                data.containsKey("picture") -> ChallengeContent.Picture()
+                data.containsKey("picture") -> ChallengeContent.Picture
                 data.containsKey("multipleChoice") -> {
                     val mc = data["multipleChoice"] as? Map<String, Any?> ?: return ChallengeContent.MultipleChoice()
                     ChallengeContent.MultipleChoice(
@@ -83,7 +83,7 @@ class ChallengeRepositoryImpl @Inject constructor(
                         shuffleAnswers = mc["shuffleAnswers"] as? Boolean ?: true,
                     )
                 }
-                data.containsKey("singleAnswer") -> ChallengeContent.SingleAnswer()
+                data.containsKey("singleAnswer") -> ChallengeContent.SingleAnswer
                 data.containsKey("noChoice") -> {
                     val nc = data["noChoice"] as? Map<String, Any?>
                     ChallengeContent.NoChoice(text = nc?.get("text") as? String ?: "")

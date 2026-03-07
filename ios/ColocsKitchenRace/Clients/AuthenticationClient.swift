@@ -22,6 +22,7 @@ enum AuthError: Error, LocalizedError, Equatable {
     case failed
     case failedWithError(String)
     case accountNotFound
+    case invalidCredentials
 
     var errorDescription: String? {
         switch self {
@@ -31,6 +32,8 @@ enum AuthError: Error, LocalizedError, Equatable {
             return message
         case .accountNotFound:
             return "No account found for this email."
+        case .invalidCredentials:
+            return "Invalid email or password."
         }
     }
 }
@@ -71,9 +74,10 @@ extension AuthenticationClient: DependencyKey {
                 let errorCode = (error as NSError).code
                 // Firebase may return .userNotFound (17011) or .invalidCredential
                 // (17004, when email enumeration protection is enabled) for non-existent accounts.
-                if errorCode == AuthErrorCode.userNotFound.rawValue
-                    || errorCode == AuthErrorCode.invalidCredential.rawValue {
+                if errorCode == AuthErrorCode.userNotFound.rawValue {
                     throw AuthError.accountNotFound
+                } else if errorCode == AuthErrorCode.invalidCredential.rawValue {
+                    throw AuthError.invalidCredentials
                 }
                 throw error
             }
@@ -206,9 +210,12 @@ extension AuthenticationClient: DependencyKey {
         },
         signInWithGoogle: {
             // 1. Get the root view controller to present Google Sign-In
-            guard let windowScene = await UIApplication.shared.connectedScenes.first as? UIWindowScene,
-                  let rootVC = await windowScene.windows.first?.rootViewController
-            else { throw AuthError.failed }
+            let rootVC = try await MainActor.run {
+                guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+                      let rootVC = windowScene.windows.first?.rootViewController
+                else { throw AuthError.failed }
+                return rootVC
+            }
 
             // 2. Start Google Sign-In flow
             let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: rootVC)

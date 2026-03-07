@@ -7,10 +7,3 @@
 
 import Foundation
 
-extension Error {
-    static var standardError: Error {
-        StandardError()
-    }
-}
-
-struct StandardError: Error {}

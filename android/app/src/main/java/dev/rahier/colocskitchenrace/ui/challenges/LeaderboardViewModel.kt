@@ -16,20 +16,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class LeaderboardEntry(
-    val cohouseId: String,
-    val cohouseName: String,
-    val score: Int,
-    val validatedCount: Int,
-    val rank: Int,
-)
-
-data class LeaderboardState(
-    val entries: List<LeaderboardEntry> = emptyList(),
-    val myCohouseId: String? = null,
-    val isLoading: Boolean = false,
-)
-
 @HiltViewModel
 class LeaderboardViewModel @Inject constructor(
     private val challengeRepository: ChallengeRepository,

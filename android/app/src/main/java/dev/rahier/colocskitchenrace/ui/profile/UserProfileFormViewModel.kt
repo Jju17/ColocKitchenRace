@@ -1,8 +1,11 @@
 package dev.rahier.colocskitchenrace.ui.profile
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.rahier.colocskitchenrace.R
 import dev.rahier.colocskitchenrace.data.model.DietaryPreference
 import dev.rahier.colocskitchenrace.data.repository.AuthRepository
 import dev.rahier.colocskitchenrace.util.ErrorMapper
@@ -15,38 +18,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class UserProfileFormState(
-    val firstName: String = "",
-    val lastName: String = "",
-    val email: String = "",
-    val phoneNumber: String = "",
-    val isEmailEditable: Boolean = true,
-    val dietaryPreferences: Set<DietaryPreference> = emptySet(),
-    val isSubscribeToNews: Boolean = false,
-    val isSaving: Boolean = false,
-    val error: String? = null,
-) {
-    val canSave: Boolean
-        get() = firstName.isNotBlank() && lastName.isNotBlank()
-}
-
-sealed class UserProfileFormIntent {
-    data class FirstNameChanged(val value: String) : UserProfileFormIntent()
-    data class LastNameChanged(val value: String) : UserProfileFormIntent()
-    data class EmailChanged(val value: String) : UserProfileFormIntent()
-    data class PhoneChanged(val value: String) : UserProfileFormIntent()
-    data class ToggleDietaryPreference(val preference: DietaryPreference) : UserProfileFormIntent()
-    data class SubscribeToNewsChanged(val value: Boolean) : UserProfileFormIntent()
-    data object Save : UserProfileFormIntent()
-}
-
-sealed class UserProfileFormEffect {
-    data object Saved : UserProfileFormEffect()
-}
-
 @HiltViewModel
 class UserProfileFormViewModel @Inject constructor(
     private val authRepository: AuthRepository,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(UserProfileFormState())
@@ -115,7 +90,7 @@ class UserProfileFormViewModel @Inject constructor(
                 _state.update { it.copy(isSaving = false) }
                 _effect.send(UserProfileFormEffect.Saved)
             } catch (e: Exception) {
-                _state.update { it.copy(isSaving = false, error = ErrorMapper.toUserMessage(e, "Erreur lors de la sauvegarde")) }
+                _state.update { it.copy(isSaving = false, error = ErrorMapper.toUserMessage(e, context)) }
             }
         }
     }

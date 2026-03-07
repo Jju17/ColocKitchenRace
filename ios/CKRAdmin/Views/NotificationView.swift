@@ -205,6 +205,7 @@ struct NotificationFeature {
 struct NotificationView: View {
     @Bindable var store: StoreOf<NotificationFeature>
     @State private var selectedHistoryItem: NotificationHistoryItem?
+    @State private var showSendConfirmation = false
 
     var body: some View {
         NavigationStack {
@@ -252,7 +253,7 @@ struct NotificationView: View {
 
                 Section {
                     Button {
-                        store.send(.sendNotificationButtonTapped)
+                        showSendConfirmation = true
                     } label: {
                         HStack {
                             Spacer()
@@ -272,6 +273,14 @@ struct NotificationView: View {
                         || (store.selectedTarget == .cohouse && store.selectedCohouseId == nil)
                         || (store.selectedTarget == .edition && store.targetId.isEmpty)
                     )
+                    .confirmationDialog("Send Notification?", isPresented: $showSendConfirmation, titleVisibility: .visible) {
+                        Button("Send", role: .destructive) {
+                            store.send(.sendNotificationButtonTapped)
+                        }
+                        Button("Cancel", role: .cancel) {}
+                    } message: {
+                        Text("Are you sure you want to send this notification to \(store.selectedTarget.rawValue.lowercased())?")
+                    }
                 }
 
                 if let resultMessage = store.resultMessage {

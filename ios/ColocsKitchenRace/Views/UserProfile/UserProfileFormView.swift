@@ -26,8 +26,9 @@ struct UserProfileFormFeature {
             self.wipUser = wipUser
         }
     }
-    enum Action: BindableAction, Equatable {
+    enum Action: BindableAction {
         case binding(BindingAction<State>)
+        case dietaryPreferenceToggled(DietaryPreference)
         case onAppearTriggered
     }
 
@@ -37,6 +38,13 @@ struct UserProfileFormFeature {
         Reduce { state, action in
             switch action {
                 case .binding:
+                    return .none
+                case let .dietaryPreferenceToggled(preference):
+                    if state.wipUser.dietaryPreferences.contains(preference) {
+                        state.wipUser.dietaryPreferences.remove(preference)
+                    } else {
+                        state.wipUser.dietaryPreferences.insert(preference)
+                    }
                     return .none
                 case .onAppearTriggered:
                     if let user = state.userInfo {
@@ -66,13 +74,7 @@ struct UserProfileFormView: View {
                 ForEach(DietaryPreference.allCases) { preference in
                     Toggle(isOn: Binding(
                         get: { store.wipUser.dietaryPreferences.contains(preference) },
-                        set: { isSelected in
-                            if isSelected {
-                                store.wipUser.dietaryPreferences.insert(preference)
-                            } else {
-                                store.wipUser.dietaryPreferences.remove(preference)
-                            }
-                        }
+                        set: { _ in store.send(.dietaryPreferenceToggled(preference)) }
                     )) {
                         HStack {
                             Text(preference.icon)

@@ -24,6 +24,7 @@ class CohouseRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore,
     private val functions: FirebaseFunctions,
     private val storage: FirebaseStorage,
+    private val auth: FirebaseAuth,
 ) : CohouseRepository {
 
     private val _currentCohouse = MutableStateFlow<Cohouse?>(null)
@@ -57,7 +58,8 @@ class CohouseRepositoryImpl @Inject constructor(
             .document(id)
             .get()
             .await()
-        val cohouse = mapToCohouse(doc.data!!, doc.id)
+        val data = doc.data ?: throw IllegalStateException("Cohouse document ${doc.id} has no data")
+        val cohouse = mapToCohouse(data, doc.id)
 
         // Load users subcollection
         val usersSnapshot = firestore.collection(Constants.COHOUSES_COLLECTION)
@@ -65,7 +67,7 @@ class CohouseRepositoryImpl @Inject constructor(
             .collection("users")
             .get()
             .await()
-        val users = usersSnapshot.documents.map { mapToCohouseUser(it.data!!, it.id) }
+        val users = usersSnapshot.documents.mapNotNull { it.data?.let { data -> mapToCohouseUser(data, it.id) } }
         return cohouse.copy(users = users)
     }
 
@@ -77,14 +79,15 @@ class CohouseRepositoryImpl @Inject constructor(
             .await()
         if (snapshot.documents.isEmpty()) throw Exception("No cohouse found with code $code")
         val doc = snapshot.documents[0]
-        val cohouse = mapToCohouse(doc.data!!, doc.id)
+        val data = doc.data ?: throw IllegalStateException("Cohouse document ${doc.id} has no data")
+        val cohouse = mapToCohouse(data, doc.id)
 
         val usersSnapshot = firestore.collection(Constants.COHOUSES_COLLECTION)
             .document(cohouse.id)
             .collection("users")
             .get()
             .await()
-        val users = usersSnapshot.documents.map { mapToCohouseUser(it.data!!, it.id) }
+        val users = usersSnapshot.documents.mapNotNull { it.data?.let { data -> mapToCohouseUser(data, it.id) } }
         return cohouse.copy(users = users)
     }
 
@@ -173,7 +176,7 @@ class CohouseRepositoryImpl @Inject constructor(
     private suspend fun refreshCohouseClaim() {
         try {
             functions.getHttpsCallable("setCohouseClaim").call().await()
-            FirebaseAuth.getInstance().currentUser?.getIdToken(true)?.await()
+            auth.currentUser?.getIdToken(true)?.await()
         } catch (e: Exception) {
             // Non-blocking: claim refresh failure shouldn't break the main flow.
             // The claim will be set on next app launch or token refresh.

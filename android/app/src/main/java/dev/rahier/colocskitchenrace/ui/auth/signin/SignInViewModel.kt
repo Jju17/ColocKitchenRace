@@ -1,11 +1,14 @@
 package dev.rahier.colocskitchenrace.ui.auth.signin
 
 import android.app.Activity
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.rahier.colocskitchenrace.R
 import dev.rahier.colocskitchenrace.data.repository.AuthRepository
-import dev.rahier.colocskitchenrace.data.repository.impl.NoAccountException
+import dev.rahier.colocskitchenrace.data.model.NoAccountException
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,6 +22,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SignInViewModel @Inject constructor(
     private val authRepository: AuthRepository,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SignInState())
@@ -44,7 +48,7 @@ class SignInViewModel @Inject constructor(
         val email = _state.value.email.trim()
         val password = _state.value.password
         if (email.isEmpty() || password.isEmpty()) {
-            _state.update { it.copy(errorMessage = "Veuillez remplir tous les champs") }
+            _state.update { it.copy(errorMessage = context.getString(R.string.error_fields_required)) }
             return
         }
 
@@ -56,7 +60,7 @@ class SignInViewModel @Inject constructor(
             } catch (e: NoAccountException) {
                 _state.update { it.copy(isLoading = false, showCreateAccountDialog = true) }
             } catch (e: Exception) {
-                _state.update { it.copy(isLoading = false, errorMessage = ErrorMapper.toUserMessage(e, "Erreur de connexion")) }
+                _state.update { it.copy(isLoading = false, errorMessage = ErrorMapper.toUserMessage(e, context)) }
             }
         }
     }
@@ -72,7 +76,7 @@ class SignInViewModel @Inject constructor(
                 authRepository.createAccount(email, password)
                 _effect.send(SignInEffect.NavigateToEmailVerification)
             } catch (e: Exception) {
-                _state.update { it.copy(isLoading = false, errorMessage = ErrorMapper.toUserMessage(e, "Erreur de création")) }
+                _state.update { it.copy(isLoading = false, errorMessage = ErrorMapper.toUserMessage(e, context)) }
             }
         }
     }
@@ -84,7 +88,7 @@ class SignInViewModel @Inject constructor(
                 val user = authRepository.signInWithGoogle(activity)
                 navigateAfterAuth(user)
             } catch (e: Exception) {
-                _state.update { it.copy(isLoading = false, errorMessage = ErrorMapper.toUserMessage(e, "Erreur de connexion Google")) }
+                _state.update { it.copy(isLoading = false, errorMessage = ErrorMapper.toUserMessage(e, context)) }
             }
         }
     }
@@ -96,7 +100,7 @@ class SignInViewModel @Inject constructor(
                 val user = authRepository.signInWithApple(activity)
                 navigateAfterAuth(user)
             } catch (e: Exception) {
-                _state.update { it.copy(isLoading = false, errorMessage = ErrorMapper.toUserMessage(e, "Erreur de connexion Apple")) }
+                _state.update { it.copy(isLoading = false, errorMessage = ErrorMapper.toUserMessage(e, context)) }
             }
         }
     }

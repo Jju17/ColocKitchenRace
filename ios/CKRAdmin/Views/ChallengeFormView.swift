@@ -13,6 +13,12 @@ struct ChallengeFormFeature {
     @ObservableState
     struct State {
         var wipChallenge: Challenge = .empty
+
+        var isValid: Bool {
+            !wipChallenge.title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && !wipChallenge.body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && wipChallenge.endDate > wipChallenge.startDate
+        }
     }
 
     enum Action: BindableAction {
@@ -67,7 +73,7 @@ struct ChallengeFormView: View {
             TextField("Points (default: 1)", value: $store.wipChallenge.points, format: .number)
                 .keyboardType(.numberPad)
             Picker("Select Type", selection: Binding(
-                get: { ChallengeType.fromContent(store.wipChallenge.content) },
+                get: { store.wipChallenge.content.type },
                 set: { newType in
                     store.send(.updateChallengeContent(newType.toContent()))
                 }

@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import dev.rahier.colocskitchenrace.data.model.User
+import dev.rahier.colocskitchenrace.data.model.UserMapper
 import dev.rahier.colocskitchenrace.data.repository.UserRepository
 import dev.rahier.colocskitchenrace.util.Constants
 import kotlinx.coroutines.tasks.await
@@ -21,7 +22,7 @@ class UserRepositoryImpl @Inject constructor(
             .document(userId)
             .get()
             .await()
-        return doc.data?.let { AuthRepositoryImpl.mapToUser(it, doc.id) }
+        return doc.data?.let { UserMapper.fromFirestore(it, doc.id) }
     }
 
     override suspend fun getUserByAuthId(authId: String): User? {
@@ -32,20 +33,21 @@ class UserRepositoryImpl @Inject constructor(
             .await()
         if (snapshot.documents.isEmpty()) return null
         val doc = snapshot.documents[0]
-        return AuthRepositoryImpl.mapToUser(doc.data!!, doc.id)
+        val data = doc.data ?: return null
+        return UserMapper.fromFirestore(data, doc.id)
     }
 
     override suspend fun createUser(user: User) {
         firestore.collection(Constants.USERS_COLLECTION)
             .document(user.id)
-            .set(AuthRepositoryImpl.userToMap(user))
+            .set(UserMapper.toFirestore(user))
             .await()
     }
 
     override suspend fun updateUser(user: User) {
         firestore.collection(Constants.USERS_COLLECTION)
             .document(user.id)
-            .set(AuthRepositoryImpl.userToMap(user))
+            .set(UserMapper.toFirestore(user))
             .await()
     }
 

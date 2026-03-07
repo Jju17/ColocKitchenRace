@@ -25,6 +25,7 @@ struct ChallengeValidationFeature {
         case responsesUpdated([ChallengeResponse])
         case responsesLoaded(Result<[ChallengeResponse], ChallengeResponseError>)
         case setResponseStatus(challengeId: UUID, cohouseId: String, status: ChallengeResponseStatus)
+        case setResponseStatusCompleted(challengeId: UUID, cohouseId: String, status: ChallengeResponseStatus)
         case setFilterStatus(FilterStatus)
         case setSortOrder(SortOrder)
     }
@@ -74,19 +75,20 @@ struct ChallengeValidationFeature {
                     state.errorMessage = error.localizedDescription
                     return .none
                 case let .setResponseStatus(challengeId, cohouseId, status):
-                    return .run { [state] send in
+                    return .run { send in
                         let result = await self.challengeResponseClient.updateStatus(challengeId, cohouseId, status)
                         switch result {
                             case .success:
-                                var updatedResponses = state.responses
-                                if let index = updatedResponses.firstIndex(where: { $0.challengeId == challengeId && $0.cohouseId == cohouseId }) {
-                                    updatedResponses[index].status = status
-                                }
-                                await send(.responsesLoaded(.success(updatedResponses)))
+                                await send(.setResponseStatusCompleted(challengeId: challengeId, cohouseId: cohouseId, status: status))
                             case .failure(let error):
                                 await send(.responsesLoaded(.failure(error)))
                         }
                     }
+                case let .setResponseStatusCompleted(challengeId, cohouseId, status):
+                    if let index = state.responses.firstIndex(where: { $0.challengeId == challengeId && $0.cohouseId == cohouseId }) {
+                        state.responses[index].status = status
+                    }
+                    return .none
                 case .setFilterStatus(let filterStatus):
                     state.filterStatus = filterStatus
                     return .none
@@ -103,7 +105,7 @@ struct ChallengeValidationView: View {
     @State private var selectedImagePath: IdentifiableString?
 
     var body: some View {
-        NavigationView {
+        NavigationStack {
             Group {
                 if store.isLoading && store.responses.isEmpty {
                     ProgressView("Loading...")
@@ -134,7 +136,7 @@ struct ChallengeValidationView: View {
                                             .font(.headline)
                                         Text("Cohouse: \(response.cohouseName)")
                                             .font(.subheadline)
-                                        Text("Submitted on: \(response.submissionDate, formatter: dateFormatter)")
+                                        Text("Submitted on: \(response.submissionDate, formatter: Self.dateFormatter)")
                                             .font(.caption)
                                         Text("Status: \(statusLabel(for: response.status))")
                                             .font(.caption)
@@ -238,7 +240,7 @@ struct ChallengeValidationView: View {
         }
     }
 
-    private let dateFormatter: DateFormatter = {
+    private static let dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .medium
         formatter.timeStyle = .short

@@ -1,9 +1,12 @@
 package dev.rahier.colocskitchenrace.ui.auth.emailverification
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import android.util.Log
+import dev.rahier.colocskitchenrace.R
 import dev.rahier.colocskitchenrace.data.repository.AuthRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,26 +19,10 @@ import dev.rahier.colocskitchenrace.util.ErrorMapper
 import kotlin.coroutines.cancellation.CancellationException
 import javax.inject.Inject
 
-data class EmailVerificationState(
-    val isLoading: Boolean = false,
-    val errorMessage: String? = null,
-)
-
-sealed class EmailVerificationIntent {
-    data object CheckVerification : EmailVerificationIntent()
-    data object ResendEmail : EmailVerificationIntent()
-    data object SignOut : EmailVerificationIntent()
-}
-
-sealed class EmailVerificationEffect {
-    data object NavigateToProfileCompletion : EmailVerificationEffect()
-    data object NavigateToMain : EmailVerificationEffect()
-    data object NavigateToSignIn : EmailVerificationEffect()
-}
-
 @HiltViewModel
 class EmailVerificationViewModel @Inject constructor(
     private val authRepository: AuthRepository,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(EmailVerificationState())
@@ -65,10 +52,10 @@ class EmailVerificationViewModel @Inject constructor(
                         _effect.send(EmailVerificationEffect.NavigateToMain)
                     }
                 } else {
-                    _state.update { it.copy(isLoading = false, errorMessage = "Email pas encore verifie") }
+                    _state.update { it.copy(isLoading = false, errorMessage = context.getString(R.string.error_email_not_verified)) }
                 }
             } catch (e: Exception) {
-                _state.update { it.copy(isLoading = false, errorMessage = ErrorMapper.toUserMessage(e)) }
+                _state.update { it.copy(isLoading = false, errorMessage = ErrorMapper.toUserMessage(e, context)) }
             }
         }
     }

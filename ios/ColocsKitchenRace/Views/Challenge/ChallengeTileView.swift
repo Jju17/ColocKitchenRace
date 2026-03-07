@@ -237,6 +237,7 @@ private let headerColors: [Color] = [.ckrCoral, .ckrSky, .ckrLavender, .ckrMint,
 struct ChallengeTileView: View {
     @Bindable var store: StoreOf<ChallengeTileFeature>
     @Environment(\.colorScheme) var colorScheme
+    @State private var showConfetti = false
     var colorIndex: Int = 0
 
     private var bg: Color { colorScheme == .dark ? Color(white: 0.13) : .white }
@@ -255,9 +256,15 @@ struct ChallengeTileView: View {
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
         .shadow(color: .black.opacity(colorScheme == .dark ? 0.4 : 0.08), radius: 16, y: 8)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .overlay {
+            if showConfetti {
+                ConfettiCannon()
+                    .allowsHitTesting(false)
+            }
+        }
         .onChange(of: store.liveStatus) { _, new in
             if new == .validated {
-                _ = ConfettiCannon()
+                showConfetti = true
             }
         }
     }

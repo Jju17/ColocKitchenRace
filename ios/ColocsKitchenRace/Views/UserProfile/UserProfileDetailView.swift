@@ -196,6 +196,28 @@ struct UserProfileDetailView: View {
                 self.dietaryPreferencesContent
             }
 
+            Section("Support") {
+                Link(destination: URL(string: "https://colocskitchenrace.be/privacy-policy.html")!) {
+                    HStack {
+                        Image(systemName: "hand.raised")
+                        Text("Privacy Policy")
+                        Spacer()
+                        Image(systemName: "arrow.up.right.square")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+
+                Link(destination: URL(string: "mailto:julien@rahier.dev")!) {
+                    HStack {
+                        Image(systemName: "envelope")
+                        Text("Contact Support")
+                        Spacer()
+                        Image(systemName: "arrow.up.right.square")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            }
+
             Section {
                 Button {
                     self.store.send(.signOutButtonTapped)

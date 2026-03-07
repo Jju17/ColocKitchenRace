@@ -25,10 +25,17 @@ enum ChallengeFilter: String, CaseIterable, Equatable {
 }
 
 @Reducer
+enum ChallengePath {
+    case profile(UserProfileDetailFeature)
+}
+
+extension ChallengePath.State: Equatable {}
+
+@Reducer
 struct ChallengeFeature {
     @ObservableState
     struct State: Equatable {
-        var path = StackState<Path.State>()
+        var path = StackState<ChallengePath.State>()
         var challengeTiles: IdentifiedArrayOf<ChallengeTileFeature.State> = []
         var selectedFilter: ChallengeFilter = .all
         var hasCohouse = false
@@ -72,7 +79,7 @@ struct ChallengeFeature {
     }
 
     enum Action {
-        case path(StackAction<Path.State, Path.Action>)
+        case path(StackActionOf<ChallengePath>)
         case onAppear
         case challengesAndResponsesLoaded(Result<([Challenge], [ChallengeResponse]), Error>)
         case failed(String)
@@ -85,22 +92,6 @@ struct ChallengeFeature {
 
         enum Delegate: Equatable {
             case switchToCohouseButtonTapped
-        }
-    }
-
-    @Reducer
-    struct Path {
-        @ObservableState
-        enum State: Equatable {
-            case profile(UserProfileDetailFeature.State)
-        }
-        enum Action {
-            case profile(UserProfileDetailFeature.Action)
-        }
-        var body: some ReducerOf<Self> {
-            Scope(state: \.profile, action: \.profile) {
-                UserProfileDetailFeature()
-            }
         }
     }
 
@@ -227,6 +218,9 @@ struct ChallengeFeature {
                 return .none
             }
         }
+        .forEach(\.path, action: \.path) {
+            ChallengePath.body
+        }
         .forEach(\.challengeTiles, action: \.challengeTiles) { ChallengeTileFeature() }
         .ifLet(\.$leaderboard, action: \.leaderboard) { LeaderboardFeature() }
     }
@@ -238,6 +232,7 @@ struct ChallengeFeature {
             switch err {
             case .networkError: return "Network error. Please try again."
             case .permissionDenied: return "Permission denied."
+            case .notAuthenticated: return "You must be signed in to participate."
             case .unknown(let msg): return msg
             }
         }
@@ -326,10 +321,7 @@ struct ChallengeView: View {
                         }
                         Spacer()
                     } else {
-                        SnapPagingContainer(itemWidth: UIScreen.main.bounds.width - 32, currentPage: Binding(
-                            get: { store.currentPage },
-                            set: { store.send(.currentPageChanged($0)) }
-                        )) {
+                        SnapPagingContainer(itemWidth: UIScreen.main.bounds.width - 32, currentPage: $store.currentPage.sending(\.currentPageChanged)) {
                             ForEach(Array(store.filteredTiles.enumerated()), id: \.element.id) { _, tileState in
                                 if let tileStore = store.scope(state: \.challengeTiles[id: tileState.id], action: \.challengeTiles[id: tileState.id]) {
                                     ChallengeTileView(store: tileStore, colorIndex: stableColorIndex(for: tileState.id))

@@ -23,6 +23,7 @@ extension Date {
         dateComponents.year = year
         dateComponents.month = month
         dateComponents.day = day
+        dateComponents.timeZone = TimeZone(identifier: "Europe/Brussels")
         if let hour {
             dateComponents.hour = hour
         }

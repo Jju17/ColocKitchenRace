@@ -232,10 +232,7 @@ struct UsersView: View {
             }
             .navigationTitle("Users")
             .searchable(
-                text: Binding(
-                    get: { store.searchQuery },
-                    set: { store.send(.searchQueryChanged($0)) }
-                ),
+                text: $store.searchQuery.sending(\.searchQueryChanged),
                 prompt: "Name or email"
             )
         }

@@ -7,7 +7,7 @@ class ChallengeContentTest {
 
     @Test
     fun `Picture type is picture`() {
-        assertEquals("picture", ChallengeContent.Picture().type)
+        assertEquals("picture", ChallengeContent.Picture.type)
     }
 
     @Test
@@ -17,7 +17,7 @@ class ChallengeContentTest {
 
     @Test
     fun `SingleAnswer type is singleAnswer`() {
-        assertEquals("singleAnswer", ChallengeContent.SingleAnswer().type)
+        assertEquals("singleAnswer", ChallengeContent.SingleAnswer.type)
     }
 
     @Test
@@ -27,7 +27,7 @@ class ChallengeContentTest {
 
     @Test
     fun `Picture toResponseContent returns Picture`() {
-        val response = ChallengeContent.Picture().toResponseContent()
+        val response = ChallengeContent.Picture.toResponseContent()
         assertTrue(response is ChallengeResponseContent.Picture)
     }
 
@@ -39,7 +39,7 @@ class ChallengeContentTest {
 
     @Test
     fun `SingleAnswer toResponseContent returns SingleAnswer`() {
-        val response = ChallengeContent.SingleAnswer().toResponseContent()
+        val response = ChallengeContent.SingleAnswer.toResponseContent()
         assertTrue(response is ChallengeResponseContent.SingleAnswer)
     }
 

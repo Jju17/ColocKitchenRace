@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import FirebaseFirestore
 
 enum ChallengeState: String {
     case done = "Done"
@@ -64,19 +63,16 @@ extension Challenge {
 }
 
 extension Challenge {
-    static var mock: Challenge {
-        return Challenge(
-            id: UUID(),
-            title: "Community Kickoff Challenge",
-            startDate: Date.from(year: 2024, month: 5, day: 14, hour: 9), // Today, May 14, 2025
-            endDate: Date.from(year: 2026, month: 5, day: 15, hour: 23), // Tomorrow
-            body: "Join the coloc kitchen race by registering your cohouse today!",
-            content: .noChoice(NoChoiceContent())
-        )
-    }
+    static let mock = Challenge(
+        id: UUID(),
+        title: "Community Kickoff Challenge",
+        startDate: Date.from(year: 2024, month: 5, day: 14, hour: 9), // Today, May 14, 2025
+        endDate: Date.from(year: 2026, month: 5, day: 15, hour: 23), // Tomorrow
+        body: "Join the coloc kitchen race by registering your cohouse today!",
+        content: .noChoice(NoChoiceContent())
+    )
 
-    static var mockList: [Challenge] {
-        return [
+    static let mockList: [Challenge] = [
             Challenge(
                 id: UUID(),
                 title: "First to Register!",
@@ -144,7 +140,6 @@ extension Challenge {
                 endDate: Date.from(year: 2026, month: 5, day: 27, hour: 23),
                 body: "Build a creative human pyramid with your cohouse and share the photo!",
                 content: .picture(PictureContent())
-            )
-        ]
-    }
+        )
+    ]
 }

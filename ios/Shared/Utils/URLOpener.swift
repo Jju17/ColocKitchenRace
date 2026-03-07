@@ -8,7 +8,7 @@
 import SwiftUI
 
 enum URLOpener {
-    static func open(urlString: String?, completion: ((Bool) -> Void)? = nil) {
+    @MainActor static func open(urlString: String?, completion: ((Bool) -> Void)? = nil) {
         guard let urlString = urlString,
               let url = URL(string: urlString) else {
             completion?(false)

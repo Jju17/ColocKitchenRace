@@ -17,6 +17,7 @@ interface AuthRepository {
     suspend fun deleteAccount(userId: String)
     suspend fun updateUser(user: User)
     suspend fun resendVerificationEmail()
+    fun hasCurrentFirebaseUser(): Boolean
     suspend fun reloadCurrentUser(): Boolean
     fun isEmailVerified(): Boolean
     fun listenAuthState(): Flow<Boolean>

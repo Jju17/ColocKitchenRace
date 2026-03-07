@@ -44,13 +44,13 @@ struct CohouseFormFeature {
         }
     }
 
-    enum Action: BindableAction, Equatable {
+    enum Action: BindableAction {
         case addUserButtonTapped
         case assignAdmin(userId: CohouseUser.ID)
         case binding(BindingAction<State>)
         case deleteUsers(atOffset: IndexSet)
         case quitCohouseButtonTapped
-        case addressValidationResponse(TaskResult<AddressValidationResult>)
+        case addressValidationResponse(Result<AddressValidationResult, any Error>)
         case applySuggestedAddress(ValidatedAddress)
         case pinDragged(latitude: Double, longitude: Double)
 
@@ -118,13 +118,8 @@ struct CohouseFormFeature {
 
                     return .run { [address] send in
                         try await clock.sleep(for: .milliseconds(600))
-                        await send(
-                            .addressValidationResponse(
-                                TaskResult {
-                                    await addressValidatorClient.validate(address)
-                                }
-                            )
-                        )
+                        let result = await addressValidatorClient.validate(address)
+                        await send(.addressValidationResponse(.success(result)))
                     }
                     .cancellable(id: CancelID.addressValidation, cancelInFlight: true)
 

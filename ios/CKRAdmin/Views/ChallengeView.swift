@@ -45,7 +45,6 @@ struct ChallengeFeature {
         case dismissDestinationButtonTapped
         case deleteChallenge(Challenge)
         case confirmDeleteChallenge
-        case cancelDeleteChallenge
         case onTask
     }
 
@@ -56,9 +55,7 @@ struct ChallengeFeature {
         Reduce { state, action in
             switch action {
                 case .destination(.presented(.alert(.deleteChallenge))):
-                    return .run { send in
-                        await send(.confirmDeleteChallenge)
-                    }
+                    return .send(.confirmDeleteChallenge)
                 case .addChallengeButtonTapped:
                     state.destination = .addChallenge(ChallengeFormFeature.State())
                     return .none
@@ -125,10 +122,6 @@ struct ChallengeFeature {
                     return .run { _ in
                         try await self.challengeClient.delete(challengeToDelete.id)
                     }
-                case .cancelDeleteChallenge:
-                    state.destination = nil
-                    state.challengeToDelete = nil
-                    return .none
                 case .onTask:
                     state.isLoading = true
                     return .run { send in
@@ -204,11 +197,13 @@ struct ChallengeView: View {
                         Image(systemName: "plus")
                     }
                 }
+                #if DEBUG
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Add default challenges") {
                         store.send(.addAllMockChallenges)
                     }
                 }
+                #endif
             }
         }
         .alert(
@@ -233,6 +228,7 @@ struct ChallengeView: View {
                             Button("Create") {
                                 store.send(.confirmAddChallengeButtonTapped)
                             }
+                            .disabled(!addChallengeStore.isValid)
                         }
                     }
             }

@@ -1,10 +1,12 @@
 package dev.rahier.colocskitchenrace.ui.profile
 
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.rahier.colocskitchenrace.data.model.User
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.rahier.colocskitchenrace.R
 import dev.rahier.colocskitchenrace.data.repository.AuthRepository
 import dev.rahier.colocskitchenrace.util.ErrorMapper
 import kotlinx.coroutines.channels.Channel
@@ -16,27 +18,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class UserProfileState(
-    val user: User? = null,
-    val showDeleteConfirmation: Boolean = false,
-    val isLoading: Boolean = false,
-    val error: String? = null,
-)
-
-sealed class UserProfileIntent {
-    data object SignOutClicked : UserProfileIntent()
-    data object DeleteAccountClicked : UserProfileIntent()
-    data object ConfirmDelete : UserProfileIntent()
-    data object DismissDeleteDialog : UserProfileIntent()
-}
-
-sealed class UserProfileEffect {
-    data object SignedOut : UserProfileEffect()
-}
-
 @HiltViewModel
 class UserProfileViewModel @Inject constructor(
     private val authRepository: AuthRepository,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(UserProfileState())
@@ -76,7 +61,7 @@ class UserProfileViewModel @Inject constructor(
                 _effect.send(UserProfileEffect.SignedOut)
             } catch (e: Exception) {
                 Log.e("UserProfile", "Failed to delete account", e)
-                _state.update { it.copy(isLoading = false, error = ErrorMapper.toUserMessage(e, "Erreur lors de la suppression du compte")) }
+                _state.update { it.copy(isLoading = false, error = ErrorMapper.toUserMessage(e, context)) }
             }
         }
     }

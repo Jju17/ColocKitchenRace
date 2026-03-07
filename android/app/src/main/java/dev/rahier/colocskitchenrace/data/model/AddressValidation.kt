@@ -9,9 +9,9 @@ data class ValidatedAddress(
     val longitude: Double,
 )
 
-sealed class AddressValidationResult {
-    data object InvalidSyntax : AddressValidationResult()
-    data object NotFound : AddressValidationResult()
-    data class LowConfidence(val address: ValidatedAddress) : AddressValidationResult()
-    data class Valid(val address: ValidatedAddress) : AddressValidationResult()
+sealed interface AddressValidationResult {
+    data object InvalidSyntax : AddressValidationResult
+    data object NotFound : AddressValidationResult
+    data class LowConfidence(val address: ValidatedAddress) : AddressValidationResult
+    data class Valid(val address: ValidatedAddress) : AddressValidationResult
 }

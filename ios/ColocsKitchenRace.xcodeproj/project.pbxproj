@@ -29,7 +29,6 @@
 		64A1A5DD2F2E54B800D357E9 /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = 64A1A5DC2F2E54B800D357E9 /* FirebaseFunctions */; };
 		64A1A5DF2F2E54B900D357E9 /* FirebaseFunctions in Frameworks */ = {isa = PBXBuildFile; productRef = 64A1A5DE2F2E54B900D357E9 /* FirebaseFunctions */; };
 		64AA7E082F3E6A6E002D36AF /* StripePaymentSheet in Frameworks */ = {isa = PBXBuildFile; productRef = 64AA7E072F3E6A6E002D36AF /* StripePaymentSheet */; };
-		64AA7F9C2F3EE815002D36AF /* TODO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 64AA7F9B2F3EE812002D36AF /* TODO.swift */; };
 		64B66EC62B5D50DB00B8F30B /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 64B66EC52B5D50DB00B8F30B /* ComposableArchitecture */; };
 		64C87C242DEB4D7F00EA27EB /* MijickPopups in Frameworks */ = {isa = PBXBuildFile; productRef = 64C87C232DEB4D7F00EA27EB /* MijickPopups */; };
 		64FBE3762D88682D00D8A89F /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 64FBE3752D88682D00D8A89F /* ComposableArchitecture */; };
@@ -56,7 +55,6 @@
 
 /* Begin PBXFileReference section */
 		6478D6BE2F2E30BA00DE69CF /* ColocsKitchenRace.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ColocsKitchenRace.entitlements; sourceTree = "<group>"; };
-		64AA7F9B2F3EE812002D36AF /* TODO.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TODO.swift; sourceTree = "<group>"; };
 		64CDE0012F4D000100000001 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		64CDE0022F4D000100000002 /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Release.xcconfig; sourceTree = "<group>"; };
 		64F17B2F2AD2A3BC0047F6F3 /* ColocsKitchenRace.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ColocsKitchenRace.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -88,7 +86,7 @@
 				"Utils/Color+Utils.swift",
 				"Utils/Date+Utils.swift",
 				"Utils/DateComponents+Utils.swift",
-				"Utils/Dictionnary+Utils.swift",
+				"Utils/Dictionary+Utils.swift",
 				"Utils/Error+Utils.swift",
 				Utils/Global.swift,
 				"Utils/Logger+Utils.swift",
@@ -203,7 +201,6 @@
 			isa = PBXGroup;
 			children = (
 				64CDE0032F4D000100000003 /* Config */,
-				64AA7F9B2F3EE812002D36AF /* TODO.swift */,
 				6478D6BE2F2E30BA00DE69CF /* ColocsKitchenRace.entitlements */,
 				6405CBC82D886B7400BE8B0D /* Shared */,
 				64FBE2FD2D88665300D8A89F /* ColocsKitchenRace */,
@@ -481,7 +478,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				64AA7F9C2F3EE815002D36AF /* TODO.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

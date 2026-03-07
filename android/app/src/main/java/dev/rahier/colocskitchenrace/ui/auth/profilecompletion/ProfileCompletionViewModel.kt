@@ -1,8 +1,10 @@
 package dev.rahier.colocskitchenrace.ui.auth.profilecompletion
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.rahier.colocskitchenrace.data.repository.AuthRepository
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,28 +16,10 @@ import kotlinx.coroutines.launch
 import dev.rahier.colocskitchenrace.util.ErrorMapper
 import javax.inject.Inject
 
-data class ProfileCompletionState(
-    val firstName: String = "",
-    val lastName: String = "",
-    val phoneNumber: String = "",
-    val isLoading: Boolean = false,
-    val errorMessage: String? = null,
-)
-
-sealed class ProfileCompletionIntent {
-    data class FirstNameChanged(val value: String) : ProfileCompletionIntent()
-    data class LastNameChanged(val value: String) : ProfileCompletionIntent()
-    data class PhoneChanged(val value: String) : ProfileCompletionIntent()
-    data object SaveClicked : ProfileCompletionIntent()
-}
-
-sealed class ProfileCompletionEffect {
-    data object NavigateToMain : ProfileCompletionEffect()
-}
-
 @HiltViewModel
 class ProfileCompletionViewModel @Inject constructor(
     private val authRepository: AuthRepository,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProfileCompletionState())
@@ -79,7 +63,7 @@ class ProfileCompletionViewModel @Inject constructor(
                 authRepository.updateUser(updatedUser)
                 _effect.send(ProfileCompletionEffect.NavigateToMain)
             } catch (e: Exception) {
-                _state.update { it.copy(isLoading = false, errorMessage = ErrorMapper.toUserMessage(e)) }
+                _state.update { it.copy(isLoading = false, errorMessage = ErrorMapper.toUserMessage(e, context)) }
             }
         }
     }

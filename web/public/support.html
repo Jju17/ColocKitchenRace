@@ -91,6 +91,7 @@
         <div class="lang-switcher">
             <button id="btn-fr" class="active" onclick="switchLang('fr')">🇫🇷 Français</button>
             <button id="btn-en" onclick="switchLang('en')">🇬🇧 English</button>
+            <button id="btn-nl" onclick="switchLang('nl')">🇳🇱 Nederlands</button>
         </div>
 
         <!-- FRENCH VERSION -->
@@ -201,6 +202,60 @@
                 <a class="link" href="/privacy-policy.html">Privacy Policy</a>
             </p>
         </div>
+
+        <!-- DUTCH VERSION -->
+        <div id="lang-nl" style="display: none;">
+            <h1>Ondersteuning</h1>
+            <p class="subtitle">Kitchen Race — Colocs Kitchen Race</p>
+
+            <p>
+                Hulp nodig met de Kitchen Race-app? Hieronder vind je hoe je ons kunt bereiken.
+            </p>
+
+            <h2>Veelgestelde vragen</h2>
+
+            <p><strong>Hoe word ik lid van een cohouse?</strong></p>
+            <p>
+                Vraag een van je huisgenoten om de 6-tekens cohouse-code en voer deze in
+                op het tabblad "Coloc" in de app.
+            </p>
+
+            <p><strong>Hoe maak ik een cohouse aan?</strong></p>
+            <p>
+                Tik op het tabblad "Coloc" op "Cohouse aanmaken". Je moet een naam, adres
+                en een foto van je identiteitskaart opgeven ter verificatie.
+            </p>
+
+            <p><strong>Hoe neem ik deel aan challenges?</strong></p>
+            <p>
+                Zodra je lid bent van een cohouse, ga je naar het tabblad "Challenges" om
+                beschikbare challenges te bekijken en je antwoorden in te dienen.
+            </p>
+
+            <p><strong>Hoe verwijder ik mijn account?</strong></p>
+            <p>
+                Neem contact met ons op via e-mail op het onderstaande adres en we zullen
+                je account en al je gegevens binnen 30 dagen verwijderen.
+            </p>
+
+            <div class="contact">
+                <h2>Contact</h2>
+                <p>
+                    Voor vragen, technische problemen of verzoeken met betrekking tot je
+                    persoonsgegevens, neem contact met ons op:
+                </p>
+                <p>
+                    📧 <a href="mailto:julien@rahier.dev">julien@rahier.dev</a>
+                </p>
+                <p>
+                    Julien Rahier — Brussel, Belgie
+                </p>
+            </div>
+
+            <p style="margin-top: 24px;">
+                <a class="link" href="/privacy-policy.html">Privacybeleid</a>
+            </p>
+        </div>
     </div>
 
     <footer>
@@ -211,8 +266,10 @@
         function switchLang(lang) {
             document.getElementById('lang-fr').style.display = lang === 'fr' ? 'block' : 'none';
             document.getElementById('lang-en').style.display = lang === 'en' ? 'block' : 'none';
+            document.getElementById('lang-nl').style.display = lang === 'nl' ? 'block' : 'none';
             document.getElementById('btn-fr').classList.toggle('active', lang === 'fr');
             document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+            document.getElementById('btn-nl').classList.toggle('active', lang === 'nl');
             document.documentElement.lang = lang;
         }
     </script>

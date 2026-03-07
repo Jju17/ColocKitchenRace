@@ -25,11 +25,13 @@ struct ConfettiCannon: View {
 }
 
 struct ConfettiView: View {
+    @State private var animate = false
+
     var body: some View {
         GeometryReader { proxy in
             ForEach(0..<50) { i in
                 Rectangle()
-                    .fill([.red, .blue, .green, .yellow, .purple].randomElement()!)
+                    .fill([.red, .blue, .green, .yellow, .purple].randomElement() ?? .red)
                     .frame(width: 10, height: 30)
                     .rotationEffect(.degrees(Double.random(in: 0...360)))
                     .position(
@@ -39,9 +41,12 @@ struct ConfettiView: View {
                     .animation(
                         .linear(duration: Double.random(in: 2...4))
                         .repeatCount(1),
-                        value: true
+                        value: animate
                     )
             }
+        }
+        .onAppear {
+            animate = true
         }
     }
 }

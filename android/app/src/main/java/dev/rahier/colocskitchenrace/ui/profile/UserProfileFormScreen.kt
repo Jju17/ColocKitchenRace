@@ -8,10 +8,12 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.rahier.colocskitchenrace.data.model.DietaryPreference
+import dev.rahier.colocskitchenrace.R
 import dev.rahier.colocskitchenrace.ui.components.CKRButton
 import dev.rahier.colocskitchenrace.ui.theme.*
 
@@ -35,10 +37,10 @@ fun UserProfileFormScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Modifier le profil") },
+                title = { Text(stringResource(R.string.edit_profile)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Retour")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -55,13 +57,13 @@ fun UserProfileFormScreen(
                 .padding(16.dp),
         ) {
             // Basic info section
-            Text(text = "Informations", style = MaterialTheme.typography.titleMedium, color = CkrLavender)
+            Text(text = stringResource(R.string.information), style = MaterialTheme.typography.titleMedium, color = CkrLavender)
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
                 value = state.firstName,
                 onValueChange = { viewModel.onIntent(UserProfileFormIntent.FirstNameChanged(it)) },
-                label = { Text("Prenom") },
+                label = { Text(stringResource(R.string.first_name)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium,
@@ -71,7 +73,7 @@ fun UserProfileFormScreen(
             OutlinedTextField(
                 value = state.lastName,
                 onValueChange = { viewModel.onIntent(UserProfileFormIntent.LastNameChanged(it)) },
-                label = { Text("Nom") },
+                label = { Text(stringResource(R.string.last_name)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium,
@@ -81,7 +83,7 @@ fun UserProfileFormScreen(
             OutlinedTextField(
                 value = state.email,
                 onValueChange = { viewModel.onIntent(UserProfileFormIntent.EmailChanged(it)) },
-                label = { Text("Email") },
+                label = { Text(stringResource(R.string.email)) },
                 singleLine = true,
                 enabled = state.isEmailEditable,
                 modifier = Modifier.fillMaxWidth(),
@@ -92,7 +94,7 @@ fun UserProfileFormScreen(
             OutlinedTextField(
                 value = state.phoneNumber,
                 onValueChange = { viewModel.onIntent(UserProfileFormIntent.PhoneChanged(it)) },
-                label = { Text("Telephone") },
+                label = { Text(stringResource(R.string.phone_label)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium,
@@ -101,7 +103,7 @@ fun UserProfileFormScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Dietary preferences
-            Text(text = "Preferences alimentaires", style = MaterialTheme.typography.titleMedium, color = CkrLavender)
+            Text(text = stringResource(R.string.dietary_preferences), style = MaterialTheme.typography.titleMedium, color = CkrLavender)
             Spacer(modifier = Modifier.height(12.dp))
 
             FlowRow(
@@ -124,7 +126,7 @@ fun UserProfileFormScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // News subscription
-            Text(text = "CKR", style = MaterialTheme.typography.titleMedium, color = CkrLavender)
+            Text(text = stringResource(R.string.ckr_section), style = MaterialTheme.typography.titleMedium, color = CkrLavender)
             Spacer(modifier = Modifier.height(8.dp))
 
             Row(
@@ -132,7 +134,7 @@ fun UserProfileFormScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
-                    text = "S'abonner aux actualites",
+                    text = stringResource(R.string.subscribe_news),
                     style = MaterialTheme.typography.bodyLarge,
                 )
                 Switch(
@@ -156,7 +158,7 @@ fun UserProfileFormScreen(
 
             // Save button
             CKRButton(
-                text = "Enregistrer",
+                text = stringResource(R.string.save),
                 onClick = { viewModel.onIntent(UserProfileFormIntent.Save) },
                 isLoading = state.isSaving,
                 enabled = state.canSave,

@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -68,14 +69,14 @@ fun HomeScreen(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "Colocs Kitchen Race",
+                text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.headlineLarge,
                 color = CkrDark,
             )
             IconButton(onClick = onNavigateToProfile) {
                 Icon(
                     Icons.Default.Person,
-                    contentDescription = "Profil",
+                    contentDescription = stringResource(R.string.profile),
                     tint = CkrGray,
                     modifier = Modifier.size(28.dp),
                 )
@@ -184,7 +185,7 @@ private fun CohouseTile(
         } else {
             Icon(
                 Icons.Default.AddCircleOutline,
-                contentDescription = "Ajouter une coloc",
+                contentDescription = stringResource(R.string.add_cohouse),
                 modifier = Modifier.size(40.dp),
                 tint = CkrWhite,
             )
@@ -227,7 +228,7 @@ private fun RegistrationTile(
             ) {
                 // Title — iOS: "CKR Registration" BaksoSapi 26, heavy
                 Text(
-                    text = "CKR Registration",
+                    text = stringResource(R.string.ckr_registration),
                     style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.Bold,
                     color = CkrWhite,
@@ -247,7 +248,7 @@ private fun RegistrationTile(
                                 modifier = Modifier.size(18.dp),
                             )
                             Text(
-                                text = "Registered!",
+                                text = stringResource(R.string.registered),
                                 style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = CkrGoldLight,
@@ -257,7 +258,7 @@ private fun RegistrationTile(
                     game.isRegistrationOpen -> {
                         // iOS: "Register before [date]" BaksoSapi 14, light, uppercase
                         Text(
-                            text = "Register before ${DateUtils.formatDate(game.registrationDeadline)}".uppercase(),
+                            text = stringResource(R.string.register_before, DateUtils.formatDate(game.registrationDeadline)).uppercase(),
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Light,
                             color = CkrWhite,
@@ -268,7 +269,7 @@ private fun RegistrationTile(
                             horizontalArrangement = Arrangement.spacedBy(8.dp),
                         ) {
                             Text(
-                                text = "Register your cohouse!",
+                                text = stringResource(R.string.register_your_cohouse),
                                 style = MaterialTheme.typography.headlineSmall,
                                 fontWeight = FontWeight.Bold,
                                 color = CkrGoldLight,
@@ -284,7 +285,7 @@ private fun RegistrationTile(
                     else -> {
                         // iOS: "Registrations closed" BaksoSapi 16, light
                         Text(
-                            text = "Registrations closed",
+                            text = stringResource(R.string.registration_closed),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Light,
                             color = CkrWhite,
@@ -346,7 +347,7 @@ private fun CountdownTile(
                 Column {
                     // iOS: "Next Edition In" BaksoSapi 26, heavy
                     Text(
-                        text = "Next Edition In",
+                        text = stringResource(R.string.next_edition_in),
                         style = MaterialTheme.typography.headlineLarge,
                         fontWeight = FontWeight.Bold,
                         color = CkrWhite,
@@ -368,15 +369,15 @@ private fun CountdownTile(
                     val seconds = ((diff / 1000) % 60).toInt()
 
                     Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
-                        CountdownRow(value = String.format("%02d", days), label = "Days")
-                        CountdownRow(value = String.format("%02d", hours), label = "Hours")
-                        CountdownRow(value = String.format("%02d", minutes), label = "Minutes")
-                        CountdownRow(value = String.format("%02d", seconds), label = "Seconds")
+                        CountdownRow(value = String.format("%02d", days), label = stringResource(R.string.days))
+                        CountdownRow(value = String.format("%02d", hours), label = stringResource(R.string.hours))
+                        CountdownRow(value = String.format("%02d", minutes), label = stringResource(R.string.minutes))
+                        CountdownRow(value = String.format("%02d", seconds), label = stringResource(R.string.seconds))
                     }
                 } else {
                     // Countdown finished
                     Text(
-                        text = "C'est parti !",
+                        text = stringResource(R.string.countdown_started),
                         style = MaterialTheme.typography.displaySmall,
                         color = CkrGoldLight,
                         modifier = Modifier.fillMaxWidth(),
@@ -393,14 +394,14 @@ private fun CountdownTile(
             ) {
                 // iOS: "Next Edition" BaksoSapi 26, heavy
                 Text(
-                    text = "Next Edition",
+                    text = stringResource(R.string.next_edition),
                     style = MaterialTheme.typography.headlineLarge,
                     fontWeight = FontWeight.Bold,
                     color = CkrWhite,
                 )
                 // iOS: "Coming Soon" BaksoSapi 38, heavy
                 Text(
-                    text = "Coming Soon",
+                    text = stringResource(R.string.coming_soon),
                     style = MaterialTheme.typography.displayMedium,
                     fontWeight = FontWeight.Bold,
                     color = CkrWhite,
@@ -408,7 +409,7 @@ private fun CountdownTile(
                 Spacer(modifier = Modifier.height(4.dp))
                 // iOS: "Stay tuned!" BaksoSapi 16, light, uppercase
                 Text(
-                    text = "Stay tuned!".uppercase(),
+                    text = stringResource(R.string.stay_tuned).uppercase(),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Light,
                     color = CkrWhite,
@@ -456,7 +457,7 @@ private fun NewsTile(news: List<News>) {
         Column(modifier = Modifier.fillMaxSize()) {
             // Title — iOS: "News" BaksoSapi 26, heavy, white
             Text(
-                text = "News",
+                text = stringResource(R.string.news_title),
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
                 color = CkrWhite,
@@ -515,7 +516,7 @@ private fun NewsTile(news: List<News>) {
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = "No news at the moment",
+                        text = stringResource(R.string.no_news),
                         style = MaterialTheme.typography.bodyMedium,
                         color = CkrGray,
                     )

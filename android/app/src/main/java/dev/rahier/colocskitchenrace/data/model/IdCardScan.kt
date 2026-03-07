@@ -8,9 +8,9 @@ data class IdCardInfo(
     val recognizedTextSnippet: String? = null,
 )
 
-sealed class IdCardScanResult {
-    data class Valid(val info: IdCardInfo) : IdCardScanResult()
-    data object NotAnIdCard : IdCardScanResult()
-    data object PoorQuality : IdCardScanResult()
-    data class Error(val message: String) : IdCardScanResult()
+sealed interface IdCardScanResult {
+    data class Valid(val info: IdCardInfo) : IdCardScanResult
+    data object NotAnIdCard : IdCardScanResult
+    data object PoorQuality : IdCardScanResult
+    data class Error(val message: String) : IdCardScanResult
 }

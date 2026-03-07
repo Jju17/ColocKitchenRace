@@ -10,6 +10,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -17,6 +18,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.rahier.colocskitchenrace.data.model.PlanningStep
 import dev.rahier.colocskitchenrace.data.model.PartyInfo
 import dev.rahier.colocskitchenrace.data.model.StepRole
+import dev.rahier.colocskitchenrace.R
 import dev.rahier.colocskitchenrace.ui.components.CKRButton
 import dev.rahier.colocskitchenrace.ui.theme.*
 import dev.rahier.colocskitchenrace.util.DateUtils
@@ -34,7 +36,7 @@ fun PlanningScreen(
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
     ) {
-        Text(text = "Planning", style = MaterialTheme.typography.headlineLarge, color = CkrLavender)
+        Text(text = stringResource(R.string.tab_planning), style = MaterialTheme.typography.headlineLarge, color = CkrLavender)
         Spacer(modifier = Modifier.height(24.dp))
 
         if (state.isLoading) {
@@ -46,7 +48,7 @@ fun PlanningScreen(
 
             // Apero
             TimelineItem(
-                label = "Apero",
+                label = stringResource(R.string.apero),
                 color = CkrCoral,
                 lightColor = CkrCoralLight,
                 step = planning.apero,
@@ -55,7 +57,7 @@ fun PlanningScreen(
 
             // Diner
             TimelineItem(
-                label = "Diner",
+                label = stringResource(R.string.dinner),
                 color = CkrMint,
                 lightColor = CkrMintLight,
                 step = planning.diner,
@@ -73,20 +75,20 @@ fun PlanningScreen(
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
-                        text = "Erreur lors du chargement du planning",
+                        text = stringResource(R.string.error_loading_planning),
                         style = MaterialTheme.typography.bodyLarge,
                         color = CkrCoral,
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     CKRButton(
-                        text = "Reessayer",
+                        text = stringResource(R.string.retry),
                         onClick = { viewModel.onIntent(PlanningIntent.Retry) },
                     )
                 }
             }
         } else {
             Text(
-                text = "Le planning n'est pas encore disponible",
+                text = stringResource(R.string.planning_not_revealed),
                 style = MaterialTheme.typography.bodyLarge,
                 color = CkrGray,
             )
@@ -137,7 +139,7 @@ private fun TimelineItem(
                     Text(text = label, style = MaterialTheme.typography.headlineSmall)
                     Surface(color = color, shape = MaterialTheme.shapes.small) {
                         Text(
-                            text = if (step.role == StepRole.HOST) "Hote" else "Visiteur",
+                            text = if (step.role == StepRole.HOST) stringResource(R.string.host) else stringResource(R.string.visitor),
                             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
                             style = MaterialTheme.typography.labelSmall,
                             color = CkrWhite,
@@ -153,7 +155,7 @@ private fun TimelineItem(
                     text = DateUtils.formatTimeRange(step.startTime, step.endTime),
                     style = MaterialTheme.typography.bodyMedium,
                 )
-                Text(text = "${step.totalPeople} personnes", style = MaterialTheme.typography.bodySmall, color = CkrGray)
+                Text(text = stringResource(R.string.people_count, step.totalPeople), style = MaterialTheme.typography.bodySmall, color = CkrGray)
 
                 if (step.dietarySummary.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(8.dp))
@@ -164,10 +166,10 @@ private fun TimelineItem(
 
                 step.hostPhone?.let {
                     Spacer(modifier = Modifier.height(4.dp))
-                    Text(text = "Hote: $it", style = MaterialTheme.typography.bodySmall)
+                    Text(text = stringResource(R.string.host_phone, it), style = MaterialTheme.typography.bodySmall)
                 }
                 step.visitorPhone?.let {
-                    Text(text = "Visiteur: $it", style = MaterialTheme.typography.bodySmall)
+                    Text(text = stringResource(R.string.visitor_phone, it), style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
@@ -191,7 +193,7 @@ private fun PartyItem(party: PartyInfo) {
             colors = CardDefaults.cardColors(containerColor = CkrLavenderLight),
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text(text = "Soiree", style = MaterialTheme.typography.headlineSmall)
+                Text(text = stringResource(R.string.party), style = MaterialTheme.typography.headlineSmall)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = party.name, style = MaterialTheme.typography.titleMedium)
                 Text(text = party.address, style = MaterialTheme.typography.bodySmall, color = CkrGray)

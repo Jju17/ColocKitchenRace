@@ -11,6 +11,12 @@
             "state" : "translated",
             "value" : " dont %@"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : " inclusief %@"
+          }
         }
       }
     },
@@ -27,6 +33,12 @@
             "state" : "translated",
             "value" : "**%1$lld** personnes%2$@"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "**%1$lld** personen%2$@"
+          }
         }
       }
     },
@@ -37,12 +49,24 @@
             "state" : "translated",
             "value" : "#%lld"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "#%lld"
+          }
         }
       }
     },
     "%@" : {
       "localizations" : {
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@"
+          }
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@"
@@ -63,12 +87,24 @@
             "state" : "translated",
             "value" : "%1$@ - %2$@"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ - %2$@"
+          }
         }
       }
     },
     "%@ : " : {
       "localizations" : {
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ : "
+          }
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ : "
@@ -89,6 +125,12 @@
             "state" : "translated",
             "value" : "%1$@ : %2$@"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ : %2$@"
+          }
         }
       }
     },
@@ -101,6 +143,12 @@
           }
         },
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@"
+          }
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$@ %2$@"
@@ -121,6 +169,12 @@
             "state" : "translated",
             "value" : "%1$@ %2$@?"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$@ %2$@?"
+          }
         }
       }
     },
@@ -130,6 +184,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%@ pourra accéder à CKRAdmin et gérer l'application."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ krijgt toegang tot CKRAdmin en kan de app beheren."
           }
         }
       }
@@ -141,12 +201,24 @@
             "state" : "translated",
             "value" : "%@ n'aura plus accès admin."
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@ heeft geen admin-toegang meer."
+          }
         }
       }
     },
     "%lld" : {
       "localizations" : {
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld"
+          }
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld"
@@ -167,6 +239,12 @@
             "state" : "translated",
             "value" : "%1$lld %2$@"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld %2$@"
+          }
         }
       }
     },
@@ -179,6 +257,12 @@
           }
         },
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld challenge%2$@"
+          }
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%1$lld challenge%2$@"
@@ -199,6 +283,12 @@
             "state" : "translated",
             "value" : "%1$lld challenge%2$@ validé"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld challenge%2$@ gevalideerd"
+          }
         }
       }
     },
@@ -208,6 +298,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld échoué(s)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld mislukt"
           }
         }
       }
@@ -219,6 +315,12 @@
             "state" : "translated",
             "value" : "%lld groupes ont reçu les rôles A/B/C/D."
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld groepen hebben A/B/C/D-rollen gekregen."
+          }
         }
       }
     },
@@ -228,6 +330,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld groupes de 4"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld groepen van 4"
           }
         }
       }
@@ -239,6 +347,12 @@
             "state" : "translated",
             "value" : "%lld groupes de 4 colocs ont été créés avec succès."
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld groepen van 4 cohouses zijn succesvol aangemaakt."
+          }
         }
       }
     },
@@ -248,6 +362,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld participant(s)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld deelnemer(s)"
           }
         }
       }
@@ -265,12 +385,24 @@
             "state" : "translated",
             "value" : "%1$lld pt%2$@"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%1$lld pt%2$@"
+          }
         }
       }
     },
     "%lld pts" : {
       "localizations" : {
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld pts"
+          }
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld pts"
@@ -284,6 +416,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld envoyé(s)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld verzonden"
           }
         }
       }
@@ -310,6 +448,12 @@
             "state" : "translated",
             "value" : "Un lien de vérification a été envoyé à ton adresse e-mail. Vérifie ta boîte de réception et clique sur le lien pour continuer."
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Er is een verificatielink naar je e-mailadres gestuurd. Controleer je inbox en klik op de link om verder te gaan."
+          }
         }
       }
     },
@@ -319,6 +463,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Challenge actif :"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Actieve challenges op dit moment:"
           }
         }
       }
@@ -330,6 +480,12 @@
             "state" : "translated",
             "value" : "Ajouter les challenges par défaut"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Standaard challenges toevoegen"
+          }
         }
       }
     },
@@ -339,6 +495,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ajouter un utilisateur"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gebruiker toevoegen"
           }
         }
       }
@@ -350,6 +512,12 @@
             "state" : "translated",
             "value" : "Adresse"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adres"
+          }
         }
       }
     },
@@ -359,6 +527,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Adresse trouvée mais incertaine :"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adres gevonden maar onzeker:"
           }
         }
       }
@@ -370,6 +544,12 @@
             "state" : "translated",
             "value" : "Adresse introuvable ou non reconnue."
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adres niet gevonden of niet herkend."
+          }
         }
       }
     },
@@ -380,12 +560,24 @@
             "state" : "translated",
             "value" : "Ajuster le pin sur la carte"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pin op de kaart aanpassen"
+          }
         }
       }
     },
     "Admin" : {
       "localizations" : {
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Admin"
+          }
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Admin"
@@ -400,6 +592,12 @@
             "state" : "translated",
             "value" : "Après validation, tu ne pourras plus modifier le nombre de participants ni le type de coloc."
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Na validatie kan je het aantal deelnemers of het type cohouse niet meer wijzigen."
+          }
         }
       }
     },
@@ -410,16 +608,11 @@
             "state" : "translated",
             "value" : "Tous les participants peuvent maintenant voir leur planning de soirée."
           }
-        }
-      }
-    },
-    "Already have an account?" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Déjà inscrit ?"
+            "value" : "Alle deelnemers kunnen nu hun avondplanning zien."
           }
         }
       }
@@ -431,15 +624,40 @@
             "state" : "translated",
             "value" : "Analyse de la carte d'identité..."
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identiteitskaart analyseren..."
+          }
         }
       }
     },
     "Aperitif" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apéritif"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aperitief"
+          }
+        }
+      }
     },
     "APERITIF" : {
       "localizations" : {
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "APÉRO"
+          }
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "APÉRO"
@@ -454,6 +672,12 @@
             "state" : "translated",
             "value" : "Apple Plans"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple Kaarten"
+          }
         }
       }
     },
@@ -463,6 +687,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Es-tu sûr de vouloir supprimer ce challenge ?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weet je zeker dat je deze challenge wilt verwijderen?"
           }
         }
       }
@@ -474,6 +704,12 @@
             "state" : "translated",
             "value" : "Es-tu sûr ? Cela supprimera définitivement le jeu CKR actuel et toutes ses données (participants, matchs, etc.).%@"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weet je het zeker? Dit verwijdert definitief het huidige CKR-spel en alle bijbehorende gegevens (deelnemers, matches, enz.).%@"
+          }
         }
       }
     },
@@ -483,6 +719,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Es-tu sûr ? Cela supprimera définitivement tous les groupes formés du jeu actuel. Cette action est irréversible."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Weet je het zeker? Dit verwijdert definitief alle gevormde groepen van het huidige spel. Deze actie is onomkeerbaar."
           }
         }
       }
@@ -494,6 +736,12 @@
             "state" : "translated",
             "value" : "Attribution des rôles..."
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Rollen toewijzen..."
+          }
         }
       }
     },
@@ -503,6 +751,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Moyenne d'âge"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemiddelde leeftijd"
           }
         }
       }
@@ -514,6 +768,12 @@
             "state" : "translated",
             "value" : "Information"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Basisinformatie"
+          }
         }
       }
     },
@@ -523,6 +783,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Commence ta participation à ce challenge."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Begin je deelname aan deze challenge."
           }
         }
       }
@@ -534,6 +800,12 @@
             "state" : "translated",
             "value" : "Fonctionnalité bêta"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bètafunctie"
+          }
         }
       }
     },
@@ -543,6 +815,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Body"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inhoud"
           }
         }
       }
@@ -554,6 +832,12 @@
             "state" : "translated",
             "value" : "Garçons"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jongens"
+          }
         }
       }
     },
@@ -563,6 +847,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Appeler"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bellen"
           }
         }
       }
@@ -574,6 +864,12 @@
             "state" : "translated",
             "value" : "Appareil photo"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Camera"
+          }
         }
       }
     },
@@ -584,12 +880,24 @@
             "state" : "translated",
             "value" : "Annuler"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Annuleren"
+          }
         }
       }
     },
     "Challenge" : {
       "localizations" : {
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Challenge"
+          }
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Challenge"
@@ -604,6 +912,12 @@
             "state" : "translated",
             "value" : "Réponses au challenge"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Challenge-antwoorden"
+          }
         }
       }
     },
@@ -613,6 +927,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Les réponses au challenge apparaîtront ici une fois soumises"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Challenge-antwoorden verschijnen hier zodra ze zijn ingediend"
           }
         }
       }
@@ -624,12 +944,24 @@
             "state" : "translated",
             "value" : "Challenge : %@"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Challenge: %@"
+          }
         }
       }
     },
     "Challenges" : {
       "localizations" : {
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Challenges"
+          }
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Challenges"
@@ -644,11 +976,30 @@
             "state" : "translated",
             "value" : "Changer la photo"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto wijzigen"
+          }
         }
       }
     },
     "Choice %lld" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Choix %lld"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keuze %lld"
+          }
+        }
+      }
     },
     "Choice: %@" : {
       "localizations" : {
@@ -656,6 +1007,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Choix : %@"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Keuze: %@"
           }
         }
       }
@@ -667,6 +1024,12 @@
             "state" : "translated",
             "value" : "Choisis une photo de couverture"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kies een omslagfoto"
+          }
         }
       }
     },
@@ -676,6 +1039,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Choisis une réponse, puis confirme."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kies een antwoord en bevestig."
           }
         }
       }
@@ -687,6 +1056,12 @@
             "state" : "translated",
             "value" : "Ville"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Stad"
+          }
         }
       }
     },
@@ -697,14 +1072,46 @@
             "state" : "translated",
             "value" : "CKR"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CKR"
+          }
         }
       }
     },
     "CKR Countdown start" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Début du compte à rebours CKR"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CKR Aftelling start"
+          }
+        }
+      }
     },
     "CKR Game already exists" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Un jeu CKR existe déjà"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CKR-spel bestaat al"
+          }
+        }
+      }
     },
     "CKR Registration" : {
       "localizations" : {
@@ -713,16 +1120,11 @@
             "state" : "translated",
             "value" : "Inscription CKR"
           }
-        }
-      }
-    },
-    "Click here" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Clique ici"
+            "value" : "CKR-inschrijving"
           }
         }
       }
@@ -734,6 +1136,12 @@
             "state" : "translated",
             "value" : "Fermer"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Sluiten"
+          }
         }
       }
     },
@@ -744,12 +1152,24 @@
             "state" : "translated",
             "value" : "Fermé"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gesloten"
+          }
         }
       }
     },
     "Code" : {
       "localizations" : {
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code"
+          }
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Code"
@@ -764,6 +1184,12 @@
             "state" : "translated",
             "value" : "Code :"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Code:"
+          }
         }
       }
     },
@@ -773,6 +1199,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Coloc"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cohouse"
           }
         }
       }
@@ -784,6 +1216,12 @@
             "state" : "translated",
             "value" : "Nom de la coloc"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Naam van de cohouse"
+          }
         }
       }
     },
@@ -793,6 +1231,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Type de coloc"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type cohouse"
           }
         }
       }
@@ -804,6 +1248,12 @@
             "state" : "translated",
             "value" : "Coloc mise à jour"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cohouse bijgewerkt"
+          }
         }
       }
     },
@@ -813,6 +1263,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Coloc : %@"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cohouse: %@"
           }
         }
       }
@@ -824,12 +1280,24 @@
             "state" : "translated",
             "value" : "Colocs"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cohouses"
+          }
         }
       }
     },
     "Colocs Kitchen Race" : {
       "localizations" : {
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Colocs Kitchen Race"
+          }
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Colocs Kitchen Race"
@@ -844,11 +1312,30 @@
             "state" : "translated",
             "value" : "Bientôt disponible"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Binnenkort beschikbaar"
+          }
         }
       }
     },
     "Complete your profile" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Complète ton profil"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vervolledig je profiel"
+          }
+        }
+      }
     },
     "Configure event" : {
       "localizations" : {
@@ -856,6 +1343,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Configurer l'événement"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Evenement configureren"
           }
         }
       }
@@ -867,6 +1360,12 @@
             "state" : "translated",
             "value" : "Confirmer"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bevestigen"
+          }
         }
       }
     },
@@ -876,6 +1375,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Confirmer la suppression"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwijdering bevestigen"
           }
         }
       }
@@ -887,6 +1392,12 @@
             "state" : "translated",
             "value" : "Confirmer l'association"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matching bevestigen"
+          }
         }
       }
     },
@@ -896,6 +1407,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Échec de la confirmation de l'association"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bevestiging van matching mislukt"
           }
         }
       }
@@ -907,6 +1424,12 @@
             "state" : "translated",
             "value" : "Confirmer l'association ?"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matching bevestigen?"
+          }
         }
       }
     },
@@ -917,11 +1440,46 @@
             "state" : "translated",
             "value" : "Contenu"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inhoud"
+          }
+        }
+      }
+    },
+    "Contact Support" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contacter le support"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contact opnemen"
+          }
         }
       }
     },
     "Continue" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Continuer"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Doorgaan"
+          }
+        }
+      }
     },
     "Continue anyway" : {
       "localizations" : {
@@ -929,6 +1487,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Continuer quand même"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Toch doorgaan"
           }
         }
       }
@@ -940,6 +1504,12 @@
             "state" : "translated",
             "value" : "Continuer vers le paiement"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Doorgaan naar betaling"
+          }
         }
       }
     },
@@ -949,6 +1519,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copié !"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gekopieerd!"
           }
         }
       }
@@ -960,6 +1536,12 @@
             "state" : "translated",
             "value" : "Copier"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kopiëren"
+          }
         }
       }
     },
@@ -969,6 +1551,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Copier l'adresse"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adres kopiëren"
           }
         }
       }
@@ -980,6 +1568,12 @@
             "state" : "translated",
             "value" : "Réponse correcte"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Juist antwoord"
+          }
         }
       }
     },
@@ -989,6 +1583,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Impossible d'analyser la photo. Un admin vérifiera manuellement."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kon de foto niet analyseren. Een admin zal handmatig controleren."
           }
         }
       }
@@ -1000,6 +1600,12 @@
             "state" : "translated",
             "value" : "Photo de couverture"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Omslagfoto"
+          }
         }
       }
     },
@@ -1010,11 +1616,30 @@
             "state" : "translated",
             "value" : "Créer"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aanmaken"
+          }
         }
       }
     },
     "Create account" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Créer un compte"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account aanmaken"
+          }
+        }
+      }
     },
     "Create new CKR Game" : {
       "localizations" : {
@@ -1022,6 +1647,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Créer un nouveau jeu CKR"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nieuw CKR-spel aanmaken"
           }
         }
       }
@@ -1033,6 +1664,12 @@
             "state" : "translated",
             "value" : "Créer une nouvelle coloc"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nieuwe cohouse aanmaken"
+          }
         }
       }
     },
@@ -1042,6 +1679,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sélecteur personnalisé"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aangepaste kiezer"
           }
         }
       }
@@ -1053,6 +1696,12 @@
             "state" : "translated",
             "value" : "Tableau de bord"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dashboard"
+          }
         }
       }
     },
@@ -1062,6 +1711,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Dates"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Data"
           }
         }
       }
@@ -1073,11 +1728,30 @@
             "state" : "translated",
             "value" : "Jours"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dagen"
+          }
         }
       }
     },
     "Delete" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Supprimer"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwijderen"
+          }
+        }
+      }
     },
     "Delete account" : {
       "localizations" : {
@@ -1085,6 +1759,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Supprimer le compte"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account verwijderen"
           }
         }
       }
@@ -1096,6 +1776,12 @@
             "state" : "translated",
             "value" : "Supprimer le jeu CKR"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CKR-spel verwijderen"
+          }
         }
       }
     },
@@ -1105,6 +1791,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Supprimer le jeu CKR ?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CKR-spel verwijderen?"
           }
         }
       }
@@ -1116,6 +1808,12 @@
             "state" : "translated",
             "value" : "Échec de la suppression"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verwijdering mislukt"
+          }
         }
       }
     },
@@ -1125,6 +1823,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Supprimer mon compte"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mijn account verwijderen"
           }
         }
       }
@@ -1136,6 +1840,12 @@
             "state" : "translated",
             "value" : "Supprimer cette news ?"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dit nieuws verwijderen?"
+          }
         }
       }
     },
@@ -1145,6 +1855,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Suppression du compte..."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Account verwijderen..."
           }
         }
       }
@@ -1156,6 +1872,12 @@
             "state" : "translated",
             "value" : "Tu as réalisé le défi ?"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Heb je de challenge voltooid?"
+          }
         }
       }
     },
@@ -1166,11 +1888,30 @@
             "state" : "translated",
             "value" : "Préférences alimentaires"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dieetvoorkeuren"
+          }
         }
       }
     },
     "Diner" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dîner"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Diner"
+          }
+        }
+      }
     },
     "DINNER" : {
       "localizations" : {
@@ -1178,6 +1919,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "DÎNER"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "DINER"
           }
         }
       }
@@ -1189,6 +1936,12 @@
             "state" : "translated",
             "value" : "Ignorer"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Negeren"
+          }
         }
       }
     },
@@ -1198,6 +1951,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Voulez-vous recevoir des news de CKR ?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wil je nieuws ontvangen van het CKR-team?"
           }
         }
       }
@@ -1209,6 +1968,12 @@
             "state" : "translated",
             "value" : "Terminé"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klaar"
+          }
         }
       }
     },
@@ -1218,6 +1983,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Editer"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bewerken"
           }
         }
       }
@@ -1229,6 +2000,12 @@
             "state" : "translated",
             "value" : "Modifier le jeu CKR"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CKR-spel bewerken"
+          }
         }
       }
     },
@@ -1238,6 +2015,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modifier le jeu CKR (Bêta)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "CKR-spel bewerken (bèta)"
           }
         }
       }
@@ -1249,6 +2032,12 @@
             "state" : "translated",
             "value" : "Editer la coloc"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cohouse bewerken"
+          }
         }
       }
     },
@@ -1258,6 +2047,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Modifier News"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nieuws bewerken"
           }
         }
       }
@@ -1269,6 +2064,12 @@
             "state" : "translated",
             "value" : "Modifier le profil"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profiel bewerken"
+          }
         }
       }
     },
@@ -1278,6 +2079,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "La modification d'un jeu CKR est une fonctionnalité bêta. Modifier certains champs pendant qu'un jeu est en cours peut provoquer un comportement inattendu."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Het bewerken van een CKR-spel is een bètafunctie. Het wijzigen van bepaalde velden terwijl een spel bezig is, kan onverwacht gedrag veroorzaken."
           }
         }
       }
@@ -1289,6 +2096,12 @@
             "state" : "translated",
             "value" : "Édition"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editie"
+          }
         }
       }
     },
@@ -1298,6 +2111,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Édition #%lld"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editie #%lld"
           }
         }
       }
@@ -1309,6 +2128,12 @@
             "state" : "translated",
             "value" : "ID de l'édition"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Editie-ID"
+          }
         }
       }
     },
@@ -1319,11 +2144,30 @@
             "state" : "translated",
             "value" : "Email *"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-mail *"
+          }
         }
       }
     },
     "Email Verification" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vérification de l'email"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "E-mailverificatie"
+          }
+        }
+      }
     },
     "End" : {
       "localizations" : {
@@ -1331,6 +2175,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Fin"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einde"
           }
         }
       }
@@ -1342,6 +2192,12 @@
             "state" : "translated",
             "value" : "Date de fin"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Einddatum"
+          }
         }
       }
     },
@@ -1351,6 +2207,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Terminé le %@"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geëindigd op %@"
           }
         }
       }
@@ -1362,6 +2224,12 @@
             "state" : "translated",
             "value" : "Erreur"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fout"
+          }
         }
       }
     },
@@ -1371,6 +2239,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Erreur : %@"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fout: %@"
           }
         }
       }
@@ -1382,6 +2256,12 @@
             "state" : "translated",
             "value" : "Paramètres de l'événement"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Evenementinstellingen"
+          }
         }
       }
     },
@@ -1391,6 +2271,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Échoué"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Mislukt"
           }
         }
       }
@@ -1402,6 +2288,12 @@
             "state" : "translated",
             "value" : "Filtrer les réponses"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antwoorden filteren"
+          }
         }
       }
     },
@@ -1411,6 +2303,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Décision finale pour le challenge"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Eindbeslissing voor de challenge"
           }
         }
       }
@@ -1422,6 +2320,12 @@
             "state" : "translated",
             "value" : "Prénom *"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Voornaam *"
+          }
         }
       }
     },
@@ -1431,6 +2335,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pour le moment, si tu veux supprimer le jeu en cours, contacte un Admin."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Als je het huidige spel wilt verwijderen, neem dan contact op met een Admin."
           }
         }
       }
@@ -1442,6 +2352,12 @@
             "state" : "translated",
             "value" : "Réponse libre. Joue le jeu, sans tricher 👀"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vrij antwoord. Speel eerlijk, niet spieken 👀"
+          }
         }
       }
     },
@@ -1451,6 +2367,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Classement complet"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volledig klassement"
           }
         }
       }
@@ -1462,6 +2384,12 @@
             "state" : "translated",
             "value" : "Date du jeu"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Speldatum"
+          }
         }
       }
     },
@@ -1471,6 +2399,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Filles"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Meisjes"
           }
         }
       }
@@ -1482,6 +2416,12 @@
             "state" : "translated",
             "value" : "Global"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Globaal"
+          }
         }
       }
     },
@@ -1491,6 +2431,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sans gluten"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Glutenvrij"
           }
         }
       }
@@ -1502,12 +2448,24 @@
             "state" : "translated",
             "value" : "Aller à l'onglet Coloc"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ga naar het cohouse-tabblad"
+          }
         }
       }
     },
     "Google Maps" : {
       "localizations" : {
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Google Maps"
+          }
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Google Maps"
@@ -1522,12 +2480,24 @@
             "state" : "translated",
             "value" : "Groupe"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Groep"
+          }
         }
       }
     },
     "GSM" : {
       "localizations" : {
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "GSM"
+          }
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "GSM"
@@ -1542,6 +2512,12 @@
             "state" : "translated",
             "value" : "Invité"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gast"
+          }
         }
       }
     },
@@ -1552,6 +2528,12 @@
             "state" : "translated",
             "value" : "Tel. invité"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tel. gast"
+          }
         }
       }
     },
@@ -1559,11 +2541,30 @@
       "shouldTranslate" : false
     },
     "History" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Historique"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geschiedenis"
+          }
+        }
+      }
     },
     "Home" : {
       "localizations" : {
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Home"
+          }
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Home"
@@ -1578,6 +2579,12 @@
             "state" : "translated",
             "value" : "Hôte"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gastheer"
+          }
         }
       }
     },
@@ -1587,6 +2594,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tel. hôte"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tel. gastheer"
           }
         }
       }
@@ -1598,6 +2611,12 @@
             "state" : "translated",
             "value" : "Heures"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Uren"
+          }
         }
       }
     },
@@ -1607,6 +2626,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Je comprends, continuer"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ik begrijp het, doorgaan"
           }
         }
       }
@@ -1618,6 +2643,12 @@
             "state" : "translated",
             "value" : "C'est fait !"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ik heb het gedaan!"
+          }
         }
       }
     },
@@ -1628,12 +2659,24 @@
             "state" : "translated",
             "value" : "J'ai vérifié mon email"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ik heb mijn e-mail geverifieerd"
+          }
         }
       }
     },
     "ID" : {
       "localizations" : {
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID"
+          }
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "ID"
@@ -1648,6 +2691,12 @@
             "state" : "translated",
             "value" : "Carte d'identité"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identiteitskaart"
+          }
         }
       }
     },
@@ -1657,6 +2706,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Carte d'identité détectée"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Identiteitskaart gedetecteerd"
           }
         }
       }
@@ -1668,6 +2723,12 @@
             "state" : "translated",
             "value" : "Vérification de la carte d'identité"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verificatie identiteitskaart"
+          }
         }
       }
     },
@@ -1677,6 +2738,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Échec du chargement de l'image"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Afbeelding kon niet worden geladen"
           }
         }
       }
@@ -1688,6 +2755,12 @@
             "state" : "translated",
             "value" : "La qualité de l'image est faible. Reprends la photo avec un meilleur éclairage."
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De beeldkwaliteit is laag. Neem de foto opnieuw met betere belichting."
+          }
         }
       }
     },
@@ -1697,6 +2770,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Important"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Belangrijk"
           }
         }
       }
@@ -1708,6 +2787,12 @@
             "state" : "translated",
             "value" : "Infos"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Info"
+          }
         }
       }
     },
@@ -1717,6 +2802,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Adresse invalide (format incorrect)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ongeldig adres (verkeerd formaat)."
           }
         }
       }
@@ -1728,6 +2819,12 @@
             "state" : "translated",
             "value" : "Invalider"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ongeldig verklaren"
+          }
         }
       }
     },
@@ -1737,6 +2834,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Invalider la réponse %@"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antwoord %@ ongeldig verklaren"
           }
         }
       }
@@ -1748,6 +2851,12 @@
             "state" : "translated",
             "value" : "Joindre une coloc existante"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bestaande cohouse joinen"
+          }
         }
       }
     },
@@ -1757,6 +2866,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rejoins ou crée une colocation\npour participer aux challenges."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Join of maak een cohouse aan\nom deel te nemen aan challenges."
           }
         }
       }
@@ -1768,6 +2883,12 @@
             "state" : "translated",
             "value" : "Sans lactose"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lactosevrij"
+          }
         }
       }
     },
@@ -1777,6 +2898,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nom *"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Achternaam *"
           }
         }
       }
@@ -1788,6 +2915,12 @@
             "state" : "translated",
             "value" : "Classement"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klassement"
+          }
         }
       }
     },
@@ -1797,6 +2930,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Bibliothèque"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bibliotheek"
           }
         }
       }
@@ -1808,6 +2947,12 @@
             "state" : "translated",
             "value" : "Chargement des challenges…"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Challenges laden…"
+          }
         }
       }
     },
@@ -1817,6 +2962,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chargement des colocs..."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cohouses laden..."
           }
         }
       }
@@ -1828,11 +2979,30 @@
             "state" : "translated",
             "value" : "Chargement des colocs…"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cohouses laden…"
+          }
         }
       }
     },
     "Loading history…" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chargement de l'historique…"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geschiedenis laden…"
+          }
+        }
+      }
     },
     "Loading leaderboard…" : {
       "localizations" : {
@@ -1840,6 +3010,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Chargement du leaderboard…"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klassement laden…"
           }
         }
       }
@@ -1851,11 +3027,30 @@
             "state" : "translated",
             "value" : "Chargement du planning..."
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planning laden..."
+          }
         }
       }
     },
     "Loading..." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chargement..."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laden..."
+          }
+        }
+      }
     },
     "Location" : {
       "localizations" : {
@@ -1863,6 +3058,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Localisation"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Locatie"
           }
         }
       }
@@ -1874,6 +3075,12 @@
             "state" : "translated",
             "value" : "LOCALISATION"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LOCATIE"
+          }
         }
       }
     },
@@ -1883,6 +3090,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rendre admin"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Admin maken"
           }
         }
       }
@@ -1894,6 +3107,12 @@
             "state" : "translated",
             "value" : "Rendre Admin"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Admin maken"
+          }
         }
       }
     },
@@ -1903,6 +3122,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Associer %lld colocs"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%lld cohouses matchen"
           }
         }
       }
@@ -1914,6 +3139,12 @@
             "state" : "translated",
             "value" : "Associer les colocs"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cohouses matchen"
+          }
         }
       }
     },
@@ -1923,6 +3154,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Associer les colocs ?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cohouses matchen?"
           }
         }
       }
@@ -1934,6 +3171,12 @@
             "state" : "translated",
             "value" : "Associé le"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gematcht op"
+          }
         }
       }
     },
@@ -1943,6 +3186,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Groupes formés"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gevormde groepen"
           }
         }
       }
@@ -1954,6 +3203,12 @@
             "state" : "translated",
             "value" : "Groupes formés"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gevormde groepen"
+          }
         }
       }
     },
@@ -1963,6 +3218,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Association des colocs..."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cohouses matchen..."
           }
         }
       }
@@ -1974,6 +3235,12 @@
             "state" : "translated",
             "value" : "Association terminée !"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matching voltooid!"
+          }
         }
       }
     },
@@ -1983,6 +3250,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Association confirmée !"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matching bevestigd!"
           }
         }
       }
@@ -1994,6 +3267,12 @@
             "state" : "translated",
             "value" : "Échec de l'association"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matching mislukt"
+          }
         }
       }
     },
@@ -2003,6 +3282,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Participants max"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Max deelnemers"
           }
         }
       }
@@ -2014,6 +3299,12 @@
             "state" : "translated",
             "value" : "Participants max :"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Max deelnemers:"
+          }
         }
       }
     },
@@ -2023,6 +3314,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Moi"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ik"
           }
         }
       }
@@ -2034,6 +3331,12 @@
             "state" : "translated",
             "value" : "Membres"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Leden"
+          }
         }
       }
     },
@@ -2044,11 +3347,30 @@
             "state" : "translated",
             "value" : "MEMBRES (%lld)"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "LEDEN (%lld)"
+          }
         }
       }
     },
     "Message" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Message"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bericht"
+          }
+        }
+      }
     },
     "Minutes" : {
       "localizations" : {
@@ -2056,6 +3378,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Minutes"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Minuten"
           }
         }
       }
@@ -2066,6 +3394,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mixte"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gemengd"
           }
         }
       }
@@ -2078,6 +3412,12 @@
             "state" : "translated",
             "value" : "mois"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "maand"
+          }
         }
       }
     },
@@ -2087,6 +3427,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nom"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Naam"
           }
         }
       }
@@ -2098,6 +3444,12 @@
             "state" : "translated",
             "value" : "Nom ou email"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Naam of e-mail"
+          }
         }
       }
     },
@@ -2107,6 +3459,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Tant pis"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Laat maar"
           }
         }
       }
@@ -2118,6 +3476,12 @@
             "state" : "translated",
             "value" : "Nouveau challenge"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nieuwe challenge"
+          }
         }
       }
     },
@@ -2127,6 +3491,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nouveau jeu CKR"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nieuw CKR-spel"
           }
         }
       }
@@ -2138,6 +3508,12 @@
             "state" : "translated",
             "value" : "Nouvelle coloc"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nieuwe cohouse"
+          }
         }
       }
     },
@@ -2147,6 +3523,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Nouvelle News"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nieuw nieuwsbericht"
           }
         }
       }
@@ -2158,11 +3540,30 @@
             "state" : "translated",
             "value" : "News"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nieuws"
+          }
         }
       }
     },
     "Next challenges :" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prochains challenges :"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volgende challenges:"
+          }
+        }
+      }
     },
     "Next CKR Game" : {
       "localizations" : {
@@ -2170,6 +3571,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Prochain jeu CKR"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volgend CKR-spel"
           }
         }
       }
@@ -2181,6 +3588,12 @@
             "state" : "translated",
             "value" : "Prochaine édition"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volgende editie"
+          }
         }
       }
     },
@@ -2190,6 +3603,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Prochaine édition dans"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Volgende editie over"
           }
         }
       }
@@ -2201,11 +3620,30 @@
             "state" : "translated",
             "value" : "Aucun challenge %@"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen %@ challenges"
+          }
         }
       }
     },
     "No account found for this email. Would you like to create a new account?" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Aucun compte trouvé pour cet email. Souhaites-tu créer un nouveau compte ?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen account gevonden voor dit e-mailadres. Wil je een nieuw account aanmaken?"
+          }
+        }
+      }
     },
     "No bracelet, no entry!" : {
       "localizations" : {
@@ -2213,6 +3651,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Pas de bracelet, pas d'entrée !"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen bandje, geen toegang!"
           }
         }
       }
@@ -2224,6 +3668,12 @@
             "state" : "translated",
             "value" : "Aucun challenge"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen challenges"
+          }
         }
       }
     },
@@ -2233,6 +3683,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucun jeu CKR prévu"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen CKR-spel gepland"
           }
         }
       }
@@ -2244,6 +3700,12 @@
             "state" : "translated",
             "value" : "Aucune coloc trouvée"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen cohouses gevonden"
+          }
         }
       }
     },
@@ -2253,6 +3715,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucune préférence alimentaire"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen dieetvoorkeuren"
           }
         }
       }
@@ -2264,6 +3732,12 @@
             "state" : "translated",
             "value" : "Aucun membre"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen leden"
+          }
         }
       }
     },
@@ -2274,6 +3748,12 @@
             "state" : "translated",
             "value" : "Aucune news"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen nieuws"
+          }
         }
       }
     },
@@ -2283,6 +3763,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucune news pour le moment"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen nieuws op dit moment"
           }
         }
       }
@@ -2295,6 +3781,12 @@
             "state" : "translated",
             "value" : "Pas de prochaine date"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen volgende datum opgegeven"
+          }
         }
       }
     },
@@ -2304,6 +3796,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucune notification envoyée"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nog geen notificaties verstuurd"
           }
         }
       }
@@ -2315,6 +3813,12 @@
             "state" : "translated",
             "value" : "Aucune réponse"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen antwoorden"
+          }
         }
       }
     },
@@ -2324,6 +3828,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucun résultat"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen resultaten"
           }
         }
       }
@@ -2335,6 +3845,12 @@
             "state" : "translated",
             "value" : "Aucune réponse spécifique"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen specifiek antwoord"
+          }
         }
       }
     },
@@ -2344,6 +3860,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucun utilisateur ne correspond à \"%@\""
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen gebruikers gevonden voor \"%@\""
           }
         }
       }
@@ -2355,6 +3877,12 @@
             "state" : "translated",
             "value" : "Aucun challenge validé pour l'instant"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nog geen gevalideerde challenges"
+          }
         }
       }
     },
@@ -2364,6 +3892,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Aucun"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geen"
           }
         }
       }
@@ -2375,6 +3909,12 @@
             "state" : "translated",
             "value" : "Note (optionnel)"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opmerking (optioneel)"
+          }
         }
       }
     },
@@ -2384,6 +3924,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Rien à faire ici. Valide quand c'est fait ✅"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Niets te doen hier. Valideer wanneer het klaar is ✅"
           }
         }
       }
@@ -2395,6 +3941,12 @@
             "state" : "translated",
             "value" : "Détail de la notification"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notificatiedetail"
+          }
         }
       }
     },
@@ -2405,12 +3957,24 @@
             "state" : "translated",
             "value" : "Notifications"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notificaties"
+          }
         }
       }
     },
     "Notifs" : {
       "localizations" : {
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notifs"
+          }
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Notifs"
@@ -2425,12 +3989,24 @@
             "state" : "translated",
             "value" : "Sans noix"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notenvrij"
+          }
         }
       }
     },
     "OK" : {
       "localizations" : {
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "OK"
+          }
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "OK"
@@ -2445,6 +4021,12 @@
             "state" : "translated",
             "value" : "Ouvert"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Open"
+          }
         }
       }
     },
@@ -2454,6 +4036,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Ouvrir l'adresse"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adres openen"
           }
         }
       }
@@ -2465,6 +4053,12 @@
             "state" : "translated",
             "value" : "Optionnel — personnalise la page de ta coloc."
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Optioneel — personaliseer je cohouse-pagina."
+          }
         }
       }
     },
@@ -2474,6 +4068,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ou"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "of"
           }
         }
       }
@@ -2485,6 +4085,12 @@
             "state" : "translated",
             "value" : "Résumé de la commande"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Besteloverzicht"
+          }
         }
       }
     },
@@ -2495,11 +4101,30 @@
             "state" : "translated",
             "value" : "Participants"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deelnemers"
+          }
         }
       }
     },
     "Party" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Teuf"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Feest"
+          }
+        }
+      }
     },
     "PARTY" : {
       "localizations" : {
@@ -2507,6 +4132,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "TEUF"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FEEST"
           }
         }
       }
@@ -2518,6 +4149,12 @@
             "state" : "translated",
             "value" : "Nom de la teuf"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Naam van het feest"
+          }
         }
       }
     },
@@ -2527,6 +4164,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Payer %@"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Betaal %@"
           }
         }
       }
@@ -2538,6 +4181,12 @@
             "state" : "translated",
             "value" : "Paiement"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Betaling"
+          }
         }
       }
     },
@@ -2547,6 +4196,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le paiement est traité de manière sécurisée via Stripe. Vos informations bancaires ne sont jamais stockées sur nos serveurs."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De betaling wordt veilig verwerkt via Stripe. Je kaartgegevens worden nooit op onze servers opgeslagen."
           }
         }
       }
@@ -2558,6 +4213,12 @@
             "state" : "translated",
             "value" : "Bibliothèque photo"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fotobibliotheek"
+          }
         }
       }
     },
@@ -2567,6 +4228,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Source de la photo"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Fotobron"
           }
         }
       }
@@ -2578,6 +4245,12 @@
             "state" : "translated",
             "value" : "Choisis la bonne réponse. Une seule tentative 🫣"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Kies het juiste antwoord. Slechts één poging 🫣"
+          }
         }
       }
     },
@@ -2588,12 +4261,24 @@
             "state" : "translated",
             "value" : "Position du pin"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Pinlocatie"
+          }
         }
       }
     },
     "Planning" : {
       "localizations" : {
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planning"
+          }
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Planning"
@@ -2608,6 +4293,12 @@
             "state" : "translated",
             "value" : "Planning pas encore disponible"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planning nog niet beschikbaar"
+          }
         }
       }
     },
@@ -2617,6 +4308,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Planning révélé"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planning onthuld"
           }
         }
       }
@@ -2628,6 +4325,12 @@
             "state" : "translated",
             "value" : "Planning révélé ! 🎉"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planning onthuld! 🎉"
+          }
         }
       }
     },
@@ -2637,6 +4340,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Points (par défaut : 1)"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Punten (standaard: 1)"
           }
         }
       }
@@ -2648,6 +4357,12 @@
             "state" : "translated",
             "value" : "Code Postal"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Postcode"
+          }
         }
       }
     },
@@ -2657,6 +4372,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Prix par personne"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Prijs per persoon"
           }
         }
       }
@@ -2668,6 +4389,28 @@
             "state" : "translated",
             "value" : "Tarif"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tarief"
+          }
+        }
+      }
+    },
+    "Privacy Policy" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Politique de confidentialite"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Privacybeleid"
+          }
         }
       }
     },
@@ -2677,6 +4420,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Traitement de la photo…"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto verwerken…"
           }
         }
       }
@@ -2688,6 +4437,12 @@
             "state" : "translated",
             "value" : "Profil"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Profiel"
+          }
         }
       }
     },
@@ -2697,6 +4452,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Quitter la coloc"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cohouse verlaten"
           }
         }
       }
@@ -2708,6 +4469,12 @@
             "state" : "translated",
             "value" : "Prêt à envoyer · %@"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Klaar om te verzenden · %@"
+          }
         }
       }
     },
@@ -2717,6 +4484,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Inscris-toi avant le %@"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schrijf je in voor %@"
           }
         }
       }
@@ -2728,6 +4501,12 @@
             "state" : "translated",
             "value" : "Inscris ta coloc !"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Schrijf je cohouse in!"
+          }
         }
       }
     },
@@ -2737,6 +4516,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Inscrit !"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingeschreven!"
           }
         }
       }
@@ -2748,6 +4533,12 @@
             "state" : "translated",
             "value" : "Date limite d'inscription"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inschrijvingsdeadline"
+          }
         }
       }
     },
@@ -2757,6 +4548,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Inscriptions fermées"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inschrijvingen gesloten"
           }
         }
       }
@@ -2768,6 +4565,12 @@
             "state" : "translated",
             "value" : "Retirer Admin"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Admin verwijderen"
+          }
         }
       }
     },
@@ -2777,6 +4580,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Supprimer la photo"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto verwijderen"
           }
         }
       }
@@ -2788,6 +4597,12 @@
             "state" : "translated",
             "value" : "Requis pour vérifier ton identité quand tu crées une coloc"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vereist om je identiteit te verifiëren bij het aanmaken van een cohouse."
+          }
         }
       }
     },
@@ -2798,11 +4613,30 @@
             "state" : "translated",
             "value" : "Renvoyer le mail de vérification"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verificatie-e-mail opnieuw versturen"
+          }
         }
       }
     },
     "Reset" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Réinitialiser"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resetten"
+          }
+        }
+      }
     },
     "Reset all matches?" : {
       "localizations" : {
@@ -2810,6 +4644,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Réinitialiser toutes les associations ?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Alle matches resetten?"
           }
         }
       }
@@ -2821,6 +4661,12 @@
             "state" : "translated",
             "value" : "Échec de la réinitialisation"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Reset mislukt"
+          }
         }
       }
     },
@@ -2830,6 +4676,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Réinitialiser les associations"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Matches resetten"
           }
         }
       }
@@ -2841,6 +4693,12 @@
             "state" : "translated",
             "value" : "Réponse invalidée ❌"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antwoord ongeldig verklaard ❌"
+          }
         }
       }
     },
@@ -2850,6 +4708,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Réponse validée ✅"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antwoord gevalideerd ✅"
           }
         }
       }
@@ -2861,6 +4725,12 @@
             "state" : "translated",
             "value" : "Réponse : %@"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antwoord: %@"
+          }
         }
       }
     },
@@ -2870,6 +4740,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Résultat"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resultaat"
           }
         }
       }
@@ -2881,19 +4757,27 @@
             "state" : "translated",
             "value" : "Reprendre la photo"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Foto opnieuw nemen"
+          }
         }
       }
     },
     "Retry confirmation" : {
-
-    },
-    "Retry registration" : {
-      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Réessayer l'inscription"
+            "value" : "Réessayer la confirmation"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Bevestiging opnieuw proberen"
           }
         }
       }
@@ -2905,6 +4789,12 @@
             "state" : "translated",
             "value" : "Échec de la révélation"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onthulling mislukt"
+          }
         }
       }
     },
@@ -2914,6 +4804,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Révéler le planning ?"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Planning onthullen?"
           }
         }
       }
@@ -2925,6 +4821,12 @@
             "state" : "translated",
             "value" : "Révéler à tous les participants"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onthullen aan alle deelnemers"
+          }
         }
       }
     },
@@ -2934,6 +4836,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Révéler aux participants"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onthullen aan deelnemers"
           }
         }
       }
@@ -2945,6 +4853,12 @@
             "state" : "translated",
             "value" : "Révélation en cours..."
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Onthullen..."
+          }
         }
       }
     },
@@ -2954,6 +4868,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enregistrer"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opslaan"
           }
         }
       }
@@ -2965,6 +4885,12 @@
             "state" : "translated",
             "value" : "Échec de l'enregistrement"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opslaan mislukt"
+          }
         }
       }
     },
@@ -2974,6 +4900,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Enregistrement des paramètres..."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Evenementinstellingen opslaan..."
           }
         }
       }
@@ -2985,6 +4917,12 @@
             "state" : "translated",
             "value" : "Rechercher un utilisateur"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoek een gebruiker"
+          }
         }
       }
     },
@@ -2994,6 +4932,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Recherche..."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoeken..."
           }
         }
       }
@@ -3005,6 +4949,12 @@
             "state" : "translated",
             "value" : "Secondes"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Seconden"
+          }
         }
       }
     },
@@ -3014,6 +4964,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Sélectionner"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecteren"
           }
         }
       }
@@ -3025,12 +4981,24 @@
             "state" : "translated",
             "value" : "Sélectionner une coloc"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Selecteer een cohouse"
+          }
         }
       }
     },
     "Select Type" : {
       "localizations" : {
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Type"
+          }
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "Type"
@@ -3045,6 +5013,12 @@
             "state" : "translated",
             "value" : "Trouve toi"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoek jezelf"
+          }
         }
       }
     },
@@ -3054,6 +5028,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Trouve toi"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Zoek jezelf"
           }
         }
       }
@@ -3065,6 +5045,12 @@
             "state" : "translated",
             "value" : "Envoyer la notification"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Notificatie versturen"
+          }
         }
       }
     },
@@ -3074,6 +5060,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Envoyer à"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Versturen naar"
           }
         }
       }
@@ -3085,6 +5077,12 @@
             "state" : "translated",
             "value" : "Envoyé"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verzonden"
+          }
         }
       }
     },
@@ -3094,6 +5092,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Envoyé le"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verzonden op"
           }
         }
       }
@@ -3105,6 +5109,12 @@
             "state" : "translated",
             "value" : "Partager ce code avec tes colocs"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deel deze code met je cohouse-genoten"
+          }
         }
       }
     },
@@ -3114,6 +5124,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Mélanger les réponses"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antwoorden schudden"
           }
         }
       }
@@ -3128,6 +5144,12 @@
             "state" : "translated",
             "value" : "Sign in avec Apple"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inloggen met Apple"
+          }
         }
       }
     },
@@ -3138,44 +5160,17 @@
             "state" : "translated",
             "value" : "Sign in avec Google"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inloggen met Google"
+          }
         }
       }
     },
     "Sign out" : {
       "shouldTranslate" : false
-    },
-    "Sign up" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "S'inscrire"
-          }
-        }
-      }
-    },
-    "Sign up with Apple" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "S'inscrire avec Apple"
-          }
-        }
-      }
-    },
-    "Sign up with Google" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "S'inscrire avec Google"
-          }
-        }
-      }
     },
     "Sort responses" : {
       "localizations" : {
@@ -3183,6 +5178,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Trier les réponses"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antwoorden sorteren"
           }
         }
       }
@@ -3194,12 +5195,24 @@
             "state" : "translated",
             "value" : "Début"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Start"
+          }
         }
       }
     },
     "START" : {
       "localizations" : {
         "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "START"
+          }
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
             "value" : "START"
@@ -3214,6 +5227,12 @@
             "state" : "translated",
             "value" : "Date de début"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Startdatum"
+          }
         }
       }
     },
@@ -3224,11 +5243,30 @@
             "state" : "translated",
             "value" : "Commencer le challenge"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Begin de challenge"
+          }
         }
       }
     },
     "Status" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Statut"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status"
+          }
+        }
+      }
     },
     "Status: %@" : {
       "localizations" : {
@@ -3236,6 +5274,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Statut : %@"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Status: %@"
           }
         }
       }
@@ -3246,6 +5290,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Reste connecté !"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Blijf op de hoogte!"
           }
         }
       }
@@ -3263,6 +5313,12 @@
             "state" : "translated",
             "value" : "Stocké en %1$lld centimes — affiché %2$@"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Opgeslagen als %1$lld cent — weergegeven als %2$@"
+          }
         }
       }
     },
@@ -3272,6 +5328,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ENVOYER LA PHOTO"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "FOTO VERSTUREN"
           }
         }
       }
@@ -3283,6 +5345,12 @@
             "state" : "translated",
             "value" : "ENVOIE TA RÉPONSE"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VERSTUUR JE ANTWOORD"
+          }
         }
       }
     },
@@ -3292,6 +5360,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "ENVOIE TON NOM"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "VERSTUUR JE NAAM"
           }
         }
       }
@@ -3303,6 +5377,12 @@
             "state" : "translated",
             "value" : "Soumis le : %@"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ingediend op: %@"
+          }
         }
       }
     },
@@ -3312,6 +5392,28 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Envoi en cours…"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verzenden…"
+          }
+        }
+      }
+    },
+    "Support" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Support"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Ondersteuning"
           }
         }
       }
@@ -3323,6 +5425,12 @@
             "state" : "translated",
             "value" : "Prends ta carte d'identité en photo"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neem een foto van je identiteitskaart"
+          }
         }
       }
     },
@@ -3332,6 +5440,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Prends ou choisis une photo"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neem of kies een foto"
           }
         }
       }
@@ -3343,6 +5457,12 @@
             "state" : "translated",
             "value" : "Prends ta plus belle photo. Souris 😄"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Neem je mooiste foto. Lach 😄"
+          }
         }
       }
     },
@@ -3352,6 +5472,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Appuie sur + pour créer un challenge"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tik op + om een challenge aan te maken"
           }
         }
       }
@@ -3363,6 +5489,12 @@
             "state" : "translated",
             "value" : "Appuie sur + pour créer une news"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tik op + om een nieuwsbericht aan te maken"
+          }
         }
       }
     },
@@ -3372,6 +5504,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Appuie ici pour écrire ta réponse..."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tik hier om je antwoord te schrijven..."
           }
         }
       }
@@ -3383,6 +5521,12 @@
             "state" : "translated",
             "value" : "Appuie sur la carte pour ajuster la position du pin"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tik op de kaart om de pinlocatie aan te passen"
+          }
         }
       }
     },
@@ -3393,14 +5537,46 @@
             "state" : "translated",
             "value" : "Cible"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Doel"
+          }
         }
       }
     },
     "Target ID" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "ID de la cible"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Doel-ID"
+          }
+        }
+      }
     },
     "Text" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Texte"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tekst"
+          }
+        }
+      }
     },
     "The event planning will be available soon!" : {
       "localizations" : {
@@ -3408,6 +5584,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Le planning de la soirée sera bientôt disponible !"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De evenementplanning is binnenkort beschikbaar!"
           }
         }
       }
@@ -3419,6 +5601,12 @@
             "state" : "translated",
             "value" : "La photo ne semble pas être une carte d'identité valide. Ton inscription pourrait être annulée si un admin ne peut pas vérifier ton identité."
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "De foto lijkt geen geldige identiteitskaart te zijn. Je inschrijving kan worden geannuleerd als een admin je identiteit niet kan verifiëren."
+          }
         }
       }
     },
@@ -3428,6 +5616,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cette action est irréversible."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deze actie is onomkeerbaar."
           }
         }
       }
@@ -3439,6 +5633,12 @@
             "state" : "translated",
             "value" : "Ce challenge est terminé."
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Deze challenge is afgelopen."
+          }
         }
       }
     },
@@ -3448,6 +5648,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cela ne ressemble pas à une carte d'identité. Reprends la photo."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dit lijkt geen identiteitskaart te zijn. Neem de foto opnieuw."
           }
         }
       }
@@ -3459,6 +5665,12 @@
             "state" : "translated",
             "value" : "Cela rendra le planning de soirée visible pour toutes les colocs inscrites et enverra une notification push. Cette action est irréversible."
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dit maakt de avondplanning zichtbaar voor alle ingeschreven cohouses en verstuurt een pushnotificatie. Deze actie kan niet ongedaan worden gemaakt."
+          }
         }
       }
     },
@@ -3469,11 +5681,30 @@
             "state" : "translated",
             "value" : "Cela regroupera %lld colocs inscrites en groupes de 4 selon la proximité GPS. Cette action écrasera tout regroupement précédent."
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dit verdeelt %lld ingeschreven cohouses in groepen van 4 op basis van GPS-nabijheid. Deze actie overschrijft eerdere matching."
+          }
         }
       }
     },
     "This will permanently delete your account and all associated data." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cela supprimera définitivement ton compte et toutes les données associées."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dit verwijdert definitief je account en alle bijbehorende gegevens."
+          }
+        }
+      }
     },
     "This will permanently delete your account, your data, and remove you from your cohouse. This action cannot be undone." : {
       "localizations" : {
@@ -3481,6 +5712,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Cela supprimera définitivement ton compte, tes données, et te retirera de ta coloc. Cette action est irréversible."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dit verwijdert definitief je account, je gegevens en verwijdert je uit je cohouse. Deze actie kan niet ongedaan worden gemaakt."
           }
         }
       }
@@ -3492,6 +5729,12 @@
             "state" : "translated",
             "value" : "Cela attribuera aléatoirement les rôles A/B/C/D dans chaque groupe. L'attribution des rôles détermine qui va où pour l'apéro et le dîner."
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Dit wijst willekeurig A/B/C/D-rollen toe binnen elke groep. De rolverdeling bepaalt wie waar naartoe gaat voor de apéro en het diner."
+          }
         }
       }
     },
@@ -3501,6 +5744,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Temps restant"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Resterende tijd"
           }
         }
       }
@@ -3512,6 +5761,12 @@
             "state" : "translated",
             "value" : "Titre"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Titel"
+          }
         }
       }
     },
@@ -3521,6 +5776,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Total"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Totaal"
           }
         }
       }
@@ -3541,6 +5802,12 @@
             "state" : "translated",
             "value" : "Tape un nom ou email pour trouver des utilisateurs"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Typ een naam of e-mail om gebruikers te zoeken"
+          }
         }
       }
     },
@@ -3551,11 +5818,30 @@
             "state" : "translated",
             "value" : "Tape ton nom créatif ici..."
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Typ hier je creatieve naam..."
+          }
         }
       }
     },
     "Users" : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Utilisateurs"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Gebruikers"
+          }
+        }
+      }
     },
     "Valid address ✅" : {
       "localizations" : {
@@ -3563,6 +5849,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Adresse valide ✅"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Geldig adres ✅"
           }
         }
       }
@@ -3574,6 +5866,12 @@
             "state" : "translated",
             "value" : "Valider la réponse %@"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Antwoord %@ valideren"
+          }
         }
       }
     },
@@ -3583,6 +5881,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Validation de l'adresse…"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Adres valideren…"
           }
         }
       }
@@ -3594,6 +5898,12 @@
             "state" : "translated",
             "value" : "Validation"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Validatie"
+          }
         }
       }
     },
@@ -3603,6 +5913,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Végan"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Veganistisch"
           }
         }
       }
@@ -3614,6 +5930,12 @@
             "state" : "translated",
             "value" : "Végétarien"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Vegetarisch"
+          }
         }
       }
     },
@@ -3623,6 +5945,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vérifie ton email"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Verifieer je e-mail"
           }
         }
       }
@@ -3634,11 +5962,30 @@
             "state" : "translated",
             "value" : "En attente de validation"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Wachten op validatie"
+          }
         }
       }
     },
     "We need a few more details before you can get started." : {
-
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Nous avons besoin de quelques informations supplémentaires avant de commencer."
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "We hebben nog een paar gegevens nodig voordat je kunt beginnen."
+          }
+        }
+      }
     },
     "You have been removed from this cohouse by admin user." : {
       "localizations" : {
@@ -3647,16 +5994,11 @@
             "state" : "translated",
             "value" : "Tu as été retiré de cette coloc par un administrateur."
           }
-        }
-      }
-    },
-    "You need an account?" : {
-      "extractionState" : "stale",
-      "localizations" : {
-        "fr" : {
+        },
+        "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Tu as besoin d'un compte ?"
+            "value" : "Je bent door een admin uit deze cohouse verwijderd."
           }
         }
       }
@@ -3668,6 +6010,12 @@
             "state" : "translated",
             "value" : "Vous allez chez **%@**"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je gaat naar **%@**"
+          }
         }
       }
     },
@@ -3677,6 +6025,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Vous recevez **%@** chez vous"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je ontvangt **%@** bij jou thuis"
           }
         }
       }
@@ -3688,6 +6042,12 @@
             "state" : "translated",
             "value" : "Ta réponse"
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Jouw antwoord"
+          }
         }
       }
     },
@@ -3698,6 +6058,12 @@
             "state" : "translated",
             "value" : "Ta réponse a été envoyée ! L'admin va la valider bientôt."
           }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Je antwoord is verstuurd! De admin zal het binnenkort valideren."
+          }
         }
       }
     },
@@ -3707,6 +6073,12 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Code postal"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Postcode"
           }
         }
       }

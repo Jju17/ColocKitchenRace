@@ -13,10 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.rahier.colocskitchenrace.R
 import dev.rahier.colocskitchenrace.ui.components.CKRButton
 import dev.rahier.colocskitchenrace.ui.theme.*
 
@@ -55,7 +57,7 @@ fun ProfileCompletionScreen(
         Spacer(modifier = Modifier.height(32.dp))
 
         Text(
-            text = "Completez votre profil",
+            text = stringResource(R.string.complete_profile),
             style = MaterialTheme.typography.headlineSmall,
             color = CkrDark,
         )
@@ -63,7 +65,7 @@ fun ProfileCompletionScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Ces informations sont necessaires pour participer",
+            text = stringResource(R.string.profile_info_required),
             style = MaterialTheme.typography.bodyMedium,
             color = CkrGray,
             textAlign = TextAlign.Center,
@@ -74,7 +76,7 @@ fun ProfileCompletionScreen(
         OutlinedTextField(
             value = state.firstName,
             onValueChange = { viewModel.onIntent(ProfileCompletionIntent.FirstNameChanged(it)) },
-            label = { Text("Prenom") },
+            label = { Text(stringResource(R.string.first_name)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(15.dp),
@@ -92,7 +94,7 @@ fun ProfileCompletionScreen(
         OutlinedTextField(
             value = state.lastName,
             onValueChange = { viewModel.onIntent(ProfileCompletionIntent.LastNameChanged(it)) },
-            label = { Text("Nom") },
+            label = { Text(stringResource(R.string.last_name)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(15.dp),
@@ -110,7 +112,7 @@ fun ProfileCompletionScreen(
         OutlinedTextField(
             value = state.phoneNumber,
             onValueChange = { viewModel.onIntent(ProfileCompletionIntent.PhoneChanged(it)) },
-            label = { Text("Numero de telephone") },
+            label = { Text(stringResource(R.string.phone_number)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(15.dp),
@@ -129,7 +131,7 @@ fun ProfileCompletionScreen(
         Spacer(modifier = Modifier.height(24.dp))
 
         CKRButton(
-            text = "Continuer",
+            text = stringResource(R.string.continue_button),
             isLoading = state.isLoading,
             enabled = state.firstName.isNotBlank() && state.lastName.isNotBlank() && state.phoneNumber.isNotBlank(),
             onClick = { viewModel.onIntent(ProfileCompletionIntent.SaveClicked) },

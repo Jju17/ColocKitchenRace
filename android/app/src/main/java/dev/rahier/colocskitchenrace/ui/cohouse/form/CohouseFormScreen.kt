@@ -19,11 +19,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.rahier.colocskitchenrace.data.model.AddressValidationResult
 import dev.rahier.colocskitchenrace.data.model.ValidatedAddress
+import dev.rahier.colocskitchenrace.R
 import dev.rahier.colocskitchenrace.ui.components.CKRButton
 import dev.rahier.colocskitchenrace.ui.theme.*
 
@@ -64,10 +66,10 @@ fun CohouseFormScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (isEditMode) "Modifier la coloc" else "Creer une coloc") },
+                title = { Text(if (isEditMode) stringResource(R.string.edit_cohouse) else stringResource(R.string.create_cohouse)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Retour")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -84,12 +86,12 @@ fun CohouseFormScreen(
                 .padding(16.dp),
         ) {
             // Cohouse name
-            Text(text = "Nom de la coloc", style = MaterialTheme.typography.titleMedium, color = CkrLavender)
+            Text(text = stringResource(R.string.cohouse_name), style = MaterialTheme.typography.titleMedium, color = CkrLavender)
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = state.name,
                 onValueChange = { viewModel.onIntent(CohouseFormIntent.NameChanged(it)) },
-                label = { Text("Nom") },
+                label = { Text(stringResource(R.string.cohouse_name_label)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium,
@@ -98,7 +100,7 @@ fun CohouseFormScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Cover image
-            Text(text = "Photo de couverture", style = MaterialTheme.typography.titleMedium, color = CkrLavender)
+            Text(text = stringResource(R.string.cover_image), style = MaterialTheme.typography.titleMedium, color = CkrLavender)
             Spacer(modifier = Modifier.height(8.dp))
 
             if (state.coverImageData != null) {
@@ -114,7 +116,7 @@ fun CohouseFormScreen(
                     ) {
                         Image(
                             bitmap = bitmap.asImageBitmap(),
-                            contentDescription = "Photo de couverture",
+                            contentDescription = stringResource(R.string.cover_image),
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop,
                         )
@@ -124,7 +126,7 @@ fun CohouseFormScreen(
                         ) {
                             Icon(
                                 Icons.Default.Close,
-                                contentDescription = "Supprimer la photo",
+                                contentDescription = stringResource(R.string.delete_photo),
                                 tint = CkrWhite,
                             )
                         }
@@ -138,19 +140,19 @@ fun CohouseFormScreen(
                 ) {
                     Icon(Icons.Default.AddAPhoto, contentDescription = null)
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Choisir une photo")
+                    Text(stringResource(R.string.choose_photo))
                 }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
             // Address
-            Text(text = "Adresse", style = MaterialTheme.typography.titleMedium, color = CkrLavender)
+            Text(text = stringResource(R.string.address), style = MaterialTheme.typography.titleMedium, color = CkrLavender)
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
                 value = state.street,
                 onValueChange = { viewModel.onIntent(CohouseFormIntent.StreetChanged(it)) },
-                label = { Text("Rue et numero") },
+                label = { Text(stringResource(R.string.street_and_number)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
                 shape = MaterialTheme.shapes.medium,
@@ -160,7 +162,7 @@ fun CohouseFormScreen(
                 OutlinedTextField(
                     value = state.postalCode,
                     onValueChange = { viewModel.onIntent(CohouseFormIntent.PostalCodeChanged(it)) },
-                    label = { Text("Code postal") },
+                    label = { Text(stringResource(R.string.postal_code)) },
                     singleLine = true,
                     modifier = Modifier.weight(1f),
                     shape = MaterialTheme.shapes.medium,
@@ -168,7 +170,7 @@ fun CohouseFormScreen(
                 OutlinedTextField(
                     value = state.city,
                     onValueChange = { viewModel.onIntent(CohouseFormIntent.CityChanged(it)) },
-                    label = { Text("Ville") },
+                    label = { Text(stringResource(R.string.city)) },
                     singleLine = true,
                     modifier = Modifier.weight(2f),
                     shape = MaterialTheme.shapes.medium,
@@ -182,7 +184,7 @@ fun CohouseFormScreen(
             Spacer(modifier = Modifier.height(24.dp))
 
             // Members
-            Text(text = "Membres (${state.members.size})", style = MaterialTheme.typography.titleMedium, color = CkrLavender)
+            Text(text = stringResource(R.string.members_count, state.members.size), style = MaterialTheme.typography.titleMedium, color = CkrLavender)
             Spacer(modifier = Modifier.height(8.dp))
 
             state.members.forEach { member ->
@@ -206,7 +208,7 @@ fun CohouseFormScreen(
                             if (member.isAdmin) {
                                 Surface(color = CkrGold, shape = MaterialTheme.shapes.small) {
                                     Text(
-                                        text = "Admin",
+                                        text = stringResource(R.string.admin_badge),
                                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 2.dp),
                                         style = MaterialTheme.typography.labelSmall,
                                         color = CkrWhite,
@@ -219,7 +221,7 @@ fun CohouseFormScreen(
                                 onClick = { viewModel.onIntent(CohouseFormIntent.RemoveMember(member.id)) },
                                 modifier = Modifier.size(24.dp),
                             ) {
-                                Icon(Icons.Default.Close, contentDescription = "Supprimer", tint = CkrCoral)
+                                Icon(Icons.Default.Close, contentDescription = stringResource(R.string.remove_member), tint = CkrCoral)
                             }
                         }
                     }
@@ -237,7 +239,7 @@ fun CohouseFormScreen(
                 OutlinedTextField(
                     value = state.newMemberName,
                     onValueChange = { viewModel.onIntent(CohouseFormIntent.NewMemberNameChanged(it)) },
-                    label = { Text("Nouveau membre") },
+                    label = { Text(stringResource(R.string.new_member)) },
                     singleLine = true,
                     modifier = Modifier.weight(1f),
                     shape = MaterialTheme.shapes.medium,
@@ -246,7 +248,7 @@ fun CohouseFormScreen(
                     onClick = { viewModel.onIntent(CohouseFormIntent.AddMember) },
                     enabled = state.newMemberName.isNotBlank(),
                 ) {
-                    Icon(Icons.Default.PersonAdd, contentDescription = "Ajouter", tint = CkrMint)
+                    Icon(Icons.Default.PersonAdd, contentDescription = stringResource(R.string.add), tint = CkrMint)
                 }
             }
 
@@ -264,7 +266,7 @@ fun CohouseFormScreen(
 
             // Save button
             CKRButton(
-                text = if (state.isEditMode) "Enregistrer" else "Creer la coloc",
+                text = if (state.isEditMode) stringResource(R.string.save) else stringResource(R.string.create_cohouse_button),
                 onClick = { viewModel.onIntent(CohouseFormIntent.Save) },
                 isLoading = state.isSaving,
                 enabled = state.canSave,
@@ -283,7 +285,7 @@ private fun AddressValidationStatus(state: CohouseFormState) {
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 CircularProgressIndicator(modifier = Modifier.size(16.dp), strokeWidth = 2.dp, color = CkrLavender)
-                Text("Validation de l'adresse...", style = MaterialTheme.typography.bodySmall, color = CkrGray)
+                Text(stringResource(R.string.address_validating), style = MaterialTheme.typography.bodySmall, color = CkrGray)
             }
         }
         state.addressValidationResult is AddressValidationResult.Valid -> {
@@ -292,7 +294,7 @@ private fun AddressValidationStatus(state: CohouseFormState) {
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 Icon(Icons.Default.CheckCircle, contentDescription = null, tint = CkrMint, modifier = Modifier.size(18.dp))
-                Text("Adresse validee", style = MaterialTheme.typography.bodySmall, color = CkrMint)
+                Text(stringResource(R.string.address_validated), style = MaterialTheme.typography.bodySmall, color = CkrMint)
             }
         }
         state.addressValidationResult is AddressValidationResult.LowConfidence -> {
@@ -303,7 +305,7 @@ private fun AddressValidationStatus(state: CohouseFormState) {
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     Icon(Icons.Default.Warning, contentDescription = null, tint = CkrGold, modifier = Modifier.size(18.dp))
-                    Text("Adresse incertaine", style = MaterialTheme.typography.bodySmall, color = CkrGold)
+                    Text(stringResource(R.string.address_uncertain), style = MaterialTheme.typography.bodySmall, color = CkrGold)
                 }
                 Spacer(modifier = Modifier.height(4.dp))
                 SuggestedAddressCard(suggested) { state }
@@ -315,7 +317,7 @@ private fun AddressValidationStatus(state: CohouseFormState) {
                 horizontalArrangement = Arrangement.spacedBy(6.dp),
             ) {
                 Icon(Icons.Default.ErrorOutline, contentDescription = null, tint = CkrCoral, modifier = Modifier.size(18.dp))
-                Text("Adresse introuvable", style = MaterialTheme.typography.bodySmall, color = CkrCoral)
+                Text(stringResource(R.string.address_not_found), style = MaterialTheme.typography.bodySmall, color = CkrCoral)
             }
         }
     }
@@ -331,7 +333,7 @@ private fun SuggestedAddressCard(suggested: ValidatedAddress, stateProvider: () 
     ) {
         Column(modifier = Modifier.padding(12.dp)) {
             Text(
-                text = "Suggestion : ${suggested.street}, ${suggested.postalCode} ${suggested.city}",
+                text = stringResource(R.string.address_suggestion, suggested.street, suggested.postalCode, suggested.city),
                 style = MaterialTheme.typography.bodySmall,
             )
         }

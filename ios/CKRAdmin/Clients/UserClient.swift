@@ -56,6 +56,10 @@ extension UserClient: DependencyKey {
                 }
             }
         },
+        // NOTE: This listener downloads all user documents to count them, which incurs
+        // a Firestore read for every document on each change. Consider using Firestore
+        // count aggregation (.count.getAggregation) if real-time updates are not required,
+        // or a Cloud Function to maintain a counter document for cheaper real-time counts.
         watchTotalUsersCount: {
             AsyncStream { continuation in
                 let listener = Firestore.firestore()
@@ -76,6 +80,7 @@ extension UserClient: DependencyKey {
                 let queryLowercased = query.lowercased()
                 let snapshot = try await Firestore.firestore()
                     .collection("users")
+                    .limit(to: 50)
                     .getDocuments()
 
                 let allUsers = snapshot.documents.compactMap { doc -> User? in

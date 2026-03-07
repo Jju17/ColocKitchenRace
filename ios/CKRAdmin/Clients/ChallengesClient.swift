@@ -55,7 +55,7 @@ extension ChallengeClient: DependencyKey {
                     try batch.setData(from: response, forDocument: responseRef)
                 }
                 try await batch.commit()
-                Logger.challengeResponseLog.log(level: .info, "Successfully added \(ChallengeResponse.mockList.count) mock challenges")
+                Logger.challengeLog.log(level: .info, "Successfully added \(Challenge.mockList.count) mock challenges")
                 return .success(())
             } catch let error as NSError {
                 Logger.challengeResponseLog.log(level: .fault, "Failed to add mock challenge responses: \(error.localizedDescription)")

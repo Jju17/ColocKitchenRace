@@ -24,22 +24,6 @@ struct CohouseFeature {
         case noCohouse(NoCohouseFeature.Action)
     }
 
-    @Reducer
-    struct Path {
-        @ObservableState
-        enum State {
-            case profile(UserProfileDetailFeature.State)
-        }
-        enum Action {
-            case profile(UserProfileDetailFeature.Action)
-        }
-        var body: some ReducerOf<Self> {
-            Scope(state: \.profile, action: \.profile) {
-                UserProfileDetailFeature()
-            }
-        }
-    }
-
     var body: some ReducerOf<Self> {
         Scope(state: \.noCohouse, action: \.noCohouse) {
             NoCohouseFeature()

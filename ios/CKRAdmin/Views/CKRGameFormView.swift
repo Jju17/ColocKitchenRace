@@ -13,6 +13,7 @@ struct CKRGameFormFeature {
 
     // MARK: - Defaults
 
+    // Note: Date() in static default — acceptable for form initialization, cannot use @Dependency in static context.
     /// Default game date: 2 months from now.
     static func defaultGameDate() -> Date {
         Calendar.current.date(byAdding: .month, value: 2, to: Date()) ?? Date()
@@ -38,6 +39,15 @@ struct CKRGameFormFeature {
         var wipCKRGame: CKRGame
         var isEditing: Bool
 
+        var isValid: Bool {
+            wipCKRGame.maxParticipants > 0
+            && wipCKRGame.pricePerPersonCents > 0
+            && wipCKRGame.nextGameDate > Date()
+            && wipCKRGame.registrationDeadline > Date()
+            && wipCKRGame.registrationDeadline < wipCKRGame.nextGameDate
+            && wipCKRGame.startCKRCountdown < wipCKRGame.registrationDeadline
+        }
+
         /// Create mode — new game with smart defaults.
         init() {
             let gameDate = CKRGameFormFeature.defaultGameDate()
@@ -61,6 +71,7 @@ struct CKRGameFormFeature {
 
     enum Action: BindableAction {
         case binding(BindingAction<State>)
+        case pricePerPersonEurosChanged(Double)
     }
 
     // MARK: - Body
@@ -86,6 +97,9 @@ struct CKRGameFormFeature {
                 if state.wipCKRGame.startCKRCountdown > state.wipCKRGame.registrationDeadline.addingTimeInterval(-Self.minimumDateGap) {
                     state.wipCKRGame.startCKRCountdown = Self.defaultCountdown(for: state.wipCKRGame.registrationDeadline)
                 }
+                return .none
+            case let .pricePerPersonEurosChanged(euros):
+                state.wipCKRGame.pricePerPersonCents = Int((euros * 100).rounded())
                 return .none
             case .binding:
                 return .none
@@ -136,10 +150,7 @@ struct CKRGameFormView: View {
                     Spacer()
                     TextField(
                         "1000",
-                        value: Binding(
-                            get: { store.wipCKRGame.maxParticipants },
-                            set: { store.wipCKRGame.maxParticipants = Int($0) }
-                        ),
+                        value: $store.wipCKRGame.maxParticipants,
                         format: .number
                     )
                     .keyboardType(.numberPad)
@@ -156,7 +167,7 @@ struct CKRGameFormView: View {
                         "5.00",
                         value: Binding(
                             get: { Double(store.wipCKRGame.pricePerPersonCents) / 100.0 },
-                            set: { store.wipCKRGame.pricePerPersonCents = Int(($0 * 100).rounded()) }
+                            set: { store.send(.pricePerPersonEurosChanged($0)) }
                         ),
                         format: .number.precision(.fractionLength(2))
                     )

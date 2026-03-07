@@ -73,13 +73,17 @@ struct CKRGame: Equatable, Hashable, Identifiable, Codable {
         Date() >= startCKRCountdown
     }
 
-    /// Formatted price per person (e.g. "5,00 €").
-    var formattedPricePerPerson: String {
-        let euros = Double(pricePerPersonCents) / 100.0
+    private static let eurFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
         formatter.currencyCode = "EUR"
         formatter.locale = Locale(identifier: "fr_BE")
-        return formatter.string(from: NSNumber(value: euros)) ?? "\(euros) €"
+        return formatter
+    }()
+
+    /// Formatted price per person (e.g. "5,00 €").
+    var formattedPricePerPerson: String {
+        let euros = Double(pricePerPersonCents) / 100.0
+        return Self.eurFormatter.string(from: NSNumber(value: euros)) ?? "\(euros) €"
     }
 }

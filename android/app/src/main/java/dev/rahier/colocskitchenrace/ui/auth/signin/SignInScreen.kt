@@ -23,9 +23,11 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.rahier.colocskitchenrace.R
 import dev.rahier.colocskitchenrace.ui.components.CKRButton
 import dev.rahier.colocskitchenrace.ui.theme.*
 
@@ -54,16 +56,16 @@ fun SignInScreen(
     if (state.showCreateAccountDialog) {
         AlertDialog(
             onDismissRequest = { viewModel.onIntent(SignInIntent.CreateAccountDismissed) },
-            title = { Text("Creer un compte ?") },
-            text = { Text("Aucun compte ne correspond a cet email. Voulez-vous en creer un ?") },
+            title = { Text(stringResource(R.string.create_account_title)) },
+            text = { Text(stringResource(R.string.create_account_message)) },
             confirmButton = {
                 TextButton(onClick = { viewModel.onIntent(SignInIntent.CreateAccountConfirmed) }) {
-                    Text("Oui")
+                    Text(stringResource(R.string.yes))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { viewModel.onIntent(SignInIntent.CreateAccountDismissed) }) {
-                    Text("Non")
+                    Text(stringResource(R.string.no))
                 }
             },
         )
@@ -92,7 +94,7 @@ fun SignInScreen(
         CKRTextField(
             value = state.email,
             onValueChange = { viewModel.onIntent(SignInIntent.EmailChanged(it)) },
-            label = "Email",
+            label = stringResource(R.string.email),
             leadingIcon = { Icon(Icons.Default.Email, contentDescription = null, tint = CkrGray) },
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,
@@ -106,7 +108,7 @@ fun SignInScreen(
         CKRTextField(
             value = state.password,
             onValueChange = { viewModel.onIntent(SignInIntent.PasswordChanged(it)) },
-            label = "Mot de passe",
+            label = stringResource(R.string.password),
             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null, tint = CkrGray) },
             visualTransformation = PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(
@@ -119,7 +121,7 @@ fun SignInScreen(
 
         // Sign in button
         CKRButton(
-            text = "Se connecter",
+            text = stringResource(R.string.sign_in),
             isLoading = state.isLoading,
             onClick = { viewModel.onIntent(SignInIntent.SignInClicked) },
             modifier = Modifier.fillMaxWidth(),
@@ -162,7 +164,7 @@ private fun SocialAuthButtons(
                 color = CkrGray.copy(alpha = 0.4f),
             )
             Text(
-                text = "  ou  ",
+                text = "  ${stringResource(R.string.or)}  ",
                 style = MaterialTheme.typography.bodySmall,
                 color = CkrGray,
             )
@@ -188,7 +190,7 @@ private fun SocialAuthButtons(
             elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp),
         ) {
             Text(
-                text = "Se connecter avec Google",
+                text = stringResource(R.string.sign_in_with_google),
                 style = MaterialTheme.typography.labelLarge,
             )
         }
@@ -208,7 +210,7 @@ private fun SocialAuthButtons(
             ),
         ) {
             Text(
-                text = "Se connecter avec Apple",
+                text = stringResource(R.string.sign_in_with_apple),
                 style = MaterialTheme.typography.labelLarge,
             )
         }

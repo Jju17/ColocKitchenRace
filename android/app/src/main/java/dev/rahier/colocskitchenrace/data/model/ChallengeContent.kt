@@ -1,14 +1,14 @@
 package dev.rahier.colocskitchenrace.data.model
 
 sealed class ChallengeContent {
-    data class Picture(val dummy: Unit = Unit) : ChallengeContent()
+    data object Picture : ChallengeContent()
     data class MultipleChoice(
         val choices: List<String> = listOf("", "", "", ""),
         val correctAnswerIndex: Int? = null,
         val shuffleAnswers: Boolean = true,
     ) : ChallengeContent()
 
-    data class SingleAnswer(val dummy: Unit = Unit) : ChallengeContent()
+    data object SingleAnswer : ChallengeContent()
     data class NoChoice(val text: String = "") : ChallengeContent()
 
     val type: String

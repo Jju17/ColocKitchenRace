@@ -12,11 +12,14 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.rahier.colocskitchenrace.data.model.AuthProvider
+import dev.rahier.colocskitchenrace.data.model.NoAccountException
 import dev.rahier.colocskitchenrace.data.model.User
+import dev.rahier.colocskitchenrace.data.model.UserMapper
 import dev.rahier.colocskitchenrace.data.repository.AuthRepository
 import dev.rahier.colocskitchenrace.data.repository.CohouseRepository
 import dev.rahier.colocskitchenrace.util.Constants
 import dev.rahier.colocskitchenrace.util.DemoMode
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -165,6 +168,10 @@ class AuthRepositoryImpl @Inject constructor(
         return auth.currentUser?.isEmailVerified == true
     }
 
+    override fun hasCurrentFirebaseUser(): Boolean {
+        return auth.currentUser != null
+    }
+
     override fun isEmailVerified(): Boolean {
         return auth.currentUser?.isEmailVerified == true
     }
@@ -219,6 +226,8 @@ class AuthRepositoryImpl @Inject constructor(
             try {
                 val cohouse = cohouseRepository.get(user.cohouseId)
                 cohouseRepository.setCurrentCohouse(cohouse)
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 Log.e("AuthRepo", "Failed to load cohouse during session restore", e)
             }
@@ -296,6 +305,8 @@ class AuthRepositoryImpl @Inject constructor(
             try {
                 val cohouse = cohouseRepository.get(user.cohouseId)
                 cohouseRepository.setCurrentCohouse(cohouse)
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 Log.e("AuthRepo", "Failed to load cohouse", e)
             }
@@ -319,58 +330,7 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     companion object {
-        fun userToMap(user: User): Map<String, Any?> = mapOf(
-            "id" to user.id,
-            "authId" to user.authId,
-            "authProvider" to user.authProvider?.name?.lowercase(),
-            "isAdmin" to user.isAdmin,
-            "isSubscribeToNews" to user.isSubscribeToNews,
-            "firstName" to user.firstName,
-            "lastName" to user.lastName,
-            "phoneNumber" to user.phoneNumber,
-            "email" to user.email,
-            "dietaryPreferences" to user.dietaryPreferences.map { it.toFirestore() },
-            "gender" to user.gender?.name?.lowercase(),
-            "fcmToken" to user.fcmToken,
-            "cohouseId" to user.cohouseId,
-        )
-
-        fun mapToUser(data: Map<String, Any?>, docId: String): User {
-            val prefs = (data["dietaryPreferences"] as? List<*>)
-                ?.mapNotNull { dev.rahier.colocskitchenrace.data.model.DietaryPreference.fromFirestore(it.toString()) }
-                ?.toSet() ?: emptySet()
-
-            return User(
-                id = data["id"] as? String ?: docId,
-                authId = data["authId"] as? String ?: "",
-                authProvider = (data["authProvider"] as? String)?.let {
-                    when (it) {
-                        "email" -> AuthProvider.EMAIL
-                        "google" -> AuthProvider.GOOGLE
-                        "apple" -> AuthProvider.APPLE
-                        else -> null
-                    }
-                },
-                isAdmin = data["isAdmin"] as? Boolean ?: false,
-                isSubscribeToNews = data["isSubscribeToNews"] as? Boolean ?: false,
-                firstName = data["firstName"] as? String ?: "",
-                lastName = data["lastName"] as? String ?: "",
-                phoneNumber = data["phoneNumber"] as? String,
-                email = data["email"] as? String,
-                dietaryPreferences = prefs,
-                gender = (data["gender"] as? String)?.let {
-                    when (it) {
-                        "male" -> dev.rahier.colocskitchenrace.data.model.Gender.MALE
-                        "female" -> dev.rahier.colocskitchenrace.data.model.Gender.FEMALE
-                        "other" -> dev.rahier.colocskitchenrace.data.model.Gender.OTHER
-                        else -> null
-                    }
-                },
-                fcmToken = data["fcmToken"] as? String,
-                cohouseId = data["cohouseId"] as? String,
-            )
-        }
+        fun userToMap(user: User): Map<String, Any?> = UserMapper.toFirestore(user)
+        fun mapToUser(data: Map<String, Any?>, docId: String): User = UserMapper.fromFirestore(data, docId)
     }
 }
-
-class NoAccountException(val email: String) : Exception("No account found for $email")

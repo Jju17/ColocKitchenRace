@@ -7,6 +7,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -14,6 +15,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.stripe.android.paymentsheet.PaymentSheet
 import com.stripe.android.paymentsheet.PaymentSheetResult
 import com.stripe.android.paymentsheet.rememberPaymentSheet
+import dev.rahier.colocskitchenrace.R
 import dev.rahier.colocskitchenrace.ui.components.CKRButton
 import dev.rahier.colocskitchenrace.ui.theme.*
 
@@ -32,6 +34,7 @@ fun PaymentSummaryScreen(
     onBack: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val context = androidx.compose.ui.platform.LocalContext.current
 
     // Stripe PaymentSheet integration
     val paymentSheet = rememberPaymentSheet { result ->
@@ -45,7 +48,7 @@ fun PaymentSummaryScreen(
             is PaymentSheetResult.Failed -> {
                 viewModel.onIntent(
                     PaymentSummaryIntent.PaymentFailed(
-                        result.error.localizedMessage ?: "Erreur de paiement"
+                        result.error.localizedMessage ?: context.getString(R.string.error_payment)
                     )
                 )
             }
@@ -91,10 +94,10 @@ fun PaymentSummaryScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Recapitulatif") },
+                title = { Text(stringResource(R.string.payment_summary_title)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Retour")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -145,7 +148,7 @@ private fun PaymentOrderSummary(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = "Votre commande",
+                    text = stringResource(R.string.your_order),
                     style = MaterialTheme.typography.headlineSmall,
                 )
                 Spacer(modifier = Modifier.height(12.dp))
@@ -154,7 +157,7 @@ private fun PaymentOrderSummary(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Text("Participants", style = MaterialTheme.typography.bodyLarge)
+                    Text(stringResource(R.string.participants), style = MaterialTheme.typography.bodyLarge)
                     Text("$participantCount", style = MaterialTheme.typography.bodyLarge)
                 }
 
@@ -164,7 +167,7 @@ private fun PaymentOrderSummary(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Text("Prix par personne", style = MaterialTheme.typography.bodyMedium, color = CkrGray)
+                    Text(stringResource(R.string.price_per_person), style = MaterialTheme.typography.bodyMedium, color = CkrGray)
                     Text(formattedPricePerPerson, style = MaterialTheme.typography.bodyMedium, color = CkrGray)
                 }
 
@@ -176,7 +179,7 @@ private fun PaymentOrderSummary(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    Text("Total", style = MaterialTheme.typography.headlineSmall)
+                    Text(stringResource(R.string.total), style = MaterialTheme.typography.headlineSmall)
                     Text(formattedTotal, style = MaterialTheme.typography.headlineSmall, color = CkrMint)
                 }
             }
@@ -217,7 +220,7 @@ private fun PaymentActionFooter(
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Preparation du paiement...",
+                text = stringResource(R.string.preparing_payment),
                 style = MaterialTheme.typography.bodySmall,
                 color = CkrGray,
                 modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -228,20 +231,20 @@ private fun PaymentActionFooter(
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Finalisation de l'inscription...",
+                text = stringResource(R.string.finalizing_registration),
                 style = MaterialTheme.typography.bodySmall,
                 color = CkrGray,
                 modifier = Modifier.align(Alignment.CenterHorizontally),
             )
         } else if (hasError && hasPaymentResult) {
             CKRButton(
-                text = "Reessayer l'inscription",
+                text = stringResource(R.string.retry_registration),
                 onClick = onRetry,
                 modifier = Modifier.fillMaxWidth(),
             )
         } else {
             CKRButton(
-                text = "Payer $formattedTotal",
+                text = stringResource(R.string.pay_amount, formattedTotal),
                 onClick = onPay,
                 enabled = hasPaymentResult,
                 modifier = Modifier.fillMaxWidth(),

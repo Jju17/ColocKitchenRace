@@ -30,11 +30,13 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
+import dev.rahier.colocskitchenrace.R
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.rahier.colocskitchenrace.data.model.Challenge
 import dev.rahier.colocskitchenrace.data.model.ChallengeContent
@@ -46,13 +48,6 @@ import dev.rahier.colocskitchenrace.util.DateUtils
 import java.io.File
 import java.util.Date
 import kotlin.math.absoluteValue
-
-enum class ChallengeFilter(val label: String) {
-    ALL("Tous"),
-    TODO("A faire"),
-    WAITING("En attente"),
-    REVIEWED("Evalues"),
-}
 
 // Stable color palette for challenge headers
 private val challengeHeaderColors = listOf(CkrCoral, CkrSky, CkrLavender, CkrMint, CkrGold)
@@ -80,12 +75,12 @@ fun ChallengesScreen(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
-                text = "Challenges",
+                text = stringResource(R.string.challenges_title),
                 style = MaterialTheme.typography.headlineLarge,
                 color = CkrDark,
             )
             IconButton(onClick = onShowLeaderboard) {
-                Icon(Icons.Default.EmojiEvents, contentDescription = "Classement", tint = CkrGray)
+                Icon(Icons.Default.EmojiEvents, contentDescription = stringResource(R.string.leaderboard), tint = CkrGray)
             }
         }
 
@@ -106,7 +101,7 @@ fun ChallengesScreen(
                     color = if (isSelected) CkrMint else CkrOffWhite,
                 ) {
                     Text(
-                        text = filter.label,
+                        text = stringResource(filter.labelResId),
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                         style = MaterialTheme.typography.labelMedium,
                         color = if (isSelected) CkrWhite else CkrDark,
@@ -120,7 +115,7 @@ fun ChallengesScreen(
         // Challenge pager
         if (state.filteredChallenges.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("Aucun challenge", style = MaterialTheme.typography.bodyLarge, color = CkrGray)
+                Text(stringResource(R.string.no_challenges), style = MaterialTheme.typography.bodyLarge, color = CkrGray)
             }
         } else {
             val pagerState = rememberPagerState(pageCount = { state.filteredChallenges.size })
@@ -316,9 +311,9 @@ private fun ChallengeCardHeader(
 
                 // State badge
                 val stateLabel = when (state) {
-                    ChallengeState.ONGOING -> "En cours"
-                    ChallengeState.DONE -> "Termine"
-                    ChallengeState.NOT_STARTED -> "A venir"
+                    ChallengeState.ONGOING -> stringResource(R.string.challenge_state_ongoing)
+                    ChallengeState.DONE -> stringResource(R.string.challenge_state_done)
+                    ChallengeState.NOT_STARTED -> stringResource(R.string.challenge_state_not_started)
                 }
                 Surface(
                     shape = RoundedCornerShape(50),
@@ -409,7 +404,7 @@ private fun ChallengeActionArea(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 TextButton(onClick = onCancel) {
-                    Text("Annuler", color = CkrGray)
+                    Text(stringResource(R.string.cancel), color = CkrGray)
                 }
             }
         }
@@ -422,7 +417,7 @@ private fun ChallengeActionArea(
                 colors = ButtonDefaults.buttonColors(containerColor = CkrMint),
             ) {
                 Text(
-                    text = "Participer",
+                    text = stringResource(R.string.participate),
                     color = CkrWhite,
                     style = MaterialTheme.typography.labelLarge,
                 )
@@ -452,7 +447,7 @@ private fun NoChoiceForm(
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = "Tu as releve le defi ?",
+            text = stringResource(R.string.challenge_question),
             style = MaterialTheme.typography.bodyMedium,
             color = CkrGray,
         )
@@ -469,7 +464,7 @@ private fun NoChoiceForm(
             if (isSubmitting) {
                 CircularProgressIndicator(modifier = Modifier.size(20.dp), color = CkrWhite, strokeWidth = 2.dp)
             } else {
-                Text("C'est fait !", color = CkrWhite, style = MaterialTheme.typography.labelLarge)
+                Text(stringResource(R.string.challenge_completed), color = CkrWhite, style = MaterialTheme.typography.labelLarge)
             }
         }
     }
@@ -486,7 +481,7 @@ private fun SingleAnswerForm(
         OutlinedTextField(
             value = textAnswer,
             onValueChange = onTextChanged,
-            label = { Text("Ta reponse") },
+            label = { Text(stringResource(R.string.your_answer)) },
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(12.dp),
             minLines = 2,
@@ -505,7 +500,7 @@ private fun SingleAnswerForm(
             if (isSubmitting) {
                 CircularProgressIndicator(modifier = Modifier.size(20.dp), color = CkrWhite, strokeWidth = 2.dp)
             } else {
-                Text("Envoyer", color = CkrWhite, style = MaterialTheme.typography.labelLarge)
+                Text(stringResource(R.string.send), color = CkrWhite, style = MaterialTheme.typography.labelLarge)
             }
         }
     }
@@ -579,7 +574,7 @@ private fun MultipleChoiceForm(
             if (isSubmitting) {
                 CircularProgressIndicator(modifier = Modifier.size(20.dp), color = CkrWhite, strokeWidth = 2.dp)
             } else {
-                Text("Envoyer", color = CkrWhite, style = MaterialTheme.typography.labelLarge)
+                Text(stringResource(R.string.send), color = CkrWhite, style = MaterialTheme.typography.labelLarge)
             }
         }
     }
@@ -646,7 +641,7 @@ private fun PictureForm(
             if (bitmap != null) {
                 Image(
                     bitmap = bitmap.asImageBitmap(),
-                    contentDescription = "Photo selectionnee",
+                    contentDescription = stringResource(R.string.selected_photo),
                     modifier = Modifier
                         .fillMaxWidth()
                         .heightIn(max = 200.dp)
@@ -659,7 +654,7 @@ private fun PictureForm(
             Spacer(modifier = Modifier.height(8.dp))
 
             TextButton(onClick = { showPhotoDialog = true }) {
-                Text("Changer la photo", color = CkrSky)
+                Text(stringResource(R.string.change_photo), color = CkrSky)
             }
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -674,7 +669,7 @@ private fun PictureForm(
                 if (isSubmitting) {
                     CircularProgressIndicator(modifier = Modifier.size(20.dp), color = CkrWhite, strokeWidth = 2.dp)
                 } else {
-                    Text("Envoyer la photo", color = CkrWhite, style = MaterialTheme.typography.labelLarge)
+                    Text(stringResource(R.string.send_photo), color = CkrWhite, style = MaterialTheme.typography.labelLarge)
                 }
             }
         } else {
@@ -685,7 +680,7 @@ private fun PictureForm(
             ) {
                 Icon(Icons.Default.PhotoCamera, contentDescription = null)
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("Prendre ou choisir une photo")
+                Text(stringResource(R.string.take_or_choose_photo))
             }
         }
     }
@@ -693,14 +688,14 @@ private fun PictureForm(
     if (showPhotoDialog) {
         AlertDialog(
             onDismissRequest = { showPhotoDialog = false },
-            title = { Text("Choisir une source") },
-            text = { Text("Comment souhaitez-vous ajouter votre photo ?") },
+            title = { Text(stringResource(R.string.choose_source)) },
+            text = { Text(stringResource(R.string.choose_source_message)) },
             confirmButton = {
                 TextButton(onClick = {
                     showPhotoDialog = false
                     cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
                 }) {
-                    Text("Camera")
+                    Text(stringResource(R.string.camera))
                 }
             },
             dismissButton = {
@@ -708,7 +703,7 @@ private fun PictureForm(
                     showPhotoDialog = false
                     galleryLauncher.launch("image/*")
                 }) {
-                    Text("Galerie")
+                    Text(stringResource(R.string.gallery))
                 }
             },
         )
@@ -733,7 +728,7 @@ private fun WaitingReviewSection() {
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = "En attente de validation",
+            text = stringResource(R.string.waiting_review),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
             color = CkrGold,
@@ -742,7 +737,7 @@ private fun WaitingReviewSection() {
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = "Ta reponse a ete envoyee. Un admin va bientot l'evaluer.",
+            text = stringResource(R.string.waiting_review_message),
             style = MaterialTheme.typography.bodySmall,
             color = CkrGray,
         )
@@ -754,11 +749,11 @@ private fun FinalStatusSection(response: ChallengeResponse) {
     val isValidated = response.status == ChallengeResponseStatus.VALIDATED
     val icon = if (isValidated) Icons.Default.CheckCircle else Icons.Default.Cancel
     val color = if (isValidated) CkrMint else CkrCoral
-    val title = if (isValidated) "Valide !" else "Invalide"
+    val title = if (isValidated) stringResource(R.string.status_validated) else stringResource(R.string.status_invalidated)
     val subtitle = if (isValidated) {
-        "Bravo ! Ton defi a ete valide."
+        stringResource(R.string.validated_message)
     } else {
-        "Malheureusement, ta reponse n'a pas ete acceptee."
+        stringResource(R.string.invalidated_message)
     }
 
     Column(
@@ -805,7 +800,7 @@ private fun ChallengeTileCardOngoingPreview() {
                     body = "Prenez une photo de tous les membres de votre coloc dans la cuisine !",
                     startDate = Date(System.currentTimeMillis() - 24 * 3600 * 1000L),
                     endDate = Date(System.currentTimeMillis() + 3 * 24 * 3600 * 1000L),
-                    content = ChallengeContent.Picture(),
+                    content = ChallengeContent.Picture,
                     points = 50,
                 ),
                 hasCohouse = true,

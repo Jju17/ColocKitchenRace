@@ -17,7 +17,7 @@ struct CKRMyPlanning: Equatable, Codable {
 
 /// One step of the evening (apéro or dîner).
 struct PlanningStep: Equatable, Codable, Identifiable {
-    var id: String { "\(role.rawValue)-\(cohouseName)" }
+    let id: UUID = UUID()
     var role: StepRole                  // Are we hosting or visiting?
     var cohouseName: String             // Name of the other cohouse
     var address: String                 // Address where this step takes place
@@ -27,6 +27,23 @@ struct PlanningStep: Equatable, Codable, Identifiable {
     var dietarySummary: [String: Int]   // e.g. ["Végétarien": 2, "Sans gluten": 1]
     var startTime: Date
     var endTime: Date
+
+    private enum CodingKeys: String, CodingKey {
+        case role, cohouseName, address, hostPhone, visitorPhone
+        case totalPeople, dietarySummary, startTime, endTime
+    }
+
+    static func == (lhs: PlanningStep, rhs: PlanningStep) -> Bool {
+        lhs.role == rhs.role &&
+        lhs.cohouseName == rhs.cohouseName &&
+        lhs.address == rhs.address &&
+        lhs.hostPhone == rhs.hostPhone &&
+        lhs.visitorPhone == rhs.visitorPhone &&
+        lhs.totalPeople == rhs.totalPeople &&
+        lhs.dietarySummary == rhs.dietarySummary &&
+        lhs.startTime == rhs.startTime &&
+        lhs.endTime == rhs.endTime
+    }
 }
 
 /// Whether the cohouse hosts (stays home) or visits (goes to the other cohouse).

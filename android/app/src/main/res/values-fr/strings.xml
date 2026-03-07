@@ -1,0 +1,270 @@
+<resources>
+    <!-- App -->
+    <string name="app_name">Colocs Kitchen Race</string>
+
+    <!-- Tabs -->
+    <string name="tab_home">Accueil</string>
+    <string name="tab_challenges">Challenges</string>
+    <string name="tab_planning">Planning</string>
+    <string name="tab_cohouse">Coloc</string>
+
+    <!-- Auth - Sign In -->
+    <string name="sign_in">Se connecter</string>
+    <string name="sign_in_with_google">Se connecter avec Google</string>
+    <string name="sign_in_with_apple">Se connecter avec Apple</string>
+    <string name="email">Email</string>
+    <string name="password">Mot de passe</string>
+    <string name="or">ou</string>
+    <string name="create_account_title">Creer un compte ?</string>
+    <string name="create_account_message">Aucun compte ne correspond a cet email. Tu veux en creer un ?</string>
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
+
+    <!-- Auth - Email Verification -->
+    <string name="verify_email_title">Verifie ton email</string>
+    <string name="verify_email_message">Nous avons envoye un email de verification a %s. Clique sur le lien dans l\'email pour verifier ton adresse.</string>
+    <string name="verify_email_message_short">Nous avons envoye un email de verification. Clique sur le lien dans l\'email pour continuer.</string>
+    <string name="check_verification">J\'ai verifie mon email</string>
+    <string name="resend_email">Renvoyer l\'email</string>
+
+    <!-- Auth - Profile Completion -->
+    <string name="complete_profile">Complete ton profil</string>
+    <string name="profile_info_required">Ces informations sont necessaires pour participer</string>
+    <string name="first_name">Prenom</string>
+    <string name="last_name">Nom</string>
+    <string name="phone_number">Numero de telephone</string>
+
+    <!-- Common Actions -->
+    <string name="cancel">Annuler</string>
+    <string name="confirm">Confirmer</string>
+    <string name="save">Enregistrer</string>
+    <string name="continue_button">Continuer</string>
+    <string name="sign_out">Se deconnecter</string>
+    <string name="delete">Supprimer</string>
+    <string name="retry">Reessayer</string>
+    <string name="loading">Chargement\u2026</string>
+    <string name="back">Retour</string>
+    <string name="edit">Modifier</string>
+    <string name="add">Ajouter</string>
+    <string name="close">Fermer</string>
+    <string name="send">Envoyer</string>
+
+    <!-- Errors -->
+    <string name="error_generic">Une erreur est survenue</string>
+    <string name="error_invalid_credentials">Email ou mot de passe incorrect</string>
+    <string name="error_email_required">L\'email est requis</string>
+    <string name="error_password_required">Le mot de passe est requis</string>
+    <string name="error_fields_required">Remplis tous les champs</string>
+    <string name="error_network">Erreur de connexion reseau. Verifie ta connexion.</string>
+    <string name="error_generic_retry">Une erreur s\'est produite. Reessaie.</string>
+    <string name="error_auth_invalid_email">Adresse email invalide.</string>
+    <string name="error_auth_wrong_password">Mot de passe incorrect.</string>
+    <string name="error_auth_user_not_found">Aucun compte trouve avec cette adresse.</string>
+    <string name="error_auth_user_disabled">Ce compte a ete desactive.</string>
+    <string name="error_auth_too_many_requests">Trop de tentatives. Reessaie plus tard.</string>
+    <string name="error_auth_email_in_use">Cette adresse email est deja utilisee.</string>
+    <string name="error_auth_weak_password">Le mot de passe est trop faible.</string>
+    <string name="error_auth_generic">Erreur d\'authentification. Reessaie.</string>
+    <string name="error_database">Erreur de base de donnees. Reessaie.</string>
+    <string name="error_functions_unauthenticated">Session expiree. Reconnecte-toi.</string>
+    <string name="error_functions_permission_denied">Tu n\'as pas les droits necessaires.</string>
+    <string name="error_functions_not_found">Donnee introuvable.</string>
+    <string name="error_functions_already_exists">Cette inscription existe deja.</string>
+    <string name="error_functions_resource_exhausted">Trop de requetes. Reessaie plus tard.</string>
+    <string name="error_functions_failed_precondition">Operation impossible dans l\'etat actuel.</string>
+    <string name="error_functions_unavailable">Service temporairement indisponible. Reessaie.</string>
+    <string name="error_functions_deadline_exceeded">Le serveur met trop de temps a repondre. Reessaie.</string>
+    <string name="error_functions_invalid_argument">Donnees invalides. Verifie ta saisie.</string>
+    <string name="error_functions_generic">Erreur du serveur. Reessaie.</string>
+    <string name="error_storage_not_found">Fichier introuvable.</string>
+    <string name="error_storage_quota_exceeded">Espace de stockage insuffisant.</string>
+    <string name="error_storage_not_authenticated">Session expiree. Reconnecte-toi.</string>
+    <string name="error_storage_not_authorized">Tu n\'as pas acces a ce fichier.</string>
+    <string name="error_storage_retry_limit">Erreur reseau. Reessaie.</string>
+    <string name="error_storage_canceled">Operation annulee.</string>
+    <string name="error_storage_generic">Erreur lors du transfert de fichier. Reessaie.</string>
+    <string name="error_sign_in">Erreur de connexion</string>
+    <string name="error_sign_in_google">Erreur de connexion Google</string>
+    <string name="error_sign_in_apple">Erreur de connexion Apple</string>
+    <string name="error_create_account">Erreur de creation</string>
+    <string name="error_payment">Erreur de paiement</string>
+    <string name="error_submit_response">Erreur lors de l\'envoi. Reessaie.</string>
+    <string name="error_enter_answer">Entre une reponse</string>
+    <string name="error_select_answer">Choisis une reponse</string>
+    <string name="error_take_photo">Prends ou choisis une photo</string>
+    <string name="error_loading_planning">Erreur lors du chargement du planning</string>
+    <string name="error_email_not_verified">Email pas encore verifie</string>
+    <string name="error_invalid_code">Code invalide ou coloc introuvable</string>
+    <string name="error_quit_cohouse">Erreur en quittant la coloc</string>
+    <string name="error_cohouse_duplicate">Cette coloc existe deja</string>
+    <string name="error_saving">Erreur lors de la sauvegarde</string>
+    <string name="error_reservation">Erreur lors de la reservation</string>
+    <string name="error_payment_id_missing">Erreur : identifiant de paiement manquant</string>
+    <string name="error_payment_confirmation_failed">Paiement reussi mais confirmation echouee. Reessaie.</string>
+    <string name="error_delete_account">Erreur lors de la suppression du compte</string>
+
+    <!-- Cohouse -->
+    <string name="no_cohouse_title">Tu n\'as pas encore de coloc</string>
+    <string name="create_cohouse">Creer une coloc</string>
+    <string name="join_cohouse">Rejoindre une coloc</string>
+    <string name="join">Rejoindre</string>
+    <string name="cohouse_code">Code de la coloc</string>
+    <string name="cohouse_name">Nom de la coloc</string>
+    <string name="cohouse_name_label">Nom</string>
+    <string name="add_cohouse">Ajouter une coloc</string>
+    <string name="edit_cohouse">Modifier la coloc</string>
+    <string name="create_cohouse_button">Creer la coloc</string>
+    <string name="street">Rue</string>
+    <string name="street_and_number">Rue et numero</string>
+    <string name="city">Ville</string>
+    <string name="postal_code">Code postal</string>
+    <string name="country">Pays</string>
+    <string name="members">Membres</string>
+    <string name="members_count">Membres (%d)</string>
+    <string name="quit_cohouse">Quitter la coloc</string>
+    <string name="copy_code">Code copie !</string>
+    <string name="share_code_hint">Partage ce code avec tes colocs</string>
+    <string name="code_label">Code : %s</string>
+    <string name="localisation">LOCALISATION</string>
+    <string name="address_label">Adresse</string>
+    <string name="zip_code_label">Code postal</string>
+    <string name="city_label">Ville</string>
+    <string name="members_section">MEMBRES</string>
+    <string name="admin_badge">Admin</string>
+    <string name="cohouse_photo">Photo de la coloc</string>
+    <string name="default_photo">Photo par defaut</string>
+    <string name="cover_image">Photo de couverture</string>
+    <string name="choose_photo">Choisir une photo</string>
+    <string name="delete_photo">Supprimer la photo</string>
+    <string name="address">Adresse</string>
+    <string name="new_member">Nouveau membre</string>
+    <string name="remove_member">Supprimer</string>
+    <string name="address_validating">Validation de l\'adresse\u2026</string>
+    <string name="address_validated">Adresse validee</string>
+    <string name="address_uncertain">Adresse incertaine</string>
+    <string name="address_not_found">Adresse introuvable</string>
+    <string name="address_suggestion">Suggestion : %1$s, %2$s %3$s</string>
+
+    <!-- Registration -->
+    <string name="register_for_game">S\'inscrire</string>
+    <string name="registration_closed">Inscriptions fermees</string>
+    <string name="registration_title">Inscription</string>
+    <string name="ckr_registration">CKR Registration</string>
+    <string name="registered">Registered!</string>
+    <string name="register_before">Inscris-toi avant le %s</string>
+    <string name="register_your_cohouse">Inscris ta coloc !</string>
+    <string name="who_participates">Qui participe ?</string>
+    <string name="average_age_title">Age moyen de la coloc</string>
+    <string name="average_age_label">Age moyen</string>
+    <string name="cohouse_type_title">Type de coloc</string>
+    <string name="participants_count">%d participant(s)</string>
+    <string name="total_price">Total : %s</string>
+    <string name="continue_to_payment">Continuer vers le paiement</string>
+
+    <!-- Payment -->
+    <string name="payment_summary_title">Recapitulatif</string>
+    <string name="your_order">Ta commande</string>
+    <string name="participants">Participants</string>
+    <string name="price_per_person">Prix par personne</string>
+    <string name="total">Total</string>
+    <string name="preparing_payment">Preparation du paiement\u2026</string>
+    <string name="finalizing_registration">Finalisation de l\'inscription\u2026</string>
+    <string name="retry_registration">Reessayer l\'inscription</string>
+    <string name="pay_amount">Payer %s</string>
+
+    <!-- Planning -->
+    <string name="planning_not_revealed">Le planning n\'est pas encore disponible</string>
+    <string name="host">Hote</string>
+    <string name="visitor">Visiteur</string>
+    <string name="apero">Apero</string>
+    <string name="dinner">Diner</string>
+    <string name="party">Soiree</string>
+    <string name="people_count">%d personnes</string>
+    <string name="host_phone">Hote : %s</string>
+    <string name="visitor_phone">Visiteur : %s</string>
+
+    <!-- Countdown -->
+    <string name="next_edition_in">Prochaine Edition Dans</string>
+    <string name="next_edition">Prochaine Edition</string>
+    <string name="coming_soon">Bientot</string>
+    <string name="stay_tuned">Reste connecte !</string>
+    <string name="countdown_started">C\'est parti !</string>
+    <string name="days">Jours</string>
+    <string name="hours">Heures</string>
+    <string name="minutes">Minutes</string>
+    <string name="seconds">Secondes</string>
+
+    <!-- News -->
+    <string name="news_title">News</string>
+    <string name="no_news">Aucune news pour le moment</string>
+
+    <!-- Challenges -->
+    <string name="challenges_title">Challenges</string>
+    <string name="no_challenges">Aucun challenge</string>
+    <string name="participate">Participer</string>
+    <string name="challenge_state_ongoing">En cours</string>
+    <string name="challenge_state_done">Termine</string>
+    <string name="challenge_state_not_started">A venir</string>
+    <string name="challenge_completed">C\'est fait !</string>
+    <string name="challenge_question">Tu as releve le defi ?</string>
+    <string name="your_answer">Ta reponse</string>
+    <string name="send_photo">Envoyer la photo</string>
+    <string name="take_or_choose_photo">Prendre ou choisir une photo</string>
+    <string name="change_photo">Changer la photo</string>
+    <string name="selected_photo">Photo selectionnee</string>
+    <string name="choose_source">Choisir une source</string>
+    <string name="choose_source_message">Comment souhaites-tu ajouter ta photo ?</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Galerie</string>
+    <string name="waiting_review">En attente de validation</string>
+    <string name="waiting_review_message">Ta reponse a ete envoyee. Un admin va bientot l\'evaluer.</string>
+    <string name="status_validated">Valide !</string>
+    <string name="status_invalidated">Invalide</string>
+    <string name="validated_message">Bravo ! Ton defi a ete valide.</string>
+    <string name="invalidated_message">Malheureusement, ta reponse n\'a pas ete acceptee.</string>
+    <string name="filter_all">Tous</string>
+    <string name="filter_todo">A faire</string>
+    <string name="filter_waiting">En attente</string>
+    <string name="filter_reviewed">Evalues</string>
+
+    <!-- Leaderboard -->
+    <string name="leaderboard">Classement</string>
+    <string name="no_leaderboard">Aucun classement pour le moment</string>
+    <string name="points">points</string>
+    <string name="pts_format">%d pts</string>
+    <string name="challenges_validated">%d defis</string>
+    <string name="challenges_validated_long">%d defis valides</string>
+
+    <!-- Dietary Preferences -->
+    <string name="dietary_vegetarian">Vegetarien</string>
+    <string name="dietary_vegan">Vegan</string>
+    <string name="dietary_gluten_free">Sans gluten</string>
+    <string name="dietary_lactose_free">Sans lactose</string>
+    <string name="dietary_nut_free">Sans noix</string>
+    <string name="dietary_preferences">Preferences alimentaires</string>
+
+    <!-- Cohouse Types -->
+    <string name="cohouse_type_mixed">Mixte</string>
+    <string name="cohouse_type_girls">Filles</string>
+    <string name="cohouse_type_boys">Garcons</string>
+
+    <!-- Profile -->
+    <string name="my_profile">Mon profil</string>
+    <string name="edit_profile">Modifier le profil</string>
+    <string name="profile">Profil</string>
+    <string name="information">Informations</string>
+    <string name="phone_label">Telephone</string>
+    <string name="delete_account">Supprimer mon compte</string>
+    <string name="delete_account_title">Supprimer ton compte ?</string>
+    <string name="delete_account_message">Cette action est irreversible. Toutes tes donnees seront supprimees.</string>
+    <string name="subscribe_news">S\'abonner aux actualites</string>
+    <string name="ckr_section">CKR</string>
+
+    <!-- Support -->
+    <string name="privacy_policy">Politique de confidentialite</string>
+    <string name="contact_support">Contacter le support</string>
+    <string name="support">Support</string>
+
+    <!-- Splash -->
+    <string name="splash_made_with_love">Made with \u2764\uFE0F by Julien</string>
+</resources>

@@ -4,9 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.rahier.colocskitchenrace.data.model.CKRGame
 import dev.rahier.colocskitchenrace.data.model.Cohouse
-import dev.rahier.colocskitchenrace.data.model.News
 import dev.rahier.colocskitchenrace.data.repository.AuthRepository
 import dev.rahier.colocskitchenrace.data.repository.CKRGameRepository
 import dev.rahier.colocskitchenrace.data.repository.CohouseRepository
@@ -20,42 +18,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-data class HomeState(
-    val game: CKRGame? = null,
-    val cohouse: Cohouse? = null,
-    val coverImageData: ByteArray? = null,
-    val news: List<News> = emptyList(),
-    val isRegistered: Boolean = false,
-    val isLoading: Boolean = false,
-) {
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is HomeState) return false
-        return game == other.game &&
-            cohouse == other.cohouse &&
-            (coverImageData?.contentEquals(other.coverImageData ?: byteArrayOf()) ?: (other.coverImageData == null)) &&
-            news == other.news &&
-            isRegistered == other.isRegistered &&
-            isLoading == other.isLoading
-    }
-
-    override fun hashCode(): Int {
-        var result = game?.hashCode() ?: 0
-        result = 31 * result + (cohouse?.hashCode() ?: 0)
-        result = 31 * result + (coverImageData?.contentHashCode() ?: 0)
-        result = 31 * result + news.hashCode()
-        result = 31 * result + isRegistered.hashCode()
-        result = 31 * result + isLoading.hashCode()
-        return result
-    }
-}
-
-sealed class HomeIntent {
-    data object RegisterClicked : HomeIntent()
-    data object ProfileClicked : HomeIntent()
-    data object Refresh : HomeIntent()
-}
-
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val gameRepository: CKRGameRepository,
@@ -66,6 +28,7 @@ class HomeViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(HomeState())
     val state: StateFlow<HomeState> = _state.asStateFlow()
+    private var currentCoverImagePath: String? = null
 
     init {
         // Start real-time game listener — updates currentGame StateFlow automatically
@@ -113,9 +76,12 @@ class HomeViewModel @Inject constructor(
 
     private fun loadCoverImage(cohouse: Cohouse?) {
         val path = cohouse?.coverImagePath ?: run {
+            currentCoverImagePath = null
             _state.update { it.copy(coverImageData = null) }
             return
         }
+        if (path == currentCoverImagePath) return
+        currentCoverImagePath = path
         viewModelScope.launch {
             try {
                 val data = cohouseRepository.loadCoverImage(path)

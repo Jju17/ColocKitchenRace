@@ -34,7 +34,7 @@ struct SingleAnswerView: View {
             }
             .buttonStyle(.plain)
 
-            Button("SUBMIT YOUR NAME") {
+            Button("SUBMIT YOUR ANSWER") {
                 onSubmit(trimmedAnswer)
             }
             .submitButton(isEnabled: !trimmedAnswer.isEmpty, isLoading: isSubmitting)

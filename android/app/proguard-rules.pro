@@ -4,8 +4,7 @@
 # Stripe
 -keep class com.stripe.** { *; }
 
-# Firebase
--keep class com.google.firebase.** { *; }
+# Firebase provides its own consumer ProGuard rules
 -dontwarn com.google.firebase.**
 
 # Firebase Cloud Functions callable data classes
@@ -13,8 +12,7 @@
     @com.google.firebase.firestore.PropertyName *;
 }
 
-# Hilt — keep generated components
--keep class dagger.hilt.** { *; }
+# Hilt provides its own consumer ProGuard rules
 -keep class * extends dagger.hilt.android.internal.managers.ViewComponentManager { *; }
 -dontwarn dagger.hilt.**
 

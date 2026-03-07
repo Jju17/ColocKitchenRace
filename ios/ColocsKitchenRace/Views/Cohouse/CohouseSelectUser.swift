@@ -18,7 +18,7 @@ struct CohouseSelectUserFeature {
         var newUserName = ""
     }
 
-    enum Action: BindableAction, Equatable {
+    enum Action: BindableAction {
         case addUserButtonTapped
         case binding(BindingAction<State>)
     }

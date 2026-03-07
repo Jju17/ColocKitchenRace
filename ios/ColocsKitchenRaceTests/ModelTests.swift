@@ -61,11 +61,11 @@ struct ChallengeModelTests {
         #expect(challenge.hasStarted == false)
     }
 
-    @Test("ChallengeType fromContent and toContent are symmetric")
+    @Test("ChallengeType content.type and toContent are symmetric")
     func challengeTypeSymmetry() {
         for type in ChallengeType.allCases {
             let content = type.toContent()
-            let backToType = ChallengeType.fromContent(content)
+            let backToType = content.type
             #expect(type == backToType)
         }
     }

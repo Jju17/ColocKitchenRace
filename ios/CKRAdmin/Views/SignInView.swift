@@ -16,7 +16,7 @@ struct SignInFeature {
     @ObservableState
     struct State {
         var email: String = ""
-        var error: Error?
+        var error: String?
         var focusedField: SignInField?
         var password: String = ""
     }
@@ -24,7 +24,7 @@ struct SignInFeature {
     enum Action: BindableAction {
         case binding(BindingAction<State>)
         case signinButtonTapped
-        case signinErrorTriggered(Error)
+        case signinErrorTriggered(String)
     }
 
     @Dependency(\.authenticationClient) var authenticationClient
@@ -40,10 +40,10 @@ struct SignInFeature {
                     _ = try await self.authenticationClient.signIn(email: state.email, password: state.password)
                 } catch: { error, send in
                     Logger.authLog.log(level: .fault, "\(error.localizedDescription)")
-                    await send(.signinErrorTriggered(error))
+                    await send(.signinErrorTriggered(error.localizedDescription))
                 }
-            case let .signinErrorTriggered(error):
-                state.error = error
+            case let .signinErrorTriggered(errorMessage):
+                state.error = errorMessage
                 return .none
             }
         }
@@ -78,7 +78,7 @@ struct SignInView: View {
                     }
                     .frame(height: 50)
                     if let error = store.error {
-                        Text("\(error.localizedDescription)")
+                        Text(error)
                             .foregroundStyle(.red)
                             .font(.footnote)
                     }

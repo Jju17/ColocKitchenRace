@@ -4,7 +4,6 @@ import dev.rahier.colocskitchenrace.BuildConfig
 
 object Constants {
     const val FIREBASE_REGION = "europe-west1"
-    const val DEMO_EMAIL = "test_apple@colocskitchenrace.be"
     val STRIPE_PUBLISHABLE_KEY: String = BuildConfig.STRIPE_PUBLISHABLE_KEY
 
     // Firestore collection names
@@ -15,4 +14,7 @@ object Constants {
     const val NEWS_COLLECTION = "news"
     const val REGISTRATIONS_SUBCOLLECTION = "registrations"
     const val RESPONSES_SUBCOLLECTION = "responses"
+
+    // Notification
+    const val NOTIFICATION_CHANNEL_ID = "ckr_notifications"
 }

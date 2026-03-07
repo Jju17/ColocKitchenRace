@@ -17,7 +17,7 @@ struct FullScreenImageView: View {
     @Dependency(\.storageClient) var storageClient
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .topTrailing) {
             Color.black.ignoresSafeArea()
 
             if let image = loadedImage {
@@ -36,7 +36,8 @@ struct FullScreenImageView: View {
                     .background(Color.black.opacity(0.7))
                     .clipShape(Circle())
             }
-            .position(x: UIScreen.main.bounds.width - 40, y: 40)
+            .padding(.trailing, 16)
+            .padding(.top, 16)
         }
         .task {
             await loadImage()

@@ -1,5 +1,7 @@
 package dev.rahier.colocskitchenrace.ui.profile
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -11,11 +13,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.rahier.colocskitchenrace.data.model.DietaryPreference
+import dev.rahier.colocskitchenrace.R
 import dev.rahier.colocskitchenrace.data.model.User
 import dev.rahier.colocskitchenrace.ui.theme.*
 
@@ -40,15 +45,15 @@ fun UserProfileScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Mon profil") },
+                title = { Text(stringResource(R.string.my_profile)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Retour")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 actions = {
                     IconButton(onClick = onNavigateToEdit) {
-                        Icon(Icons.Default.Edit, contentDescription = "Modifier")
+                        Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit))
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -86,10 +91,10 @@ fun UserProfileScreen(
                 colors = CardDefaults.cardColors(containerColor = CkrLavenderLight),
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    ProfileRow("Prenom", user.firstName)
-                    ProfileRow("Nom", user.lastName)
-                    ProfileRow("Email", user.email ?: "-")
-                    ProfileRow("Telephone", user.phoneNumber ?: "-")
+                    ProfileRow(stringResource(R.string.first_name), user.firstName)
+                    ProfileRow(stringResource(R.string.last_name), user.lastName)
+                    ProfileRow(stringResource(R.string.email), user.email ?: "-")
+                    ProfileRow(stringResource(R.string.phone_label), user.phoneNumber ?: "-")
                 }
             }
 
@@ -97,7 +102,7 @@ fun UserProfileScreen(
 
             // Dietary preferences
             if (user.dietaryPreferences.isNotEmpty()) {
-                Text(text = "Preferences alimentaires", style = MaterialTheme.typography.titleMedium)
+                Text(text = stringResource(R.string.dietary_preferences), style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     user.dietaryPreferences.forEach { pref ->
@@ -116,6 +121,34 @@ fun UserProfileScreen(
             }
         }
 
+        // Support section
+        Spacer(modifier = Modifier.height(24.dp))
+        Text(text = stringResource(R.string.support), style = MaterialTheme.typography.titleMedium)
+        Spacer(modifier = Modifier.height(8.dp))
+
+        val context = LocalContext.current
+        OutlinedButton(
+            onClick = {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://colocskitchenrace.be/privacy-policy.html"))
+                context.startActivity(intent)
+            },
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(stringResource(R.string.privacy_policy))
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        OutlinedButton(
+            onClick = {
+                val intent = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:julien@rahier.dev"))
+                context.startActivity(intent)
+            },
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Text(stringResource(R.string.contact_support))
+        }
+
         Spacer(modifier = Modifier.weight(1f))
 
         // Sign out
@@ -124,7 +157,7 @@ fun UserProfileScreen(
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = CkrCoral),
         ) {
-            Text("Se deconnecter", color = CkrWhite)
+            Text(stringResource(R.string.sign_out), color = CkrWhite)
         }
 
         Spacer(modifier = Modifier.height(12.dp))
@@ -135,7 +168,7 @@ fun UserProfileScreen(
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
         ) {
-            Text("Supprimer mon compte")
+            Text(stringResource(R.string.delete_account))
         }
 
         // Delete confirmation dialog
@@ -156,17 +189,17 @@ private fun DeleteAccountDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Supprimer votre compte ?") },
-        text = { Text("Cette action est irreversible. Toutes vos donnees seront supprimees.") },
+        title = { Text(stringResource(R.string.delete_account_title)) },
+        text = { Text(stringResource(R.string.delete_account_message)) },
         confirmButton = {
             TextButton(
                 onClick = onConfirm,
                 colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
-            ) { Text("Supprimer") }
+            ) { Text(stringResource(R.string.delete)) }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Annuler")
+                Text(stringResource(R.string.cancel))
             }
         },
     )

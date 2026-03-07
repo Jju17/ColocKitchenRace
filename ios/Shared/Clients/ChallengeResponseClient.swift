@@ -16,6 +16,7 @@ import os
 enum ChallengeResponseError: Error, Equatable {
     case networkError
     case permissionDenied
+    case notAuthenticated
     case unknown(String)
 
     init(from nsError: NSError) {
@@ -55,6 +56,7 @@ extension ChallengeResponseClient: DependencyKey {
             do {
                 let snapshot = try await Firestore.firestore()
                     .collectionGroup("responses")
+                    .limit(to: 500)
                     .getDocuments()
 
                 let responses = snapshot.documents.compactMap { try? $0.data(as: ChallengeResponse.self) }
@@ -127,16 +129,20 @@ extension ChallengeResponseClient: DependencyKey {
             #endif
 
             do {
+                guard let uid = Auth.auth().currentUser?.uid else {
+                    throw ChallengeResponseError.notAuthenticated
+                }
+
                 let db = Firestore.firestore()
                 let doc = db.collection("challenges")
                     .document(response.challengeId.uuidString)
                     .collection("responses")
                     .document(response.cohouseId)
 
-                try doc.setData(from: response, merge: true)
+                try await doc.setData(from: response, merge: true)
                 try await doc.updateData([
                     "serverTS": FieldValue.serverTimestamp(),
-                    "submittedByAuthId": Auth.auth().currentUser?.uid ?? ""
+                    "submittedByAuthId": uid
                 ])
                 return response
             } catch let error as NSError {
@@ -150,6 +156,9 @@ extension ChallengeResponseClient: DependencyKey {
                 return AsyncStream { continuation in
                     if let response = DemoMode.demoChallengeResponses.first(where: { $0.challengeId == challengeId }) {
                         continuation.yield(response.status)
+                        continuation.finish()
+                    } else {
+                        continuation.finish()
                     }
                 }
             }

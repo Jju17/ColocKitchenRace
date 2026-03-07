@@ -152,9 +152,7 @@ class CKRGameRepositoryImpl @Inject constructor(
     private fun parseISODate(isoString: String?): Date {
         if (isoString == null) return Date()
         return try {
-            val fmt = java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", java.util.Locale.US)
-            fmt.timeZone = java.util.TimeZone.getTimeZone("UTC")
-            fmt.parse(isoString) ?: Date()
+            Date.from(java.time.Instant.parse(isoString))
         } catch (_: Exception) { Date() }
     }
 

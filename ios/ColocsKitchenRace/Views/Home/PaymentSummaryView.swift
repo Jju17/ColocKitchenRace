@@ -47,7 +47,7 @@ struct PaymentSummaryFeature {
         }
     }
 
-    enum Action: Equatable {
+    enum Action {
         case onAppear
         case _paymentIntentCreated(PaymentIntentResult)
         case _paymentIntentFailed(String)
@@ -173,7 +173,10 @@ struct PaymentSummaryFeature {
 
         let gameId = state.gameId
         let cohouseId = state.cohouse.id.uuidString
-        let paymentIntentId = state.paymentIntentId!
+        guard let paymentIntentId = state.paymentIntentId else {
+            state.errorMessage = "Payment intent ID missing"
+            return .none
+        }
 
         return .run { send in
             do {
@@ -287,13 +290,17 @@ struct PaymentSummaryView: View {
 
     // MARK: - Helpers
 
-    static func formattedCents(_ cents: Int) -> String {
-        let euros = Double(cents) / 100.0
+    private static let currencyFormatter: NumberFormatter = {
         let formatter = NumberFormatter()
         formatter.numberStyle = .currency
         formatter.currencyCode = "EUR"
         formatter.locale = Locale(identifier: "fr_BE")
-        return formatter.string(from: NSNumber(value: euros)) ?? "\(euros) €"
+        return formatter
+    }()
+
+    static func formattedCents(_ cents: Int) -> String {
+        let euros = Double(cents) / 100.0
+        return Self.currencyFormatter.string(from: NSNumber(value: euros)) ?? "\(euros) €"
     }
 }
 

@@ -4,7 +4,7 @@ import app.cash.turbine.test
 import dev.rahier.colocskitchenrace.MainDispatcherRule
 import dev.rahier.colocskitchenrace.data.model.User
 import dev.rahier.colocskitchenrace.data.repository.AuthRepository
-import dev.rahier.colocskitchenrace.data.repository.impl.NoAccountException
+import dev.rahier.colocskitchenrace.data.model.NoAccountException
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every

@@ -109,6 +109,7 @@ struct HomeFeature {
         case errorOccurred(String)
     }
 
+    @Dependency(\.date.now) var now
     @Dependency(\.userClient) var userClient
     @Dependency(\.cohouseClient) var cohouseClient
     @Dependency(\.challengeClient) var challengeClient
@@ -263,7 +264,7 @@ struct HomeFeature {
                 case let .matchCohousesCompleted(matchResult):
                     state.isMatchingCohouses = false
                     state.currentGame?.matchedGroups = matchResult.groups
-                    state.currentGame?.matchedAt = Date()
+                    state.currentGame?.matchedAt = now
                     state.destination = .alert(
                         AlertState {
                             TextState("Matching complete!")
@@ -359,7 +360,11 @@ struct HomeFeature {
                     }
                 case .saveEventSettingsCompleted:
                     state.isSavingEventSettings = false
-                    return .none
+                    return .run { send in
+                        if let game = try? await self.ckrClient.getGame().get() {
+                            await send(.ckrGameLoaded(game))
+                        }
+                    }
                 case let .saveEventSettingsFailed(errorMessage):
                     state.isSavingEventSettings = false
                     state.destination = .alert(
@@ -452,7 +457,7 @@ struct HomeFeature {
                 case .revealPlanningCompleted:
                     state.isRevealingPlanning = false
                     state.currentGame?.isRevealed = true
-                    state.currentGame?.revealedAt = Date()
+                    state.currentGame?.revealedAt = now
                     state.destination = .alert(
                         AlertState {
                             TextState("Planning revealed! 🎉")
@@ -648,6 +653,7 @@ struct HomeView: View {
                             Button("Create") {
                                 store.send(.confirmAddCKRGameButtonTapped)
                             }
+                            .disabled(!addNewCKRGameStore.isValid)
                         }
                     }
             }
@@ -669,6 +675,7 @@ struct HomeView: View {
                             Button("Save") {
                                 store.send(.confirmEditCKRGameButtonTapped)
                             }
+                            .disabled(!editCKRGameStore.isValid)
                         }
                     }
             }
@@ -690,6 +697,7 @@ struct HomeView: View {
                             Button("Save") {
                                 store.send(.confirmSaveEventSettings)
                             }
+                            .disabled(!eventSettingsStore.isValid)
                         }
                     }
             }

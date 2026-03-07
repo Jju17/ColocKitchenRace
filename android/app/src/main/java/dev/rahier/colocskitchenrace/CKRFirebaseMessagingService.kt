@@ -1,15 +1,14 @@
 package dev.rahier.colocskitchenrace
 
-import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import dagger.hilt.android.AndroidEntryPoint
 import dev.rahier.colocskitchenrace.data.repository.UserRepository
+import dev.rahier.colocskitchenrace.util.Constants
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -33,20 +32,8 @@ class CKRFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun showNotification(title: String, body: String) {
-        val channelId = "ckr_general"
+        val channelId = Constants.NOTIFICATION_CHANNEL_ID
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-
-        // Create notification channel (required for Android O+)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                channelId,
-                "Colocs Kitchen Race",
-                NotificationManager.IMPORTANCE_HIGH,
-            ).apply {
-                description = "Notifications de la Colocs Kitchen Race"
-            }
-            notificationManager.createNotificationChannel(channel)
-        }
 
         // Tapping the notification opens the app
         val intent = Intent(this, MainActivity::class.java).apply {
@@ -69,6 +56,6 @@ class CKRFirebaseMessagingService : FirebaseMessagingService() {
             .setStyle(NotificationCompat.BigTextStyle().bigText(body))
             .build()
 
-        notificationManager.notify(System.currentTimeMillis().toInt(), notification)
+        notificationManager.notify(System.currentTimeMillis().rem(Int.MAX_VALUE).toInt(), notification)
     }
 }

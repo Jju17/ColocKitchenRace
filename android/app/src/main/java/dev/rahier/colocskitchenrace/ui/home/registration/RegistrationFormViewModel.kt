@@ -1,13 +1,9 @@
 package dev.rahier.colocskitchenrace.ui.home.registration
 
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.rahier.colocskitchenrace.data.model.CKRGame
-import dev.rahier.colocskitchenrace.data.model.Cohouse
 import dev.rahier.colocskitchenrace.data.model.CohouseType
-import dev.rahier.colocskitchenrace.data.model.CohouseUser
 import dev.rahier.colocskitchenrace.data.repository.CKRGameRepository
 import dev.rahier.colocskitchenrace.data.repository.CohouseRepository
 import kotlinx.coroutines.channels.Channel
@@ -17,58 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.text.NumberFormat
-import java.util.Currency
-import java.util.Locale
 import javax.inject.Inject
-
-data class RegistrationFormState(
-    val game: CKRGame? = null,
-    val cohouse: Cohouse? = null,
-    val selectedUserIds: Set<String> = emptySet(),
-    val averageAge: String = "",
-    val cohouseType: CohouseType = CohouseType.MIXED,
-    val isLoading: Boolean = false,
-) {
-    val participants: List<CohouseUser>
-        get() = cohouse?.users ?: emptyList()
-
-    val selectedCount: Int
-        get() = selectedUserIds.size
-
-    val totalPriceCents: Int
-        get() = selectedCount * (game?.pricePerPersonCents ?: 0)
-
-    val formattedTotal: String
-        get() {
-            val euros = totalPriceCents / 100.0
-            val formatter = NumberFormat.getCurrencyInstance(Locale("fr", "BE"))
-            formatter.currency = Currency.getInstance("EUR")
-            return formatter.format(euros)
-        }
-
-    val canContinue: Boolean
-        get() = selectedCount > 0 && averageAge.isNotBlank()
-}
-
-sealed class RegistrationFormIntent {
-    data class ToggleUser(val userId: String) : RegistrationFormIntent()
-    data class AverageAgeChanged(val age: String) : RegistrationFormIntent()
-    data class CohouseTypeChanged(val type: CohouseType) : RegistrationFormIntent()
-    data object ContinueToPayment : RegistrationFormIntent()
-}
-
-sealed class RegistrationFormEffect {
-    data class NavigateToPayment(
-        val gameId: String,
-        val cohouseId: String,
-        val attendingUserIds: List<String>,
-        val averageAge: Int,
-        val cohouseType: String,
-        val totalPriceCents: Int,
-        val participantCount: Int,
-    ) : RegistrationFormEffect()
-}
 
 @HiltViewModel
 class RegistrationFormViewModel @Inject constructor(

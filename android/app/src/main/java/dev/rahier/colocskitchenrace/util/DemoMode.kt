@@ -197,7 +197,7 @@ object DemoMode {
                 startDate = dateOf(2025, 12, 1),
                 endDate = dateOf(2026, 6, 1),
                 body = "Prenez la plus belle photo de groupe de votre coloc et montrez votre esprit d'equipe!",
-                content = ChallengeContent.Picture(),
+                content = ChallengeContent.Picture,
                 points = 10,
             ),
             Challenge(
@@ -227,7 +227,7 @@ object DemoMode {
                 startDate = dateOf(2026, 4, 1),
                 endDate = dateOf(2026, 4, 20),
                 body = "Montrez-nous votre plus beau deguisement de cuisine du monde!",
-                content = ChallengeContent.Picture(),
+                content = ChallengeContent.Picture,
                 points = 15,
             ),
             Challenge(
@@ -236,7 +236,7 @@ object DemoMode {
                 startDate = dateOf(2026, 1, 1),
                 endDate = dateOf(2026, 5, 1),
                 body = "Je suis un ustensile de cuisine. On me tourne mais je ne suis pas une page. Qui suis-je?",
-                content = ChallengeContent.SingleAnswer(),
+                content = ChallengeContent.SingleAnswer,
                 points = 8,
             ),
         )

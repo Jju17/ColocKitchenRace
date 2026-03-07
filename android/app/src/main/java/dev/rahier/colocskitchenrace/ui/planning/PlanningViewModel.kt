@@ -1,11 +1,13 @@
 package dev.rahier.colocskitchenrace.ui.planning
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.rahier.colocskitchenrace.data.model.CKRMyPlanning
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.rahier.colocskitchenrace.data.repository.CKRGameRepository
 import dev.rahier.colocskitchenrace.data.repository.CohouseRepository
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,20 +16,11 @@ import kotlinx.coroutines.launch
 import dev.rahier.colocskitchenrace.util.ErrorMapper
 import javax.inject.Inject
 
-data class PlanningState(
-    val planning: CKRMyPlanning? = null,
-    val isLoading: Boolean = false,
-    val error: String? = null,
-)
-
-sealed class PlanningIntent {
-    data object Retry : PlanningIntent()
-}
-
 @HiltViewModel
 class PlanningViewModel @Inject constructor(
     private val gameRepository: CKRGameRepository,
     private val cohouseRepository: CohouseRepository,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(PlanningState())
@@ -54,8 +47,10 @@ class PlanningViewModel @Inject constructor(
             try {
                 val planning = gameRepository.getMyPlanning(game.id, cohouse.id)
                 _state.update { it.copy(planning = planning, isLoading = false) }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
-                _state.update { it.copy(isLoading = false, error = ErrorMapper.toUserMessage(e)) }
+                _state.update { it.copy(isLoading = false, error = ErrorMapper.toUserMessage(e, context)) }
             }
         }
     }

@@ -52,7 +52,12 @@ extension AuthenticationClient: DependencyKey {
 
             // Force-refresh the ID token so that custom claims (e.g. admin: true)
             // are available immediately for Firestore security rules evaluation.
-            try await authResult.user.getIDTokenResult(forcingRefresh: true)
+            let tokenResult = try await authResult.user.getIDTokenResult(forcingRefresh: true)
+
+            guard tokenResult.claims["admin"] as? Bool == true else {
+                try Auth.auth().signOut()
+                throw AuthError.notAdmin
+            }
 
             let snapshot = try await Firestore.firestore()
                 .collection("users")
@@ -63,11 +68,6 @@ extension AuthenticationClient: DependencyKey {
                 throw AuthError.failed
             }
 
-            guard loggedUser.isAdmin ?? false else {
-                try Auth.auth().signOut()
-                throw AuthError.notAdmin
-            }
-
             return loggedUser
         },
         signOut: {
@@ -75,20 +75,11 @@ extension AuthenticationClient: DependencyKey {
         },
         verifyAdmin: { uid in
             // Force-refresh token to pick up custom claims (admin)
-            if let currentUser = Auth.auth().currentUser {
-                try await currentUser.getIDTokenResult(forcingRefresh: true)
-            }
-
-            let snapshot = try await Firestore.firestore()
-                .collection("users")
-                .whereField("authId", isEqualTo: uid)
-                .getDocuments()
-
-            guard let user = try snapshot.documents.first?.data(as: User.self) else {
+            guard let currentUser = Auth.auth().currentUser else {
                 return false
             }
-
-            return user.isAdmin ?? false
+            let tokenResult = try await currentUser.getIDTokenResult(forcingRefresh: true)
+            return tokenResult.claims["admin"] as? Bool == true
         },
         listenAuthState: {
             AsyncStream { continuation in

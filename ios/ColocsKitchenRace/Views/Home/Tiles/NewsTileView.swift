@@ -40,13 +40,13 @@ struct NewsTileView: View {
                         }
                     }
                     .listStyle(.inset)
-                    .cornerRadius(20)
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
                     .padding()
                 } else {
                     ZStack {
                         Rectangle()
                             .fill(.white)
-                            .cornerRadius(20)
+                            .clipShape(RoundedRectangle(cornerRadius: 20))
                             .padding()
                         Text("No news at the moment")
                             .font(.custom("BaksoSapi", size: 14))

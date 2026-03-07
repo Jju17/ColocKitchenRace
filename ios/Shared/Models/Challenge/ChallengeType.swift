@@ -31,12 +31,4 @@ enum ChallengeType: String, Codable, CaseIterable, Identifiable {
         }
     }
 
-    static func fromContent(_ content: ChallengeContent) -> ChallengeType {
-        switch content {
-            case .picture: return .picture
-            case .multipleChoice: return .multipleChoice
-            case .singleAnswer: return .singleAnswer
-            case .noChoice: return .noChoice
-        }
-    }
 }

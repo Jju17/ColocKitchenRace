@@ -5,6 +5,7 @@
 //  Created by Julien Rahier on 04/11/2023.
 //
 
+import Combine
 import SwiftUI
 
 struct CountdownTileView: View {
@@ -20,11 +21,7 @@ struct CountdownTileView: View {
 
     // MARK: - Private properties
 
-    private var timer: Timer {
-        Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-            self.nowDate = Date()
-        }
-    }
+    private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     private var hasCountdownStarted: Bool {
         guard let countdownStart else { return false }
@@ -53,8 +50,8 @@ struct CountdownTileView: View {
             }
         }
         .frame(height: 230)
-        .onAppear {
-            let _ = self.timer
+        .onReceive(timer) { _ in
+            nowDate = Date()
         }
     }
 

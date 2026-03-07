@@ -25,7 +25,7 @@ struct PictureChoiceFeature {
   }
 
   // MARK: - Action
-  enum Action: BindableAction, Equatable {
+  enum Action: BindableAction {
     case binding(BindingAction<State>)
     case pickTapped                    // opens the source action sheet
     case sourceChosen(State.Source)    // choose camera/library

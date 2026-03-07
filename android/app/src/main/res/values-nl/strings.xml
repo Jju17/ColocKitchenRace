@@ -1,0 +1,270 @@
+<resources>
+    <!-- App -->
+    <string name="app_name">Colocs Kitchen Race</string>
+
+    <!-- Tabs -->
+    <string name="tab_home">Home</string>
+    <string name="tab_challenges">Challenges</string>
+    <string name="tab_planning">Planning</string>
+    <string name="tab_cohouse">Coloc</string>
+
+    <!-- Auth - Sign In -->
+    <string name="sign_in">Inloggen</string>
+    <string name="sign_in_with_google">Inloggen met Google</string>
+    <string name="sign_in_with_apple">Inloggen met Apple</string>
+    <string name="email">E-mail</string>
+    <string name="password">Wachtwoord</string>
+    <string name="or">of</string>
+    <string name="create_account_title">Account aanmaken?</string>
+    <string name="create_account_message">Er is geen account gevonden voor dit e-mailadres. Wil je er een aanmaken?</string>
+    <string name="yes">Ja</string>
+    <string name="no">Nee</string>
+
+    <!-- Auth - Email Verification -->
+    <string name="verify_email_title">Verifieer je e-mail</string>
+    <string name="verify_email_message">We hebben een verificatie-e-mail gestuurd naar %s. Klik op de link in de e-mail om je adres te verifieren.</string>
+    <string name="verify_email_message_short">We hebben een verificatie-e-mail gestuurd. Klik op de link in de e-mail om verder te gaan.</string>
+    <string name="check_verification">Ik heb mijn e-mail geverifieerd</string>
+    <string name="resend_email">E-mail opnieuw versturen</string>
+
+    <!-- Auth - Profile Completion -->
+    <string name="complete_profile">Vul je profiel aan</string>
+    <string name="profile_info_required">Deze gegevens zijn nodig om deel te nemen</string>
+    <string name="first_name">Voornaam</string>
+    <string name="last_name">Achternaam</string>
+    <string name="phone_number">Telefoonnummer</string>
+
+    <!-- Common Actions -->
+    <string name="cancel">Annuleren</string>
+    <string name="confirm">Bevestigen</string>
+    <string name="save">Opslaan</string>
+    <string name="continue_button">Doorgaan</string>
+    <string name="sign_out">Uitloggen</string>
+    <string name="delete">Verwijderen</string>
+    <string name="retry">Opnieuw proberen</string>
+    <string name="loading">Laden\u2026</string>
+    <string name="back">Terug</string>
+    <string name="edit">Bewerken</string>
+    <string name="add">Toevoegen</string>
+    <string name="close">Sluiten</string>
+    <string name="send">Versturen</string>
+
+    <!-- Errors -->
+    <string name="error_generic">Er is een fout opgetreden</string>
+    <string name="error_invalid_credentials">Ongeldig e-mailadres of wachtwoord</string>
+    <string name="error_email_required">E-mail is verplicht</string>
+    <string name="error_password_required">Wachtwoord is verplicht</string>
+    <string name="error_fields_required">Vul alle velden in</string>
+    <string name="error_network">Netwerkfout. Controleer je verbinding.</string>
+    <string name="error_generic_retry">Er is een fout opgetreden. Probeer het opnieuw.</string>
+    <string name="error_auth_invalid_email">Ongeldig e-mailadres.</string>
+    <string name="error_auth_wrong_password">Verkeerd wachtwoord.</string>
+    <string name="error_auth_user_not_found">Geen account gevonden voor dit adres.</string>
+    <string name="error_auth_user_disabled">Dit account is uitgeschakeld.</string>
+    <string name="error_auth_too_many_requests">Te veel pogingen. Probeer het later opnieuw.</string>
+    <string name="error_auth_email_in_use">Dit e-mailadres is al in gebruik.</string>
+    <string name="error_auth_weak_password">Het wachtwoord is te zwak.</string>
+    <string name="error_auth_generic">Authenticatiefout. Probeer het opnieuw.</string>
+    <string name="error_database">Databasefout. Probeer het opnieuw.</string>
+    <string name="error_functions_unauthenticated">Sessie verlopen. Log opnieuw in.</string>
+    <string name="error_functions_permission_denied">Je hebt niet de benodigde rechten.</string>
+    <string name="error_functions_not_found">Gegevens niet gevonden.</string>
+    <string name="error_functions_already_exists">Deze inschrijving bestaat al.</string>
+    <string name="error_functions_resource_exhausted">Te veel verzoeken. Probeer het later opnieuw.</string>
+    <string name="error_functions_failed_precondition">Bewerking niet mogelijk in de huidige status.</string>
+    <string name="error_functions_unavailable">Service tijdelijk niet beschikbaar. Probeer het opnieuw.</string>
+    <string name="error_functions_deadline_exceeded">De server reageert te traag. Probeer het opnieuw.</string>
+    <string name="error_functions_invalid_argument">Ongeldige gegevens. Controleer je invoer.</string>
+    <string name="error_functions_generic">Serverfout. Probeer het opnieuw.</string>
+    <string name="error_storage_not_found">Bestand niet gevonden.</string>
+    <string name="error_storage_quota_exceeded">Onvoldoende opslagruimte.</string>
+    <string name="error_storage_not_authenticated">Sessie verlopen. Log opnieuw in.</string>
+    <string name="error_storage_not_authorized">Je hebt geen toegang tot dit bestand.</string>
+    <string name="error_storage_retry_limit">Netwerkfout. Probeer het opnieuw.</string>
+    <string name="error_storage_canceled">Bewerking geannuleerd.</string>
+    <string name="error_storage_generic">Fout bij bestandsoverdracht. Probeer het opnieuw.</string>
+    <string name="error_sign_in">Inlogfout</string>
+    <string name="error_sign_in_google">Google-inlogfout</string>
+    <string name="error_sign_in_apple">Apple-inlogfout</string>
+    <string name="error_create_account">Fout bij aanmaken account</string>
+    <string name="error_payment">Betaalfout</string>
+    <string name="error_submit_response">Fout bij het versturen. Probeer het opnieuw.</string>
+    <string name="error_enter_answer">Vul een antwoord in</string>
+    <string name="error_select_answer">Kies een antwoord</string>
+    <string name="error_take_photo">Maak of kies een foto</string>
+    <string name="error_loading_planning">Fout bij het laden van de planning</string>
+    <string name="error_email_not_verified">E-mail nog niet geverifieerd</string>
+    <string name="error_invalid_code">Ongeldige code of cohouse niet gevonden</string>
+    <string name="error_quit_cohouse">Fout bij het verlaten van de cohouse</string>
+    <string name="error_cohouse_duplicate">Deze cohouse bestaat al</string>
+    <string name="error_saving">Fout bij het opslaan</string>
+    <string name="error_reservation">Fout bij de reservering</string>
+    <string name="error_payment_id_missing">Fout: betalings-ID ontbreekt</string>
+    <string name="error_payment_confirmation_failed">Betaling geslaagd maar bevestiging mislukt. Probeer het opnieuw.</string>
+    <string name="error_delete_account">Fout bij het verwijderen van het account</string>
+
+    <!-- Cohouse -->
+    <string name="no_cohouse_title">Je hebt nog geen cohouse</string>
+    <string name="create_cohouse">Cohouse aanmaken</string>
+    <string name="join_cohouse">Cohouse vervoegen</string>
+    <string name="join">Vervoegen</string>
+    <string name="cohouse_code">Cohouse-code</string>
+    <string name="cohouse_name">Naam van de cohouse</string>
+    <string name="cohouse_name_label">Naam</string>
+    <string name="add_cohouse">Cohouse toevoegen</string>
+    <string name="edit_cohouse">Cohouse bewerken</string>
+    <string name="create_cohouse_button">Cohouse aanmaken</string>
+    <string name="street">Straat</string>
+    <string name="street_and_number">Straat en nummer</string>
+    <string name="city">Stad</string>
+    <string name="postal_code">Postcode</string>
+    <string name="country">Land</string>
+    <string name="members">Leden</string>
+    <string name="members_count">Leden (%d)</string>
+    <string name="quit_cohouse">Cohouse verlaten</string>
+    <string name="copy_code">Code gekopieerd!</string>
+    <string name="share_code_hint">Deel deze code met je huisgenoten</string>
+    <string name="code_label">Code: %s</string>
+    <string name="localisation">LOCATIE</string>
+    <string name="address_label">Adres</string>
+    <string name="zip_code_label">Postcode</string>
+    <string name="city_label">Stad</string>
+    <string name="members_section">LEDEN</string>
+    <string name="admin_badge">Admin</string>
+    <string name="cohouse_photo">Foto van de cohouse</string>
+    <string name="default_photo">Standaardfoto</string>
+    <string name="cover_image">Omslagfoto</string>
+    <string name="choose_photo">Kies een foto</string>
+    <string name="delete_photo">Foto verwijderen</string>
+    <string name="address">Adres</string>
+    <string name="new_member">Nieuw lid</string>
+    <string name="remove_member">Verwijderen</string>
+    <string name="address_validating">Adres valideren\u2026</string>
+    <string name="address_validated">Adres gevalideerd</string>
+    <string name="address_uncertain">Adres onzeker</string>
+    <string name="address_not_found">Adres niet gevonden</string>
+    <string name="address_suggestion">Suggestie: %1$s, %2$s %3$s</string>
+
+    <!-- Registration -->
+    <string name="register_for_game">Inschrijven</string>
+    <string name="registration_closed">Inschrijvingen gesloten</string>
+    <string name="registration_title">Inschrijving</string>
+    <string name="ckr_registration">CKR Inschrijving</string>
+    <string name="registered">Ingeschreven!</string>
+    <string name="register_before">Schrijf je in voor %s</string>
+    <string name="register_your_cohouse">Schrijf je cohouse in!</string>
+    <string name="who_participates">Wie doet er mee?</string>
+    <string name="average_age_title">Gemiddelde leeftijd van de cohouse</string>
+    <string name="average_age_label">Gemiddelde leeftijd</string>
+    <string name="cohouse_type_title">Type cohouse</string>
+    <string name="participants_count">%d deelnemer(s)</string>
+    <string name="total_price">Totaal: %s</string>
+    <string name="continue_to_payment">Doorgaan naar betaling</string>
+
+    <!-- Payment -->
+    <string name="payment_summary_title">Samenvatting</string>
+    <string name="your_order">Je bestelling</string>
+    <string name="participants">Deelnemers</string>
+    <string name="price_per_person">Prijs per persoon</string>
+    <string name="total">Totaal</string>
+    <string name="preparing_payment">Betaling voorbereiden\u2026</string>
+    <string name="finalizing_registration">Inschrijving afronden\u2026</string>
+    <string name="retry_registration">Inschrijving opnieuw proberen</string>
+    <string name="pay_amount">Betalen %s</string>
+
+    <!-- Planning -->
+    <string name="planning_not_revealed">De planning is nog niet beschikbaar</string>
+    <string name="host">Gastheer</string>
+    <string name="visitor">Bezoeker</string>
+    <string name="apero">Apero</string>
+    <string name="dinner">Diner</string>
+    <string name="party">Feest</string>
+    <string name="people_count">%d personen</string>
+    <string name="host_phone">Gastheer: %s</string>
+    <string name="visitor_phone">Bezoeker: %s</string>
+
+    <!-- Countdown -->
+    <string name="next_edition_in">Volgende Editie Over</string>
+    <string name="next_edition">Volgende Editie</string>
+    <string name="coming_soon">Binnenkort</string>
+    <string name="stay_tuned">Blijf op de hoogte!</string>
+    <string name="countdown_started">Het is zover!</string>
+    <string name="days">Dagen</string>
+    <string name="hours">Uren</string>
+    <string name="minutes">Minuten</string>
+    <string name="seconds">Seconden</string>
+
+    <!-- News -->
+    <string name="news_title">Nieuws</string>
+    <string name="no_news">Geen nieuws op dit moment</string>
+
+    <!-- Challenges -->
+    <string name="challenges_title">Challenges</string>
+    <string name="no_challenges">Geen challenges</string>
+    <string name="participate">Deelnemen</string>
+    <string name="challenge_state_ongoing">Bezig</string>
+    <string name="challenge_state_done">Afgelopen</string>
+    <string name="challenge_state_not_started">Binnenkort</string>
+    <string name="challenge_completed">Gedaan!</string>
+    <string name="challenge_question">Heb je de challenge voltooid?</string>
+    <string name="your_answer">Jouw antwoord</string>
+    <string name="send_photo">Foto versturen</string>
+    <string name="take_or_choose_photo">Foto nemen of kiezen</string>
+    <string name="change_photo">Foto wijzigen</string>
+    <string name="selected_photo">Geselecteerde foto</string>
+    <string name="choose_source">Kies een bron</string>
+    <string name="choose_source_message">Hoe wil je je foto toevoegen?</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Galerij</string>
+    <string name="waiting_review">Wachten op beoordeling</string>
+    <string name="waiting_review_message">Je antwoord is verstuurd. Een admin beoordeelt het binnenkort.</string>
+    <string name="status_validated">Goedgekeurd!</string>
+    <string name="status_invalidated">Afgekeurd</string>
+    <string name="validated_message">Goed gedaan! Je challenge is goedgekeurd.</string>
+    <string name="invalidated_message">Helaas is je antwoord niet geaccepteerd.</string>
+    <string name="filter_all">Alle</string>
+    <string name="filter_todo">Te doen</string>
+    <string name="filter_waiting">In afwachting</string>
+    <string name="filter_reviewed">Beoordeeld</string>
+
+    <!-- Leaderboard -->
+    <string name="leaderboard">Klassement</string>
+    <string name="no_leaderboard">Nog geen klassement</string>
+    <string name="points">punten</string>
+    <string name="pts_format">%d ptn</string>
+    <string name="challenges_validated">%d challenges</string>
+    <string name="challenges_validated_long">%d goedgekeurde challenges</string>
+
+    <!-- Dietary Preferences -->
+    <string name="dietary_vegetarian">Vegetarisch</string>
+    <string name="dietary_vegan">Veganistisch</string>
+    <string name="dietary_gluten_free">Glutenvrij</string>
+    <string name="dietary_lactose_free">Lactosevrij</string>
+    <string name="dietary_nut_free">Notenvrij</string>
+    <string name="dietary_preferences">Dieetvoorkeuren</string>
+
+    <!-- Cohouse Types -->
+    <string name="cohouse_type_mixed">Gemengd</string>
+    <string name="cohouse_type_girls">Meisjes</string>
+    <string name="cohouse_type_boys">Jongens</string>
+
+    <!-- Profile -->
+    <string name="my_profile">Mijn profiel</string>
+    <string name="edit_profile">Profiel bewerken</string>
+    <string name="profile">Profiel</string>
+    <string name="information">Gegevens</string>
+    <string name="phone_label">Telefoon</string>
+    <string name="delete_account">Mijn account verwijderen</string>
+    <string name="delete_account_title">Account verwijderen?</string>
+    <string name="delete_account_message">Deze actie is onomkeerbaar. Al je gegevens worden verwijderd.</string>
+    <string name="subscribe_news">Abonneren op nieuws</string>
+    <string name="ckr_section">CKR</string>
+
+    <!-- Support -->
+    <string name="privacy_policy">Privacybeleid</string>
+    <string name="contact_support">Contact opnemen</string>
+    <string name="support">Ondersteuning</string>
+
+    <!-- Splash -->
+    <string name="splash_made_with_love">Made with \u2764\uFE0F by Julien</string>
+</resources>

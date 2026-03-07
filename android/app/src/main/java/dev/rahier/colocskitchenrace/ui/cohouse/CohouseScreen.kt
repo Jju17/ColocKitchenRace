@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -92,7 +93,7 @@ private fun NoCohouseContent(
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
-            text = "Vous n'avez pas encore de coloc",
+            text = stringResource(R.string.no_cohouse_title),
             style = MaterialTheme.typography.headlineSmall,
             textAlign = TextAlign.Center,
         )
@@ -102,7 +103,7 @@ private fun NoCohouseContent(
         OutlinedTextField(
             value = joinCode,
             onValueChange = onJoinCodeChanged,
-            label = { Text("Code de la coloc") },
+            label = { Text(stringResource(R.string.cohouse_code)) },
             singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.medium,
@@ -111,7 +112,7 @@ private fun NoCohouseContent(
         Spacer(modifier = Modifier.height(12.dp))
 
         CKRButton(
-            text = "Rejoindre",
+            text = stringResource(R.string.join),
             onClick = onJoinClicked,
             isLoading = isLoading,
             enabled = joinCode.isNotBlank(),
@@ -130,7 +131,7 @@ private fun NoCohouseContent(
             modifier = Modifier.fillMaxWidth(),
         ) {
             HorizontalDivider(modifier = Modifier.weight(1f))
-            Text(text = "  ou  ", style = MaterialTheme.typography.bodySmall, color = CkrGray)
+            Text(text = "  ${stringResource(R.string.or)}  ", style = MaterialTheme.typography.bodySmall, color = CkrGray)
             HorizontalDivider(modifier = Modifier.weight(1f))
         }
 
@@ -141,7 +142,7 @@ private fun NoCohouseContent(
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.medium,
         ) {
-            Text("Creer une coloc")
+            Text(stringResource(R.string.create_cohouse))
         }
     }
 }
@@ -184,7 +185,7 @@ private fun CohouseDetailContent(
                 modifier = Modifier.weight(1f),
             )
             IconButton(onClick = onNavigateToEdit) {
-                Icon(Icons.Default.Edit, contentDescription = "Modifier")
+                Icon(Icons.Default.Edit, contentDescription = stringResource(R.string.edit))
             }
         }
 
@@ -222,7 +223,7 @@ private fun CohouseDetailContent(
             onClick = { onIntent(CohouseIntent.QuitClicked) },
             colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
         ) {
-            Text("Quitter la coloc")
+            Text(stringResource(R.string.quit_cohouse))
         }
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -245,7 +246,7 @@ private fun CoverImageSection(state: CohouseState) {
             if (bitmap != null) {
                 Image(
                     bitmap = bitmap.asImageBitmap(),
-                    contentDescription = "Photo de la coloc",
+                    contentDescription = stringResource(R.string.cohouse_photo),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
                 )
@@ -253,7 +254,7 @@ private fun CoverImageSection(state: CohouseState) {
         } else {
             Image(
                 painter = painterResource(id = R.drawable.default_coloc_background),
-                contentDescription = "Photo par defaut",
+                contentDescription = stringResource(R.string.default_photo),
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop,
             )
@@ -279,7 +280,7 @@ private fun CodeCard(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = "Code : $code",
+                    text = stringResource(R.string.code_label, code),
                     style = MaterialTheme.typography.headlineSmall,
                     color = CkrWhite,
                 )
@@ -289,14 +290,14 @@ private fun CodeCard(
                 ) {
                     Icon(
                         Icons.Default.ContentCopy,
-                        contentDescription = "Copier",
+                        contentDescription = stringResource(R.string.copy_code),
                         tint = CkrWhite.copy(alpha = 0.8f),
                         modifier = Modifier.size(20.dp),
                     )
                 }
             }
             Text(
-                text = if (showCopied) "Code copie !" else "Partager ce code avec tes colocs",
+                text = if (showCopied) stringResource(R.string.copy_code) else stringResource(R.string.share_code_hint),
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
                 color = CkrWhite.copy(alpha = 0.85f),
@@ -308,7 +309,7 @@ private fun CodeCard(
 @Composable
 private fun LocalisationSection(cohouse: Cohouse) {
     Text(
-        text = "LOCALISATION",
+        text = stringResource(R.string.localisation),
         style = MaterialTheme.typography.labelLarge,
         color = CkrGray,
         letterSpacing = 1.sp,
@@ -322,11 +323,11 @@ private fun LocalisationSection(cohouse: Cohouse) {
         shape = RoundedCornerShape(12.dp),
     ) {
         Column {
-            AddressRow(label = "Address", value = cohouse.address.street)
+            AddressRow(label = stringResource(R.string.address_label), value = cohouse.address.street)
             HorizontalDivider(color = CkrOffWhite)
-            AddressRow(label = "ZIP Code", value = cohouse.address.postalCode)
+            AddressRow(label = stringResource(R.string.zip_code_label), value = cohouse.address.postalCode)
             HorizontalDivider(color = CkrOffWhite)
-            AddressRow(label = "City", value = cohouse.address.city)
+            AddressRow(label = stringResource(R.string.city_label), value = cohouse.address.city)
         }
     }
 
@@ -389,7 +390,7 @@ private fun AddressRow(label: String, value: String) {
 @Composable
 private fun MembersSection(cohouse: Cohouse) {
     Text(
-        text = "MEMBERS",
+        text = stringResource(R.string.members_section),
         style = MaterialTheme.typography.labelLarge,
         color = CkrGray,
         letterSpacing = 1.sp,
@@ -422,7 +423,7 @@ private fun MembersSection(cohouse: Cohouse) {
                         shape = RoundedCornerShape(8.dp),
                     ) {
                         Text(
-                            text = "Admin",
+                            text = stringResource(R.string.admin_badge),
                             modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp),
                             style = MaterialTheme.typography.labelSmall,
                             color = CkrWhite,

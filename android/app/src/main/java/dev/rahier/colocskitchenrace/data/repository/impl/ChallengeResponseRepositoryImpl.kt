@@ -22,6 +22,7 @@ import javax.inject.Singleton
 class ChallengeResponseRepositoryImpl @Inject constructor(
     private val firestore: FirebaseFirestore,
     private val storage: FirebaseStorage,
+    private val auth: FirebaseAuth,
 ) : ChallengeResponseRepository {
 
     @Suppress("UNCHECKED_CAST")
@@ -73,7 +74,7 @@ class ChallengeResponseRepositoryImpl @Inject constructor(
     override suspend fun submit(response: ChallengeResponse): ChallengeResponse {
         if (DemoMode.isActive) return response
 
-        val data = responseToMap(response)
+        val data = responseToMap(response, auth.currentUser?.uid.orEmpty())
         firestore.collection(Constants.CHALLENGES_COLLECTION)
             .document(response.challengeId)
             .collection(Constants.RESPONSES_SUBCOLLECTION)
@@ -167,7 +168,7 @@ class ChallengeResponseRepositoryImpl @Inject constructor(
             else -> ChallengeResponseStatus.WAITING
         }
 
-        fun responseToMap(response: ChallengeResponse): Map<String, Any?> {
+        fun responseToMap(response: ChallengeResponse, authUid: String): Map<String, Any?> {
             val contentMap = when (response.content) {
                 is ChallengeResponseContent.Picture -> mapOf("picture" to response.content.url)
                 is ChallengeResponseContent.MultipleChoice -> mapOf("multipleChoice" to response.content.selectedIndices)
@@ -183,7 +184,7 @@ class ChallengeResponseRepositoryImpl @Inject constructor(
                 "content" to contentMap,
                 "status" to response.status.name.lowercase(),
                 "submissionDate" to com.google.firebase.firestore.FieldValue.serverTimestamp(),
-                "submittedByAuthId" to (FirebaseAuth.getInstance().currentUser?.uid.orEmpty()),
+                "submittedByAuthId" to authUid,
             )
         }
     }
