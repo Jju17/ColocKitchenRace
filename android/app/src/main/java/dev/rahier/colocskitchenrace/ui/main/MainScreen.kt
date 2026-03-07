@@ -1,5 +1,6 @@
 package dev.rahier.colocskitchenrace.ui.main
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -8,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -28,15 +30,16 @@ import dev.rahier.colocskitchenrace.ui.home.registration.RegistrationFormScreen
 import dev.rahier.colocskitchenrace.ui.planning.PlanningScreen
 import dev.rahier.colocskitchenrace.ui.profile.UserProfileFormScreen
 import dev.rahier.colocskitchenrace.ui.profile.UserProfileScreen
+import dev.rahier.colocskitchenrace.R
 import dev.rahier.colocskitchenrace.ui.theme.CkrGray
 import dev.rahier.colocskitchenrace.ui.theme.CkrLavender
 import dev.rahier.colocskitchenrace.ui.theme.CkrWhite
 
-enum class Tab(val route: String, val label: String, val icon: ImageVector) {
-    HOME("tab_home", "Accueil", Icons.Default.Home),
-    CHALLENGES("tab_challenges", "Challenges", Icons.Default.Star),
-    PLANNING("tab_planning", "Planning", Icons.Default.DateRange),
-    COHOUSE("tab_cohouse", "Coloc", Icons.Default.People),
+enum class Tab(val route: String, @StringRes val labelRes: Int, val icon: ImageVector) {
+    HOME("tab_home", R.string.tab_home, Icons.Default.Home),
+    CHALLENGES("tab_challenges", R.string.tab_challenges, Icons.Default.Star),
+    PLANNING("tab_planning", R.string.tab_planning, Icons.Default.DateRange),
+    COHOUSE("tab_cohouse", R.string.tab_cohouse, Icons.Default.People),
 }
 
 object MainRoutes {
@@ -83,8 +86,8 @@ fun MainScreen(
 
                     tabs.forEach { tab ->
                         NavigationBarItem(
-                            icon = { Icon(tab.icon, contentDescription = tab.label) },
-                            label = { Text(tab.label, style = MaterialTheme.typography.labelSmall) },
+                            icon = { Icon(tab.icon, contentDescription = stringResource(tab.labelRes)) },
+                            label = { Text(stringResource(tab.labelRes), style = MaterialTheme.typography.labelSmall) },
                             selected = currentDestination?.hierarchy?.any { it.route == tab.route } == true,
                             onClick = {
                                 navController.navigate(tab.route) {

@@ -1,6 +1,7 @@
 package dev.rahier.colocskitchenrace.ui.cohouse
 
 import dev.rahier.colocskitchenrace.MainDispatcherRule
+import android.content.Context
 import dev.rahier.colocskitchenrace.data.model.Cohouse
 import dev.rahier.colocskitchenrace.data.model.User
 import dev.rahier.colocskitchenrace.data.repository.AuthRepository
@@ -26,6 +27,7 @@ class CohouseViewModelTest {
 
     private lateinit var cohouseRepository: CohouseRepository
     private lateinit var authRepository: AuthRepository
+    private lateinit var context: Context
 
     private val cohouseFlow = MutableStateFlow<Cohouse?>(null)
 
@@ -33,11 +35,12 @@ class CohouseViewModelTest {
     fun setup() {
         cohouseRepository = mockk(relaxed = true)
         authRepository = mockk(relaxed = true)
+        context = mockk(relaxed = true)
         every { cohouseRepository.currentCohouse } returns cohouseFlow
         every { authRepository.currentUser } returns MutableStateFlow(User(id = "u1"))
     }
 
-    private fun createViewModel() = CohouseViewModel(cohouseRepository, authRepository)
+    private fun createViewModel() = CohouseViewModel(cohouseRepository, authRepository, context)
 
     @Test
     fun `initial state has no cohouse`() = runTest {
@@ -106,7 +109,7 @@ class CohouseViewModelTest {
         viewModel.onIntent(CohouseIntent.JoinClicked)
         advanceUntilIdle()
 
-        assertEquals("Code invalide ou coloc introuvable", viewModel.state.value.error)
+        assertNotNull(viewModel.state.value.error)
         assertFalse(viewModel.state.value.isLoading)
     }
 

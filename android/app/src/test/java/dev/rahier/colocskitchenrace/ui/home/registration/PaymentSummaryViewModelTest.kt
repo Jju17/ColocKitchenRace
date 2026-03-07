@@ -2,6 +2,7 @@ package dev.rahier.colocskitchenrace.ui.home.registration
 
 import app.cash.turbine.test
 import dev.rahier.colocskitchenrace.MainDispatcherRule
+import android.content.Context
 import dev.rahier.colocskitchenrace.data.repository.CKRGameRepository
 import dev.rahier.colocskitchenrace.data.repository.PaymentIntentResult
 import dev.rahier.colocskitchenrace.data.repository.StripeRepository
@@ -24,6 +25,7 @@ class PaymentSummaryViewModelTest {
 
     private lateinit var stripeRepository: StripeRepository
     private lateinit var gameRepository: CKRGameRepository
+    private lateinit var context: Context
 
     private val paymentResult = PaymentIntentResult(
         clientSecret = "secret_123",
@@ -36,9 +38,10 @@ class PaymentSummaryViewModelTest {
     fun setup() {
         stripeRepository = mockk(relaxed = true)
         gameRepository = mockk(relaxed = true)
+        context = mockk(relaxed = true)
     }
 
-    private fun createViewModel() = PaymentSummaryViewModel(stripeRepository, gameRepository)
+    private fun createViewModel() = PaymentSummaryViewModel(stripeRepository, gameRepository, context)
 
     private fun initIntent() = PaymentSummaryIntent.Initialize(
         gameId = "g1",
@@ -140,7 +143,7 @@ class PaymentSummaryViewModelTest {
         viewModel.onIntent(PaymentSummaryIntent.PaymentSucceeded)
         advanceUntilIdle()
 
-        assertEquals("Paiement réussi mais confirmation échouée. Réessayez.", viewModel.state.value.error)
+        assertNotNull(viewModel.state.value.error)
         assertFalse(viewModel.state.value.isConfirming)
     }
 }

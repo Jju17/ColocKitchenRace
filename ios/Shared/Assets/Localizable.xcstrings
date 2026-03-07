@@ -1305,6 +1305,9 @@
         }
       }
     },
+    "Colocs Kitchen Race logo" : {
+
+    },
     "Coming Soon" : {
       "localizations" : {
         "fr" : {
@@ -1433,22 +1436,6 @@
         }
       }
     },
-    "Content" : {
-      "localizations" : {
-        "fr" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Contenu"
-          }
-        },
-        "nl" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Inhoud"
-          }
-        }
-      }
-    },
     "Contact Support" : {
       "localizations" : {
         "fr" : {
@@ -1461,6 +1448,22 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "Contact opnemen"
+          }
+        }
+      }
+    },
+    "Content" : {
+      "localizations" : {
+        "fr" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Contenu"
+          }
+        },
+        "nl" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Inhoud"
           }
         }
       }
@@ -2536,9 +2539,6 @@
           }
         }
       }
-    },
-    "Hello, World!" : {
-      "shouldTranslate" : false
     },
     "History" : {
       "localizations" : {
@@ -5355,6 +5355,7 @@
       }
     },
     "SUBMIT YOUR NAME" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {

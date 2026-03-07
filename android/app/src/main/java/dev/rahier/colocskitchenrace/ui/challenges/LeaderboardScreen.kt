@@ -8,9 +8,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.rahier.colocskitchenrace.R
 import dev.rahier.colocskitchenrace.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -34,7 +36,7 @@ fun LeaderboardBottomSheet(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "Classement",
+                text = stringResource(R.string.leaderboard),
                 style = MaterialTheme.typography.headlineMedium,
                 color = CkrLavender,
             )
@@ -53,7 +55,7 @@ fun LeaderboardBottomSheet(
                     contentAlignment = Alignment.Center,
                 ) {
                     Text(
-                        text = "Aucun classement pour le moment",
+                        text = stringResource(R.string.no_leaderboard),
                         style = MaterialTheme.typography.bodyLarge,
                         color = CkrGray,
                     )
@@ -149,12 +151,12 @@ private fun PodiumSection(
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "${entry.score} pts",
+                                text = stringResource(R.string.pts_format, entry.score),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = colors.getOrElse(index) { CkrGray },
                             )
                             Text(
-                                text = "${entry.validatedCount} defis",
+                                text = stringResource(R.string.challenges_validated, entry.validatedCount),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = CkrGray,
                             )
@@ -199,14 +201,14 @@ private fun LeaderboardRow(
                 Column {
                     Text(text = entry.cohouseName, style = MaterialTheme.typography.bodyLarge)
                     Text(
-                        text = "${entry.validatedCount} defis valides",
+                        text = stringResource(R.string.challenges_validated_long, entry.validatedCount),
                         style = MaterialTheme.typography.bodySmall,
                         color = CkrGray,
                     )
                 }
             }
             Text(
-                text = "${entry.score} pts",
+                text = stringResource(R.string.pts_format, entry.score),
                 style = MaterialTheme.typography.titleMedium,
                 color = CkrLavender,
             )

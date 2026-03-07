@@ -1,6 +1,7 @@
 package dev.rahier.colocskitchenrace.ui.planning
 
 import dev.rahier.colocskitchenrace.MainDispatcherRule
+import android.content.Context
 import dev.rahier.colocskitchenrace.data.model.CKRGame
 import dev.rahier.colocskitchenrace.data.model.CKRMyPlanning
 import dev.rahier.colocskitchenrace.data.model.Cohouse
@@ -26,6 +27,7 @@ class PlanningViewModelTest {
 
     private lateinit var gameRepository: CKRGameRepository
     private lateinit var cohouseRepository: CohouseRepository
+    private lateinit var context: Context
 
     private val gameFlow = MutableStateFlow<CKRGame?>(null)
     private val cohouseFlow = MutableStateFlow<Cohouse?>(null)
@@ -34,11 +36,12 @@ class PlanningViewModelTest {
     fun setup() {
         gameRepository = mockk(relaxed = true)
         cohouseRepository = mockk(relaxed = true)
+        context = mockk(relaxed = true)
         every { gameRepository.currentGame } returns gameFlow
         every { cohouseRepository.currentCohouse } returns cohouseFlow
     }
 
-    private fun createViewModel() = PlanningViewModel(gameRepository, cohouseRepository)
+    private fun createViewModel() = PlanningViewModel(gameRepository, cohouseRepository, context)
 
     @Test
     fun `initial state has no planning`() = runTest {
@@ -106,7 +109,7 @@ class PlanningViewModelTest {
         val viewModel = createViewModel()
         advanceUntilIdle()
 
-        assertEquals("Une erreur s'est produite. Réessayez.", viewModel.state.value.error)
+        assertNotNull(viewModel.state.value.error)
         assertFalse(viewModel.state.value.isLoading)
     }
 }

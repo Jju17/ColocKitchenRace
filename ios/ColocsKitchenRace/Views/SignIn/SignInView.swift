@@ -5,6 +5,7 @@
 //  Created by Julien Rahier on 19/10/2023.
 //
 
+import AuthenticationServices
 import ComposableArchitecture
 import SwiftUI
 import os
@@ -157,25 +158,20 @@ struct SignInView: View {
                             .buttonStyle(.plain)
                             .accessibilityLabel("Sign in with Google")
 
-                            Button {
-                                self.store.send(.appleSigninButtonTapped)
-                            } label: {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "apple.logo")
-                                        .font(.title2)
-                                    Text("Sign in with Apple")
-                                        .fontWeight(.medium)
-                                }
-                                .foregroundStyle(.white)
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 50)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 15, style: .continuous)
-                                        .fill(.black)
-                                )
+                            ZStack {
+                                SignInWithAppleButton(.signIn) { _ in } onCompletion: { _ in }
+                                    .signInWithAppleButtonStyle(.black)
+                                    .frame(height: 50)
+                                    .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+                                    .allowsHitTesting(false)
+
+                                Color.clear
+                                    .contentShape(Rectangle())
+                                    .frame(height: 50)
+                                    .onTapGesture {
+                                        self.store.send(.appleSigninButtonTapped)
+                                    }
                             }
-                            .buttonStyle(.plain)
-                            .accessibilityLabel("Sign in with Apple")
                         }
                         .padding(.top)
                     }

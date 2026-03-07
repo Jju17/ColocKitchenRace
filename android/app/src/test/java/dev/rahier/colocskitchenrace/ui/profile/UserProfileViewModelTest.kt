@@ -2,6 +2,7 @@ package dev.rahier.colocskitchenrace.ui.profile
 
 import app.cash.turbine.test
 import dev.rahier.colocskitchenrace.MainDispatcherRule
+import android.content.Context
 import dev.rahier.colocskitchenrace.data.model.User
 import dev.rahier.colocskitchenrace.data.repository.AuthRepository
 import io.mockk.coEvery
@@ -25,15 +26,17 @@ class UserProfileViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private lateinit var authRepository: AuthRepository
+    private lateinit var context: Context
     private val userFlow = MutableStateFlow<User?>(null)
 
     @Before
     fun setup() {
         authRepository = mockk(relaxed = true)
+        context = mockk(relaxed = true)
         every { authRepository.currentUser } returns userFlow
     }
 
-    private fun createViewModel() = UserProfileViewModel(authRepository)
+    private fun createViewModel() = UserProfileViewModel(authRepository, context)
 
     @Test
     fun `initial state has no user`() = runTest {

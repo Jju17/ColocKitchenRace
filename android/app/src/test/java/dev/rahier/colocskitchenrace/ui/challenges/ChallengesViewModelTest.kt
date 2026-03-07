@@ -2,6 +2,7 @@ package dev.rahier.colocskitchenrace.ui.challenges
 
 import dev.rahier.colocskitchenrace.MainDispatcherRule
 import dev.rahier.colocskitchenrace.data.model.*
+import android.content.Context
 import dev.rahier.colocskitchenrace.data.repository.ChallengeRepository
 import dev.rahier.colocskitchenrace.data.repository.ChallengeResponseRepository
 import dev.rahier.colocskitchenrace.data.repository.CohouseRepository
@@ -28,6 +29,7 @@ class ChallengesViewModelTest {
     private lateinit var challengeRepository: ChallengeRepository
     private lateinit var responseRepository: ChallengeResponseRepository
     private lateinit var cohouseRepository: CohouseRepository
+    private lateinit var context: Context
 
     private val cohouseFlow = MutableStateFlow<Cohouse?>(null)
 
@@ -48,10 +50,11 @@ class ChallengesViewModelTest {
         challengeRepository = mockk(relaxed = true)
         responseRepository = mockk(relaxed = true)
         cohouseRepository = mockk(relaxed = true)
+        context = mockk(relaxed = true)
         every { cohouseRepository.currentCohouse } returns cohouseFlow
     }
 
-    private fun createViewModel() = ChallengesViewModel(challengeRepository, responseRepository, cohouseRepository)
+    private fun createViewModel() = ChallengesViewModel(challengeRepository, responseRepository, cohouseRepository, context)
 
     @Test
     fun `initial state has ALL filter`() = runTest {

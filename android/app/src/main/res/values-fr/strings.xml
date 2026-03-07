@@ -149,8 +149,8 @@
     <string name="register_for_game">S\'inscrire</string>
     <string name="registration_closed">Inscriptions fermees</string>
     <string name="registration_title">Inscription</string>
-    <string name="ckr_registration">CKR Registration</string>
-    <string name="registered">Registered!</string>
+    <string name="ckr_registration">Inscription CKR</string>
+    <string name="registered">Inscrit !</string>
     <string name="register_before">Inscris-toi avant le %s</string>
     <string name="register_your_cohouse">Inscris ta coloc !</string>
     <string name="who_participates">Qui participe ?</string>

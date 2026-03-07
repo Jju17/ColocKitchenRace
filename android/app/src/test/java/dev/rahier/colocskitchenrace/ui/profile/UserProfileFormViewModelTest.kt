@@ -2,6 +2,7 @@ package dev.rahier.colocskitchenrace.ui.profile
 
 import app.cash.turbine.test
 import dev.rahier.colocskitchenrace.MainDispatcherRule
+import android.content.Context
 import dev.rahier.colocskitchenrace.data.model.DietaryPreference
 import dev.rahier.colocskitchenrace.data.model.User
 import dev.rahier.colocskitchenrace.data.repository.AuthRepository
@@ -25,16 +26,18 @@ class UserProfileFormViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private lateinit var authRepository: AuthRepository
+    private lateinit var context: Context
     private val userFlow = MutableStateFlow<User?>(null)
 
     @Before
     fun setup() {
         authRepository = mockk(relaxed = true)
+        context = mockk(relaxed = true)
         every { authRepository.currentUser } returns userFlow
     }
 
     private fun createViewModel(): UserProfileFormViewModel {
-        return UserProfileFormViewModel(authRepository)
+        return UserProfileFormViewModel(authRepository, context)
     }
 
     @Test
@@ -150,7 +153,7 @@ class UserProfileFormViewModelTest {
         viewModel.onIntent(UserProfileFormIntent.Save)
         advanceUntilIdle()
 
-        assertEquals("Erreur lors de la sauvegarde", viewModel.state.value.error)
+        assertNotNull(viewModel.state.value.error)
         assertFalse(viewModel.state.value.isSaving)
     }
 }
