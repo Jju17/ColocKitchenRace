@@ -18,6 +18,7 @@ object DemoMode {
     const val DEMO_EMAIL = "test_apple@colocskitchenrace.be"
 
     /** Whether demo mode is currently active (checked by repositories). */
+    @Volatile
     var isActive: Boolean = false
         private set
 

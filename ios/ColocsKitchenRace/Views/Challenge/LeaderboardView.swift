@@ -32,9 +32,12 @@ struct LeaderboardFeature {
 
     enum Action {
         case onAppear
+        case onDisappear
         case challengesLoaded([Challenge])
         case responsesUpdated([ChallengeResponse])
     }
+
+    private enum CancelID { case responsesListener }
 
     @Dependency(\.challengesClient) var challengesClient
     @Dependency(\.challengeResponseClient) var challengeResponseClient
@@ -57,7 +60,11 @@ struct LeaderboardFeature {
                             await send(.responsesUpdated(responses))
                         }
                     }
+                    .cancellable(id: CancelID.responsesListener, cancelInFlight: true)
                 )
+
+            case .onDisappear:
+                return .cancel(id: CancelID.responsesListener)
 
             case let .challengesLoaded(challenges):
                 state.challenges = challenges
@@ -147,6 +154,7 @@ struct LeaderboardView: View {
         .navigationTitle("Leaderboard")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear { store.send(.onAppear) }
+        .onDisappear { store.send(.onDisappear) }
         .animation(.spring(duration: 0.4), value: store.entries)
     }
 

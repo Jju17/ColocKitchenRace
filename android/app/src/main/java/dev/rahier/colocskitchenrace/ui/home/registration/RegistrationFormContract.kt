@@ -54,4 +54,5 @@ sealed interface RegistrationFormEffect {
         val totalPriceCents: Int,
         val participantCount: Int,
     ) : RegistrationFormEffect
+    data class ShowError(val message: String) : RegistrationFormEffect
 }

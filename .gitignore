@@ -47,3 +47,5 @@ web/node_modules/
 
 # Claude
 .claude/
+.agents/
+skills-lock.json

@@ -27,21 +27,23 @@ class CKRFirebaseMessagingService : FirebaseMessagingService() {
 
         val title = message.notification?.title ?: message.data["title"] ?: return
         val body = message.notification?.body ?: message.data["body"] ?: ""
+        val type = message.data["type"]
 
-        showNotification(title, body)
+        showNotification(title, body, type)
     }
 
-    private fun showNotification(title: String, body: String) {
+    private fun showNotification(title: String, body: String, type: String?) {
         val channelId = Constants.NOTIFICATION_CHANNEL_ID
         val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
 
-        // Tapping the notification opens the app
+        // Tapping the notification opens the app with deep link info
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            type?.let { putExtra(EXTRA_NOTIFICATION_TYPE, it) }
         }
         val pendingIntent = PendingIntent.getActivity(
             this,
-            0,
+            System.currentTimeMillis().rem(Int.MAX_VALUE).toInt(),
             intent,
             PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE,
         )
@@ -57,5 +59,9 @@ class CKRFirebaseMessagingService : FirebaseMessagingService() {
             .build()
 
         notificationManager.notify(System.currentTimeMillis().rem(Int.MAX_VALUE).toInt(), notification)
+    }
+
+    companion object {
+        const val EXTRA_NOTIFICATION_TYPE = "notification_type"
     }
 }

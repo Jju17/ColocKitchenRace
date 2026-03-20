@@ -203,6 +203,14 @@ export const reserveAndCreatePayment = onCall<ReserveAndCreatePaymentRequest>(
     } = parseRequest(reserveAndCreatePaymentSchema, request.data);
     checkRateLimit(request.auth!.uid, "reserveAndCreatePayment", 5, 60_000);
 
+    // Validate that attendingUserIds count matches participantCount
+    if (attendingUserIds.length !== participantCount) {
+      throw new HttpsError(
+        "invalid-argument",
+        `participantCount (${participantCount}) does not match attendingUserIds length (${attendingUserIds.length})`
+      );
+    }
+
     try {
       // Demo mode: creates a Stripe PaymentIntent in test mode for
       // App Store / Play Store review. Bypasses Firestore validation

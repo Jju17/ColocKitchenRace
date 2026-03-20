@@ -233,9 +233,7 @@ export const getCohousesForMap = onCall<GetCohousesForMapRequest>(
           const userNames = usersSnapshot.docs
             .map((userDoc) => {
               const userData = userDoc.data();
-              const first = (userData.firstName as string) || "";
-              const last = (userData.lastName as string) || "";
-              return `${first} ${last}`.trim();
+              return (userData.surname as string) || "";
             })
             .filter((name) => name.length > 0);
 

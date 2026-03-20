@@ -40,8 +40,6 @@ class HomeViewModel @Inject constructor(
 
     fun onIntent(intent: HomeIntent) {
         when (intent) {
-            HomeIntent.RegisterClicked -> {} // TODO: navigate to registration
-            HomeIntent.ProfileClicked -> {} // TODO: navigate to profile
             HomeIntent.Refresh -> refresh()
         }
     }

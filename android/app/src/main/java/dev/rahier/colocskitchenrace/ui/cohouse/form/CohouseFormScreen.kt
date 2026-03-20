@@ -1,5 +1,6 @@
 package dev.rahier.colocskitchenrace.ui.cohouse.form
 
+import android.Manifest
 import android.graphics.BitmapFactory
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,13 +22,23 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 import dev.rahier.colocskitchenrace.data.model.AddressValidationResult
+import dev.rahier.colocskitchenrace.data.model.CohouseType
+import dev.rahier.colocskitchenrace.data.model.IdCardScanResult
 import dev.rahier.colocskitchenrace.data.model.ValidatedAddress
 import dev.rahier.colocskitchenrace.R
 import dev.rahier.colocskitchenrace.ui.components.CKRButton
 import dev.rahier.colocskitchenrace.ui.theme.*
+import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,14 +50,53 @@ fun CohouseFormScreen(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
+    var showCoverPhotoDialog by remember { mutableStateOf(false) }
 
-    val imagePickerLauncher = rememberLauncherForActivityResult(
+    // Camera for cover image
+    val tempCoverFile = remember {
+        val dir = File(context.cacheDir, "cohouse_photos").also { it.mkdirs() }
+        File(dir, "cover_photo.jpg").also { if (!it.exists()) it.createNewFile() }
+    }
+    val tempCoverUri = remember {
+        FileProvider.getUriForFile(context, "${context.packageName}.provider", tempCoverFile)
+    }
+
+    val coverCameraLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success) {
+            context.contentResolver.openInputStream(tempCoverUri)?.use { stream ->
+                val bytes = stream.readBytes()
+                if (bytes.isNotEmpty()) viewModel.onIntent(CohouseFormIntent.CoverImagePicked(bytes))
+            }
+        }
+    }
+
+    val coverGalleryLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
         uri?.let {
-            val bytes = context.contentResolver.openInputStream(it)?.readBytes()
-            if (bytes != null) {
-                viewModel.onIntent(CohouseFormIntent.CoverImagePicked(bytes))
+            context.contentResolver.openInputStream(it)?.use { stream ->
+                val bytes = stream.readBytes()
+                if (bytes.isNotEmpty()) viewModel.onIntent(CohouseFormIntent.CoverImagePicked(bytes))
+            }
+        }
+    }
+
+    val coverCameraPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) coverCameraLauncher.launch(tempCoverUri)
+    }
+
+    // ID card picker (gallery only)
+    val idCardPickerLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            context.contentResolver.openInputStream(it)?.use { stream ->
+                val bytes = stream.readBytes()
+                if (bytes.isNotEmpty()) viewModel.onIntent(CohouseFormIntent.IdCardPicked(bytes))
             }
         }
     }
@@ -97,9 +147,26 @@ fun CohouseFormScreen(
                 shape = MaterialTheme.shapes.medium,
             )
 
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Cohouse type picker
+            Text(text = stringResource(R.string.cohouse_type_title), style = MaterialTheme.typography.titleMedium, color = CkrLavender)
+            Spacer(modifier = Modifier.height(8.dp))
+            SingleChoiceSegmentedButtonRow(modifier = Modifier.fillMaxWidth()) {
+                CohouseType.entries.forEachIndexed { index, type ->
+                    SegmentedButton(
+                        shape = SegmentedButtonDefaults.itemShape(index = index, count = CohouseType.entries.size),
+                        onClick = { viewModel.onIntent(CohouseFormIntent.CohouseTypeChanged(type)) },
+                        selected = state.cohouseType == type,
+                    ) {
+                        Text(type.displayName)
+                    }
+                }
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Cover image
+            // Cover image (CKR-12: camera + gallery)
             Text(text = stringResource(R.string.cover_image), style = MaterialTheme.typography.titleMedium, color = CkrLavender)
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -134,7 +201,7 @@ fun CohouseFormScreen(
                 }
             } else {
                 OutlinedButton(
-                    onClick = { imagePickerLauncher.launch("image/*") },
+                    onClick = { showCoverPhotoDialog = true },
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium,
                 ) {
@@ -181,7 +248,51 @@ fun CohouseFormScreen(
             Spacer(modifier = Modifier.height(8.dp))
             AddressValidationStatus(state)
 
+            // Map picker button (CKR-13) — shown when coordinates are available
+            if (state.latitude != null && state.longitude != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = { viewModel.onIntent(CohouseFormIntent.ShowMapPicker) },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.medium,
+                ) {
+                    Icon(Icons.Default.Place, contentDescription = null)
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(stringResource(R.string.adjust_map_pin))
+                }
+            }
+
             Spacer(modifier = Modifier.height(24.dp))
+
+            // ID card scan (CKR-11) — only for create mode
+            if (!state.isEditMode) {
+                Text(text = stringResource(R.string.scan_id_card), style = MaterialTheme.typography.titleMedium, color = CkrLavender)
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = { idCardPickerLauncher.launch("image/*") },
+                    enabled = !state.isProcessingIdCard,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = MaterialTheme.shapes.medium,
+                ) {
+                    if (state.isProcessingIdCard) {
+                        CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp, color = CkrLavender)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(stringResource(R.string.id_card_scanning))
+                    } else {
+                        Icon(Icons.Default.CreditCard, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(stringResource(R.string.scan_id_card))
+                    }
+                }
+
+                // ID card scan result
+                state.idCardScanResult?.let { result ->
+                    Spacer(modifier = Modifier.height(8.dp))
+                    IdCardScanStatus(result)
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+            }
 
             // Members
             Text(text = stringResource(R.string.members_count, state.members.size), style = MaterialTheme.typography.titleMedium, color = CkrLavender)
@@ -274,6 +385,140 @@ fun CohouseFormScreen(
             )
         }
     }
+
+    // Cover photo source dialog (CKR-12)
+    if (showCoverPhotoDialog) {
+        AlertDialog(
+            onDismissRequest = { showCoverPhotoDialog = false },
+            title = { Text(stringResource(R.string.choose_source)) },
+            text = { Text(stringResource(R.string.choose_source_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showCoverPhotoDialog = false
+                    coverCameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                }) {
+                    Text(stringResource(R.string.camera))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showCoverPhotoDialog = false
+                    coverGalleryLauncher.launch("image/*")
+                }) {
+                    Text(stringResource(R.string.gallery))
+                }
+            },
+        )
+    }
+
+    // Map picker dialog (CKR-13)
+    if (state.showMapPicker && state.latitude != null && state.longitude != null) {
+        MapPickerDialog(
+            latitude = state.latitude!!,
+            longitude = state.longitude!!,
+            onPinMoved = { lat, lng -> viewModel.onIntent(CohouseFormIntent.MapPinMoved(lat, lng)) },
+            onDismiss = { viewModel.onIntent(CohouseFormIntent.DismissMapPicker) },
+        )
+    }
+}
+
+@Composable
+private fun IdCardScanStatus(result: IdCardScanResult) {
+    when (result) {
+        is IdCardScanResult.Valid -> {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                Icon(Icons.Default.CheckCircle, contentDescription = null, tint = CkrMint, modifier = Modifier.size(18.dp))
+                Column {
+                    Text(stringResource(R.string.id_card_valid), style = MaterialTheme.typography.bodySmall, color = CkrMint)
+                    result.info.name?.let { name ->
+                        Text(stringResource(R.string.id_card_name, name), style = MaterialTheme.typography.bodySmall, color = CkrGray)
+                    }
+                }
+            }
+        }
+        is IdCardScanResult.NotAnIdCard -> {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                Icon(Icons.Default.ErrorOutline, contentDescription = null, tint = CkrCoral, modifier = Modifier.size(18.dp))
+                Text(stringResource(R.string.id_card_not_found), style = MaterialTheme.typography.bodySmall, color = CkrCoral)
+            }
+        }
+        is IdCardScanResult.PoorQuality -> {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                Icon(Icons.Default.Warning, contentDescription = null, tint = CkrGold, modifier = Modifier.size(18.dp))
+                Text(stringResource(R.string.id_card_poor_quality), style = MaterialTheme.typography.bodySmall, color = CkrGold)
+            }
+        }
+        is IdCardScanResult.Error -> {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(6.dp),
+            ) {
+                Icon(Icons.Default.ErrorOutline, contentDescription = null, tint = CkrCoral, modifier = Modifier.size(18.dp))
+                Text(stringResource(R.string.id_card_error), style = MaterialTheme.typography.bodySmall, color = CkrCoral)
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MapPickerDialog(
+    latitude: Double,
+    longitude: Double,
+    onPinMoved: (Double, Double) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    val markerState = remember(latitude, longitude) {
+        MarkerState(position = LatLng(latitude, longitude))
+    }
+    val cameraPositionState = rememberCameraPositionState {
+        position = CameraPosition.fromLatLngZoom(LatLng(latitude, longitude), 16f)
+    }
+
+    // Track marker drag
+    LaunchedEffect(markerState.position) {
+        val pos = markerState.position
+        if (pos.latitude != latitude || pos.longitude != longitude) {
+            onPinMoved(pos.latitude, pos.longitude)
+        }
+    }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.map_picker_title)) },
+        text = {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+            ) {
+                GoogleMap(
+                    modifier = Modifier.fillMaxSize(),
+                    cameraPositionState = cameraPositionState,
+                ) {
+                    Marker(
+                        state = markerState,
+                        draggable = true,
+                    )
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.confirm))
+            }
+        },
+    )
 }
 
 @Composable
@@ -325,8 +570,6 @@ private fun AddressValidationStatus(state: CohouseFormState) {
 
 @Composable
 private fun SuggestedAddressCard(suggested: ValidatedAddress, stateProvider: () -> CohouseFormState) {
-    // Note: We can't easily call the viewModel from here without restructuring.
-    // The suggestion is shown but the apply action is handled at the form level.
     Card(
         colors = CardDefaults.cardColors(containerColor = CkrLavenderLight),
         shape = RoundedCornerShape(8.dp),

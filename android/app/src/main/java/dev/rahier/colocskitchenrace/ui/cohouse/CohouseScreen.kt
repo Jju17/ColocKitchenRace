@@ -319,7 +319,7 @@ private fun LocalisationSection(cohouse: Cohouse) {
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = CkrWhite),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         shape = RoundedCornerShape(12.dp),
     ) {
         Column {
@@ -403,7 +403,7 @@ private fun MembersSection(cohouse: Cohouse) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 3.dp),
-            colors = CardDefaults.cardColors(containerColor = CkrWhite),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
             shape = RoundedCornerShape(12.dp),
         ) {
             Row(

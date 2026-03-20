@@ -1,13 +1,15 @@
 package dev.rahier.colocskitchenrace.ui.theme
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Shapes
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 
-private val CKRColorScheme = lightColorScheme(
+private val CKRLightColorScheme = lightColorScheme(
     primary = CkrLavender,
     onPrimary = CkrWhite,
     primaryContainer = CkrLavenderLight,
@@ -29,6 +31,28 @@ private val CKRColorScheme = lightColorScheme(
     outline = CkrGray,
 )
 
+private val CKRDarkColorScheme = darkColorScheme(
+    primary = CkrLavender,
+    onPrimary = CkrWhite,
+    primaryContainer = CkrDarkSurface,
+    onPrimaryContainer = CkrLavenderLight,
+    secondary = CkrMint,
+    onSecondary = CkrWhite,
+    secondaryContainer = CkrDarkSurface,
+    onSecondaryContainer = CkrMintLight,
+    tertiary = CkrCoral,
+    onTertiary = CkrWhite,
+    tertiaryContainer = CkrDarkSurface,
+    onTertiaryContainer = CkrCoralLight,
+    background = CkrDarkBackground,
+    onBackground = CkrWhite,
+    surface = CkrDarkSurface,
+    onSurface = CkrWhite,
+    surfaceVariant = CkrDarkSurface,
+    onSurfaceVariant = CkrGrayLight,
+    outline = CkrGray,
+)
+
 private val CKRShapes = Shapes(
     small = RoundedCornerShape(8.dp),
     medium = RoundedCornerShape(15.dp),
@@ -37,9 +61,14 @@ private val CKRShapes = Shapes(
 )
 
 @Composable
-fun CKRTheme(content: @Composable () -> Unit) {
+fun CKRTheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    content: @Composable () -> Unit,
+) {
+    val colorScheme = if (darkTheme) CKRDarkColorScheme else CKRLightColorScheme
+
     MaterialTheme(
-        colorScheme = CKRColorScheme,
+        colorScheme = colorScheme,
         typography = CKRTypography,
         shapes = CKRShapes,
         content = content,

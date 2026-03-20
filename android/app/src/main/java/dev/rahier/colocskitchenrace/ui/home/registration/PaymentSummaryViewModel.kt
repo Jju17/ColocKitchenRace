@@ -16,9 +16,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import dev.rahier.colocskitchenrace.util.ErrorMapper
 import kotlin.coroutines.cancellation.CancellationException
@@ -131,10 +130,11 @@ class PaymentSummaryViewModel @Inject constructor(
             // immediately reflects "not registered".
             gameRepository.removeCohouseLocally(s.cohouseId)
 
-            // Use an independent scope so the cancellation request outlives
-            // this ViewModel (viewModelScope is already cancelled in onCleared).
-            // SupervisorJob prevents failure propagation from child coroutines.
-            CoroutineScope(SupervisorJob() + Dispatchers.IO).launch {
+            // GlobalScope is intentional: viewModelScope is already cancelled in onCleared,
+            // but we must still notify the backend to release the reserved spot. This fire-and-forget
+            // call is acceptable because the backend also has a TTL-based cleanup (Cloud Task).
+            @OptIn(kotlinx.coroutines.DelicateCoroutinesApi::class)
+            GlobalScope.launch(Dispatchers.IO) {
                 try {
                     gameRepository.cancelReservation(s.gameId, s.cohouseId)
                 } catch (e: CancellationException) {

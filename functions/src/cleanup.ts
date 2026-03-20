@@ -58,7 +58,12 @@ export const releaseExpiredReservation = onTaskDispatched(
     const regRef = gameRef.collection("registrations").doc(cohouseId);
 
     await db.runTransaction(async (transaction) => {
-      const regDoc = await transaction.get(regRef);
+      // Read both docs inside the transaction to ensure consistency.
+      // Firestore transactions require all reads before writes.
+      const [regDoc, gameDoc] = await Promise.all([
+        transaction.get(regRef),
+        transaction.get(gameRef),
+      ]);
 
       // Already deleted (e.g. account deletion, manual cleanup)
       if (!regDoc.exists) {
@@ -75,6 +80,15 @@ export const releaseExpiredReservation = onTaskDispatched(
         console.log(
           `Registration ${cohouseId} in game ${gameId} has status "${regData.status}", skipping`
         );
+        return;
+      }
+
+      // Game already deleted → just delete the orphaned registration
+      if (!gameDoc.exists) {
+        console.warn(
+          `Game ${gameId} not found while releasing reservation for ${cohouseId}, deleting orphaned registration`
+        );
+        transaction.delete(regRef);
         return;
       }
 
@@ -116,7 +130,11 @@ export const cancelReservation = onCall<CancelReservationRequest>(
     const regRef = gameRef.collection("registrations").doc(cohouseId);
 
     await db.runTransaction(async (transaction) => {
-      const regDoc = await transaction.get(regRef);
+      // Read both docs inside the transaction to ensure consistency.
+      const [regDoc, gameDoc] = await Promise.all([
+        transaction.get(regRef),
+        transaction.get(gameRef),
+      ]);
 
       if (!regDoc.exists) {
         console.log(
@@ -127,8 +145,10 @@ export const cancelReservation = onCall<CancelReservationRequest>(
 
       const regData = regDoc.data()!;
 
-      // Verify the caller is the one who reserved this spot
-      if (regData.reservedBy && regData.reservedBy !== request.auth!.uid) {
+      // Verify the caller is the one who reserved this spot.
+      // Treat missing reservedBy as an error — all valid reservations
+      // must have this field set by reserveAndCreatePayment.
+      if (!regData.reservedBy || regData.reservedBy !== request.auth!.uid) {
         throw new HttpsError(
           "permission-denied",
           "You can only cancel your own reservation"
@@ -139,6 +159,15 @@ export const cancelReservation = onCall<CancelReservationRequest>(
         console.log(
           `cancelReservation: registration ${cohouseId} in game ${gameId} has status "${regData.status}", skipping`
         );
+        return;
+      }
+
+      // Game already deleted → just delete the orphaned registration
+      if (!gameDoc.exists) {
+        console.warn(
+          `cancelReservation: game ${gameId} not found, deleting orphaned registration for ${cohouseId}`
+        );
+        transaction.delete(regRef);
         return;
       }
 

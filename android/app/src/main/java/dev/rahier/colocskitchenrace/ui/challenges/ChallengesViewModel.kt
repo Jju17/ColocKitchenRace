@@ -17,6 +17,7 @@ import dev.rahier.colocskitchenrace.data.repository.CohouseRepository
 import dev.rahier.colocskitchenrace.util.ErrorMapper
 import dev.rahier.colocskitchenrace.util.ImageUtils
 import kotlin.coroutines.cancellation.CancellationException
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,6 +37,7 @@ class ChallengesViewModel @Inject constructor(
 
     private val _state = MutableStateFlow(ChallengesState())
     val state: StateFlow<ChallengesState> = _state.asStateFlow()
+    private var responsesListenerJob: Job? = null
 
     init {
         loadChallenges()
@@ -51,7 +53,7 @@ class ChallengesViewModel @Inject constructor(
             is ChallengesIntent.TextAnswerChanged -> _state.update { it.copy(textAnswer = intent.text) }
             is ChallengesIntent.PhotoCaptured -> handlePhotoCaptured(intent.imageData)
             is ChallengesIntent.SubmitResponse -> submitResponse()
-            ChallengesIntent.LeaderboardClicked -> {} // handled by navigation
+            ChallengesIntent.LeaderboardClicked -> {} // No-op: handled directly by MainScreen navigation (onShowLeaderboard callback)
         }
     }
 
@@ -168,12 +170,6 @@ class ChallengesViewModel @Inject constructor(
             try {
                 val challenges = challengeRepository.getAll()
                 _state.update { it.copy(challenges = challenges) }
-
-                val cohouse = cohouseRepository.currentCohouse.value
-                if (cohouse != null) {
-                    val responses = responseRepository.getAllForCohouse(cohouse.id)
-                    _state.update { it.copy(responses = responses) }
-                }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -187,6 +183,39 @@ class ChallengesViewModel @Inject constructor(
         viewModelScope.launch {
             cohouseRepository.currentCohouse.collect { cohouse ->
                 _state.update { it.copy(hasCohouse = cohouse != null) }
+                // Start real-time listener for responses when cohouse is available
+                startResponsesListener(cohouse?.id)
+            }
+        }
+    }
+
+    private fun startResponsesListener(cohouseId: String?) {
+        responsesListenerJob?.cancel()
+        if (cohouseId == null) {
+            _state.update { it.copy(responses = emptyList()) }
+            return
+        }
+        responsesListenerJob = viewModelScope.launch {
+            try {
+                // Initial one-shot load for immediate data
+                val responses = responseRepository.getAllForCohouse(cohouseId)
+                _state.update { it.copy(responses = responses) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.w("ChallengesVM", "Failed to load initial responses", e)
+            }
+            // Real-time listener for status updates (admin validation/invalidation)
+            try {
+                responseRepository.watchAllResponses().collect { responses ->
+                    // Filter to only this cohouse's responses
+                    val cohouseResponses = responses.filter { it.cohouseId == cohouseId }
+                    _state.update { it.copy(responses = cohouseResponses) }
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.w("ChallengesVM", "Responses listener failed", e)
             }
         }
     }

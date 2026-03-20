@@ -33,7 +33,6 @@ struct AdminCKRApp: App {
                     AppFeature()
                 }
             )
-            .preferredColorScheme(.light)
         }
     }
 }

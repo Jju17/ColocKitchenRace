@@ -71,7 +71,7 @@ fun HomeScreen(
             Text(
                 text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.headlineLarge,
-                color = CkrDark,
+                color = MaterialTheme.colorScheme.onSurface,
             )
             IconButton(onClick = onNavigateToProfile) {
                 Icon(
@@ -478,14 +478,20 @@ private fun NewsTile(news: List<News>) {
                         .padding(12.dp),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
+                    var expandedNewsId by remember { mutableStateOf<String?>(null) }
                     news.forEach { item ->
+                        val isExpanded = expandedNewsId == item.id
                         // iOS NewsCell: title (headline), date (caption, gray), body (subheadline)
-                        Column {
+                        Column(
+                            modifier = Modifier.clickable {
+                                expandedNewsId = if (isExpanded) null else item.id
+                            },
+                        ) {
                             Text(
                                 text = item.title,
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = CkrDark,
+                                color = MaterialTheme.colorScheme.onSurface,
                             )
                             Text(
                                 text = DateUtils.formatDate(item.publicationDate),
@@ -495,8 +501,8 @@ private fun NewsTile(news: List<News>) {
                             Text(
                                 text = item.body,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = CkrDark,
-                                maxLines = 3,
+                                color = MaterialTheme.colorScheme.onSurface,
+                                maxLines = if (isExpanded) Int.MAX_VALUE else 3,
                                 overflow = TextOverflow.Ellipsis,
                             )
                         }

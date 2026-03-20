@@ -136,8 +136,12 @@ class AuthRepositoryImpl @Inject constructor(
         )
     }
 
-    override fun signOut() {
-        messaging.unsubscribeFromTopic("all_users")
+    override suspend fun signOut() {
+        try {
+            messaging.unsubscribeFromTopic("all_users").await()
+        } catch (e: Exception) {
+            Log.w("AuthRepo", "Failed to unsubscribe from all_users topic", e)
+        }
         auth.signOut()
         _currentUser.value = null
         cohouseRepository.setCurrentCohouse(null)
@@ -178,12 +182,12 @@ class AuthRepositoryImpl @Inject constructor(
 
     override fun listenAuthState(): Flow<Boolean> = isLoggedIn
 
-    override fun storeFCMToken(token: String) {
+    override suspend fun storeFCMToken(token: String) {
         val user = _currentUser.value ?: return
         firestore.collection(Constants.USERS_COLLECTION)
             .document(user.id)
             .update("fcmToken", token)
-            .addOnFailureListener { Log.e("AuthRepo", "Failed to store FCM token", it) }
+            .await()
     }
 
     override suspend fun restoreSession(): User? {
@@ -234,8 +238,13 @@ class AuthRepositoryImpl @Inject constructor(
         }
 
         // Refresh FCM token
-        messaging.token.addOnSuccessListener { token ->
+        try {
+            val token = messaging.token.await()
             storeFCMToken(token)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Log.e("AuthRepo", "Failed to refresh FCM token", e)
         }
 
         return user
@@ -313,8 +322,13 @@ class AuthRepositoryImpl @Inject constructor(
         }
 
         // Store FCM token
-        messaging.token.addOnSuccessListener { token ->
+        try {
+            val token = messaging.token.await()
             storeFCMToken(token)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Log.e("AuthRepo", "Failed to store FCM token", e)
         }
 
         return user

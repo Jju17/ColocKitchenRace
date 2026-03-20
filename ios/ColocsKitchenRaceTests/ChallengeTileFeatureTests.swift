@@ -435,7 +435,7 @@ struct ChallengeTileFeatureTests {
         }
 
         // First: upload finishes
-        let expectedPath = "challenges/\(challenge.id)/responses/\(response.id).jpg"
+        let expectedPath = "challenges/\(challenge.id)/responses/\(response.cohouseId).jpg"
         await store.receive(\._uploadFinished)
 
         // Then: submit finishes

@@ -39,7 +39,20 @@ export const deleteAccount = onCall<DeleteAccountRequest>(
       const userDoc = await db.collection("users").doc(userId).get();
 
       if (!userDoc.exists) {
-        throw new HttpsError("not-found", "User not found");
+        // Idempotent retry path: user doc already deleted (e.g. partial
+        // previous run). Still attempt to delete the Auth account so the
+        // caller isn't stuck with an orphaned Auth record.
+        console.warn(`User document users/${userId} not found — attempting Auth account cleanup`);
+        try {
+          await admin.auth().deleteUser(request.auth!.uid);
+          console.log(`Deleted orphaned Firebase Auth account: ${request.auth!.uid}`);
+        } catch (authError: unknown) {
+          const code = (authError as { code?: string }).code;
+          if (code !== "auth/user-not-found") {
+            console.error("Failed to delete Auth account during idempotent retry:", authError);
+          }
+        }
+        return { success: true };
       }
 
       const userData = userDoc.data()!;
@@ -62,8 +75,17 @@ export const deleteAccount = onCall<DeleteAccountRequest>(
       console.log(`Deleted user document: users/${userId}`);
 
       // 4. Delete the Firebase Auth account
-      await admin.auth().deleteUser(authUid);
-      console.log(`Deleted Firebase Auth account: ${authUid}`);
+      try {
+        await admin.auth().deleteUser(authUid);
+        console.log(`Deleted Firebase Auth account: ${authUid}`);
+      } catch (authError: unknown) {
+        const code = (authError as { code?: string }).code;
+        if (code === "auth/user-not-found") {
+          console.warn(`Auth account ${authUid} already deleted, skipping`);
+        } else {
+          throw authError;
+        }
+      }
 
       console.log(`Account deletion complete for user ${userId} (auth: ${authUid})`);
       return { success: true };

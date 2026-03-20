@@ -106,7 +106,8 @@ struct ChallengeTileFeature {
                     switch payload {
                         case let .picture(data):
                             // 1) upload → _uploadFinished → 2) submit to Firestore
-                            let path = "challenges/\(current.challengeId)/responses/\(current.id).jpg"
+                            // Use cohouseId (not current.id) for a stable, deterministic storage path
+                            let path = "challenges/\(current.challengeId)/responses/\(current.cohouseId).jpg"
                             return .run { send in
                                 do {
                                     _ = try await storageClient.uploadImage(data, path)

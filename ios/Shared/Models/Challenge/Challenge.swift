@@ -62,12 +62,13 @@ extension Challenge {
     }
 }
 
+#if DEBUG
 extension Challenge {
     static let mock = Challenge(
         id: UUID(),
         title: "Community Kickoff Challenge",
-        startDate: Date.from(year: 2024, month: 5, day: 14, hour: 9), // Today, May 14, 2025
-        endDate: Date.from(year: 2026, month: 5, day: 15, hour: 23), // Tomorrow
+        startDate: Date.from(year: 2024, month: 5, day: 14, hour: 9),
+        endDate: Date.from(year: 2026, month: 5, day: 15, hour: 23),
         body: "Join the coloc kitchen race by registering your cohouse today!",
         content: .noChoice(NoChoiceContent())
     )
@@ -143,3 +144,4 @@ extension Challenge {
         )
     ]
 }
+#endif

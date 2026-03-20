@@ -48,8 +48,10 @@ class UserProfileViewModel @Inject constructor(
     }
 
     private fun signOut() {
-        authRepository.signOut()
-        viewModelScope.launch { _effect.send(UserProfileEffect.SignedOut) }
+        viewModelScope.launch {
+            authRepository.signOut()
+            _effect.send(UserProfileEffect.SignedOut)
+        }
     }
 
     private fun deleteAccount() {

@@ -32,7 +32,9 @@ struct CKREventSettings: Equatable, Hashable, Codable {
 /// - Apéro: A → B (A cooks at B), C → D (C cooks at D)
 /// - Dîner: C → A (C cooks at A), D → B (D cooks at B)
 struct GroupPlanning: Equatable, Hashable, Codable, Identifiable {
-    var id: UUID = UUID()
+    /// Stable ID derived from groupIndex to ensure consistent Equatable conformance
+    /// across Firestore decodes (UUID() would produce different values each time).
+    var id: String { "group-\(groupIndex)" }
     var groupIndex: Int        // 1-based group number
     var cohouseA: String       // cohouseId assigned role A
     var cohouseB: String       // cohouseId assigned role B

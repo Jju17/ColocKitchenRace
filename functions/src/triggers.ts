@@ -85,12 +85,12 @@ export const onChallengeCreated = onDocumentCreated(
       const message: admin.messaging.Message = {
         topic: "all_users",
         notification: {
-          title: `🏆 New challenge: ${title}`,
+          title: `🏆 Nouveau challenge : ${title}`,
           body: body
             ? body.length > 100
               ? body.substring(0, 100) + "..."
               : body
-            : "A new challenge is available!",
+            : "Un nouveau challenge est disponible !",
         },
         data: {
           type: "challenge",
@@ -134,8 +134,10 @@ export const checkChallengeSchedules = onSchedule(
   async () => {
     const now = new Date();
     const fiveMinAgo = new Date(now.getTime() - 5 * 60 * 1000);
-    const twentyFiveMinFromNow = new Date(now.getTime() + 25 * 60 * 1000);
-    const thirtyMinFromNow = new Date(now.getTime() + 30 * 60 * 1000);
+    // Widened from 5 minutes to 15 minutes to tolerate scheduler jitter.
+    // The deduplication marker prevents double-sends.
+    const twentyMinFromNow = new Date(now.getTime() + 20 * 60 * 1000);
+    const thirtyFiveMinFromNow = new Date(now.getTime() + 35 * 60 * 1000);
 
     try {
       // 1. Check for challenges that just started
@@ -146,98 +148,137 @@ export const checkChallengeSchedules = onSchedule(
         .get();
 
       for (const doc of startedSnapshot.docs) {
-        const challengeId = doc.id;
-        const data = doc.data();
-        const title = data.title as string;
-        const endDate = (data.endDate as admin.firestore.Timestamp).toDate();
+        try {
+          const challengeId = doc.id;
+          const data = doc.data();
+          const title = data.title as string;
 
-        // Check if we already sent this notification
-        const markerRef = db
-          .collection("challenges")
-          .doc(challengeId)
-          .collection("notifications")
-          .doc("started");
+          // Null-safe endDate: use fallback string if endDate is missing
+          const endDateRaw = data.endDate as admin.firestore.Timestamp | undefined;
+          const endDateStr = endDateRaw
+            ? endDateRaw.toDate().toLocaleString("fr-BE", {
+                day: "numeric",
+                month: "short",
+                hour: "2-digit",
+                minute: "2-digit",
+              })
+            : "la date limite";
 
-        const marker = await markerRef.get();
-        if (marker.exists) continue;
+          // Deduplicate using transaction: create() fails if doc already exists
+          const markerRef = db
+            .collection("challenges")
+            .doc(challengeId)
+            .collection("notifications")
+            .doc("started");
 
-        // Send notification
-        const message: admin.messaging.Message = {
-          topic: "all_users",
-          notification: {
-            title: `🟢 ${title} has started!`,
-            body: `You have until ${endDate.toLocaleString("fr-BE", {
-              day: "numeric",
-              month: "short",
-              hour: "2-digit",
-              minute: "2-digit",
-            })} to complete it.`,
-          },
-          data: {
-            type: "challenge_started",
-            challengeId: challengeId,
-          },
-          apns: {
-            payload: {
-              aps: {
-                sound: "default",
-                badge: 1,
+          let alreadySent = false;
+          try {
+            await db.runTransaction(async (transaction) => {
+              const marker = await transaction.get(markerRef);
+              if (marker.exists) {
+                alreadySent = true;
+                return;
+              }
+              transaction.create(markerRef, { sentAt: admin.firestore.FieldValue.serverTimestamp() });
+            });
+          } catch (error) {
+            // create() throws if doc was created by a concurrent invocation
+            console.log(`Marker already exists for challenge started: ${challengeId}, skipping`);
+            continue;
+          }
+          if (alreadySent) continue;
+
+          // Send notification
+          const message: admin.messaging.Message = {
+            topic: "all_users",
+            notification: {
+              title: `🟢 ${title} a commence !`,
+              body: `Vous avez jusqu'au ${endDateStr} pour le completer.`,
+            },
+            data: {
+              type: "challenge_started",
+              challengeId: challengeId,
+            },
+            apns: {
+              payload: {
+                aps: {
+                  sound: "default",
+                  badge: 1,
+                },
               },
             },
-          },
-        };
+          };
 
-        await messaging.send(message);
-        await markerRef.set({ sentAt: admin.firestore.FieldValue.serverTimestamp() });
-        console.log(`Challenge started notification sent for: ${title} (${challengeId})`);
+          await messaging.send(message);
+          console.log(`Challenge started notification sent for: ${title} (${challengeId})`);
+        } catch (docError) {
+          console.error(`Error processing started challenge ${doc.id}:`, docError);
+        }
       }
 
       // 2. Check for challenges ending in ~30 minutes
       const endingSoonSnapshot = await db
         .collection("challenges")
-        .where("endDate", ">=", twentyFiveMinFromNow)
-        .where("endDate", "<=", thirtyMinFromNow)
+        .where("endDate", ">=", twentyMinFromNow)
+        .where("endDate", "<=", thirtyFiveMinFromNow)
         .get();
 
       for (const doc of endingSoonSnapshot.docs) {
-        const challengeId = doc.id;
-        const data = doc.data();
-        const title = data.title as string;
+        try {
+          const challengeId = doc.id;
+          const data = doc.data();
+          const title = data.title as string;
 
-        // Check if we already sent this notification
-        const markerRef = db
-          .collection("challenges")
-          .doc(challengeId)
-          .collection("notifications")
-          .doc("ending_soon");
+          // Deduplicate using transaction: create() fails if doc already exists
+          const markerRef = db
+            .collection("challenges")
+            .doc(challengeId)
+            .collection("notifications")
+            .doc("ending_soon");
 
-        const marker = await markerRef.get();
-        if (marker.exists) continue;
+          let alreadySent = false;
+          try {
+            await db.runTransaction(async (transaction) => {
+              const marker = await transaction.get(markerRef);
+              if (marker.exists) {
+                alreadySent = true;
+                return;
+              }
+              transaction.create(markerRef, { sentAt: admin.firestore.FieldValue.serverTimestamp() });
+            });
+          } catch (error) {
+            // create() throws if doc was created by a concurrent invocation
+            console.log(`Marker already exists for challenge ending_soon: ${challengeId}, skipping`);
+            continue;
+          }
+          if (alreadySent) continue;
 
-        // Send notification
-        const message: admin.messaging.Message = {
-          topic: "all_users",
-          notification: {
-            title: `⏰ ${title} ends in 30 minutes!`,
-            body: "Hurry up and submit your response!",
-          },
-          data: {
-            type: "challenge_ending_soon",
-            challengeId: challengeId,
-          },
-          apns: {
-            payload: {
-              aps: {
-                sound: "default",
-                badge: 1,
+          // Send notification
+          const message: admin.messaging.Message = {
+            topic: "all_users",
+            notification: {
+              title: `⏰ ${title} se termine dans 30 minutes !`,
+              body: "Depecchez-vous de soumettre votre reponse !",
+            },
+            data: {
+              type: "challenge_ending_soon",
+              challengeId: challengeId,
+            },
+            apns: {
+              payload: {
+                aps: {
+                  sound: "default",
+                  badge: 1,
+                },
               },
             },
-          },
-        };
+          };
 
-        await messaging.send(message);
-        await markerRef.set({ sentAt: admin.firestore.FieldValue.serverTimestamp() });
-        console.log(`Challenge ending soon notification sent for: ${title} (${challengeId})`);
+          await messaging.send(message);
+          console.log(`Challenge ending soon notification sent for: ${title} (${challengeId})`);
+        } catch (docError) {
+          console.error(`Error processing ending_soon challenge ${doc.id}:`, docError);
+        }
       }
     } catch (error) {
       console.error("Error in checkChallengeSchedules:", error);

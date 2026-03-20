@@ -37,6 +37,11 @@ struct CohouseFormFeature {
         var isProcessingIdCard: Bool = false
         var idCardScanResult: IdCardScanResult?
 
+        // Quit cohouse
+        var showQuitConfirmation: Bool = false
+        var isQuitting: Bool = false
+        var quitError: String?
+
         /// Whether the address has been modified from the original (relevant for edit mode).
         var hasAddressChanged: Bool {
             guard let original = originalAddress else { return true }
@@ -50,6 +55,9 @@ struct CohouseFormFeature {
         case binding(BindingAction<State>)
         case deleteUsers(atOffset: IndexSet)
         case quitCohouseButtonTapped
+        case quitCohouseConfirmed
+        case _quitCohouseCompleted
+        case _quitCohouseFailed(String)
         case addressValidationResponse(Result<AddressValidationResult, any Error>)
         case applySuggestedAddress(ValidatedAddress)
         case pinDragged(latitude: Double, longitude: Double)
@@ -137,11 +145,26 @@ struct CohouseFormFeature {
                     }
                     return .none
                 case .quitCohouseButtonTapped:
-                    return .run { _ in
+                    state.showQuitConfirmation = true
+                    return .none
+                case .quitCohouseConfirmed:
+                    state.showQuitConfirmation = false
+                    state.isQuitting = true
+                    state.quitError = nil
+                    return .run { send in
                         try await self.cohouseClient.quitCohouse()
-                    } catch: { error, _ in
+                        await send(._quitCohouseCompleted)
+                    } catch: { error, send in
                         Logger.cohouseLog.log(level: .error, "Failed to quit cohouse: \(error)")
+                        await send(._quitCohouseFailed(error.localizedDescription))
                     }
+                case ._quitCohouseCompleted:
+                    state.isQuitting = false
+                    return .none
+                case let ._quitCohouseFailed(message):
+                    state.isQuitting = false
+                    state.quitError = message
+                    return .none
                 case let .addressValidationResponse(.success(result)):
                     state.isValidatingAddress = false
                     state.addressValidationResult = result
@@ -226,6 +249,15 @@ struct CohouseFormView: View {
 
             Section {
                 TextField("Cohouse name", text: $store.wipCohouse.name)
+            }
+
+            Section {
+                Picker("Type de coloc", selection: $store.wipCohouse.cohouseType) {
+                    ForEach(CohouseType.allCases, id: \.self) { type in
+                        Text(type.displayName).tag(type as CohouseType?)
+                    }
+                }
+                .pickerStyle(.segmented)
             }
 
             self.coverImageSection

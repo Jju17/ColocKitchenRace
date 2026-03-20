@@ -24,7 +24,7 @@ enum FirestoreHelpers {
     static func updateUserCohouseId(_ cohouseId: String?, for userInfo: User) throws {
         var updatedUser = userInfo
         updatedUser.cohouseId = cohouseId
-        try Firestore.firestore().collection("users").document(userInfo.id.uuidString).setData(from: updatedUser)
+        try Firestore.firestore().collection("users").document(userInfo.id.uuidString).setData(from: updatedUser, merge: true)
         @Shared(.userInfo) var sharedUserInfo
         $sharedUserInfo.withLock { $0 = updatedUser }
     }

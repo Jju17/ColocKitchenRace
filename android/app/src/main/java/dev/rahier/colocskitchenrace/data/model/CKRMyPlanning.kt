@@ -8,7 +8,15 @@ data class CKRMyPlanning(
     val party: PartyInfo,
 )
 
-enum class StepRole { HOST, VISITOR }
+enum class StepRole(val value: String) {
+    HOST("host"),
+    VISITOR("visitor");
+
+    companion object {
+        fun fromServer(value: String): StepRole =
+            entries.find { it.value == value } ?: VISITOR
+    }
+}
 
 data class PlanningStep(
     val role: StepRole,

@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.unit.dp
-import dev.rahier.colocskitchenrace.ui.theme.CkrDark
 import dev.rahier.colocskitchenrace.ui.theme.CkrGoldLight
 import dev.rahier.colocskitchenrace.ui.theme.CkrGray
 
@@ -33,14 +32,14 @@ fun CKRButton(
         shape = RoundedCornerShape(15.dp),
         colors = ButtonDefaults.buttonColors(
             containerColor = CkrGoldLight,
-            contentColor = CkrDark,
+            contentColor = MaterialTheme.colorScheme.onSurface,
         ),
     ) {
         if (isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.size(20.dp),
                 strokeWidth = 2.dp,
-                color = CkrDark,
+                color = MaterialTheme.colorScheme.onSurface,
             )
         } else {
             Text(

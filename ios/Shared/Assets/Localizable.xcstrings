@@ -5138,6 +5138,7 @@
       "shouldTranslate" : false
     },
     "Sign in with Apple" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -5811,6 +5812,9 @@
           }
         }
       }
+    },
+    "Type de coloc" : {
+
     },
     "Type your creative name here..." : {
       "localizations" : {

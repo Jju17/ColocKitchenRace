@@ -73,7 +73,9 @@ class EmailVerificationViewModel @Inject constructor(
     }
 
     private fun signOut() {
-        authRepository.signOut()
-        viewModelScope.launch { _effect.send(EmailVerificationEffect.NavigateToSignIn) }
+        viewModelScope.launch {
+            authRepository.signOut()
+            _effect.send(EmailVerificationEffect.NavigateToSignIn)
+        }
     }
 }

@@ -51,7 +51,7 @@ fun ProfileCompletionScreen(
             text = "Colocs\nKitchen Race",
             style = MaterialTheme.typography.displaySmall,
             textAlign = TextAlign.Center,
-            color = CkrDark,
+            color = MaterialTheme.colorScheme.onBackground,
         )
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -59,7 +59,7 @@ fun ProfileCompletionScreen(
         Text(
             text = stringResource(R.string.complete_profile),
             style = MaterialTheme.typography.headlineSmall,
-            color = CkrDark,
+            color = MaterialTheme.colorScheme.onBackground,
         )
 
         Spacer(modifier = Modifier.height(8.dp))

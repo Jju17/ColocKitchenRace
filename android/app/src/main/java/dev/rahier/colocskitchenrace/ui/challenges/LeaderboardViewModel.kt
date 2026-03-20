@@ -33,7 +33,7 @@ class LeaderboardViewModel @Inject constructor(
 
     private fun observeLeaderboard() {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
+            _state.update { it.copy(isLoading = true, error = null) }
 
             // Build challengeId -> points map
             val challenges = try {
@@ -46,23 +46,30 @@ class LeaderboardViewModel @Inject constructor(
             }
             val pointsMap = challenges.associate { it.id to (it.points ?: 0) }
 
-            responseRepository.watchAllValidatedResponses().collect { responses ->
-                val validatedResponses = responses.filter { it.status == ChallengeResponseStatus.VALIDATED }
+            try {
+                responseRepository.watchAllValidatedResponses().collect { responses ->
+                    val validatedResponses = responses.filter { it.status == ChallengeResponseStatus.VALIDATED }
 
-                val grouped = validatedResponses.groupBy { it.cohouseId }
-                val entries = grouped.map { (cohouseId, cohouseResponses) ->
-                    LeaderboardEntry(
-                        cohouseId = cohouseId,
-                        cohouseName = cohouseResponses.firstOrNull()?.cohouseName ?: cohouseId,
-                        score = cohouseResponses.sumOf { pointsMap[it.challengeId] ?: 0 },
-                        validatedCount = cohouseResponses.size,
-                        rank = 0,
-                    )
+                    val grouped = validatedResponses.groupBy { it.cohouseId }
+                    val entries = grouped.map { (cohouseId, cohouseResponses) ->
+                        LeaderboardEntry(
+                            cohouseId = cohouseId,
+                            cohouseName = cohouseResponses.firstOrNull()?.cohouseName ?: cohouseId,
+                            score = cohouseResponses.sumOf { pointsMap[it.challengeId] ?: 0 },
+                            validatedCount = cohouseResponses.size,
+                            rank = 0,
+                        )
+                    }
+                        .sortedByDescending { it.score }
+                        .mapIndexed { index, entry -> entry.copy(rank = index + 1) }
+
+                    _state.update { it.copy(entries = entries, isLoading = false, error = null) }
                 }
-                    .sortedByDescending { it.score }
-                    .mapIndexed { index, entry -> entry.copy(rank = index + 1) }
-
-                _state.update { it.copy(entries = entries, isLoading = false) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.e("Leaderboard", "Failed to observe leaderboard", e)
+                _state.update { it.copy(isLoading = false, error = e.message) }
             }
         }
     }

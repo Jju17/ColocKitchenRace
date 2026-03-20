@@ -321,20 +321,24 @@ struct ChallengeView: View {
                         }
                         Spacer()
                     } else {
-                        SnapPagingContainer(itemWidth: UIScreen.main.bounds.width - 32, currentPage: $store.currentPage.sending(\.currentPageChanged)) {
-                            ForEach(Array(store.filteredTiles.enumerated()), id: \.element.id) { _, tileState in
-                                if let tileStore = store.scope(state: \.challengeTiles[id: tileState.id], action: \.challengeTiles[id: tileState.id]) {
-                                    ChallengeTileView(store: tileStore, colorIndex: stableColorIndex(for: tileState.id))
+                        GeometryReader { geometry in
+                            VStack(spacing: 0) {
+                                SnapPagingContainer(itemWidth: geometry.size.width - 32, currentPage: $store.currentPage.sending(\.currentPageChanged)) {
+                                    ForEach(Array(store.filteredTiles.enumerated()), id: \.element.id) { _, tileState in
+                                        if let tileStore = store.scope(state: \.challengeTiles[id: tileState.id], action: \.challengeTiles[id: tileState.id]) {
+                                            ChallengeTileView(store: tileStore, colorIndex: stableColorIndex(for: tileState.id))
+                                        }
+                                    }
                                 }
+
+                                // Page dots
+                                PageDotsView(
+                                    total: store.filteredTiles.count,
+                                    currentIndex: store.filteredTiles.firstIndex(where: { $0.id == store.currentPage }) ?? 0
+                                )
+                                .padding(.bottom, 8)
                             }
                         }
-
-                        // Page dots
-                        PageDotsView(
-                            total: store.filteredTiles.count,
-                            currentIndex: store.filteredTiles.firstIndex(where: { $0.id == store.currentPage }) ?? 0
-                        )
-                        .padding(.bottom, 8)
                     }
                 }
             }
@@ -372,7 +376,7 @@ struct ChallengeView: View {
                     }
             }
         }
-        .onAppear { store.send(.onAppear) }
+        .task { store.send(.onAppear) }
     }
 
     /// Derive a stable color index from the tile's UUID so it never changes on re-sort.

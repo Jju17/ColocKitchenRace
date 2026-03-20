@@ -142,6 +142,7 @@ extension ChallengeResponseClient: DependencyKey {
                 try await doc.setData(from: response, merge: true)
                 try await doc.updateData([
                     "serverTS": FieldValue.serverTimestamp(),
+                    "submissionDate": FieldValue.serverTimestamp(),
                     "submittedByAuthId": uid
                 ])
                 return response

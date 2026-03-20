@@ -180,6 +180,13 @@ export const revealPlanning = onCall<RevealPlanningRequest>(
 
       const gameData = gameDoc.data()!;
 
+      // Idempotency guard: if already revealed, return success immediately
+      // to prevent duplicate Cloud Task scheduling on double-calls.
+      if (gameData.isRevealed === true) {
+        console.log(`Planning for game ${gameId} is already revealed, skipping`);
+        return { success: true };
+      }
+
       if (!gameData.groupPlannings || gameData.groupPlannings.length === 0) {
         throw new HttpsError("failed-precondition", "Matching must be confirmed before revealing.");
       }
@@ -192,31 +199,38 @@ export const revealPlanning = onCall<RevealPlanningRequest>(
       // Send push notification to all registered cohouses
       const cohouseIDs: string[] = gameData.cohouseIDs || [];
       if (cohouseIDs.length > 0) {
-        const allUserIds: string[] = [];
+        const userIdSet = new Set<string>();
 
-        for (const cohouseId of cohouseIDs) {
-          const cohouseSnapshot = await db
-            .collection("cohouses")
-            .where("id", "==", cohouseId)
-            .limit(1)
-            .get();
+        // Fetch all cohouse docs and their users in parallel
+        const cohouseSnapshots = await Promise.all(
+          cohouseIDs.map((cohouseId) =>
+            db.collection("cohouses")
+              .where("id", "==", cohouseId)
+              .limit(1)
+              .get()
+          )
+        );
 
-          if (cohouseSnapshot.empty) continue;
+        const usersSnapshots = await Promise.all(
+          cohouseSnapshots.map((snapshot) => {
+            if (snapshot.empty) return Promise.resolve(null);
+            return db
+              .collection("cohouses")
+              .doc(snapshot.docs[0].id)
+              .collection("users")
+              .get();
+          })
+        );
 
-          const usersSnapshot = await db
-            .collection("cohouses")
-            .doc(cohouseSnapshot.docs[0].id)
-            .collection("users")
-            .get();
-
+        for (const usersSnapshot of usersSnapshots) {
+          if (!usersSnapshot) continue;
           usersSnapshot.docs.forEach((doc) => {
             const userId = doc.data().userId;
-            if (userId && !allUserIds.includes(userId)) {
-              allUserIds.push(userId);
-            }
+            if (userId) userIdSet.add(userId);
           });
         }
 
+        const allUserIds = Array.from(userIdSet);
         const tokens = await getFCMTokensForUsers(allUserIds);
         if (tokens.length > 0) {
           await sendToTokens(tokens, {
@@ -258,6 +272,16 @@ export const getMyPlanning = onCall<GetMyPlanningRequest>(
   async (request) => {
     requireAuth(request);
     const { gameId, cohouseId } = parseRequest(getMyPlanningSchema, request.data);
+
+    // Verify the caller's cohouse claim matches the requested cohouseId
+    // to prevent any authenticated user from reading other cohouses' planning.
+    const callerCohouseId = request.auth!.token.cohouseId;
+    if (!callerCohouseId || callerCohouseId !== cohouseId) {
+      throw new HttpsError(
+        "permission-denied",
+        "You can only view planning for your own cohouse"
+      );
+    }
 
     try {
       const gameDoc = await db.collection("ckrGames").doc(gameId).get();

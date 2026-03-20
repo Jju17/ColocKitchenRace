@@ -170,19 +170,23 @@ struct NoCohouseFeature {
                     }
                     return .none
                 case .confirmJoinCohouseButtonTapped:
-                    @Shared(.cohouse) var cohouse
-
                     guard case let .some(.setCohouseUser(selectState)) = state.destination
                     else { return .none }
 
                     let selectedCohouse = selectState.cohouse
                     let selectedUser = selectState.selectedUser
+                    state.isCreating = true
+                    state.errorMessage = nil
 
-                    $cohouse.withLock { $0 = selectedCohouse }
-                    state.destination = nil
-
-                    return .run { [selectedUser = selectedUser, cohouseId = selectedCohouse.id.uuidString] _ in
+                    return .run { [selectedUser = selectedUser, cohouseId = selectedCohouse.id.uuidString, selectedCohouse] send in
                         try await self.cohouseClient.setUser(selectedUser, cohouseId)
+                        // Only update shared state after the async write succeeds
+                        @Shared(.cohouse) var cohouse
+                        $cohouse.withLock { $0 = selectedCohouse }
+                        await send(.creationCompleted)
+                    } catch: { error, send in
+                        Logger.cohouseLog.error("Failed to join cohouse: \(error)")
+                        await send(.cohouseLookupFailed(error.localizedDescription))
                     }
                 case .createCohouseButtonTapped:
                     guard let userInfo = state.userInfo else { return .none }
@@ -235,6 +239,7 @@ struct NoCohouseFeature {
                         }
                     }
                 case let .cohouseLookupFailed(message):
+                    state.isCreating = false
                     state.errorMessage = message
                     return .none
                 case let .setUserToCohouseFound(cohouse):

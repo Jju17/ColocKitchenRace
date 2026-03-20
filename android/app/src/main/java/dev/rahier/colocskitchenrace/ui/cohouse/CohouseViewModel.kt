@@ -37,9 +37,7 @@ class CohouseViewModel @Inject constructor(
         when (intent) {
             is CohouseIntent.JoinCodeChanged -> _state.update { it.copy(joinCode = intent.code) }
             CohouseIntent.JoinClicked -> joinByCode()
-            CohouseIntent.CreateClicked -> {} // TODO: Navigation handled by parent composable
             CohouseIntent.QuitClicked -> quitCohouse()
-            CohouseIntent.EditClicked -> {} // TODO: Navigation handled by parent composable
             CohouseIntent.Refresh -> refresh()
         }
     }

@@ -128,9 +128,7 @@ struct HomeFeature {
                         // immediately reflects "not registered".
                         @Shared(.ckrGame) var ckrGame
                         $ckrGame.withLock { game in
-                            if game != nil {
-                                game!.cohouseIDs.removeAll { $0 == cohouseId }
-                            }
+                            game?.cohouseIDs.removeAll { $0 == cohouseId }
                         }
 
                         return .run { [ckrClient] _ in

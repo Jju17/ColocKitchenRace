@@ -144,6 +144,15 @@
     <string name="address_uncertain">Address uncertain</string>
     <string name="address_not_found">Address not found</string>
     <string name="address_suggestion">Suggestion: %1$s, %2$s %3$s</string>
+    <string name="adjust_map_pin">Adjust pin on map</string>
+    <string name="map_picker_title">Adjust location</string>
+    <string name="scan_id_card">Scan an ID card</string>
+    <string name="id_card_scanning">Scanning ID card\u2026</string>
+    <string name="id_card_valid">ID card detected</string>
+    <string name="id_card_not_found">No ID card detected</string>
+    <string name="id_card_poor_quality">ID card detected but poor quality — try again</string>
+    <string name="id_card_error">Scan error</string>
+    <string name="id_card_name">Name: %s</string>
 
     <!-- Registration -->
     <string name="register_for_game">Register</string>

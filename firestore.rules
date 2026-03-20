@@ -33,14 +33,17 @@ service cloud.firestore {
 
       // Allow create during signup — the authId in the new doc must
       // match the caller so nobody can create a doc for someone else.
+      // Prevent self-promotion: isAdmin must be false at creation time.
       allow create: if isSignedIn()
-                    && request.resource.data.authId == authUid();
+                    && request.resource.data.authId == authUid()
+                    && request.resource.data.isAdmin == false;
 
-      // Allow update by the owner (authId immutable) or by an admin.
+      // Allow update by the owner (authId + isAdmin immutable) or by an admin.
       allow update: if isSignedIn()
                     && (
                       (resource.data.authId == authUid()
-                       && request.resource.data.authId == resource.data.authId)
+                       && request.resource.data.authId == resource.data.authId
+                       && request.resource.data.isAdmin == resource.data.isAdmin)
                       || isAdmin()
                     );
 
@@ -126,9 +129,10 @@ service cloud.firestore {
 
       // ── Registrations subcollection ──
       match /registrations/{regId} {
-        // Any signed-in user can read registrations
-        // (needed to check if already registered).
-        allow read: if isSignedIn();
+        // Only the cohouse that owns this registration or admins can read.
+        // regId === cohouseId by design (registration doc keyed by cohouse).
+        allow read: if isSignedIn()
+                    && (isCohouseMember(regId) || isAdmin());
 
         // Writes happen exclusively via Cloud Functions (Admin SDK).
         allow create, update, delete: if false;
@@ -258,11 +262,10 @@ service cloud.firestore {
     }
 
     // Allow collectionGroup("users") queries for signed-in users
-    // (cohouse users subcollection).
-    // NOTE: This matches any subcollection named "users" at any depth.
-    // Currently only cohouses/{id}/users exists. If new "users"
-    // subcollections are added, they will inherit this rule.
-    match /{path=**}/users/{userId} {
+    // (cohouse users subcollection only).
+    // Scoped to /cohouses/{cohouseId}/users/ to avoid exposing
+    // the top-level /users/{userId} collection via collectionGroup.
+    match /cohouses/{cohouseId}/users/{userId} {
       allow read: if isSignedIn();
     }
   }

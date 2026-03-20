@@ -77,7 +77,7 @@ fun ChallengesScreen(
             Text(
                 text = stringResource(R.string.challenges_title),
                 style = MaterialTheme.typography.headlineLarge,
-                color = CkrDark,
+                color = MaterialTheme.colorScheme.onSurface,
             )
             IconButton(onClick = onShowLeaderboard) {
                 Icon(Icons.Default.EmojiEvents, contentDescription = stringResource(R.string.leaderboard), tint = CkrGray)
@@ -202,7 +202,7 @@ private fun ChallengeTileCard(
                 ambientColor = Color.Black.copy(alpha = 0.08f),
             ),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = CkrWhite),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             ChallengeCardHeader(
@@ -224,7 +224,7 @@ private fun ChallengeTileCard(
                 Text(
                     text = challenge.body,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = CkrDark,
+                    color = MaterialTheme.colorScheme.onSurface,
                     overflow = TextOverflow.Ellipsis,
                 )
 
@@ -232,6 +232,7 @@ private fun ChallengeTileCard(
                 Spacer(modifier = Modifier.weight(1f))
 
                 ChallengeActionArea(
+                    challengeId = challenge.id,
                     challengeState = challenge.state,
                     challengeContent = challenge.content,
                     hasCohouse = hasCohouse,
@@ -334,6 +335,7 @@ private fun ChallengeCardHeader(
 
 @Composable
 private fun ChallengeActionArea(
+    challengeId: String,
     challengeState: ChallengeState,
     challengeContent: ChallengeContent,
     hasCohouse: Boolean,
@@ -385,6 +387,7 @@ private fun ChallengeActionArea(
                         onSubmit = onSubmit,
                     )
                     is ChallengeContent.Picture -> PictureForm(
+                        challengeId = challengeId,
                         capturedImageData = capturedImageData,
                         isSubmitting = isSubmitting,
                         onPhotoCaptured = onPhotoCaptured,
@@ -582,6 +585,7 @@ private fun MultipleChoiceForm(
 
 @Composable
 private fun PictureForm(
+    challengeId: String,
     capturedImageData: ByteArray?,
     isSubmitting: Boolean,
     onPhotoCaptured: (ByteArray) -> Unit,
@@ -590,9 +594,11 @@ private fun PictureForm(
     val context = LocalContext.current
     var showPhotoDialog by remember { mutableStateOf(false) }
 
-    // Create temp file for camera capture
+    // Create temp file for camera capture in the challenge_photos subdirectory
+    // (must match the path declared in res/xml/file_paths.xml for FileProvider)
     val tempImageFile = remember {
-        File(context.cacheDir, "challenge_photo.jpg").also {
+        val dir = File(context.cacheDir, "challenge_photos").also { it.mkdirs() }
+        File(dir, "challenge_photo_${challengeId}.jpg").also {
             if (!it.exists()) it.createNewFile()
         }
     }

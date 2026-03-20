@@ -35,7 +35,5 @@ data class HomeState(
 }
 
 sealed interface HomeIntent {
-    data object RegisterClicked : HomeIntent
-    data object ProfileClicked : HomeIntent
     data object Refresh : HomeIntent
 }

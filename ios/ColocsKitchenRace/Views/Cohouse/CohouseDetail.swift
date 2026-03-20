@@ -209,7 +209,8 @@ struct CohouseDetailView: View {
                         Button {
                             UIPasteboard.general.string = store.cohouse.code
                             codeCopied = true
-                            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            Task {
+                                try? await Task.sleep(for: .seconds(2))
                                 codeCopied = false
                             }
                         } label: {

@@ -128,8 +128,10 @@ export const validateAddressSchema = z.object({
   country: z.string().optional(),
 });
 
+// Scoped to authenticated users only — returns GPS coordinates for the
+// requested cohouse IDs. Max 100 IDs per call to prevent abuse.
 export const getCohousesForMapSchema = z.object({
-  cohouseIds: z.array(z.string().min(1)).min(1, "At least one cohouseId required"),
+  cohouseIds: z.array(z.string().min(1)).min(1, "At least one cohouseId required").max(100, "Maximum 100 cohouseIds per request"),
 });
 
 // ── Account ────────────────────────────────────────────────────────────────

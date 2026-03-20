@@ -29,6 +29,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.rahier.colocskitchenrace.R
 import dev.rahier.colocskitchenrace.ui.components.CKRButton
+import dev.rahier.colocskitchenrace.ui.components.CKRTextField
 import dev.rahier.colocskitchenrace.ui.theme.*
 
 @Composable
@@ -215,35 +216,6 @@ private fun SocialAuthButtons(
             )
         }
     }
-}
-
-@Composable
-private fun CKRTextField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    label: String,
-    modifier: Modifier = Modifier,
-    leadingIcon: @Composable (() -> Unit)? = null,
-    visualTransformation: androidx.compose.ui.text.input.VisualTransformation = androidx.compose.ui.text.input.VisualTransformation.None,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
-        leadingIcon = leadingIcon,
-        visualTransformation = visualTransformation,
-        keyboardOptions = keyboardOptions,
-        singleLine = true,
-        modifier = modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(15.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedContainerColor = CkrWhite,
-            unfocusedContainerColor = CkrWhite,
-            focusedBorderColor = CkrMint,
-            unfocusedBorderColor = Color.Transparent,
-        ),
-    )
 }
 
 // ─── Previews ────────────────────────────────────────────────────────

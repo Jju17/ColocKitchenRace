@@ -199,7 +199,7 @@ extension AuthenticationClient: DependencyKey {
             let docRef = Firestore.firestore()
                 .collection("users")
                 .document(updatedUser.id.uuidString)
-            try docRef.setData(from: updatedUser)
+            try docRef.setData(from: updatedUser, merge: true)
 
             @Shared(.userInfo) var user
             $user.withLock { $0 = updatedUser }
@@ -340,13 +340,20 @@ extension AuthenticationClient: DependencyKey {
         },
         listenAuthState: {
             AsyncStream { continuation in
-                DispatchQueue.main.async {
-                    let handle = Auth.auth().addStateDidChangeListener { _, user in
-                        continuation.yield(user)
-                    }
+                // Use nonisolated(unsafe) to bridge the handle across the
+                // concurrency boundary. The handle is set once on the main
+                // queue and only read on termination.
+                nonisolated(unsafe) var handle: AuthStateDidChangeListenerHandle?
 
-                    continuation.onTermination = { _ in
+                continuation.onTermination = { _ in
+                    if let handle {
                         Auth.auth().removeStateDidChangeListener(handle)
+                    }
+                }
+
+                DispatchQueue.main.async {
+                    handle = Auth.auth().addStateDidChangeListener { _, user in
+                        continuation.yield(user)
                     }
                 }
             }
@@ -457,7 +464,8 @@ final class AppleSignInHelper: NSObject, ASAuthorizationControllerDelegate, ASAu
         precondition(length > 0)
         var randomBytes = [UInt8](repeating: 0, count: length)
         _ = SecRandomCopyBytes(kSecRandomDefault, randomBytes.count, &randomBytes)
-        let charset: [Character] = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVXYZabcdefghijklmnopqrstuvwxyz-._")
+        // 64 characters (power of 2) to avoid modulo bias with UInt8 values
+        let charset: [Character] = Array("0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_")
         return String(randomBytes.map { charset[Int($0) % charset.count] })
     }
 

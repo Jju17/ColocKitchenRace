@@ -25,7 +25,7 @@ struct CKRTextField: View {
                 .font(.system(size: 14))
             ZStack(alignment: .leading) {
                 RoundedRectangle(cornerRadius: 15)
-                    .fill(Color.white)
+                    .fill(Color(.systemBackground))
                 if isSecure {
                     SecureField("", text: $value)
                         .textContentType(textContentType)

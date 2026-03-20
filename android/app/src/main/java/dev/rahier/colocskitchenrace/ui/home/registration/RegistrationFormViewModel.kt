@@ -1,8 +1,11 @@
 package dev.rahier.colocskitchenrace.ui.home.registration
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.rahier.colocskitchenrace.R
 import dev.rahier.colocskitchenrace.data.model.CohouseType
 import dev.rahier.colocskitchenrace.data.repository.CKRGameRepository
 import dev.rahier.colocskitchenrace.data.repository.CohouseRepository
@@ -19,6 +22,7 @@ import javax.inject.Inject
 class RegistrationFormViewModel @Inject constructor(
     private val gameRepository: CKRGameRepository,
     private val cohouseRepository: CohouseRepository,
+    @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(RegistrationFormState())
@@ -60,8 +64,14 @@ class RegistrationFormViewModel @Inject constructor(
 
     private fun continueToPayment() {
         val s = _state.value
-        val game = s.game ?: return
-        val cohouse = s.cohouse ?: return
+        val game = s.game
+        val cohouse = s.cohouse
+        if (game == null || cohouse == null) {
+            viewModelScope.launch {
+                _effect.send(RegistrationFormEffect.ShowError(context.getString(R.string.error_generic)))
+            }
+            return
+        }
         val age = s.averageAge.toIntOrNull() ?: return
 
         viewModelScope.launch {

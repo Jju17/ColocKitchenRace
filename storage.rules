@@ -29,6 +29,15 @@ service firebase.storage {
     //  • Any signed-in user can CREATE (submit a photo response).
     //  • UPDATE: the original uploader can re-submit.
     //  • DELETE: admin only (or Cloud Functions via Admin SDK).
+    //
+    //  LIMITATION: No cohouseId ownership check on create/update.
+    //  The fileName is a UUID on iOS (not the cohouseId), making it
+    //  impossible to reliably match the file name to the caller's
+    //  cohouse via security rules alone. The Firestore-level
+    //  challenge response document enforces submittedByAuthId, which
+    //  provides the primary access control. A malicious user could
+    //  overwrite another cohouse's image file but not the Firestore
+    //  response document, so the impact is limited.
     // ──────────────────────────────────────────────
     match /challenges/{challengeId}/responses/{fileName} {
       allow read: if isSignedIn();
@@ -51,7 +60,10 @@ service firebase.storage {
     // ──────────────────────────────────────────────
     match /cohouses/{cohouseId}/{fileName} {
       allow read: if isSignedIn();
-      allow create, update: if isSignedIn() && isValidImage();
+      // Only members of the cohouse (or admins) can upload/update images.
+      allow create, update: if isSignedIn()
+                            && isValidImage()
+                            && (request.auth.token.cohouseId == cohouseId || isAdmin());
       allow delete: if isSignedIn() && isAdmin();
     }
 

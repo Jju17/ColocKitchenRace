@@ -22,6 +22,7 @@ struct TabFeature {
 
     enum Action {
         case tabChanged(Tab)
+        case deepLink(String)
         case challenge(ChallengeFeature.Action)
         case cohouse(CohouseFeature.Action)
         case home(HomeFeature.Action)
@@ -47,6 +48,15 @@ struct TabFeature {
                 case let .tabChanged(tab):
                     state.selectedTab = tab
                     return .none
+                case let .deepLink(type):
+                    if type.contains("challenge") {
+                        state.selectedTab = .challenges
+                    } else if type.contains("apero") || type.contains("diner") || type.contains("party") || type.contains("planning") {
+                        state.selectedTab = .planning
+                    } else {
+                        state.selectedTab = .home
+                    }
+                    return .none
                 case .home(.delegate(.switchToCohouseButtonTapped)):
                     state.selectedTab = .cohouse
                     return .none
@@ -54,6 +64,11 @@ struct TabFeature {
                       state.selectedTab = .cohouse
                       return .none
                 case .challenge, .cohouse, .home, .planning:
+                    // Reset tab if planning is no longer available
+                    if state.selectedTab == .planning
+                        && !(state.planning.isRevealed && state.planning.isRegistered) {
+                        state.selectedTab = .home
+                    }
                     return .none
             }
         }
@@ -114,6 +129,11 @@ struct MyTabView: View {
                 Label("Cohouse", systemImage: "person.3.fill")
             }
             .tag(Tab.cohouse)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .ckrDeepLink)) { notification in
+            if let type = notification.userInfo?["type"] as? String {
+                store.send(.deepLink(type))
+            }
         }
     }
 }

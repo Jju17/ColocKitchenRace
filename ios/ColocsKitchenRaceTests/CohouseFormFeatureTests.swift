@@ -261,7 +261,7 @@ struct CohouseFormFeatureTests {
 
     // MARK: - Quit Cohouse
 
-    @Test("quitCohouseButtonTapped calls quitCohouse")
+    @Test("quitCohouseConfirmed calls quitCohouse")
     func quitCohouse() async {
         var quitCalled = false
 
@@ -273,12 +273,24 @@ struct CohouseFormFeatureTests {
             }
         }
 
-        await store.send(.quitCohouseButtonTapped)
+        await store.send(.quitCohouseButtonTapped) {
+            $0.showQuitConfirmation = true
+        }
+
+        await store.send(.quitCohouseConfirmed) {
+            $0.showQuitConfirmation = false
+            $0.isQuitting = true
+            $0.quitError = nil
+        }
+
+        await store.receive(\._quitCohouseCompleted) {
+            $0.isQuitting = false
+        }
 
         #expect(quitCalled == true)
     }
 
-    @Test("quitCohouseButtonTapped handles network error gracefully")
+    @Test("quitCohouseConfirmed handles network error gracefully")
     func quitCohouse_networkError() async {
         let store = TestStore(initialState: CohouseFormFeature.State(wipCohouse: .mock)) {
             CohouseFormFeature()
@@ -288,8 +300,20 @@ struct CohouseFormFeatureTests {
             }
         }
 
-        // Error is caught and logged, no crash
-        await store.send(.quitCohouseButtonTapped)
+        await store.send(.quitCohouseButtonTapped) {
+            $0.showQuitConfirmation = true
+        }
+
+        await store.send(.quitCohouseConfirmed) {
+            $0.showQuitConfirmation = false
+            $0.isQuitting = true
+            $0.quitError = nil
+        }
+
+        await store.receive(\._quitCohouseFailed) {
+            $0.isQuitting = false
+            $0.quitError = CohouseClientError.failedWithError("Network error").localizedDescription
+        }
     }
 
     // MARK: - ID Card Scanning

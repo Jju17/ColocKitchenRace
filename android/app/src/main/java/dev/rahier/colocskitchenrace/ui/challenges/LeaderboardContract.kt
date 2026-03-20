@@ -12,4 +12,5 @@ data class LeaderboardState(
     val entries: List<LeaderboardEntry> = emptyList(),
     val myCohouseId: String? = null,
     val isLoading: Boolean = false,
+    val error: String? = null,
 )

@@ -116,13 +116,34 @@ export async function sendToTokens(
     success += response.successCount;
     failure += response.failureCount;
 
-    // Clean up invalid tokens
-    response.responses.forEach((resp, idx) => {
-      if (!resp.success && resp.error?.code === "messaging/invalid-registration-token") {
-        // Could delete invalid token from Firestore here
-        console.log(`Invalid token: ${batch[idx]}`);
+    // Clean up invalid tokens from Firestore
+    const invalidTokens = response.responses
+      .map((resp, idx) => (!resp.success && resp.error?.code === "messaging/invalid-registration-token") ? batch[idx] : null)
+      .filter((token): token is string => token !== null);
+
+    if (invalidTokens.length > 0) {
+      // Find and clear fcmToken for users with these invalid tokens
+      // Firestore 'in' query supports max 30 items, so batch
+      for (let j = 0; j < invalidTokens.length; j += 30) {
+        const tokenBatch = invalidTokens.slice(j, j + 30);
+        try {
+          const usersWithInvalidTokens = await db
+            .collection("users")
+            .where("fcmToken", "in", tokenBatch)
+            .get();
+
+          const clearBatch = db.batch();
+          usersWithInvalidTokens.docs.forEach((doc) => {
+            clearBatch.update(doc.ref, { fcmToken: admin.firestore.FieldValue.delete() });
+          });
+          await clearBatch.commit();
+          console.log(`Cleared ${usersWithInvalidTokens.size} invalid FCM token(s) from Firestore`);
+        } catch (cleanupError) {
+          // Don't fail the notification send if cleanup fails
+          console.error("Failed to clean up invalid FCM tokens:", cleanupError);
+        }
       }
-    });
+    }
   }
 
   return { success, failure };

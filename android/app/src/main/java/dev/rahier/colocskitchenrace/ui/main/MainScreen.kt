@@ -30,10 +30,12 @@ import dev.rahier.colocskitchenrace.ui.home.registration.RegistrationFormScreen
 import dev.rahier.colocskitchenrace.ui.planning.PlanningScreen
 import dev.rahier.colocskitchenrace.ui.profile.UserProfileFormScreen
 import dev.rahier.colocskitchenrace.ui.profile.UserProfileScreen
+import dev.rahier.colocskitchenrace.MainActivity
 import dev.rahier.colocskitchenrace.R
 import dev.rahier.colocskitchenrace.ui.theme.CkrGray
 import dev.rahier.colocskitchenrace.ui.theme.CkrLavender
 import dev.rahier.colocskitchenrace.ui.theme.CkrWhite
+import androidx.compose.ui.platform.LocalContext
 
 enum class Tab(val route: String, @StringRes val labelRes: Int, val icon: ImageVector) {
     HOME("tab_home", R.string.tab_home, Icons.Default.Home),
@@ -46,7 +48,7 @@ object MainRoutes {
     const val PROFILE = "profile"
     const val PROFILE_EDIT = "profile_edit"
     const val REGISTRATION_FORM = "registration_form"
-    const val PAYMENT_SUMMARY = "payment_summary/{gameId}/{cohouseId}/{averageAge}/{cohouseType}/{totalPriceCents}/{participantCount}"
+    const val PAYMENT_SUMMARY = "payment_summary/{gameId}/{cohouseId}/{averageAge}/{cohouseType}/{totalPriceCents}/{participantCount}/{attendingUserIds}"
     const val COHOUSE_CREATE = "cohouse_create"
     const val COHOUSE_EDIT = "cohouse_edit"
 
@@ -57,7 +59,11 @@ object MainRoutes {
         cohouseType: String,
         totalPriceCents: Int,
         participantCount: Int,
-    ) = "payment_summary/$gameId/$cohouseId/$averageAge/$cohouseType/$totalPriceCents/$participantCount"
+        attendingUserIds: List<String>,
+    ): String {
+        val encodedIds = java.net.URLEncoder.encode(attendingUserIds.joinToString(","), "UTF-8")
+        return "payment_summary/$gameId/$cohouseId/$averageAge/$cohouseType/$totalPriceCents/$participantCount/$encodedIds"
+    }
 }
 
 @Composable
@@ -76,11 +82,34 @@ fun MainScreen(
 
     var showLeaderboard by remember { mutableStateOf(false) }
 
+    // Deep link handling from push notifications
+    val activity = LocalContext.current as? MainActivity
+    val pendingDeepLink by activity?.pendingDeepLink?.collectAsStateWithLifecycle()
+        ?: remember { mutableStateOf(null) }
+
+    LaunchedEffect(pendingDeepLink) {
+        val type = pendingDeepLink ?: return@LaunchedEffect
+        val targetRoute = when {
+            type.contains("challenge") -> Tab.CHALLENGES.route
+            type.contains("apero") || type.contains("diner") || type.contains("party") ||
+                type.contains("planning") -> Tab.PLANNING.route
+            else -> Tab.HOME.route
+        }
+        navController.navigate(targetRoute) {
+            popUpTo(navController.graph.findStartDestination().id) {
+                saveState = true
+            }
+            launchSingleTop = true
+            restoreState = true
+        }
+        activity?.consumeDeepLink()
+    }
+
     Scaffold(
         bottomBar = {
             if (isOnTab) {
                 NavigationBar(
-                    containerColor = CkrWhite,
+                    containerColor = MaterialTheme.colorScheme.surface,
                 ) {
                     val currentDestination = navBackStackEntry?.destination
 
@@ -164,9 +193,8 @@ fun MainScreen(
             composable(MainRoutes.REGISTRATION_FORM) {
                 RegistrationFormScreen(
                     onNavigateToPayment = { gameId, cohouseId, attendingUserIds, averageAge, cohouseType, totalPriceCents, participantCount ->
-                        navController.currentBackStackEntry?.savedStateHandle?.set("attendingUserIds", attendingUserIds)
                         navController.navigate(
-                            MainRoutes.paymentSummary(gameId, cohouseId, averageAge, cohouseType, totalPriceCents, participantCount)
+                            MainRoutes.paymentSummary(gameId, cohouseId, averageAge, cohouseType, totalPriceCents, participantCount, attendingUserIds)
                         )
                     },
                     onBack = { navController.popBackStack() },
@@ -181,6 +209,7 @@ fun MainScreen(
                     navArgument("cohouseType") { type = NavType.StringType },
                     navArgument("totalPriceCents") { type = NavType.IntType },
                     navArgument("participantCount") { type = NavType.IntType },
+                    navArgument("attendingUserIds") { type = NavType.StringType },
                 ),
             ) { backStackEntry ->
                 val gameId = backStackEntry.arguments?.getString("gameId") ?: ""
@@ -189,8 +218,11 @@ fun MainScreen(
                 val cohouseType = backStackEntry.arguments?.getString("cohouseType") ?: ""
                 val totalPriceCents = backStackEntry.arguments?.getInt("totalPriceCents") ?: 0
                 val participantCount = backStackEntry.arguments?.getInt("participantCount") ?: 0
-                val attendingUserIds = navController.previousBackStackEntry
-                    ?.savedStateHandle?.get<List<String>>("attendingUserIds") ?: emptyList()
+                val attendingUserIds = backStackEntry.arguments?.getString("attendingUserIds")
+                    ?.let { java.net.URLDecoder.decode(it, "UTF-8") }
+                    ?.split(",")
+                    ?.filter { it.isNotBlank() }
+                    ?: emptyList()
 
                 PaymentSummaryScreen(
                     gameId = gameId,

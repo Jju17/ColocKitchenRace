@@ -5,8 +5,25 @@
  * State is per-instance (Cloud Functions auto-scales), so this provides
  * best-effort protection rather than absolute guarantees.
  *
- * For production-grade rate limiting, consider Cloud Armor or
- * Firestore-based tracking with distributed counters.
+ * IMPORTANT LIMITATION: This rate limiter is in-memory and scoped to a single
+ * Cloud Functions instance. Because Cloud Functions auto-scales across multiple
+ * instances, each instance maintains its own independent rate limit state. This
+ * means:
+ *   - A user's requests may be routed to different instances, effectively
+ *     multiplying their allowed rate by the number of active instances.
+ *   - Instance cold starts reset all rate limit state.
+ *   - Under high load (many instances), the rate limiter provides minimal
+ *     protection as limits are not shared across instances.
+ *
+ * This is acceptable for basic abuse prevention (e.g., a single user hammering
+ * a single instance), but it does NOT provide cross-instance guarantees.
+ *
+ * FUTURE IMPROVEMENT: For stricter rate limiting, replace this with a
+ * Firestore-based approach using distributed counters or atomic increments
+ * on a per-user document (e.g., /rateLimits/{userId}/{fnName}). This would
+ * provide consistent limits across all instances at the cost of one Firestore
+ * read+write per request. Alternatively, consider using Cloud Armor rate
+ * limiting rules or Redis (via Memorystore) for sub-millisecond checks.
  */
 import { HttpsError } from "firebase-functions/v2/https";
 

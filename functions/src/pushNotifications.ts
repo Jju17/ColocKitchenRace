@@ -151,53 +151,84 @@ async function sendStepReminders(
   const stepTitle = step === "apero" ? "L'apéro" : "Le dîner";
   const stepGreeting = step === "apero" ? "Bon apéro !" : "Bon appétit !";
 
-  for (const group of groupPlannings) {
-    let hostPairs: Array<{
-      hostCohouseId: string;
-      visitorCohouseId: string;
-    }>;
+  // Collect all host/visitor pairs across all groups
+  const allPairs: Array<{
+    hostCohouseId: string;
+    visitorCohouseId: string;
+  }> = [];
 
+  for (const group of groupPlannings) {
     if (step === "apero") {
-      hostPairs = [
+      allPairs.push(
         { hostCohouseId: group.cohouseB, visitorCohouseId: group.cohouseA },
         { hostCohouseId: group.cohouseD, visitorCohouseId: group.cohouseC },
-      ];
+      );
     } else {
-      hostPairs = [
+      allPairs.push(
         { hostCohouseId: group.cohouseA, visitorCohouseId: group.cohouseC },
         { hostCohouseId: group.cohouseB, visitorCohouseId: group.cohouseD },
-      ];
+      );
     }
+  }
 
-    for (const pair of hostPairs) {
+  // Fetch all user IDs in parallel across all pairs
+  const allCohouseIdsForUsers = new Set<string>();
+  for (const pair of allPairs) {
+    allCohouseIdsForUsers.add(pair.hostCohouseId);
+    allCohouseIdsForUsers.add(pair.visitorCohouseId);
+  }
+
+  const userIdsByCohouseEntries = await Promise.all(
+    Array.from(allCohouseIdsForUsers).map(async (cohouseId) => {
+      const userIds = await getUserIdsForCohouse(cohouseId);
+      return [cohouseId, userIds] as const;
+    })
+  );
+  const userIdsByCohouse = new Map(userIdsByCohouseEntries);
+
+  // Fetch FCM tokens per cohouse in parallel
+  const tokensByCohouse = new Map<string, string[]>();
+  await Promise.all(
+    Array.from(userIdsByCohouse.entries()).map(async ([cohouseId, userIds]) => {
+      const tokens = await getFCMTokensForUsers(userIds);
+      tokensByCohouse.set(cohouseId, tokens);
+    })
+  );
+
+  // Send all notifications in parallel
+  await Promise.all(
+    allPairs.map(async (pair) => {
       const hostName = cohouseNames[pair.hostCohouseId] || "une coloc";
       const visitorName = cohouseNames[pair.visitorCohouseId] || "une coloc";
 
-      // Host notification
-      const hostUserIds = await getUserIdsForCohouse(pair.hostCohouseId);
-      const hostTokens = await getFCMTokensForUsers(hostUserIds);
+      const hostTokens = tokensByCohouse.get(pair.hostCohouseId) || [];
+      const visitorTokens = tokensByCohouse.get(pair.visitorCohouseId) || [];
+
+      const promises: Promise<unknown>[] = [];
+
       if (hostTokens.length > 0) {
-        await sendToTokens(hostTokens, {
-          title: `${stepTitle} commence dans 15 min !`,
-          body: `Vous recevez ${visitorName} chez vous. ${stepGreeting}`,
-          data: { type: `${step}_reminder`, gameId, role: "host" },
-        });
+        promises.push(
+          sendToTokens(hostTokens, {
+            title: `${stepTitle} commence dans 15 min !`,
+            body: `Vous recevez ${visitorName} chez vous. ${stepGreeting}`,
+            data: { type: `${step}_reminder`, gameId, role: "host" },
+          })
+        );
       }
 
-      // Visitor notification
-      const visitorUserIds = await getUserIdsForCohouse(
-        pair.visitorCohouseId
-      );
-      const visitorTokens = await getFCMTokensForUsers(visitorUserIds);
       if (visitorTokens.length > 0) {
-        await sendToTokens(visitorTokens, {
-          title: `${stepTitle} commence dans 15 min !`,
-          body: `Direction chez ${hostName} pour ${stepLabel} !`,
-          data: { type: `${step}_reminder`, gameId, role: "visitor" },
-        });
+        promises.push(
+          sendToTokens(visitorTokens, {
+            title: `${stepTitle} commence dans 15 min !`,
+            body: `Direction chez ${hostName} pour ${stepLabel} !`,
+            data: { type: `${step}_reminder`, gameId, role: "visitor" },
+          })
+        );
       }
-    }
-  }
+
+      await Promise.all(promises);
+    })
+  );
 
   console.log(
     `${step} reminders sent for game ${gameId} (${groupPlannings.length} groups)`

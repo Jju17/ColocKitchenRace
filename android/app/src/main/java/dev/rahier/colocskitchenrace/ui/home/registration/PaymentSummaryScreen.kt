@@ -126,7 +126,7 @@ fun PaymentSummaryScreen(
                 hasError = state.error != null,
                 hasPaymentResult = state.paymentResult != null,
                 formattedTotal = state.formattedTotal,
-                onRetry = { viewModel.onIntent(PaymentSummaryIntent.PaymentSucceeded) },
+                onRetry = { viewModel.onIntent(PaymentSummaryIntent.RetryPayment) },
                 onPay = { viewModel.onIntent(PaymentSummaryIntent.PayClicked) },
             )
         }

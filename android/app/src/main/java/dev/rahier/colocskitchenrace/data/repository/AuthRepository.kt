@@ -13,7 +13,7 @@ interface AuthRepository {
     suspend fun createAccount(email: String, password: String): User
     suspend fun signInWithGoogle(activity: Activity): User
     suspend fun signInWithApple(activity: Activity): User
-    fun signOut()
+    suspend fun signOut()
     suspend fun deleteAccount(userId: String)
     suspend fun updateUser(user: User)
     suspend fun resendVerificationEmail()
@@ -21,6 +21,6 @@ interface AuthRepository {
     suspend fun reloadCurrentUser(): Boolean
     fun isEmailVerified(): Boolean
     fun listenAuthState(): Flow<Boolean>
-    fun storeFCMToken(token: String)
+    suspend fun storeFCMToken(token: String)
     suspend fun restoreSession(): User?
 }

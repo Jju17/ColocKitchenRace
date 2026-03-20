@@ -98,6 +98,7 @@ struct SignInFeature {
 struct SignInView: View {
     @Bindable var store: StoreOf<SignInFeature>
     @FocusState var focusedField: SignInField?
+    @Environment(\.colorScheme) private var colorScheme
 
     var body: some View {
         GeometryReader { geo in
@@ -135,43 +136,7 @@ struct SignInView: View {
                                 Rectangle().frame(height: 1).foregroundStyle(.gray.opacity(0.3))
                             }
 
-                            Button {
-                                self.store.send(.googleSigninButtonTapped)
-                            } label: {
-                                HStack(spacing: 8) {
-                                    Image(systemName: "g.circle.fill")
-                                        .font(.title2)
-                                    Text("Sign in with Google")
-                                        .fontWeight(.medium)
-                                }
-                                .frame(maxWidth: .infinity)
-                                .frame(height: 50)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 15, style: .continuous)
-                                        .fill(.white)
-                                )
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 15, style: .continuous)
-                                        .stroke(Color.gray.opacity(0.3), lineWidth: 1)
-                                )
-                            }
-                            .buttonStyle(.plain)
-                            .accessibilityLabel("Sign in with Google")
-
-                            ZStack {
-                                SignInWithAppleButton(.signIn) { _ in } onCompletion: { _ in }
-                                    .signInWithAppleButtonStyle(.black)
-                                    .frame(height: 50)
-                                    .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
-                                    .allowsHitTesting(false)
-
-                                Color.clear
-                                    .contentShape(Rectangle())
-                                    .frame(height: 50)
-                                    .onTapGesture {
-                                        self.store.send(.appleSigninButtonTapped)
-                                    }
-                            }
+                            socialLoginButtons
                         }
                         .padding(.top)
                     }
@@ -212,6 +177,47 @@ struct SignInView: View {
 }
 
 extension SignInView {
+    @ViewBuilder
+    private var socialLoginButtons: some View {
+        Button {
+            self.store.send(.googleSigninButtonTapped)
+        } label: {
+            HStack(spacing: 8) {
+                Image(systemName: "g.circle.fill")
+                    .font(.title2)
+                Text("Sign in with Google")
+                    .fontWeight(.medium)
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 50)
+            .background(
+                RoundedRectangle(cornerRadius: 15, style: .continuous)
+                    .fill(Color(uiColor: .systemBackground))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 15, style: .continuous)
+                    .stroke(Color.gray.opacity(0.3), lineWidth: 1)
+            )
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Sign in with Google")
+
+        ZStack {
+            SignInWithAppleButton(.signIn) { _ in } onCompletion: { _ in }
+                .signInWithAppleButtonStyle(colorScheme == .dark ? .white : .black)
+                .frame(height: 50)
+                .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
+                .allowsHitTesting(false)
+
+            Color.clear
+                .contentShape(Rectangle())
+                .frame(height: 50)
+                .onTapGesture {
+                    self.store.send(.appleSigninButtonTapped)
+                }
+        }
+    }
+
     private func focusPreviousField() {
         focusedField = focusedField.map {
             SignInField(rawValue: $0.rawValue - 1) ?? .password

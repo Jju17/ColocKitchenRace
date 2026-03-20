@@ -92,15 +92,14 @@ class CohouseRepositoryImpl @Inject constructor(
     }
 
     override suspend fun set(id: String, cohouse: Cohouse) {
-        firestore.collection(Constants.COHOUSES_COLLECTION)
-            .document(id)
-            .set(cohouseToMap(cohouse))
-            .await()
-
-        // Rewrite users subcollection
+        // Read existing users first (needed to know which docs to delete)
         val existingUsers = firestore.collection(Constants.COHOUSES_COLLECTION)
             .document(id).collection("users").get().await()
+
+        // Combine parent doc write + subcollection delete-and-rewrite into a single batch
         val batch = firestore.batch()
+        val docRef = firestore.collection(Constants.COHOUSES_COLLECTION).document(id)
+        batch.set(docRef, cohouseToMap(cohouse))
         for (doc in existingUsers.documents) {
             batch.delete(doc.reference)
         }

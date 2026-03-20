@@ -64,7 +64,8 @@ struct AppFeature {
                 if isAdmin {
                     state = .tab(TabFeature.State())
                 } else {
-                    state = .signin(SignInFeature.State(error: AuthError.notAdmin))
+                    let notAdminError: String = AuthError.notAdmin.localizedDescription
+                    state = .signin(SignInFeature.State(error: notAdminError))
                     return .run { _ in
                         try? await self.authenticationClient.signOut()
                     }

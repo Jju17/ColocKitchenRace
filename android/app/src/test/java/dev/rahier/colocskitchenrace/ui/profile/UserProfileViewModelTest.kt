@@ -65,10 +65,11 @@ class UserProfileViewModelTest {
 
         viewModel.effect.test {
             viewModel.onIntent(UserProfileIntent.SignOutClicked)
+            advanceUntilIdle()
             assertEquals(UserProfileEffect.SignedOut, awaitItem())
         }
 
-        verify { authRepository.signOut() }
+        coVerify { authRepository.signOut() }
     }
 
     @Test

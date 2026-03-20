@@ -23,6 +23,11 @@ import dev.rahier.colocskitchenrace.ui.components.CKRButton
 import dev.rahier.colocskitchenrace.ui.theme.*
 import dev.rahier.colocskitchenrace.util.DateUtils
 import java.util.Date
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextDecoration
 
 @Composable
 fun PlanningScreen(
@@ -104,6 +109,7 @@ private fun TimelineItem(
     step: PlanningStep,
     isLast: Boolean,
 ) {
+    val context = LocalContext.current
     Row(modifier = Modifier.fillMaxWidth()) {
         // Timeline indicator
         Column(
@@ -149,7 +155,16 @@ private fun TimelineItem(
 
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = step.cohouseName, style = MaterialTheme.typography.titleMedium)
-                Text(text = step.address, style = MaterialTheme.typography.bodySmall, color = CkrGray)
+                Text(
+                    text = step.address,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = CkrLavender,
+                    textDecoration = TextDecoration.Underline,
+                    modifier = Modifier.clickable {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=${Uri.encode(step.address)}"))
+                        context.startActivity(intent)
+                    },
+                )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = DateUtils.formatTimeRange(step.startTime, step.endTime),
@@ -178,6 +193,7 @@ private fun TimelineItem(
 
 @Composable
 private fun PartyItem(party: PartyInfo) {
+    val context = LocalContext.current
     Row(modifier = Modifier.fillMaxWidth()) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -196,7 +212,16 @@ private fun PartyItem(party: PartyInfo) {
                 Text(text = stringResource(R.string.party), style = MaterialTheme.typography.headlineSmall)
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = party.name, style = MaterialTheme.typography.titleMedium)
-                Text(text = party.address, style = MaterialTheme.typography.bodySmall, color = CkrGray)
+                Text(
+                    text = party.address,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = CkrLavender,
+                    textDecoration = TextDecoration.Underline,
+                    modifier = Modifier.clickable {
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse("geo:0,0?q=${Uri.encode(party.address)}"))
+                        context.startActivity(intent)
+                    },
+                )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = DateUtils.formatTimeRange(party.startTime, party.endTime),

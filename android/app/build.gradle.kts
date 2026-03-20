@@ -24,6 +24,7 @@ android {
         applicationId = "dev.rahier.colocskitchenrace"
         minSdk = 26
         targetSdk = 35
+        // versionCode and versionName are overridden by CI/Bitrise at build time
         versionCode = 1
         versionName = "1.0.0"
 

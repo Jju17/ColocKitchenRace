@@ -27,7 +27,7 @@ struct CKRButton: View {
                     .shadow(color: .gray, radius: 2, x: 3, y: 3)
                 Text(self.titleKey)
                     .fontWeight(.bold)
-                    .foregroundStyle(.black)
+                    .foregroundStyle(Color.primary)
                     .frame(maxHeight: 100)
             }
         }

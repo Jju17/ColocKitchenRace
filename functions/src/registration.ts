@@ -73,11 +73,19 @@ export const confirmRegistration = onCall<ConfirmRegistrationRequest>(
         );
       }
 
-      // 2. Confirm reservation in a transaction
+      // 2. Confirm reservation in a transaction.
+      // The Stripe refund (if needed) is moved OUTSIDE the transaction
+      // to avoid duplicate refunds on transaction retries.
       const gameRef = db.collection("ckrGames").doc(gameId);
       const regRef = gameRef.collection("registrations").doc(cohouseId);
 
+      let needsRefund = false;
+
       await db.runTransaction(async (transaction) => {
+        // Reset on each transaction attempt so that a retry after a
+        // transient conflict starts with a clean flag.
+        needsRefund = false;
+
         const regDoc = await transaction.get(regRef);
 
         if (!regDoc.exists) {
@@ -85,6 +93,15 @@ export const confirmRegistration = onCall<ConfirmRegistrationRequest>(
         }
 
         const regData = regDoc.data()!;
+
+        // Verify the client-supplied paymentIntentId matches the one
+        // stored during reservation to prevent cross-registration attacks.
+        if (regData.paymentIntentId && regData.paymentIntentId !== paymentIntentId) {
+          throw new HttpsError(
+            "invalid-argument",
+            "PaymentIntent ID does not match the reservation"
+          );
+        }
 
         // Idempotent: already confirmed → success
         if (regData.status === "confirmed") {
@@ -101,25 +118,12 @@ export const confirmRegistration = onCall<ConfirmRegistrationRequest>(
         // Check if reservation has expired
         const reservedUntil = (regData.reservedUntil as admin.firestore.Timestamp).toDate();
         if (new Date() >= reservedUntil) {
-          // Reservation expired but payment succeeded — issue automatic refund
-          try {
-            await getStripe().refunds.create({
-              payment_intent: paymentIntentId,
-              reason: "requested_by_customer",
-            });
-            console.warn(
-              `Auto-refunded payment ${paymentIntentId} for expired reservation ` +
-              `(cohouse ${cohouseId}, game ${gameId})`
-            );
-          } catch (refundError) {
-            console.error(
-              `CRITICAL: Failed to auto-refund payment ${paymentIntentId} for expired reservation:`,
-              refundError
-            );
-          }
+          // Flag for refund outside the transaction to avoid
+          // duplicate Stripe calls on transaction retries.
+          needsRefund = true;
           throw new HttpsError(
             "failed-precondition",
-            "Reservation has expired. Your payment has been refunded. Please register again."
+            "Reservation has expired. Your payment will be refunded. Please register again."
           );
         }
 
@@ -135,6 +139,29 @@ export const confirmRegistration = onCall<ConfirmRegistrationRequest>(
           reservedBy: admin.firestore.FieldValue.delete(),
         });
       });
+
+      // Issue refund outside the transaction (idempotent, no retry risk)
+      if (needsRefund) {
+        try {
+          await getStripe().refunds.create({
+            payment_intent: paymentIntentId,
+            reason: "requested_by_customer",
+          });
+          console.warn(
+            `Auto-refunded payment ${paymentIntentId} for expired reservation ` +
+            `(cohouse ${cohouseId}, game ${gameId})`
+          );
+        } catch (refundError) {
+          console.error(
+            `CRITICAL: Failed to auto-refund payment ${paymentIntentId} for expired reservation:`,
+            refundError
+          );
+        }
+        throw new HttpsError(
+          "failed-precondition",
+          "Reservation has expired. Your payment has been refunded. Please register again."
+        );
+      }
 
       console.log(
         `Registration confirmed for cohouse ${cohouseId} in game ${gameId} (payment: ${paymentIntentId})`

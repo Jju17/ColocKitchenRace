@@ -10,6 +10,7 @@ import FirebaseAuth
 import FirebaseFirestore
 import FirebaseFunctions
 import FirebaseStorage
+import os
 import UIKit
 
 // MARK: - Error
@@ -245,7 +246,15 @@ extension CohouseClient: DependencyKey {
                 .whereField("userId", isEqualTo: userInfo.id.uuidString)
                 .getDocuments()
 
-            guard let document = snapshot.documents.first else { return }
+            guard let document = snapshot.documents.first else {
+                // User doc not found in cohouse subcollection — still clear local
+                // state and cohouseId to avoid the user being stuck.
+                Logger.cohouseLog.warning("quitCohouse: user doc not found in cohouse subcollection, clearing local state")
+                try FirestoreHelpers.updateUserCohouseId(nil, for: userInfo)
+                try await refreshCohouseClaim()
+                $cohouse.withLock { $0 = nil }
+                return
+            }
 
             try await usersRef.document(document.documentID).delete()
             try FirestoreHelpers.updateUserCohouseId(nil, for: userInfo)

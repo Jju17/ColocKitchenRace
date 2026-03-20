@@ -21,6 +21,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
     @Dependency(\.ckrClient) var ckrClient
     @Dependency(\.newsClient) var newsClient
 
+    private var gameListenerTask: Task<Void, Never>?
+    private var newsListenerTask: Task<Void, Never>?
+
     private var isTesting: Bool {
         NSClassFromString("XCTestCase") != nil || ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
     }
@@ -31,13 +34,14 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 
         FirebaseApp.configure()
 
-        // Start real-time Firestore listeners (must be after FirebaseApp.configure)
+        // Start real-time Firestore listeners (must be after FirebaseApp.configure).
+        // Task handles are stored so they can be cancelled if needed.
         let ckr = ckrClient
         let news = newsClient
-        Task {
+        gameListenerTask = Task {
             for await _ in ckr.listenToGame() {}
         }
-        Task {
+        newsListenerTask = Task {
             for await _ in news.listenToNews() {}
         }
 
@@ -153,7 +157,6 @@ struct colocskitchenraceApp: App {
                     AppFeature()
                 }
             )
-            .preferredColorScheme(.light)
             .registerPopups(id: .shared) { config in config
                     .vertical { $0
                         .enableDragGesture(true)
@@ -162,7 +165,7 @@ struct colocskitchenraceApp: App {
                     }
                     .center { $0
                         .tapOutsideToDismissPopup(true)
-                        .backgroundColor(.white)
+                        .backgroundColor(Color(.systemBackground))
                     }
             }
         }

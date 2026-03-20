@@ -32,8 +32,6 @@ data class CohouseState(
 sealed interface CohouseIntent {
     data class JoinCodeChanged(val code: String) : CohouseIntent
     data object JoinClicked : CohouseIntent
-    data object CreateClicked : CohouseIntent
     data object QuitClicked : CohouseIntent
-    data object EditClicked : CohouseIntent
     data object Refresh : CohouseIntent
 }

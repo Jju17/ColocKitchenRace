@@ -22,6 +22,11 @@ val CkrWhite = Color(0xFFFFFFFF)
 val CkrOffWhite = Color(0xFFF7F8FA)
 val CkrDark = Color(0xFF1A1F2E)
 val CkrGray = Color(0xFF6B7280)
+val CkrGrayLight = Color(0xFF9CA3AF)
+
+// Dark Theme Colors
+val CkrDarkBackground = Color(0xFF121318)
+val CkrDarkSurface = Color(0xFF1E2030)
 
 // Event type colors
 fun eventColor(type: String): Color = when (type) {

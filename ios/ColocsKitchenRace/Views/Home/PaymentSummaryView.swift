@@ -144,10 +144,8 @@ struct PaymentSummaryFeature {
                 let count = state.participantCount
                 @Shared(.ckrGame) var ckrGame
                 $ckrGame.withLock { game in
-                    if game != nil {
-                        game!.cohouseIDs.append(cohouseId)
-                        game!.totalRegisteredParticipants += count
-                    }
+                    game?.cohouseIDs.append(cohouseId)
+                    game?.totalRegisteredParticipants += count
                 }
 
                 return .send(.delegate(.registrationSucceeded))

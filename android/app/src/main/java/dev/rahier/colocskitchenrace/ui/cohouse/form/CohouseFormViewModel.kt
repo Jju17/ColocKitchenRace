@@ -9,12 +9,14 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.rahier.colocskitchenrace.R
 import dev.rahier.colocskitchenrace.data.model.AddressValidationResult
 import dev.rahier.colocskitchenrace.data.model.Cohouse
+import dev.rahier.colocskitchenrace.data.model.CohouseType
 import dev.rahier.colocskitchenrace.data.model.CohouseUser
 import dev.rahier.colocskitchenrace.data.model.PostalAddress
 import dev.rahier.colocskitchenrace.data.model.ValidatedAddress
 import dev.rahier.colocskitchenrace.data.repository.AddressValidatorRepository
 import dev.rahier.colocskitchenrace.data.repository.AuthRepository
 import dev.rahier.colocskitchenrace.data.repository.CohouseRepository
+import dev.rahier.colocskitchenrace.data.repository.IdCardScannerRepository
 import dev.rahier.colocskitchenrace.util.ErrorMapper
 import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.Job
@@ -34,6 +36,7 @@ class CohouseFormViewModel @Inject constructor(
     private val cohouseRepository: CohouseRepository,
     private val authRepository: AuthRepository,
     private val addressValidatorRepository: AddressValidatorRepository,
+    private val idCardScannerRepository: IdCardScannerRepository,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
@@ -52,6 +55,7 @@ class CohouseFormViewModel @Inject constructor(
                 isEditMode = true,
                 cohouseId = cohouse.id,
                 name = cohouse.name,
+                cohouseType = cohouse.cohouseType ?: CohouseType.MIXED,
                 street = cohouse.address.street,
                 postalCode = cohouse.address.postalCode,
                 city = cohouse.address.city,
@@ -89,6 +93,7 @@ class CohouseFormViewModel @Inject constructor(
     fun onIntent(intent: CohouseFormIntent) {
         when (intent) {
             is CohouseFormIntent.NameChanged -> _state.update { it.copy(name = intent.name) }
+            is CohouseFormIntent.CohouseTypeChanged -> _state.update { it.copy(cohouseType = intent.type) }
             is CohouseFormIntent.StreetChanged -> {
                 _state.update { it.copy(street = intent.street) }
                 debouncedValidateAddress()
@@ -107,7 +112,28 @@ class CohouseFormViewModel @Inject constructor(
             is CohouseFormIntent.CoverImagePicked -> _state.update { it.copy(coverImageData = intent.imageData) }
             CohouseFormIntent.CoverImageCleared -> _state.update { it.copy(coverImageData = null) }
             is CohouseFormIntent.ApplySuggestedAddress -> applySuggestedAddress(intent.address)
+            is CohouseFormIntent.IdCardPicked -> scanIdCard(intent.imageData)
+            CohouseFormIntent.ShowMapPicker -> _state.update { it.copy(showMapPicker = true) }
+            CohouseFormIntent.DismissMapPicker -> _state.update { it.copy(showMapPicker = false) }
+            is CohouseFormIntent.MapPinMoved -> _state.update {
+                it.copy(latitude = intent.latitude, longitude = intent.longitude)
+            }
             CohouseFormIntent.Save -> save()
+        }
+    }
+
+    private fun scanIdCard(imageData: ByteArray) {
+        viewModelScope.launch {
+            _state.update { it.copy(isProcessingIdCard = true, idCardScanResult = null) }
+            try {
+                val result = idCardScannerRepository.scanIdCard(imageData)
+                _state.update { it.copy(isProcessingIdCard = false, idCardScanResult = result) }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Log.w("CohouseForm", "Failed to scan ID card", e)
+                _state.update { it.copy(isProcessingIdCard = false) }
+            }
         }
     }
 
@@ -208,21 +234,22 @@ class CohouseFormViewModel @Inject constructor(
                     val existing = cohouseRepository.currentCohouse.value ?: return@launch
                     // Strip empty non-admin users (like iOS)
                     val cleanMembers = s.members.filter { it.surname.isNotBlank() || it.isAdmin }
-                    val updated = existing.copy(
+                    var updated = existing.copy(
                         name = s.name,
+                        cohouseType = s.cohouseType,
                         address = address,
                         users = cleanMembers,
                         latitude = s.latitude,
                         longitude = s.longitude,
                     )
-                    cohouseRepository.set(s.cohouseId, updated)
 
-                    // Upload cover image if changed
+                    // Upload cover image first if changed, then do a single set() with the complete object
                     s.coverImageData?.let { imageData ->
                         val path = cohouseRepository.uploadCoverImage(s.cohouseId, imageData)
-                        cohouseRepository.set(s.cohouseId, updated.copy(coverImagePath = path))
-                        cohouseRepository.setCurrentCohouse(updated.copy(coverImagePath = path))
-                    } ?: cohouseRepository.setCurrentCohouse(updated)
+                        updated = updated.copy(coverImagePath = path)
+                    }
+                    cohouseRepository.set(s.cohouseId, updated)
+                    cohouseRepository.setCurrentCohouse(updated)
                 } else {
                     // Check for duplicates
                     val duplicateResult = cohouseRepository.checkDuplicate(s.name, s.street, s.city)
@@ -235,6 +262,7 @@ class CohouseFormViewModel @Inject constructor(
                     val cleanMembers = s.members.filter { it.surname.isNotBlank() || it.isAdmin }
                     val cohouse = Cohouse(
                         name = s.name,
+                        cohouseType = s.cohouseType,
                         address = address,
                         code = code,
                         users = cleanMembers,
@@ -261,6 +289,8 @@ class CohouseFormViewModel @Inject constructor(
 
                 _state.update { it.copy(isSaving = false) }
                 _effect.send(CohouseFormEffect.Saved)
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 _state.update { it.copy(isSaving = false, error = ErrorMapper.toUserMessage(e, context)) }
             }

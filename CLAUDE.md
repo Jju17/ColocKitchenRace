@@ -52,15 +52,18 @@ Colocs Kitchen Race (CKR) is a mobile app for organizing community dining events
 ```
 ColocKitchenRace/
 ├── ios/                              # iOS apps
-│   ├── ColocKitchenRace/             # Main iOS app
+│   ├── ColocsKitchenRace/            # Main iOS app
 │   │   ├── App.swift                 # TCA root reducer (AppFeature)
-│   │   ├── Views/                    # Feature-based UI
+│   │   ├── colocskitchenraceApp.swift # @main app entry point + AppDelegate
+│   │   ├── Views/                    # Feature-based UI (reducers co-located in *View.swift)
 │   │   ├── Models/                   # App-specific models
 │   │   ├── Clients/                  # Service layer
+│   │   ├── Helpers/                  # FirestoreHelpers, AddressHelpers
 │   │   └── Utils/                    # Helpers
 │   ├── CKRAdmin/                     # Admin iOS app
 │   ├── Shared/                       # Code shared between iOS targets
-│   │   ├── Models/                   # Common models
+│   │   ├── Assets/                   # Shared asset catalog
+│   │   ├── Models/                   # Common models (incl. Challenge/ChallengeContent/)
 │   │   ├── Clients/                  # Shared client logic
 │   │   └── Utils/                    # Common utilities
 │   ├── ColocsKitchenRace.xcodeproj/  # Xcode project
@@ -85,7 +88,7 @@ ColocKitchenRace/
 │   └── package.json
 ├── functions/                        # Firebase Cloud Functions
 │   ├── src/                          # TypeScript source
-│   └── __tests__/                    # Jest tests
+│   │   └── __tests__/                # Jest tests
 ├── firestore.rules                   # Firestore security rules
 ├── firestore.indexes.json            # Firestore composite indexes
 └── firebase.json                     # Firebase project config
@@ -139,16 +142,17 @@ xcodebuild -project ios/ColocsKitchenRace.xcodeproj -scheme colocskitchenrace -d
 ## Architecture & Conventions
 
 ### iOS - TCA Pattern
-- Each feature has a `*Feature.swift` reducer and a `*View.swift` view
-- Root flow: `AppFeature` -> `TabFeature` -> individual feature reducers
+- Each feature co-locates the `@Reducer` struct and `View` struct in a single `*View.swift` file (e.g., `HomeFeature` + `HomeView` both live in `HomeView.swift`)
+- Root flow: `AppFeature` (in `App.swift`) -> `TabFeature` -> individual feature reducers
+- Entry point: `colocskitchenraceApp.swift` (`@main` struct + `AppDelegate`)
 - Clients use `@DependencyClient` for testability
 - Tests use TCA's `TestStore` for exhaustive action/state verification
-- Naming: `FeatureNameFeature.swift` (reducer), `FeatureNameView.swift` (view), `ServiceNameClient.swift` (client)
+- Naming: `FeatureNameView.swift` (reducer + view), `ServiceNameClient.swift` (client)
 - Shared components go in `Views/Global/`
 
 ### Android - MVI Pattern
 - Each feature has a `*Contract.kt` (State/Intent/Effect), `*ViewModel.kt`, and `*Screen.kt`
-- Root flow: `CKRNavGraph` -> `MainScreen` (tabs) -> individual screens
+- Root flow: `CKRApp` (in `CKRApp.kt`) -> `MainScreen` (tabs) -> individual screens
 - Repository pattern for data layer, injected via Hilt
 - `@HiltViewModel` for all ViewModels
 - Naming: `FeatureNameScreen.kt` (UI), `FeatureNameViewModel.kt` (logic), `FeatureNameContract.kt` (MVI contract)
@@ -195,6 +199,7 @@ xcodebuild -project ios/ColocsKitchenRace.xcodeproj -scheme colocskitchenrace -d
 - `deleteAccount` - User account cleanup
 - `checkDuplicateCohouse` - Duplicate detection
 - `validateAddress` - Geocoding via OpenStreetMap
+- `getCohousesForMap` - Batch-fetches cohouse GPS coordinates, names, and members for map display
 - `setCohouseClaim` / `setAdminClaim` - Custom claims management
 
 ## Registration Flow (Reserve-Then-Pay)
@@ -402,8 +407,9 @@ Inline form appears on card (type-specific UI)
 User fills form + taps "Envoyer"
   ↓
 [Picture only] Upload image to Firebase Storage
-  → Path: challenges/{challengeId}/responses/{cohouseId}.jpg
-  → Image compressed to <1MB JPEG before upload
+  → Path: challenges/{challengeId}/responses/{responseId}.jpg
+  → iOS uses a deterministic UUID for responseId; Android uses cohouseId
+  → Image compressed to <500KB JPEG before upload
   ↓
 Create ChallengeResponse document in Firestore
   → Path: /challenges/{challengeId}/responses/{cohouseId}
@@ -414,14 +420,14 @@ Card switches to "En attente de validation" state
 Admin validates/invalidates via CKRAdmin app
   ↓
 [iOS] Real-time listener updates card status instantly
-[Android] Status reflected on next load
+[Android] Real-time listener updates card status
 ```
 
 ### iOS Implementation (TCA)
 
-- **`ChallengeTileFeature.swift`** — TCA Reducer managing the full participation lifecycle per tile. Handles `startTapped`, `submitTapped(ChallengeSubmitPayload)`, real-time status watching via `responseClient.watchStatus()`, and nested `PictureChoiceFeature` for camera/gallery.
+- **`ChallengeTileView.swift`** — TCA Reducer (`ChallengeTileFeature`) + View, managing the full participation lifecycle per tile. Handles `startTapped`, `submitTapped(ChallengeSubmitPayload)`, real-time status watching via `responseClient.watchStatus()`, and nested `PictureChoiceFeature` for camera/gallery.
 - **`ChallengeContentView.swift`** — Router view switching between `NoChoiceView`, `SingleAnswerView`, `MultipleChoiceView`, `PictureChoiceView`.
-- **`PictureChoiceFeature.swift`** — Nested TCA reducer for image picking (UIImagePickerController) + compression (`ImagePipeline.compress`).
+- **`PictureChoiceView.swift`** — Nested TCA reducer (`PictureChoiceFeature`) + View for image picking (UIImagePickerController) + compression (`ImagePipeline.compress`).
 - **`WaitingReviewView.swift`** / **`FinalStatusView.swift`** — Status display composables.
 - **State fields:** `response: ChallengeResponse?`, `isSubmitting`, `submitError`, `liveStatus` (real-time from Firestore listener).
 - **Real-time updates:** Each tile watches `responseClient.watchStatus(challengeId, cohouseId)` for instant admin decisions.
@@ -439,7 +445,7 @@ Admin validates/invalidates via CKRAdmin app
 | Aspect | iOS | Android |
 |--------|-----|---------|
 | Architecture | Per-tile TCA reducer (`ChallengeTileFeature`) | Shared `ChallengesViewModel` with `participatingChallengeId` |
-| Real-time status | `watchStatus()` listener per tile | Loaded on screen init (no real-time listener yet) |
+| Real-time status | `watchStatus()` listener per tile | `watchStatus()` with `addSnapshotListener` |
 | Image picker | UIImagePickerController (camera/library) | `ActivityResultContracts.TakePicture` / `GetContent` |
 | Image compression | `ImagePipeline.compress` (custom) | `Bitmap.compress(JPEG, quality, stream)` loop |
 | Text input | Bottom sheet modal for SingleAnswer | Inline `OutlinedTextField` |
@@ -449,8 +455,8 @@ Admin validates/invalidates via CKRAdmin app
 | Layer | Files |
 |-------|-------|
 | **Firestore** | `/challenges/{challengeId}/responses/{cohouseId}` |
-| **Storage** | `challenges/{challengeId}/responses/{cohouseId}.jpg` (pictures only) |
-| **iOS** | `ChallengeTileFeature.swift`, `ChallengeContentView.swift`, `NoChoiceView.swift`, `SingleAnswerView.swift`, `MultipleChoiceView.swift`, `PictureChoiceView.swift` |
+| **Storage** | `challenges/{challengeId}/responses/{responseId}.jpg` (pictures only) |
+| **iOS** | `ChallengeTileView.swift`, `ChallengeContentView.swift`, `NoChoiceView.swift`, `SingleAnswerView.swift`, `MultipleChoiceView.swift`, `PictureChoiceView.swift` |
 | **Android** | `ChallengesViewModel.kt`, `ChallengesScreen.kt`, `ChallengeResponseRepository.kt`, `ChallengeResponseRepositoryImpl.kt` |
 | **Models** | `Challenge.kt`/`Challenge.swift`, `ChallengeContent.kt`/`ChallengeContent.swift`, `ChallengeResponse.kt`/`ChallengeResponse.swift` |
 
@@ -468,12 +474,14 @@ Config: `bitrise.yml` at project root.
 ### iOS
 - `deploy_testflight` workflow: builds main app -> TestFlight
 - `deploy_testflight_admin` workflow: builds CKRAdmin -> TestFlight
-- `GoogleService-Info.plist` restored from Base64 secrets at build time
+- 4 `GoogleService-Info.plist` files (staging/prod x main/admin) restored from Base64 secrets:
+  `GOOGLE_SERVICE_INFO_PLIST_STAGING_BASE64`, `GOOGLE_SERVICE_INFO_PLIST_PROD_BASE64`,
+  `GOOGLE_SERVICE_INFO_PLIST_ADMIN_STAGING_BASE64`, `GOOGLE_SERVICE_INFO_PLIST_ADMIN_PROD_BASE64`
 
 ### Android
 - `android_test` workflow: runs unit tests (debug variant)
 - `deploy_play_store` workflow: builds signed release AAB -> Play Store internal track
-- `google-services.json` restored from Base64 secret (`GOOGLE_SERVICES_JSON_BASE64`)
+- `google-services.json` restored from Base64 secrets: `GOOGLE_SERVICES_JSON_STAGING_BASE64` (debug), `GOOGLE_SERVICES_JSON_PROD_BASE64` (release)
 - Keystore restored from Base64 secret (`ANDROID_KEYSTORE_BASE64`)
 - Required secrets: `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD`
 

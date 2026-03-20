@@ -13,10 +13,6 @@ enum AuthProvider: String, Codable, Equatable {
     case apple
 }
 
-enum Gender: String, CaseIterable, Codable {
-    case male, female, other
-}
-
 struct User: Equatable, Hashable, Identifiable, Codable {
     var id: UUID
     var authId: String = ""
@@ -28,7 +24,6 @@ struct User: Equatable, Hashable, Identifiable, Codable {
     var phoneNumber: String?
     var email: String?
     var dietaryPreferences: Set<DietaryPreference> = []
-    var gender: Gender?
     var fcmToken: String?
     var cohouseId: String?
 }

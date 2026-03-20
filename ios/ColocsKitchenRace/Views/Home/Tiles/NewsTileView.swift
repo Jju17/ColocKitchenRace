@@ -45,7 +45,7 @@ struct NewsTileView: View {
                 } else {
                     ZStack {
                         Rectangle()
-                            .fill(.white)
+                            .fill(Color(.systemBackground))
                             .clipShape(RoundedRectangle(cornerRadius: 20))
                             .padding()
                         Text("No news at the moment")

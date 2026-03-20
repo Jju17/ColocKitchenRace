@@ -5,8 +5,6 @@ import java.util.UUID
 
 enum class AuthProvider { EMAIL, GOOGLE, APPLE }
 
-enum class Gender { MALE, FEMALE, OTHER }
-
 data class User(
     val id: String = UUID.randomUUID().toString(),
     val authId: String = "",
@@ -18,7 +16,6 @@ data class User(
     val phoneNumber: String? = null,
     val email: String? = null,
     val dietaryPreferences: Set<DietaryPreference> = emptySet(),
-    val gender: Gender? = null,
     val fcmToken: String? = null,
     val cohouseId: String? = null,
 ) {

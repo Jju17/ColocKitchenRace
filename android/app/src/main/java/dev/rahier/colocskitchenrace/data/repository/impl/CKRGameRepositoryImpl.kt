@@ -137,7 +137,7 @@ class CKRGameRepositoryImpl @Inject constructor(
 
     @Suppress("UNCHECKED_CAST")
     private fun mapToPlanningStep(data: Map<String, Any>): PlanningStep = PlanningStep(
-        role = if (data["role"] == "host") StepRole.HOST else StepRole.VISITOR,
+        role = StepRole.fromServer(data["role"] as? String ?: "visitor"),
         cohouseName = data["cohouseName"] as? String ?: "",
         address = data["address"] as? String ?: "",
         hostPhone = data["hostPhone"] as? String,

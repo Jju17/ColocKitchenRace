@@ -24,14 +24,6 @@ object UserMapper {
             phoneNumber = data["phoneNumber"] as? String,
             email = data["email"] as? String,
             dietaryPreferences = prefs,
-            gender = (data["gender"] as? String)?.let {
-                when (it) {
-                    "male" -> Gender.MALE
-                    "female" -> Gender.FEMALE
-                    "other" -> Gender.OTHER
-                    else -> null
-                }
-            },
             fcmToken = data["fcmToken"] as? String,
             cohouseId = data["cohouseId"] as? String,
         )
@@ -48,7 +40,6 @@ object UserMapper {
         "phoneNumber" to user.phoneNumber,
         "email" to user.email,
         "dietaryPreferences" to user.dietaryPreferences.map { it.toFirestore() },
-        "gender" to user.gender?.name?.lowercase(),
         "fcmToken" to user.fcmToken,
         "cohouseId" to user.cohouseId,
     )

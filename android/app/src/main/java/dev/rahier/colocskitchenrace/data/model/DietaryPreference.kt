@@ -11,9 +11,9 @@ enum class DietaryPreference(val displayName: String, val icon: String) {
         fun fromFirestore(value: String): DietaryPreference? = when (value) {
             "vegetarian" -> VEGETARIAN
             "vegan" -> VEGAN
-            "glutenFree" -> GLUTEN_FREE
-            "lactoseFree" -> LACTOSE_FREE
-            "nutFree" -> NUT_FREE
+            "gluten_free" -> GLUTEN_FREE
+            "lactose_free" -> LACTOSE_FREE
+            "nut_free" -> NUT_FREE
             else -> null
         }
     }
@@ -21,8 +21,8 @@ enum class DietaryPreference(val displayName: String, val icon: String) {
     fun toFirestore(): String = when (this) {
         VEGETARIAN -> "vegetarian"
         VEGAN -> "vegan"
-        GLUTEN_FREE -> "glutenFree"
-        LACTOSE_FREE -> "lactoseFree"
-        NUT_FREE -> "nutFree"
+        GLUTEN_FREE -> "gluten_free"
+        LACTOSE_FREE -> "lactose_free"
+        NUT_FREE -> "nut_free"
     }
 }

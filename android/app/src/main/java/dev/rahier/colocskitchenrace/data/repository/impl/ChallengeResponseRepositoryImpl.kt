@@ -25,11 +25,20 @@ class ChallengeResponseRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth,
 ) : ChallengeResponseRepository {
 
+    /**
+     * Fetches ALL challenge responses across all cohouses.
+     *
+     * This is intentional: the leaderboard aggregation needs validated responses from every
+     * cohouse to compute scores and rankings. Firestore security rules are the primary
+     * access control mechanism — this collection group query is allowed only for
+     * authenticated users.
+     */
     @Suppress("UNCHECKED_CAST")
     override suspend fun getAll(): List<ChallengeResponse> {
         if (DemoMode.isActive) return DemoMode.demoChallengeResponses
 
         val snapshot = firestore.collectionGroup(Constants.RESPONSES_SUBCOLLECTION)
+            .whereEqualTo("status", "validated")
             .limit(500)
             .get()
             .await()
