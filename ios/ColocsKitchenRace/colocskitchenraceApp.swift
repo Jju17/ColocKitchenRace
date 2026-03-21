@@ -147,6 +147,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
 struct colocskitchenraceApp: App {
 
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some Scene {
         WindowGroup {
@@ -167,6 +168,11 @@ struct colocskitchenraceApp: App {
                         .tapOutsideToDismissPopup(true)
                         .backgroundColor(Color(.systemBackground))
                     }
+            }
+            .onChange(of: scenePhase) { _, newPhase in
+                if newPhase == .active {
+                    UNUserNotificationCenter.current().setBadgeCount(0)
+                }
             }
         }
     }
