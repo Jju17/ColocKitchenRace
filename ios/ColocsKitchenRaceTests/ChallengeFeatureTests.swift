@@ -288,10 +288,6 @@ struct ChallengeFeatureTests {
             $0.selectedFilter = .todo
         }
 
-        await store.send(.filterChanged(.inProgress)) {
-            $0.selectedFilter = .inProgress
-        }
-
         await store.send(.filterChanged(.reviewed)) {
             $0.selectedFilter = .reviewed
         }
@@ -326,31 +322,6 @@ struct ChallengeFeatureTests {
 
         #expect(state.filteredTiles.count == 1)
         #expect(state.filteredTiles[0].id == todoId)
-    }
-
-    @Test("filteredTiles inProgress returns only tiles started but not yet submitted")
-    func filteredTiles_inProgress() {
-        let todoId = UUID()
-        let inProgressId = UUID()
-        let waitingId = UUID()
-        let reviewedId = UUID()
-
-        let inProgressResp = makeResponse(challengeId: inProgressId, status: .waiting)
-        let waitingResp = makeResponse(challengeId: waitingId, status: .waiting)
-        let reviewedResp = makeResponse(challengeId: reviewedId, status: .validated)
-
-        let state = ChallengeFeature.State(
-            challengeTiles: IdentifiedArray(uniqueElements: [
-                makeTile(id: todoId, response: nil, liveStatus: nil),
-                makeTile(id: inProgressId, response: inProgressResp, liveStatus: nil),
-                makeTile(id: waitingId, response: waitingResp, liveStatus: .waiting),
-                makeTile(id: reviewedId, response: reviewedResp, liveStatus: .validated),
-            ]),
-            selectedFilter: .inProgress
-        )
-
-        #expect(state.filteredTiles.count == 1)
-        #expect(state.filteredTiles[0].id == inProgressId)
     }
 
     @Test("filteredTiles waitingForReview returns only submitted tiles awaiting admin review")
@@ -405,34 +376,38 @@ struct ChallengeFeatureTests {
         #expect(ids.contains(invalidatedId))
     }
 
-    @Test("filteredTiles all returns all tiles sorted by user state then endDate")
-    func filteredTiles_all_sortedByUserStateThenEndDate() {
-        let todoId = UUID()
-        let inProgressId = UUID()
+    @Test("filteredTiles all returns active first, ended last")
+    func filteredTiles_all_sortedActiveFirstEndedLast() {
+        let activeTodoId = UUID()
         let waitingId = UUID()
-        let reviewedId = UUID()
+        let respondedId = UUID()
+        let endedId = UUID()
 
-        let inProgressResp = makeResponse(challengeId: inProgressId, status: .waiting)
         let waitingResp = makeResponse(challengeId: waitingId, status: .waiting)
-        let reviewedResp = makeResponse(challengeId: reviewedId, status: .validated)
+        let respondedResp = makeResponse(challengeId: respondedId, status: .validated)
+        let endedResp = makeResponse(challengeId: endedId, status: .validated)
 
-        // Insert in wrong order: reviewed, todo, waiting, inProgress
+        // Insert in wrong order: ended, waiting, active, responded
         let state = ChallengeFeature.State(
             challengeTiles: IdentifiedArray(uniqueElements: [
-                makeTile(id: reviewedId, endDate: Date.from(year: 2026, month: 3, day: 1, hour: 23), response: reviewedResp, liveStatus: .validated),
-                makeTile(id: todoId, endDate: Date.from(year: 2026, month: 4, day: 1, hour: 23), response: nil, liveStatus: nil),
-                makeTile(id: waitingId, endDate: Date.from(year: 2026, month: 5, day: 1, hour: 23), response: waitingResp, liveStatus: .waiting),
-                makeTile(id: inProgressId, endDate: Date.from(year: 2026, month: 6, day: 1, hour: 23), response: inProgressResp, liveStatus: nil),
+                // Ended challenge (endDate in the past)
+                makeTile(id: endedId, endDate: Date.from(year: 2024, month: 1, day: 1, hour: 23), response: endedResp, liveStatus: .validated),
+                // Waiting for review (active)
+                makeTile(id: waitingId, endDate: Date.from(year: 2027, month: 5, day: 1, hour: 23), response: waitingResp, liveStatus: .waiting),
+                // Active, no response yet (should be first)
+                makeTile(id: activeTodoId, endDate: Date.from(year: 2027, month: 4, day: 1, hour: 23), response: nil, liveStatus: nil),
+                // Responded/validated (active)
+                makeTile(id: respondedId, endDate: Date.from(year: 2027, month: 6, day: 1, hour: 23), response: respondedResp, liveStatus: .validated),
             ]),
             selectedFilter: .all
         )
 
-        // Expected order: inProgress → waitingForReview → todo → reviewed
+        // Expected: active-todo first → waiting → responded → ended last
         #expect(state.filteredTiles.count == 4)
-        #expect(state.filteredTiles[0].id == inProgressId)
+        #expect(state.filteredTiles[0].id == activeTodoId)
         #expect(state.filteredTiles[1].id == waitingId)
-        #expect(state.filteredTiles[2].id == todoId)
-        #expect(state.filteredTiles[3].id == reviewedId)
+        #expect(state.filteredTiles[2].id == respondedId)
+        #expect(state.filteredTiles[3].id == endedId)
     }
 
     @Test("filteredTiles sorts by endDate within same user state")
@@ -446,8 +421,8 @@ struct ChallengeFeatureTests {
         // Two waitingForReview tiles with different endDates, inserted late first
         let state = ChallengeFeature.State(
             challengeTiles: IdentifiedArray(uniqueElements: [
-                makeTile(id: lateId, endDate: Date.from(year: 2026, month: 9, day: 1, hour: 23), response: lateResp, liveStatus: .waiting),
-                makeTile(id: earlyId, endDate: Date.from(year: 2026, month: 3, day: 1, hour: 23), response: earlyResp, liveStatus: .waiting),
+                makeTile(id: lateId, endDate: Date.from(year: 2027, month: 9, day: 1, hour: 23), response: lateResp, liveStatus: .waiting),
+                makeTile(id: earlyId, endDate: Date.from(year: 2027, month: 3, day: 1, hour: 23), response: earlyResp, liveStatus: .waiting),
             ]),
             selectedFilter: .waitingForReview
         )
@@ -573,8 +548,8 @@ struct ChallengeFeatureTests {
             ChallengeFeature()
         }
 
-        await store.send(.filterChanged(.inProgress)) {
-            $0.selectedFilter = .inProgress
+        await store.send(.filterChanged(.waitingForReview)) {
+            $0.selectedFilter = .waitingForReview
             $0.pinnedTileIDs = []
         }
     }

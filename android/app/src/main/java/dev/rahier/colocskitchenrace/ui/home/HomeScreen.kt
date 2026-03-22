@@ -116,7 +116,24 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(15.dp))
 
-        // ── 4. News Tile (always visible, shows empty state) ──
+        // ── 4. Join Edition Tile ──
+        JoinEditionTile(
+            hasActiveEdition = state.hasActiveEdition,
+            activeEdition = state.activeEdition,
+            joinCode = state.joinCode,
+            isJoining = state.isJoiningEdition,
+            isLeaving = state.isLeavingEdition,
+            isLoadingEdition = state.isLoadingEdition,
+            errorMessage = state.joinEditionError,
+            successMessage = state.joinEditionSuccess,
+            onCodeChanged = { viewModel.onIntent(HomeIntent.JoinCodeChanged(it)) },
+            onJoinTapped = { viewModel.onIntent(HomeIntent.JoinEditionTapped) },
+            onLeaveTapped = { viewModel.onIntent(HomeIntent.LeaveEditionTapped) },
+        )
+
+        Spacer(modifier = Modifier.height(15.dp))
+
+        // ── 5. News Tile (always visible, shows empty state) ──
         NewsTile(news = state.news)
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -632,5 +649,188 @@ private fun NewsTileWithNewsPreview() {
 private fun NewsTileEmptyPreview() {
     CKRTheme {
         NewsTile(news = emptyList())
+    }
+}
+
+// ─── 5. Join Edition Tile ────────────────────────────────────────────
+
+@Composable
+private fun JoinEditionTile(
+    hasActiveEdition: Boolean,
+    activeEdition: CKRGame?,
+    joinCode: String,
+    isJoining: Boolean,
+    isLeaving: Boolean,
+    isLoadingEdition: Boolean,
+    errorMessage: String?,
+    successMessage: String?,
+    onCodeChanged: (String) -> Unit,
+    onJoinTapped: () -> Unit,
+    onLeaveTapped: () -> Unit,
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        color = CkrCoral,
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            if (hasActiveEdition) {
+                // ── Active edition state ──
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.special_edition).uppercase(),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = Color.White.copy(alpha = 0.8f),
+                        )
+                        Text(
+                            text = activeEdition?.title ?: stringResource(R.string.loading),
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White,
+                        )
+                    }
+                    Icon(
+                        painter = painterResource(R.drawable.ic_launcher_foreground),
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(32.dp),
+                    )
+                }
+
+                if (activeEdition != null) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            Icons.Default.CheckCircle,
+                            contentDescription = null,
+                            tint = Color.White.copy(alpha = 0.9f),
+                            modifier = Modifier.size(16.dp),
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = DateUtils.formatDateLong(activeEdition.nextGameDate),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = Color.White.copy(alpha = 0.9f),
+                        )
+                    }
+                }
+
+                if (isLoadingEdition) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(20.dp),
+                        color = Color.White,
+                        strokeWidth = 2.dp,
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+                Button(
+                    onClick = onLeaveTapped,
+                    enabled = !isLeaving,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.White.copy(alpha = 0.2f),
+                        contentColor = Color.White,
+                    ),
+                    shape = RoundedCornerShape(12.dp),
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    if (isLeaving) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(18.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp,
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(R.string.leave_edition),
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
+                }
+            } else {
+                // ── Join code entry state ──
+                Text(
+                    text = stringResource(R.string.special_edition),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = stringResource(R.string.enter_code_to_join),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.White.copy(alpha = 0.8f),
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    OutlinedTextField(
+                        value = joinCode,
+                        onValueChange = onCodeChanged,
+                        placeholder = { Text("CODE") },
+                        singleLine = true,
+                        modifier = Modifier.weight(1f),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedContainerColor = Color.White,
+                            unfocusedContainerColor = Color.White,
+                            focusedBorderColor = Color.White,
+                            unfocusedBorderColor = Color.White.copy(alpha = 0.5f),
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                    )
+
+                    Button(
+                        onClick = onJoinTapped,
+                        enabled = !isJoining,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.White,
+                            contentColor = CkrCoral,
+                        ),
+                        shape = RoundedCornerShape(12.dp),
+                    ) {
+                        if (isJoining) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                color = CkrCoral,
+                                strokeWidth = 2.dp,
+                            )
+                        } else {
+                            Text(
+                                text = stringResource(R.string.join_edition),
+                                fontWeight = FontWeight.Bold,
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Error/Success messages
+            errorMessage?.let {
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.Yellow.copy(alpha = 0.9f),
+                )
+            }
+            successMessage?.let {
+                Spacer(modifier = Modifier.height(6.dp))
+                Text(
+                    text = it,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.White,
+                )
+            }
+        }
     }
 }

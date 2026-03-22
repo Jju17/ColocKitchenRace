@@ -36,7 +36,7 @@ enum AuthError: Error, LocalizedError {
 struct AuthenticationClient {
     var signIn: @Sendable (_ email: String, _ password: String) async throws -> User
     var signOut: () async throws -> Void
-    var verifyAdmin: @Sendable (_ uid: String) async throws -> Bool = { _ in false }
+    var verifyAdmin: @Sendable (_ uid: String) async throws -> AdminRole? = { _ in nil }
     var listenAuthState: @Sendable () -> AsyncStream<FirebaseAuth.User?> = { .never }
 }
 
@@ -74,12 +74,19 @@ extension AuthenticationClient: DependencyKey {
             try Auth.auth().signOut()
         },
         verifyAdmin: { uid in
-            // Force-refresh token to pick up custom claims (admin)
+            // Force-refresh token to pick up custom claims (role, admin)
             guard let currentUser = Auth.auth().currentUser else {
-                return false
+                return nil
             }
             let tokenResult = try await currentUser.getIDTokenResult(forcingRefresh: true)
-            return tokenResult.claims["admin"] as? Bool == true
+            if let role = tokenResult.claims["role"] as? String {
+                return AdminRole(rawValue: role)
+            }
+            // Legacy fallback
+            if tokenResult.claims["admin"] as? Bool == true {
+                return .superAdmin
+            }
+            return nil
         },
         listenAuthState: {
             AsyncStream { continuation in

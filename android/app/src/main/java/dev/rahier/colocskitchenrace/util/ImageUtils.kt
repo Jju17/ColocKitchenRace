@@ -5,7 +5,7 @@ import android.graphics.BitmapFactory
 import java.io.ByteArrayOutputStream
 
 object ImageUtils {
-    fun compressToJpeg(data: ByteArray, maxBytes: Int = 1024 * 1024): ByteArray {
+    fun compressToJpeg(data: ByteArray, maxBytes: Int = 500_000): ByteArray {
         val bitmap = BitmapFactory.decodeByteArray(data, 0, data.size) ?: return data
         var quality = 85
         var output: ByteArray

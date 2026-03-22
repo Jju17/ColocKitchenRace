@@ -12,7 +12,8 @@ import SwiftUI
 struct TabFeature {
     @ObservableState
     struct State {
-        var selectedTab: Tab = .home
+        var currentRole: AdminRole = .editionAdmin
+        var selectedTab: Tab = .editions
         var challenge = ChallengeFeature.State()
         var challengeValidation = ChallengeValidationFeature.State()
         var home = HomeFeature.State()
@@ -20,6 +21,9 @@ struct TabFeature {
         var news = NewsFeature.State()
         var notification = NotificationFeature.State()
         var users = UsersFeature.State()
+        var editions = EditionsFeature.State()
+
+        var isSuperAdmin: Bool { currentRole == .superAdmin }
     }
 
     enum Action {
@@ -31,6 +35,7 @@ struct TabFeature {
         case news(NewsFeature.Action)
         case notification(NotificationFeature.Action)
         case users(UsersFeature.Action)
+        case editions(EditionsFeature.Action)
     }
 
     var body: some ReducerOf<Self> {
@@ -62,6 +67,10 @@ struct TabFeature {
             UsersFeature()
         }
 
+        Scope(state: \.editions, action: \.editions) {
+            EditionsFeature()
+        }
+
         Reduce { state, action in
             switch action {
                 case let .tabChanged(tab):
@@ -81,6 +90,8 @@ struct TabFeature {
                     return .none
                 case .users:
                     return .none
+                case .editions:
+                    return .none
             }
         }
     }
@@ -89,6 +100,7 @@ struct TabFeature {
 enum Tab {
     case challenge
     case challengeValidation
+    case editions
     case home
     case leaderboard
     case news
@@ -101,26 +113,49 @@ struct MyTabView: View {
 
     var body: some View {
         TabView(selection: $store.selectedTab.sending(\.tabChanged)) {
-            HomeView(
-                store: self.store.scope(
-                    state: \.home,
-                    action: \.home
+            // Super Admin only: global dashboard
+            if store.isSuperAdmin {
+                HomeView(
+                    store: self.store.scope(
+                        state: \.home,
+                        action: \.home
+                    )
                 )
-            )
-            .tabItem {
-                Label("Home", systemImage: "house.fill")
+                .tabItem {
+                    Label("Home", systemImage: "house.fill")
+                }
+                .tag(Tab.home)
             }
-            .tag(Tab.home)
-            ChallengeView(
-                store: self.store.scope(
-                    state: \.challenge,
-                    action: \.challenge
+
+            // All admins: manage their editions
+            NavigationStack {
+                EditionsView(
+                    store: self.store.scope(
+                        state: \.editions,
+                        action: \.editions
+                    )
                 )
-            )
-            .tabItem {
-                Label("Challenges", systemImage: "flag.2.crossed.fill")
             }
-            .tag(Tab.challenge)
+            .tabItem {
+                Label("Editions", systemImage: "star.circle.fill")
+            }
+            .tag(Tab.editions)
+
+            // Super Admin only: global challenges
+            if store.isSuperAdmin {
+                ChallengeView(
+                    store: self.store.scope(
+                        state: \.challenge,
+                        action: \.challenge
+                    )
+                )
+                .tabItem {
+                    Label("Challenges", systemImage: "flag.2.crossed.fill")
+                }
+                .tag(Tab.challenge)
+            }
+
+            // All admins: validate challenge responses
             ChallengeValidationView(
                 store: self.store.scope(
                     state: \.challengeValidation,
@@ -131,46 +166,53 @@ struct MyTabView: View {
                 Label("Validation", systemImage: "checklist.checked")
             }
             .tag(Tab.challengeValidation)
-            AdminLeaderboardView(
-                store: self.store.scope(
-                    state: \.leaderboard,
-                    action: \.leaderboard
+
+            // Super Admin only: leaderboard, news, notifications, users
+            if store.isSuperAdmin {
+                AdminLeaderboardView(
+                    store: self.store.scope(
+                        state: \.leaderboard,
+                        action: \.leaderboard
+                    )
                 )
-            )
-            .tabItem {
-                Label("Leaderboard", systemImage: "trophy.fill")
-            }
-            .tag(Tab.leaderboard)
-            NewsView(
-                store: self.store.scope(
-                    state: \.news,
-                    action: \.news
+                .tabItem {
+                    Label("Leaderboard", systemImage: "trophy.fill")
+                }
+                .tag(Tab.leaderboard)
+
+                NewsView(
+                    store: self.store.scope(
+                        state: \.news,
+                        action: \.news
+                    )
                 )
-            )
-            .tabItem {
-                Label("News", systemImage: "newspaper.fill")
-            }
-            .tag(Tab.news)
-            NotificationView(
-                store: self.store.scope(
-                    state: \.notification,
-                    action: \.notification
+                .tabItem {
+                    Label("News", systemImage: "newspaper.fill")
+                }
+                .tag(Tab.news)
+
+                NotificationView(
+                    store: self.store.scope(
+                        state: \.notification,
+                        action: \.notification
+                    )
                 )
-            )
-            .tabItem {
-                Label("Notifs", systemImage: "bell.fill")
-            }
-            .tag(Tab.notification)
-            UsersView(
-                store: self.store.scope(
-                    state: \.users,
-                    action: \.users
+                .tabItem {
+                    Label("Notifs", systemImage: "bell.fill")
+                }
+                .tag(Tab.notification)
+
+                UsersView(
+                    store: self.store.scope(
+                        state: \.users,
+                        action: \.users
+                    )
                 )
-            )
-            .tabItem {
-                Label("Users", systemImage: "person.2.fill")
+                .tabItem {
+                    Label("Users", systemImage: "person.2.fill")
+                }
+                .tag(Tab.users)
             }
-            .tag(Tab.users)
         }
     }
 }

@@ -26,6 +26,7 @@ object UserMapper {
             dietaryPreferences = prefs,
             fcmToken = data["fcmToken"] as? String,
             cohouseId = data["cohouseId"] as? String,
+            activeEditionId = data["activeEditionId"] as? String,
         )
     }
 
@@ -42,5 +43,6 @@ object UserMapper {
         "dietaryPreferences" to user.dietaryPreferences.map { it.toFirestore() },
         "fcmToken" to user.fcmToken,
         "cohouseId" to user.cohouseId,
+        "activeEditionId" to user.activeEditionId,
     )
 }

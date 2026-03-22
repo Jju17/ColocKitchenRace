@@ -3,6 +3,16 @@
     {
       "filename" : "CKR_logo_without_bg.png",
       "idiom" : "universal"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "CKR_logo_without_bg_dark.png",
+      "idiom" : "universal"
     }
   ],
   "info" : {

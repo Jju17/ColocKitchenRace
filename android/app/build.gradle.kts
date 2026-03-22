@@ -37,6 +37,19 @@ android {
         manifestPlaceholders["MAPS_API_KEY"] = mapsApiKey
     }
 
+    flavorDimensions += "environment"
+    productFlavors {
+        create("staging") {
+            dimension = "environment"
+            applicationIdSuffix = ".staging"
+            buildConfigField("String", "FCM_TOPIC_ALL_USERS", "\"all_users_staging\"")
+        }
+        create("production") {
+            dimension = "environment"
+            buildConfigField("String", "FCM_TOPIC_ALL_USERS", "\"all_users_prod\"")
+        }
+    }
+
     buildTypes {
         debug {
             buildConfigField(

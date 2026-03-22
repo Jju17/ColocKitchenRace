@@ -63,6 +63,9 @@ struct TabFeature {
                 case .challenge(.delegate(.switchToCohouseButtonTapped)):
                       state.selectedTab = .cohouse
                       return .none
+                case .home(.joinEdition(.delegate(.editionChanged))):
+                    // Re-load challenges when edition changes
+                    return .send(.challenge(.onAppear))
                 case .challenge, .cohouse, .home, .planning:
                     // Reset tab if planning is no longer available
                     if state.selectedTab == .planning

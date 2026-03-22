@@ -55,4 +55,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindIdCardScannerRepository(impl: IdCardScannerRepositoryImpl): IdCardScannerRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindEditionRepository(impl: EditionRepositoryImpl): EditionRepository
 }

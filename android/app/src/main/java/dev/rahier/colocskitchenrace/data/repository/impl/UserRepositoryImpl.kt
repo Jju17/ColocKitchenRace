@@ -69,4 +69,19 @@ class UserRepositoryImpl @Inject constructor(
             }
             .addOnFailureListener { Log.e("UserRepo", "Failed to store FCM token", it) }
     }
+
+    override suspend fun updateActiveEditionId(editionId: String?) {
+        val uid = auth.currentUser?.uid ?: return
+        val snapshot = firestore.collection(Constants.USERS_COLLECTION)
+            .whereEqualTo("authId", uid)
+            .limit(1)
+            .get()
+            .await()
+        val doc = snapshot.documents.firstOrNull() ?: return
+        if (editionId != null) {
+            doc.reference.update("activeEditionId", editionId).await()
+        } else {
+            doc.reference.update("activeEditionId", com.google.firebase.firestore.FieldValue.delete()).await()
+        }
+    }
 }

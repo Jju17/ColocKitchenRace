@@ -31,10 +31,19 @@ data class ChallengesState(
     val filteredChallenges: List<Challenge>
         get() {
             val respondedIds = responses.map { it.challengeId }.toSet()
-            return when (selectedFilter) {
-                ChallengeFilter.ALL -> challenges
+            val sorted: List<Challenge> = when (selectedFilter) {
+                ChallengeFilter.ALL -> {
+                    // Active challenges first, ended last
+                    challenges.sortedWith(compareBy<Challenge> {
+                        when (it.state) {
+                            ChallengeState.ONGOING -> 0
+                            ChallengeState.NOT_STARTED -> 1
+                            ChallengeState.DONE -> 2
+                        }
+                    }.thenBy { it.endDate })
+                }
                 ChallengeFilter.TODO -> challenges.filter {
-                    it.state == ChallengeState.ONGOING && it.id !in respondedIds
+                    it.id !in respondedIds
                 }
                 ChallengeFilter.WAITING -> challenges.filter {
                     it.id in respondedIds && responses.any { r ->
@@ -47,6 +56,7 @@ data class ChallengesState(
                     }
                 }
             }
+            return sorted
         }
 
     fun responseFor(challengeId: String): ChallengeResponse? =
@@ -63,7 +73,7 @@ data class ChallengesState(
             participatingChallengeId == other.participatingChallengeId &&
             selectedChoiceIndex == other.selectedChoiceIndex &&
             textAnswer == other.textAnswer &&
-            capturedImageData.contentEquals(other.capturedImageData) &&
+            (capturedImageData?.contentEquals(other.capturedImageData) ?: (other.capturedImageData == null)) &&
             isSubmitting == other.isSubmitting &&
             submitError == other.submitError
     }

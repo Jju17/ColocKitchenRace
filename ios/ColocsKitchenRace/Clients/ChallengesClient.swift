@@ -42,6 +42,7 @@ extension ChallengesClient: DependencyKey {
 
             let snapshot = try await Firestore.firestore()
                 .collection("challenges")
+                .limit(to: 50)
                 .getDocuments()
 
             let allChallenges = snapshot.documents.compactMap { document in

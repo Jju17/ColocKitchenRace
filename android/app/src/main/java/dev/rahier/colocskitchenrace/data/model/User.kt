@@ -18,6 +18,7 @@ data class User(
     val dietaryPreferences: Set<DietaryPreference> = emptySet(),
     val fcmToken: String? = null,
     val cohouseId: String? = null,
+    val activeEditionId: String? = null,
 ) {
     val fullName: String get() = "$firstName $lastName"
 

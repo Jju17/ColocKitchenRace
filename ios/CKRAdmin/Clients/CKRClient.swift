@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import FirebaseAuth
 import FirebaseFirestore
 import FirebaseFunctions
 import os
@@ -48,6 +49,12 @@ struct CKRClient {
     var updateEventSettings: @Sendable (_ gameId: String, _ settings: CKREventSettings) async -> Result<Bool, CKRError> = { _, _ in .success(true) }
     var confirmMatching: @Sendable (_ gameId: String) async -> Result<[GroupPlanning], CKRError> = { _ in .success([]) }
     var revealPlanning: @Sendable (_ gameId: String) async -> Result<Bool, CKRError> = { _ in .success(true) }
+
+    // ── Edition management ──
+    var createSpecialEdition: @Sendable (_ title: String, _ maxParticipants: Int, _ pricePerPersonCents: Int) async -> Result<(gameId: String, joinCode: String), CKRError> = { _, _, _ in .success(("", "")) }
+    var saveDraftEdition: @Sendable (_ gameId: String, _ fields: [String: Any]) async -> Result<Bool, CKRError> = { _, _ in .success(true) }
+    var publishEdition: @Sendable (_ gameId: String) async -> Result<String, CKRError> = { _ in .success("") }
+    var getMyEditions: @Sendable () async -> Result<[CKRGame], CKRError> = { .success([]) }
 }
 
 
@@ -210,6 +217,78 @@ extension CKRClient: DependencyKey {
             } catch {
                 return .failure(CKRError.fromFirestoreError(error))
             }
+        },
+        createSpecialEdition: { title, maxParticipants, pricePerPersonCents in
+            do {
+                let functions = Functions.functions(region: "europe-west1")
+                let result = try await functions.httpsCallable("createSpecialEdition").call([
+                    "title": title,
+                    "maxParticipants": maxParticipants,
+                    "pricePerPersonCents": pricePerPersonCents,
+                ] as [String: Any])
+
+                guard let data = result.data as? [String: Any],
+                      let gameId = data["gameId"] as? String,
+                      let joinCode = data["joinCode"] as? String
+                else {
+                    return .failure(.unknown("Invalid response from createSpecialEdition"))
+                }
+                return .success((gameId: gameId, joinCode: joinCode))
+            } catch {
+                return .failure(CKRError.fromFirestoreError(error))
+            }
+        },
+        saveDraftEdition: { gameId, fields in
+            do {
+                let functions = Functions.functions(region: "europe-west1")
+                _ = try await functions.httpsCallable("saveDraftEdition").call([
+                    "gameId": gameId,
+                    "fields": fields,
+                ] as [String: Any])
+                return .success(true)
+            } catch {
+                return .failure(CKRError.fromFirestoreError(error))
+            }
+        },
+        publishEdition: { gameId in
+            do {
+                let functions = Functions.functions(region: "europe-west1")
+                let result = try await functions.httpsCallable("publishEdition").call([
+                    "gameId": gameId
+                ])
+                let data = result.data as? [String: Any]
+                let joinCode = data?["joinCode"] as? String ?? ""
+                return .success(joinCode)
+            } catch {
+                return .failure(CKRError.fromFirestoreError(error))
+            }
+        },
+        getMyEditions: {
+            do {
+                guard let callerUid = Auth.auth().currentUser?.uid else {
+                    return .failure(.notFound)
+                }
+
+                // Super admins see all special editions; edition admins see only their own
+                let callerToken = try await Auth.auth().currentUser?.getIDTokenResult()
+                let role = callerToken?.claims["role"] as? String
+
+                var query = Firestore.firestore()
+                    .collection("ckrGames")
+                    .whereField("editionType", isEqualTo: "special")
+
+                if role != "super_admin" {
+                    query = query.whereField("createdByAuthUid", isEqualTo: callerUid)
+                }
+
+                let snapshot = try await query.getDocuments()
+                let editions = snapshot.documents.compactMap { doc -> CKRGame? in
+                    try? doc.data(as: CKRGame.self)
+                }
+                return .success(editions)
+            } catch {
+                return .failure(CKRError.fromFirestoreError(error))
+            }
         }
     )
 
@@ -224,7 +303,11 @@ extension CKRClient: DependencyKey {
             resetMatches: { _ in .success(true) },
             updateEventSettings: { _, _ in .success(true) },
             confirmMatching: { _ in .success([]) },
-            revealPlanning: { _ in .success(true) }
+            revealPlanning: { _ in .success(true) },
+            createSpecialEdition: { _, _, _ in .success(("preview-id", "ABC123")) },
+            saveDraftEdition: { _, _ in .success(true) },
+            publishEdition: { _ in .success("ABC123") },
+            getMyEditions: { .success([]) }
         )
     }
 
@@ -239,7 +322,11 @@ extension CKRClient: DependencyKey {
             resetMatches: { _ in .success(true) },
             updateEventSettings: { _, _ in .success(true) },
             confirmMatching: { _ in .success([]) },
-            revealPlanning: { _ in .success(true) }
+            revealPlanning: { _ in .success(true) },
+            createSpecialEdition: { _, _, _ in .success(("test-id", "TEST12")) },
+            saveDraftEdition: { _, _ in .success(true) },
+            publishEdition: { _ in .success("TEST12") },
+            getMyEditions: { .success([]) }
         )
     }
 }

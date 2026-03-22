@@ -13,6 +13,7 @@ data class Challenge(
     val body: String = "",
     val content: ChallengeContent = ChallengeContent.NoChoice(),
     val points: Int? = null,
+    val editionId: String? = null,       // gameId of the edition (null = global)
 ) {
     val state: ChallengeState
         get() {

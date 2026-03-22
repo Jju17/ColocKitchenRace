@@ -9,4 +9,6 @@ interface UserRepository {
     suspend fun updateUser(user: User)
     suspend fun deleteUser(userId: String)
     fun storeFCMToken(token: String)
+    /** Update the user's activeEditionId in Firestore. Pass null to clear. */
+    suspend fun updateActiveEditionId(editionId: String?)
 }

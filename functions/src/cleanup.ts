@@ -222,6 +222,40 @@ export const deleteCKRGame = onCall<DeleteCKRGameRequest>(
 
     // Delete all documents in subcollections using batched writes.
     // Firestore does not cascade deletes to subcollections.
+    // For challenges, we also recursively delete their sub-subcollections
+    // (responses, notifications) before deleting the challenge docs.
+    const challengesSnapshot = await gameRef.collection("challenges").get();
+    if (!challengesSnapshot.empty) {
+      for (const challengeDoc of challengesSnapshot.docs) {
+        const challengeSubcollections = ["responses", "notifications"];
+        for (const sub of challengeSubcollections) {
+          const subSnapshot = await challengeDoc.ref.collection(sub).get();
+          if (!subSnapshot.empty) {
+            const subBatch = db.batch();
+            subSnapshot.docs.forEach((d) => subBatch.delete(d.ref));
+            await subBatch.commit();
+          }
+        }
+      }
+      // Now delete the challenge docs themselves
+      const challengeBatches: FirebaseFirestore.WriteBatch[] = [];
+      let cBatch = db.batch();
+      let cCount = 0;
+      for (const doc of challengesSnapshot.docs) {
+        cBatch.delete(doc.ref);
+        cCount++;
+        if (cCount % 500 === 0) {
+          challengeBatches.push(cBatch);
+          cBatch = db.batch();
+        }
+      }
+      challengeBatches.push(cBatch);
+      for (const batch of challengeBatches) {
+        await batch.commit();
+      }
+      console.log(`Deleted ${challengesSnapshot.size} challenge documents (with sub-subcollections)`);
+    }
+
     const subcollections = ["registrations", "notifications"];
 
     for (const subcollection of subcollections) {

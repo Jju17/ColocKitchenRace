@@ -22,13 +22,18 @@ data class CKREventSettings(
 )
 
 data class GroupPlanning(
-    val id: String = UUID.randomUUID().toString(),
     val groupIndex: Int = 0,
     val cohouseA: String = "",
     val cohouseB: String = "",
     val cohouseC: String = "",
     val cohouseD: String = "",
-)
+) {
+    /** Stable ID derived from groupIndex — matches iOS `"group-\(groupIndex)"` pattern. */
+    val id: String get() = "group-$groupIndex"
+}
+
+enum class CKREditionType { GLOBAL, SPECIAL }
+enum class CKRGameStatus { DRAFT, PUBLISHED, ARCHIVED }
 
 data class CKRGame(
     val id: String = UUID.randomUUID().toString(),
@@ -47,6 +52,14 @@ data class CKRGame(
     val groupPlannings: List<GroupPlanning>? = null,
     val isRevealed: Boolean = false,
     val revealedAt: Date? = null,
+    // Multi-edition fields
+    val editionType: CKREditionType = CKREditionType.GLOBAL,
+    val title: String? = null,
+    val editionDescription: String? = null,
+    val joinCode: String? = null,
+    val createdByAuthUid: String? = null,
+    val status: CKRGameStatus = CKRGameStatus.PUBLISHED,
+    val lastSavedAt: Date? = null,
 ) {
     val isRegistrationOpen: Boolean
         get() = Date().before(registrationDeadline) && totalRegisteredParticipants < maxParticipants

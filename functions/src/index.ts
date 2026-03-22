@@ -9,7 +9,15 @@ export { matchCohouses } from "./match-cohouses";
 export { updateEventSettings, confirmMatching, revealPlanning, getMyPlanning } from "./planning";
 export { setAdminClaim } from "./admin";
 export { deleteAccount } from "./account";
-export { onNewsCreated, onChallengeCreated, checkChallengeSchedules } from "./triggers";
+export { migrateToMultiEdition } from "./migration";
+export {
+  createSpecialEdition,
+  saveDraftEdition,
+  publishEdition,
+  joinEditionByCode,
+  leaveEdition,
+} from "./edition";
+export { onNewsCreated, onChallengeCreated, onEditionChallengeCreated, checkChallengeSchedules } from "./triggers";
 export {
   onCKRGameCreated,
   sendGameReminder24h,

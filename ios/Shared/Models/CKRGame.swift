@@ -42,6 +42,19 @@ struct GroupPlanning: Equatable, Hashable, Codable, Identifiable {
     var cohouseD: String       // cohouseId assigned role D
 }
 
+/// Edition type: global (super admin) or special (edition admin, join by code).
+enum CKREditionType: String, Codable, Equatable, Hashable {
+    case global
+    case special
+}
+
+/// Lifecycle status of a CKR game edition.
+enum CKRGameStatus: String, Codable, Equatable, Hashable {
+    case draft
+    case published
+    case archived
+}
+
 struct CKRGame: Equatable, Hashable, Identifiable, Codable {
     var id: UUID = UUID()
     var editionNumber: Int = 1
@@ -59,6 +72,15 @@ struct CKRGame: Equatable, Hashable, Identifiable, Codable {
     var groupPlannings: [GroupPlanning]?           // Role assignments (A/B/C/D) per group
     var isRevealed: Bool = false                  // Whether planning is visible to users
     var revealedAt: Date?                         // Timestamp when planning was revealed
+
+    // Multi-edition fields
+    var editionType: CKREditionType = .global     // global or special
+    var title: String?                             // Edition name (special editions)
+    var editionDescription: String?                // Optional description
+    var joinCode: String?                          // Unique 6-char code (special editions)
+    var createdByAuthUid: String?                  // Auth UID of the creator
+    var status: CKRGameStatus = .published         // draft / published / archived
+    var lastSavedAt: Date?                         // Last autosave timestamp (drafts)
 
     /// Whether registrations are still open (deadline not passed and capacity not reached).
     var isRegistrationOpen: Bool {

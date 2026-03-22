@@ -4,6 +4,7 @@
  */
 import { z } from "zod";
 import { HttpsError } from "firebase-functions/v2/https";
+import type { firestore } from "firebase-admin";
 
 // ── Parse helper ───────────────────────────────────────────────────────────
 
@@ -34,11 +35,44 @@ export function requireAuth(request: { auth?: { uid: string; token: Record<strin
   }
 }
 
-/** Throws if the caller is not an admin. */
+/** Throws if the caller is not an admin (any role: super_admin or edition_admin). */
 export function requireAdmin(request: { auth?: { uid: string; token: Record<string, unknown> } }): void {
   requireAuth(request);
-  if (!request.auth!.token.admin) {
+  const role = request.auth!.token.role as string | undefined;
+  // Backward compat: accept legacy `admin: true` claim during migration
+  if (role !== "super_admin" && role !== "edition_admin" && !request.auth!.token.admin) {
     throw new HttpsError("permission-denied", "Admin access required");
+  }
+}
+
+/** Throws if the caller is not a super admin. */
+export function requireSuperAdmin(request: { auth?: { uid: string; token: Record<string, unknown> } }): void {
+  requireAuth(request);
+  const role = request.auth!.token.role as string | undefined;
+  // Backward compat: accept legacy `admin: true` during migration
+  if (role !== "super_admin" && !request.auth!.token.admin) {
+    throw new HttpsError("permission-denied", "Super admin access required");
+  }
+}
+
+/** Throws if the caller cannot manage the given edition.
+ *  Super admins can manage any edition. Edition admins can only manage their own. */
+export async function requireEditionOwner(
+  request: { auth?: { uid: string; token: Record<string, unknown> } },
+  gameId: string,
+  db: firestore.Firestore,
+): Promise<void> {
+  requireAdmin(request);
+  const role = request.auth!.token.role as string | undefined;
+  // Super admins can manage everything
+  if (role === "super_admin" || request.auth!.token.admin) return;
+  // Edition admins must own the edition
+  const gameDoc = await db.doc(`ckrGames/${gameId}`).get();
+  if (!gameDoc.exists) {
+    throw new HttpsError("not-found", "Game not found");
+  }
+  if (gameDoc.data()?.createdByAuthUid !== request.auth!.uid) {
+    throw new HttpsError("permission-denied", "You don't have permission to manage this edition");
   }
 }
 
@@ -144,7 +178,8 @@ export const deleteAccountSchema = z.object({
 
 export const setAdminClaimSchema = z.object({
   targetAuthUid: z.string().min(1, "targetAuthUid is required"),
-  isAdmin: z.boolean(),
+  isAdmin: z.boolean().optional(), // Legacy compat
+  role: z.enum(["super_admin", "edition_admin"]).optional().nullable(),
 });
 
 // ── Cleanup ────────────────────────────────────────────────────────────────

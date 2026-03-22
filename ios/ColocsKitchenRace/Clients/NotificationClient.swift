@@ -44,11 +44,11 @@ extension NotificationClient: DependencyKey {
             Logger.globalLog.log(level: .info, "FCM token stored for user \(user.id)")
         },
         subscribeToAllUsers: {
-            try await Messaging.messaging().subscribe(toTopic: "all_users")
+            try await Messaging.messaging().subscribe(toTopic: CKREnvironment.fcmTopicAllUsers)
             Logger.globalLog.log(level: .info, "Subscribed to 'all_users' topic")
         },
         unsubscribeFromAllUsers: {
-            try await Messaging.messaging().unsubscribe(fromTopic: "all_users")
+            try await Messaging.messaging().unsubscribe(fromTopic: CKREnvironment.fcmTopicAllUsers)
             Logger.globalLog.log(level: .info, "Unsubscribed from 'all_users' topic")
         }
     )

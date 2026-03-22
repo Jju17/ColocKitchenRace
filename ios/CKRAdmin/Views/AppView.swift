@@ -26,7 +26,7 @@ struct AppFeature {
         case signin(SignInFeature.Action)
         case splashScreen(SplashScreenFeature.Action)
         case newAuthStateTrigger(FirebaseAuth.User?)
-        case adminCheckCompleted(isAdmin: Bool)
+        case adminCheckCompleted(role: AdminRole?)
     }
 
     @Dependency(\.authenticationClient) var authenticationClient
@@ -45,11 +45,11 @@ struct AppFeature {
                     state = .splashScreen(SplashScreenFeature.State())
                     return .run { send in
                         do {
-                            let isAdmin = try await self.authenticationClient.verifyAdmin(user.uid)
-                            await send(.adminCheckCompleted(isAdmin: isAdmin))
+                            let role = try await self.authenticationClient.verifyAdmin(user.uid)
+                            await send(.adminCheckCompleted(role: role))
                         } catch {
                             Logger.authLog.log(level: .error, "Admin verification failed: \(error)")
-                            await send(.adminCheckCompleted(isAdmin: false))
+                            await send(.adminCheckCompleted(role: nil))
                         }
                     }
                 } else {
@@ -60,9 +60,9 @@ struct AppFeature {
                     state = .signin(SignInFeature.State())
                     return .none
                 }
-            case let .adminCheckCompleted(isAdmin):
-                if isAdmin {
-                    state = .tab(TabFeature.State())
+            case let .adminCheckCompleted(role):
+                if let role {
+                    state = .tab(TabFeature.State(currentRole: role))
                 } else {
                     let notAdminError: String = AuthError.notAdmin.localizedDescription
                     state = .signin(SignInFeature.State(error: notAdminError))

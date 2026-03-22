@@ -174,6 +174,12 @@ function adminCallWith(fn: any, data: any) {
   return wrapped({ data, auth: { uid: "test-admin", token: { admin: true } } } as any);
 }
 
+/** Helper: call wrapped function with auth + custom claims (e.g. cohouseId). */
+function callWithClaims(fn: any, data: any, claims: Record<string, any>) {
+  const wrapped = testEnv.wrap(fn);
+  return wrapped({ data, auth: { uid: "test-user", token: claims } } as any);
+}
+
 // ── Setup / teardown ────────────────────────────────────────────────────────────
 
 beforeEach(() => {
@@ -325,7 +331,7 @@ describe("sendNotificationToAll", () => {
     expect(mockSend).toHaveBeenCalledTimes(1);
     expect(mockSend).toHaveBeenCalledWith(
       expect.objectContaining({
-        topic: "all_users",
+        topic: "all_users_staging",
         notification: { title: "News", body: "Body" },
       })
     );
@@ -599,8 +605,8 @@ describe("getCohousesForMap", () => {
     };
     firestoreSubcollections = {
       cohouses: {
-        c1: { users: [{ firstName: "Alice", lastName: "Dupont" }, { firstName: "Bob", lastName: "Martin" }] },
-        c2: { users: [{ firstName: "Charlie", lastName: "Leclerc" }] },
+        c1: { users: [{ surname: "Alice Dupont" }, { surname: "Bob Martin" }] },
+        c2: { users: [{ surname: "Charlie Leclerc" }] },
       },
     };
 
@@ -927,7 +933,7 @@ describe("getMyPlanning", () => {
 
   it("throws not-found when game does not exist", async () => {
     await expect(
-      callWith(getMyPlanning, { gameId: "nope", cohouseId: "c1" })
+      callWithClaims(getMyPlanning, { gameId: "nope", cohouseId: "c1" }, { cohouseId: "c1" })
     ).rejects.toThrow(/not.found/i);
   });
 
@@ -938,7 +944,7 @@ describe("getMyPlanning", () => {
       },
     };
     await expect(
-      callWith(getMyPlanning, { gameId: "g1", cohouseId: "c1" })
+      callWithClaims(getMyPlanning, { gameId: "g1", cohouseId: "c1" }, { cohouseId: "c1" })
     ).rejects.toThrow(/not been revealed/i);
   });
 
@@ -955,7 +961,7 @@ describe("getMyPlanning", () => {
       },
     };
     await expect(
-      callWith(getMyPlanning, { gameId: "g1", cohouseId: "c99" })
+      callWithClaims(getMyPlanning, { gameId: "g1", cohouseId: "c99" }, { cohouseId: "c99" })
     ).rejects.toThrow(/not in any group/i);
   });
 
@@ -1000,7 +1006,7 @@ describe("getMyPlanning", () => {
       },
     };
 
-    const result = await callWith(getMyPlanning, { gameId: "g1", cohouseId: "c1" });
+    const result = await callWithClaims(getMyPlanning, { gameId: "g1", cohouseId: "c1" }, { cohouseId: "c1" });
 
     expect(result.success).toBe(true);
     expect(result.planning).toBeDefined();

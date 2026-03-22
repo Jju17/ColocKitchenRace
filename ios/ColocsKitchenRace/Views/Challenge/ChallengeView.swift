@@ -11,13 +11,12 @@ import SwiftUI
 // MARK: - Filter
 
 enum ChallengeFilter: String, CaseIterable, Equatable {
-    case all, todo, inProgress, waitingForReview, reviewed
+    case all, todo, waitingForReview, reviewed
 
     var label: String {
         switch self {
         case .all:               "All"
         case .todo:              "📋 To do"
-        case .inProgress:        "🔥 In progress"
         case .waitingForReview:  "⏳ Waiting"
         case .reviewed:          "✅ Reviewed"
         }
@@ -53,7 +52,6 @@ struct ChallengeFeature {
                 return switch selectedFilter {
                 case .all:              true
                 case .todo:             tile.response == nil
-                case .inProgress:       tile.response != nil && tile.liveStatus == nil
                 case .waitingForReview: tile.liveStatus == .waiting
                 case .reviewed:         tile.liveStatus == .validated
                                         || tile.liveStatus == .invalidated
@@ -61,16 +59,17 @@ struct ChallengeFeature {
             }
 
             let sorted = filtered.sorted { a, b in
-                // Primary sort: inProgress → waitingForReview → todo → reviewed
+                // Primary: active challenges first, ended last
                 let order: (ChallengeTileFeature.State) -> Int = { tile in
-                    if tile.response != nil && tile.liveStatus == nil { return 0 }          // inProgress
-                    if tile.liveStatus == .waiting { return 1 }                             // waitingForReview
-                    if tile.response == nil { return 2 }                                    // todo
-                    return 3                                                                // reviewed
+                    if tile.challenge.hasEnded { return 3 }                                  // ended → last
+                    if tile.liveStatus == .waiting { return 1 }                               // waiting review
+                    if tile.response == nil && tile.challenge.isActiveNow { return 0 }        // active, not done → first
+                    if tile.response == nil { return 0 }                                      // not started but actionable
+                    return 2                                                                  // responded
                 }
                 let ao = order(a), bo = order(b)
                 if ao != bo { return ao < bo }
-                // Secondary sort: soonest deadline first
+                // Secondary: soonest deadline first
                 return a.challenge.endDate < b.challenge.endDate
             }
 
@@ -96,6 +95,7 @@ struct ChallengeFeature {
     }
 
     @Shared(.cohouse) var currentCohouse: Cohouse?
+    @Shared(.userInfo) var currentUser: User?
     @Dependency(\.challengesClient) var challengesClient
     @Dependency(\.challengeResponseClient) var challengeResponseClient
 
@@ -151,13 +151,25 @@ struct ChallengeFeature {
                         return .none
                     }
 
+                    // Filter challenges by active edition
+                    let activeEditionId = currentUser?.activeEditionId
+                    let filteredChallenges = challenges.filter { challenge in
+                        if let activeEditionId {
+                            // In a special edition: show only that edition's challenges
+                            return challenge.editionId == activeEditionId
+                        } else {
+                            // Global mode: show global challenges (no editionId)
+                            return challenge.editionId == nil
+                        }
+                    }
+
                     // Index responses by challengeId for quick lookup
                     let responseByChallenge = Dictionary(
                         uniqueKeysWithValues: responses.map { ($0.challengeId, $0) }
                     )
 
                     state.challengeTiles = IdentifiedArray(
-                        uniqueElements: challenges.map { challenge in
+                        uniqueElements: filteredChallenges.map { challenge in
                             let resp = responseByChallenge[challenge.id]
                             return ChallengeTileFeature.State(
                                 id: challenge.id,

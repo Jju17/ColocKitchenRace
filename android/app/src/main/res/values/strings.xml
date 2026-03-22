@@ -276,4 +276,10 @@
 
     <!-- Splash -->
     <string name="splash_made_with_love">Made with \u2764\uFE0F by Julien</string>
+
+    <!-- Edition -->
+    <string name="special_edition">Special Edition</string>
+    <string name="enter_code_to_join">Enter a code to join a private edition</string>
+    <string name="join_edition">Join</string>
+    <string name="leave_edition">Leave edition</string>
 </resources>

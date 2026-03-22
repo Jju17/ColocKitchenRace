@@ -82,6 +82,7 @@
 				Models/CKRGame.swift,
 				Models/CKRMyPlanning.swift,
 				"Utils/CGFloat+Utils.swift",
+				Utils/CKREnvironment.swift,
 				"Utils/Collection+Utils.swift",
 				"Utils/Color+Utils.swift",
 				"Utils/Date+Utils.swift",
@@ -229,9 +230,10 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 64F17B532AD2A3BE0047F6F3 /* Build configuration list for PBXNativeTarget "ColocsKitchenRace" */;
 			buildPhases = (
+				64F17B2D2AD2A3BC0047F6F3 /* Resources */,
+				643A43DA2F6EF0370050454A /* Select Firebase Config */,
 				64F17B2B2AD2A3BC0047F6F3 /* Sources */,
 				64F17B2C2AD2A3BC0047F6F3 /* Frameworks */,
-				64F17B2D2AD2A3BC0047F6F3 /* Resources */,
 				64FB41C72AD408E800C93A34 /* Crashlytics Accesses */,
 			);
 			buildRules = (
@@ -306,6 +308,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 64FBE0312D8860CD00D8A89F /* Build configuration list for PBXNativeTarget "CKRAdmin" */;
 			buildPhases = (
+				643A43DB2F6EF08C0050454A /* Select Firebase Config */,
 				64FBE0212D8860CC00D8A89F /* Sources */,
 				64FBE0222D8860CC00D8A89F /* Frameworks */,
 				64FBE0232D8860CC00D8A89F /* Resources */,
@@ -422,6 +425,44 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		643A43DA2F6EF0370050454A /* Select Firebase Config */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Select Firebase Config";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "${SRCROOT}/Scripts/select-firebase-config.sh\n";
+		};
+		643A43DB2F6EF08C0050454A /* Select Firebase Config */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Select Firebase Config";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "${SRCROOT}/Scripts/select-firebase-config.sh\n";
+		};
 		64FB41C72AD408E800C93A34 /* Crashlytics Accesses */ = {
 			isa = PBXShellScriptBuildPhase;
 			alwaysOutOfDate = 1;
@@ -635,6 +676,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"colocskitchenrace/Preview Content\"";
 				DEVELOPMENT_TEAM = YXXNH92P5F;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = colocskitchenrace/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Kitchen Race";
@@ -678,6 +720,7 @@
 				DEVELOPMENT_ASSET_PATHS = "\"colocskitchenrace/Preview Content\"";
 				DEVELOPMENT_TEAM = YXXNH92P5F;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = colocskitchenrace/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Kitchen Race";
@@ -797,6 +840,7 @@
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CKRAdmin/Info.plist;
@@ -844,6 +888,7 @@
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = CKRAdmin/Info.plist;

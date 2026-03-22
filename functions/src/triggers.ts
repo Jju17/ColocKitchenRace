@@ -1,6 +1,6 @@
 import { onDocumentCreated } from "firebase-functions/v2/firestore";
 import { onSchedule } from "firebase-functions/v2/scheduler";
-import { admin, db, messaging, REGION } from "./config";
+import { admin, db, messaging, REGION, getFCMTopicAllUsers, getFCMTopicEdition } from "./config";
 
 // ============================================
 // Firestore Triggers
@@ -31,7 +31,7 @@ export const onNewsCreated = onDocumentCreated(
 
     try {
       const message: admin.messaging.Message = {
-        topic: "all_users",
+        topic: getFCMTopicAllUsers(),
         notification: {
           title: `📰 ${title}`,
           body: body.length > 100 ? body.substring(0, 100) + "..." : body,
@@ -59,59 +59,88 @@ export const onNewsCreated = onDocumentCreated(
 );
 
 /**
- * Automatically send a notification to all users when a new challenge is created
- *
- * Triggered when a new document is added to the "challenges" collection
+ * LEGACY: Notification for challenges in the root /challenges/ collection.
+ * Kept during migration — will be removed once all challenges live under
+ * /ckrGames/{gameId}/challenges/.
  */
 export const onChallengeCreated = onDocumentCreated(
   { document: "challenges/{challengeId}", region: REGION },
   async (event) => {
     const challengeData = event.data?.data();
-
-    if (!challengeData) {
-      console.log("No challenge data found");
-      return;
-    }
+    if (!challengeData) return;
 
     const title = challengeData.title as string;
-    const body = challengeData.body as string;
+    if (!title) return;
 
-    if (!title) {
-      console.log("Challenge missing title");
-      return;
-    }
+    const body = challengeData.body as string;
 
     try {
       const message: admin.messaging.Message = {
-        topic: "all_users",
+        topic: getFCMTopicAllUsers(),
         notification: {
           title: `🏆 Nouveau challenge : ${title}`,
           body: body
-            ? body.length > 100
-              ? body.substring(0, 100) + "..."
-              : body
+            ? body.length > 100 ? body.substring(0, 100) + "..." : body
+            : "Un nouveau challenge est disponible !",
+        },
+        data: { type: "challenge", challengeId: event.params.challengeId },
+        apns: { payload: { aps: { sound: "default", badge: 1 } } },
+      };
+      const messageId = await messaging.send(message);
+      console.log(`[legacy] Challenge notification sent, messageId: ${messageId}`);
+    } catch (error) {
+      console.error("Error sending challenge notification:", error);
+    }
+  }
+);
+
+/**
+ * NEW: Notification for edition-scoped challenges.
+ * Path: /ckrGames/{gameId}/challenges/{challengeId}
+ *
+ * For global editions → sends to all_users topic.
+ * For special editions → sends to edition-specific topic.
+ */
+export const onEditionChallengeCreated = onDocumentCreated(
+  { document: "ckrGames/{gameId}/challenges/{challengeId}", region: REGION },
+  async (event) => {
+    const challengeData = event.data?.data();
+    if (!challengeData) return;
+
+    const title = challengeData.title as string;
+    if (!title) return;
+
+    const gameId = event.params.gameId;
+    const body = challengeData.body as string;
+
+    // Determine the right FCM topic based on edition type
+    const gameDoc = await db.doc(`ckrGames/${gameId}`).get();
+    const gameData = gameDoc.data();
+    const editionType = gameData?.editionType || "global";
+    const topic = editionType === "special"
+      ? getFCMTopicEdition(gameId)
+      : getFCMTopicAllUsers();
+
+    try {
+      const message: admin.messaging.Message = {
+        topic,
+        notification: {
+          title: `🏆 Nouveau challenge : ${title}`,
+          body: body
+            ? body.length > 100 ? body.substring(0, 100) + "..." : body
             : "Un nouveau challenge est disponible !",
         },
         data: {
           type: "challenge",
           challengeId: event.params.challengeId,
+          gameId,
         },
-        apns: {
-          payload: {
-            aps: {
-              sound: "default",
-              badge: 1,
-            },
-          },
-        },
+        apns: { payload: { aps: { sound: "default", badge: 1 } } },
       };
-
       const messageId = await messaging.send(message);
-      console.log(
-        `Challenge notification sent, messageId: ${messageId}, challengeId: ${event.params.challengeId}`
-      );
+      console.log(`Edition challenge notification sent to topic ${topic}, messageId: ${messageId}`);
     } catch (error) {
-      console.error("Error sending challenge notification:", error);
+      console.error("Error sending edition challenge notification:", error);
     }
   }
 );
@@ -141,8 +170,9 @@ export const checkChallengeSchedules = onSchedule(
 
     try {
       // 1. Check for challenges that just started
+      // Uses collectionGroup to query both legacy /challenges/ and new /ckrGames/{gameId}/challenges/
       const startedSnapshot = await db
-        .collection("challenges")
+        .collectionGroup("challenges")
         .where("startDate", ">=", fiveMinAgo)
         .where("startDate", "<=", now)
         .get();
@@ -165,11 +195,8 @@ export const checkChallengeSchedules = onSchedule(
             : "la date limite";
 
           // Deduplicate using transaction: create() fails if doc already exists
-          const markerRef = db
-            .collection("challenges")
-            .doc(challengeId)
-            .collection("notifications")
-            .doc("started");
+          // Use the doc's parent ref to support both legacy and edition-scoped paths
+          const markerRef = doc.ref.collection("notifications").doc("started");
 
           let alreadySent = false;
           try {
@@ -188,9 +215,19 @@ export const checkChallengeSchedules = onSchedule(
           }
           if (alreadySent) continue;
 
+          // Determine the correct FCM topic: edition-specific or global
+          const gameRef = doc.ref.parent.parent;
+          let topic = getFCMTopicAllUsers();
+          if (gameRef && gameRef.parent.id === "ckrGames") {
+            const gameDoc = await gameRef.get();
+            if (gameDoc.exists && gameDoc.data()?.editionType === "special") {
+              topic = getFCMTopicEdition(gameRef.id);
+            }
+          }
+
           // Send notification
           const message: admin.messaging.Message = {
-            topic: "all_users",
+            topic,
             notification: {
               title: `🟢 ${title} a commence !`,
               body: `Vous avez jusqu'au ${endDateStr} pour le completer.`,
@@ -210,7 +247,7 @@ export const checkChallengeSchedules = onSchedule(
           };
 
           await messaging.send(message);
-          console.log(`Challenge started notification sent for: ${title} (${challengeId})`);
+          console.log(`Challenge started notification sent for: ${title} (${challengeId}) on topic: ${topic}`);
         } catch (docError) {
           console.error(`Error processing started challenge ${doc.id}:`, docError);
         }
@@ -218,7 +255,7 @@ export const checkChallengeSchedules = onSchedule(
 
       // 2. Check for challenges ending in ~30 minutes
       const endingSoonSnapshot = await db
-        .collection("challenges")
+        .collectionGroup("challenges")
         .where("endDate", ">=", twentyMinFromNow)
         .where("endDate", "<=", thirtyFiveMinFromNow)
         .get();
@@ -230,11 +267,7 @@ export const checkChallengeSchedules = onSchedule(
           const title = data.title as string;
 
           // Deduplicate using transaction: create() fails if doc already exists
-          const markerRef = db
-            .collection("challenges")
-            .doc(challengeId)
-            .collection("notifications")
-            .doc("ending_soon");
+          const markerRef = doc.ref.collection("notifications").doc("ending_soon");
 
           let alreadySent = false;
           try {
@@ -253,9 +286,19 @@ export const checkChallengeSchedules = onSchedule(
           }
           if (alreadySent) continue;
 
+          // Determine the correct FCM topic: edition-specific or global
+          const gameRef = doc.ref.parent.parent;
+          let topic = getFCMTopicAllUsers();
+          if (gameRef && gameRef.parent.id === "ckrGames") {
+            const gameDoc = await gameRef.get();
+            if (gameDoc.exists && gameDoc.data()?.editionType === "special") {
+              topic = getFCMTopicEdition(gameRef.id);
+            }
+          }
+
           // Send notification
           const message: admin.messaging.Message = {
-            topic: "all_users",
+            topic,
             notification: {
               title: `⏰ ${title} se termine dans 30 minutes !`,
               body: "Depecchez-vous de soumettre votre reponse !",
@@ -275,7 +318,7 @@ export const checkChallengeSchedules = onSchedule(
           };
 
           await messaging.send(message);
-          console.log(`Challenge ending soon notification sent for: ${title} (${challengeId})`);
+          console.log(`Challenge ending soon notification sent for: ${title} (${challengeId}) on topic: ${topic}`);
         } catch (docError) {
           console.error(`Error processing ending_soon challenge ${doc.id}:`, docError);
         }

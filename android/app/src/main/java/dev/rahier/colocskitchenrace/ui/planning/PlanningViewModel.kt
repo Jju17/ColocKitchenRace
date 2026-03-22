@@ -27,12 +27,21 @@ class PlanningViewModel @Inject constructor(
     val state: StateFlow<PlanningState> = _state.asStateFlow()
 
     init {
-        loadPlanning()
+        observeGameAndLoad()
     }
 
     fun onIntent(intent: PlanningIntent) {
         when (intent) {
             PlanningIntent.Retry -> loadPlanning()
+        }
+    }
+
+    /** Reactively observe the game and cohouse, load planning when both are available. */
+    private fun observeGameAndLoad() {
+        viewModelScope.launch {
+            gameRepository.currentGame.collect { game ->
+                if (game != null) loadPlanning()
+            }
         }
     }
 

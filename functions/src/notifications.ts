@@ -1,5 +1,5 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
-import { admin, db, messaging, REGION } from "./config";
+import { admin, db, messaging, REGION, getFCMTopicAllUsers } from "./config";
 import { parseRequest, requireAdmin, sendToCohouseSchema, sendToEditionSchema, sendToAllSchema } from "./schemas";
 
 // ============================================
@@ -356,7 +356,7 @@ export const sendNotificationToAll = onCall<SendToAllRequest>(
 
     try {
       const message: admin.messaging.Message = {
-        topic: "all_users",
+        topic: getFCMTopicAllUsers(),
         notification: {
           title: notification.title,
           body: notification.body,

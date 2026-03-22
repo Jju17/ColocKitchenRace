@@ -15,8 +15,10 @@ import dev.rahier.colocskitchenrace.data.model.AuthProvider
 import dev.rahier.colocskitchenrace.data.model.NoAccountException
 import dev.rahier.colocskitchenrace.data.model.User
 import dev.rahier.colocskitchenrace.data.model.UserMapper
+import dev.rahier.colocskitchenrace.BuildConfig
 import dev.rahier.colocskitchenrace.data.repository.AuthRepository
 import dev.rahier.colocskitchenrace.data.repository.CohouseRepository
+import dev.rahier.colocskitchenrace.data.repository.NotificationRepository
 import dev.rahier.colocskitchenrace.util.Constants
 import dev.rahier.colocskitchenrace.util.DemoMode
 import kotlin.coroutines.cancellation.CancellationException
@@ -39,6 +41,7 @@ class AuthRepositoryImpl @Inject constructor(
     private val messaging: FirebaseMessaging,
     private val functions: FirebaseFunctions,
     private val cohouseRepository: CohouseRepository,
+    private val notificationRepository: NotificationRepository,
 ) : AuthRepository {
 
     private val _currentUser = MutableStateFlow<User?>(null)
@@ -83,6 +86,13 @@ class AuthRepositoryImpl @Inject constructor(
             .set(userToMap(user))
             .await()
         _currentUser.value = user
+
+        try {
+            notificationRepository.subscribeToAllUsers()
+        } catch (e: Exception) {
+            Log.w("AuthRepo", "Failed to subscribe to FCM topic on account creation", e)
+        }
+
         return user
     }
 
@@ -137,10 +147,21 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override suspend fun signOut() {
+        // Unsubscribe from all FCM topics
         try {
-            messaging.unsubscribeFromTopic("all_users").await()
+            messaging.unsubscribeFromTopic(BuildConfig.FCM_TOPIC_ALL_USERS).await()
         } catch (e: Exception) {
-            Log.w("AuthRepo", "Failed to unsubscribe from all_users topic", e)
+            Log.w("AuthRepo", "Failed to unsubscribe from FCM all_users topic", e)
+        }
+        // Unsubscribe from edition topic if active
+        val editionId = _currentUser.value?.activeEditionId
+        if (editionId != null) {
+            val env = if (BuildConfig.FCM_TOPIC_ALL_USERS.endsWith("_prod")) "prod" else "staging"
+            try {
+                messaging.unsubscribeFromTopic("edition_${editionId}_${env}").await()
+            } catch (e: Exception) {
+                Log.w("AuthRepo", "Failed to unsubscribe from edition topic", e)
+            }
         }
         auth.signOut()
         _currentUser.value = null
@@ -237,7 +258,14 @@ class AuthRepositoryImpl @Inject constructor(
             }
         }
 
-        // Refresh FCM token
+        // Re-subscribe to FCM topic + refresh token
+        try {
+            notificationRepository.subscribeToAllUsers()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Log.w("AuthRepo", "Failed to subscribe to FCM topic on session restore", e)
+        }
         try {
             val token = messaging.token.await()
             storeFCMToken(token)
@@ -321,7 +349,14 @@ class AuthRepositoryImpl @Inject constructor(
             }
         }
 
-        // Store FCM token
+        // Subscribe to FCM topic + store token
+        try {
+            notificationRepository.subscribeToAllUsers()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Log.w("AuthRepo", "Failed to subscribe to FCM topic", e)
+        }
         try {
             val token = messaging.token.await()
             storeFCMToken(token)
@@ -341,6 +376,10 @@ class AuthRepositoryImpl @Inject constructor(
         throw IllegalStateException(
             "default_web_client_id not found. Ensure google-services.json is properly configured."
         )
+    }
+
+    override fun updateLocalActiveEditionId(editionId: String?) {
+        _currentUser.value = _currentUser.value?.copy(activeEditionId = editionId)
     }
 
     companion object {

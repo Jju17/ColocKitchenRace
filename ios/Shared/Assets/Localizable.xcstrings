@@ -157,6 +157,7 @@
       }
     },
     "%@ %@?" : {
+      "extractionState" : "stale",
       "localizations" : {
         "en" : {
           "stringUnit" : {
@@ -179,6 +180,7 @@
       }
     },
     "%@ will be able to access CKRAdmin and manage the app." : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -195,6 +197,7 @@
       }
     },
     "%@ will no longer have admin access." : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -422,6 +425,16 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "%lld verzonden"
+          }
+        }
+      }
+    },
+    "%lld/%lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld/%2$lld"
           }
         }
       }
@@ -697,6 +710,9 @@
         }
       }
     },
+    "Are you sure you want to send this notification to %@?" : {
+
+    },
     "Are you sure? This will permanently delete the current CKR Game and all its data (participants, matches, etc.).%@" : {
       "localizations" : {
         "fr" : {
@@ -888,6 +904,9 @@
           }
         }
       }
+    },
+    "Capacity" : {
+
     },
     "Challenge" : {
       "localizations" : {
@@ -1176,6 +1195,9 @@
           }
         }
       }
+    },
+    "CODE" : {
+
     },
     "Code :" : {
       "localizations" : {
@@ -1676,6 +1698,9 @@
         }
       }
     },
+    "Create Special Edition" : {
+
+    },
     "Custom Picker" : {
       "localizations" : {
         "fr" : {
@@ -2140,6 +2165,12 @@
         }
       }
     },
+    "Edition Info" : {
+
+    },
+    "Editions" : {
+
+    },
     "Email *" : {
       "localizations" : {
         "fr" : {
@@ -2219,6 +2250,9 @@
           }
         }
       }
+    },
+    "Enter a code to join a private edition" : {
+
     },
     "Error" : {
       "localizations" : {
@@ -2844,6 +2878,12 @@
         }
       }
     },
+    "Join" : {
+
+    },
+    "Join Code" : {
+
+    },
     "Join existing cohouse" : {
       "localizations" : {
         "fr" : {
@@ -2924,6 +2964,9 @@
         }
       }
     },
+    "Leave edition" : {
+
+    },
     "Library" : {
       "localizations" : {
         "fr" : {
@@ -2987,6 +3030,9 @@
           }
         }
       }
+    },
+    "Loading editions..." : {
+
     },
     "Loading history…" : {
       "localizations" : {
@@ -3101,6 +3147,7 @@
       }
     },
     "Make Admin" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -3308,6 +3355,9 @@
         }
       }
     },
+    "Max participants: %lld" : {
+
+    },
     "Me" : {
       "localizations" : {
         "fr" : {
@@ -3421,6 +3471,9 @@
         }
       }
     },
+    "My Editions" : {
+
+    },
     "Name" : {
       "localizations" : {
         "fr" : {
@@ -3516,6 +3569,9 @@
           }
         }
       }
+    },
+    "New Edition" : {
+
     },
     "New News" : {
       "localizations" : {
@@ -3838,6 +3894,9 @@
         }
       }
     },
+    "No special editions yet" : {
+
+    },
     "No specific response" : {
       "localizations" : {
         "fr" : {
@@ -4013,6 +4072,9 @@
           }
         }
       }
+    },
+    "Once published, users can join with the code. Are you sure?" : {
+
     },
     "Open" : {
       "localizations" : {
@@ -4366,6 +4428,9 @@
         }
       }
     },
+    "Price" : {
+
+    },
     "Price per person" : {
       "localizations" : {
         "fr" : {
@@ -4445,6 +4510,12 @@
           }
         }
       }
+    },
+    "Publish" : {
+
+    },
+    "Publish Edition" : {
+
     },
     "Quit cohouse" : {
       "localizations" : {
@@ -4558,7 +4629,11 @@
         }
       }
     },
+    "Registrations open!" : {
+
+    },
     "Remove Admin" : {
+      "extractionState" : "stale",
       "localizations" : {
         "fr" : {
           "stringUnit" : {
@@ -5038,6 +5113,9 @@
         }
       }
     },
+    "Send" : {
+
+    },
     "Send notification" : {
       "localizations" : {
         "fr" : {
@@ -5053,6 +5131,9 @@
           }
         }
       }
+    },
+    "Send Notification?" : {
+
     },
     "Send to" : {
       "localizations" : {
@@ -5101,6 +5182,12 @@
           }
         }
       }
+    },
+    "Set Role" : {
+
+    },
+    "Share this code with participants" : {
+
     },
     "Share this code with your cohouse buddies" : {
       "localizations" : {
@@ -5188,6 +5275,9 @@
           }
         }
       }
+    },
+    "Special Edition" : {
+
     },
     "Start" : {
       "localizations" : {

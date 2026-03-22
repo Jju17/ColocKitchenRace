@@ -3,10 +3,13 @@ package dev.rahier.colocskitchenrace
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
+import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.google.firebase.messaging.FirebaseMessaging
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import dagger.hilt.android.AndroidEntryPoint
+import dev.rahier.colocskitchenrace.data.repository.AuthRepository
 import dev.rahier.colocskitchenrace.data.repository.UserRepository
 import dev.rahier.colocskitchenrace.util.Constants
 import javax.inject.Inject
@@ -17,9 +20,28 @@ class CKRFirebaseMessagingService : FirebaseMessagingService() {
     @Inject
     lateinit var userRepository: UserRepository
 
+    @Inject
+    lateinit var authRepository: AuthRepository
+
     override fun onNewToken(token: String) {
         super.onNewToken(token)
         userRepository.storeFCMToken(token)
+
+        // Re-subscribe to FCM topics when token changes
+        FirebaseMessaging.getInstance().subscribeToTopic(BuildConfig.FCM_TOPIC_ALL_USERS)
+            .addOnFailureListener { e ->
+                Log.w("CKRFirebaseMessaging", "Failed to re-subscribe to all_users topic", e)
+            }
+
+        // Re-subscribe to edition topic if user has an active edition
+        val editionId = authRepository.currentUser.value?.activeEditionId
+        if (editionId != null) {
+            val env = if (BuildConfig.FCM_TOPIC_ALL_USERS.endsWith("_prod")) "prod" else "staging"
+            FirebaseMessaging.getInstance().subscribeToTopic("edition_${editionId}_${env}")
+                .addOnFailureListener { e ->
+                    Log.w("CKRFirebaseMessaging", "Failed to re-subscribe to edition topic", e)
+                }
+        }
     }
 
     override fun onMessageReceived(message: RemoteMessage) {

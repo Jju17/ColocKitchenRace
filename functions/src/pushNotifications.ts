@@ -1,7 +1,7 @@
 import { onDocumentCreated } from "firebase-functions/v2/firestore";
 import { onTaskDispatched } from "firebase-functions/v2/tasks";
 import { getFunctions } from "firebase-admin/functions";
-import { admin, db, messaging, REGION } from "./config";
+import { admin, db, messaging, REGION, getFCMTopicAllUsers } from "./config";
 import { getFCMTokensForUsers, sendToTokens } from "./notifications";
 
 // ============================================
@@ -45,7 +45,7 @@ function toDate(val: unknown): Date {
  * Schedule a Cloud Task at an absolute time.
  * Returns false if the time is in the past or too far in the future.
  */
-async function scheduleTaskAt(
+export async function scheduleTaskAt(
   queueName: string,
   data: Record<string, string>,
   targetDate: Date
@@ -254,6 +254,12 @@ export const onCKRGameCreated = onDocumentCreated(
 
     const gameId = event.params.gameId;
 
+    // Skip draft editions — notifications are sent when the edition is published
+    if (gameData.status === "draft") {
+      console.log(`Skipping notifications for draft game ${gameId}`);
+      return;
+    }
+
     // 1. Send "registration open" notification to all users
     const editionNumber = gameData.editionNumber as number | undefined;
     const body = editionNumber
@@ -262,7 +268,7 @@ export const onCKRGameCreated = onDocumentCreated(
 
     try {
       const message: admin.messaging.Message = {
-        topic: "all_users",
+        topic: getFCMTopicAllUsers(),
         notification: {
           title: "🎉 Les inscriptions sont ouvertes !",
           body,

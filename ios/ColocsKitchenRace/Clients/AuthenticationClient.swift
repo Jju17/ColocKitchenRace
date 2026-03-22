@@ -130,7 +130,7 @@ extension AuthenticationClient: DependencyKey {
                 .setData(from: newUser)
 
             do {
-                try await Messaging.messaging().subscribe(toTopic: "all_users")
+                try await Messaging.messaging().subscribe(toTopic: CKREnvironment.fcmTopicAllUsers)
             } catch {
                 Logger.authLog.error("Failed to subscribe to FCM topic on account creation: \(error)")
             }
@@ -138,14 +138,23 @@ extension AuthenticationClient: DependencyKey {
             return newUser
         },
         signOut: {
+            // Unsubscribe from all FCM topics
             do {
-                try await Messaging.messaging().unsubscribe(fromTopic: "all_users")
+                try await Messaging.messaging().unsubscribe(fromTopic: CKREnvironment.fcmTopicAllUsers)
             } catch {
-                Logger.authLog.error("Failed to unsubscribe from FCM topic on sign-out: \(error)")
+                Logger.authLog.error("Failed to unsubscribe from FCM all_users topic: \(error)")
+            }
+            // Unsubscribe from edition topic if active
+            @Shared(.userInfo) var user
+            if let editionId = user?.activeEditionId {
+                let editionTopic = CKREnvironment.fcmTopicEdition(editionId)
+                do {
+                    try await Messaging.messaging().unsubscribe(fromTopic: editionTopic)
+                } catch {
+                    Logger.authLog.error("Failed to unsubscribe from edition topic: \(error)")
+                }
             }
             try Auth.auth().signOut()
-
-            @Shared(.userInfo) var user
             @Shared(.cohouse) var cohouse
             @Shared(.ckrGame) var ckrGame
             @Shared(.news) var news
@@ -170,7 +179,7 @@ extension AuthenticationClient: DependencyKey {
 
             // 1. Unsubscribe from FCM topic before account is deleted
             do {
-                try await Messaging.messaging().unsubscribe(fromTopic: "all_users")
+                try await Messaging.messaging().unsubscribe(fromTopic: CKREnvironment.fcmTopicAllUsers)
             } catch {
                 Logger.authLog.error("Failed to unsubscribe from FCM topic on delete: \(error)")
             }
@@ -368,7 +377,7 @@ extension AuthenticationClient: DependencyKey {
         @Shared(.cohouse) var cohouse
 
         do {
-            try await Messaging.messaging().subscribe(toTopic: "all_users")
+            try await Messaging.messaging().subscribe(toTopic: CKREnvironment.fcmTopicAllUsers)
         } catch {
             Logger.authLog.error("Failed to subscribe to FCM topic: \(error)")
         }

@@ -21,6 +21,7 @@ struct Challenge: Equatable, Hashable, Codable, Identifiable {
     var body: String
     var content: ChallengeContent
     var points: Int?
+    var editionId: String?          // gameId of the edition this challenge belongs to (nil = global)
 }
 
 extension Challenge {

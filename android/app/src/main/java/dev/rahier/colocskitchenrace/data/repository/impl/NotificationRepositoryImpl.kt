@@ -3,6 +3,7 @@ package dev.rahier.colocskitchenrace.data.repository.impl
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.messaging.FirebaseMessaging
+import dev.rahier.colocskitchenrace.BuildConfig
 import dev.rahier.colocskitchenrace.data.repository.NotificationRepository
 import dev.rahier.colocskitchenrace.util.Constants
 import kotlinx.coroutines.tasks.await
@@ -28,14 +29,10 @@ class NotificationRepositoryImpl @Inject constructor(
     }
 
     override suspend fun subscribeToAllUsers() {
-        messaging.subscribeToTopic(TOPIC_ALL_USERS).await()
+        messaging.subscribeToTopic(BuildConfig.FCM_TOPIC_ALL_USERS).await()
     }
 
     override suspend fun unsubscribeFromAllUsers() {
-        messaging.unsubscribeFromTopic(TOPIC_ALL_USERS).await()
-    }
-
-    companion object {
-        private const val TOPIC_ALL_USERS = "all_users"
+        messaging.unsubscribeFromTopic(BuildConfig.FCM_TOPIC_ALL_USERS).await()
     }
 }

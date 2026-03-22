@@ -110,9 +110,20 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
             }
 
             do {
-                try await Messaging.messaging().subscribe(toTopic: "all_users")
+                try await Messaging.messaging().subscribe(toTopic: CKREnvironment.fcmTopicAllUsers)
             } catch {
-                Logger.globalLog.error("Failed to subscribe to all_users topic: \(error)")
+                Logger.globalLog.error("Failed to subscribe to \(CKREnvironment.fcmTopicAllUsers) topic: \(error)")
+            }
+
+            // Re-subscribe to edition topic if user has an active edition
+            @Shared(.userInfo) var userInfo
+            if let editionId = userInfo?.activeEditionId {
+                let editionTopic = CKREnvironment.fcmTopicEdition(editionId)
+                do {
+                    try await Messaging.messaging().subscribe(toTopic: editionTopic)
+                } catch {
+                    Logger.globalLog.error("Failed to re-subscribe to edition topic: \(error)")
+                }
             }
         }
     }

@@ -26,6 +26,7 @@ struct User: Equatable, Hashable, Identifiable, Codable {
     var dietaryPreferences: Set<DietaryPreference> = []
     var fcmToken: String?
     var cohouseId: String?
+    var activeEditionId: String?           // gameId of active special edition (nil = global)
 }
 
 extension User {

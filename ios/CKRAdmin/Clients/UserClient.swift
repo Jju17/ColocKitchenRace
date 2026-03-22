@@ -33,8 +33,10 @@ struct UserClient {
     var totalUsersCount: @Sendable () async -> Result<Int, UserError> = { .success(0) }
     var watchTotalUsersCount: @Sendable () -> AsyncStream<Int> = { AsyncStream { $0.finish() } }
     var searchUsers: @Sendable (_ query: String) async -> Result<[User], UserError> = { _ in .success([]) }
-    var setAdminClaim: @Sendable (_ authUid: String, _ isAdmin: Bool) async -> Result<Void, UserError> = { _, _ in .success(()) }
-    var updateUserAdminStatus: @Sendable (_ userId: String, _ isAdmin: Bool) async -> Result<Void, UserError> = { _, _ in .success(()) }
+    /// Set a role on a user via Cloud Function. Pass `nil` to remove admin access.
+    var setRole: @Sendable (_ authUid: String, _ role: AdminRole?) async -> Result<Void, UserError> = { _, _ in .success(()) }
+    /// Update the Firestore user doc to keep `isAdmin` and `role` fields in sync.
+    var updateUserRole: @Sendable (_ userId: String, _ role: AdminRole?) async -> Result<Void, UserError> = { _, _ in .success(()) }
 }
 
 extension UserClient: DependencyKey {
@@ -100,28 +102,36 @@ extension UserClient: DependencyKey {
                 return .failure(.fromError(error))
             }
         },
-        setAdminClaim: { authUid, isAdmin in
+        setRole: { authUid, role in
             do {
                 let functions = Functions.functions(region: "europe-west1")
-                _ = try await functions.httpsCallable("setAdminClaim").call([
-                    "targetAuthUid": authUid,
-                    "isAdmin": isAdmin,
-                ])
+                var payload: [String: Any] = ["targetAuthUid": authUid]
+                if let role {
+                    payload["role"] = role.rawValue
+                } else {
+                    payload["role"] = NSNull()
+                    payload["isAdmin"] = false
+                }
+                _ = try await functions.httpsCallable("setAdminClaim").call(payload)
                 return .success(())
             } catch {
-                Logger.authLog.log(level: .fault, "setAdminClaim error: \(error.localizedDescription)")
+                Logger.authLog.log(level: .fault, "setRole error: \(error.localizedDescription)")
                 return .failure(.fromError(error))
             }
         },
-        updateUserAdminStatus: { userId, isAdmin in
+        updateUserRole: { userId, role in
             do {
+                let data: [String: Any] = [
+                    "isAdmin": role != nil,
+                    "role": role?.rawValue as Any,
+                ]
                 try await Firestore.firestore()
                     .collection("users")
                     .document(userId)
-                    .updateData(["isAdmin": isAdmin])
+                    .updateData(data)
                 return .success(())
             } catch {
-                Logger.authLog.log(level: .fault, "updateUserAdminStatus error: \(error.localizedDescription)")
+                Logger.authLog.log(level: .fault, "updateUserRole error: \(error.localizedDescription)")
                 return .failure(.fromError(error))
             }
         }
@@ -132,8 +142,8 @@ extension UserClient: DependencyKey {
             totalUsersCount: { .success(42) },
             watchTotalUsersCount: { AsyncStream { $0.finish() } },
             searchUsers: { _ in .success(User.mockUsers) },
-            setAdminClaim: { _, _ in .success(()) },
-            updateUserAdminStatus: { _, _ in .success(()) }
+            setRole: { _, _ in .success(()) },
+            updateUserRole: { _, _ in .success(()) }
         )
     }
 
@@ -142,8 +152,8 @@ extension UserClient: DependencyKey {
             totalUsersCount: { .success(0) },
             watchTotalUsersCount: { AsyncStream { $0.finish() } },
             searchUsers: { _ in .success([]) },
-            setAdminClaim: { _, _ in .success(()) },
-            updateUserAdminStatus: { _, _ in .success(()) }
+            setRole: { _, _ in .success(()) },
+            updateUserRole: { _, _ in .success(()) }
         )
     }
 }

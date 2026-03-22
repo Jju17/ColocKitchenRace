@@ -11,6 +11,7 @@ import dev.rahier.colocskitchenrace.data.model.ChallengeContent
 import dev.rahier.colocskitchenrace.data.model.ChallengeResponse
 import dev.rahier.colocskitchenrace.data.model.ChallengeResponseContent
 import dev.rahier.colocskitchenrace.data.model.ChallengeResponseStatus
+import dev.rahier.colocskitchenrace.data.repository.AuthRepository
 import dev.rahier.colocskitchenrace.data.repository.ChallengeRepository
 import dev.rahier.colocskitchenrace.data.repository.ChallengeResponseRepository
 import dev.rahier.colocskitchenrace.data.repository.CohouseRepository
@@ -32,16 +33,20 @@ class ChallengesViewModel @Inject constructor(
     private val challengeRepository: ChallengeRepository,
     private val responseRepository: ChallengeResponseRepository,
     private val cohouseRepository: CohouseRepository,
+    private val authRepository: AuthRepository,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ChallengesState())
     val state: StateFlow<ChallengesState> = _state.asStateFlow()
     private var responsesListenerJob: Job? = null
+    private var lastActiveEditionId: String? = null
 
     init {
-        loadChallenges()
+        // observeEditionChanges will trigger loadChallenges() reactively once the
+        // user session is restored, avoiding a premature load with stale activeEditionId
         observeCohouse()
+        observeEditionChanges()
     }
 
     fun onIntent(intent: ChallengesIntent) {
@@ -168,8 +173,19 @@ class ChallengesViewModel @Inject constructor(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             try {
-                val challenges = challengeRepository.getAll()
-                _state.update { it.copy(challenges = challenges) }
+                val allChallenges = challengeRepository.getAll()
+                // Filter by active edition
+                val activeEditionId = authRepository.currentUser.value?.activeEditionId
+                val filtered = allChallenges.filter { challenge ->
+                    if (activeEditionId != null) {
+                        // In a special edition: show only that edition's challenges
+                        challenge.editionId == activeEditionId
+                    } else {
+                        // Global mode: show challenges without an editionId
+                        challenge.editionId == null
+                    }
+                }
+                _state.update { it.copy(challenges = filtered) }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
@@ -185,6 +201,18 @@ class ChallengesViewModel @Inject constructor(
                 _state.update { it.copy(hasCohouse = cohouse != null) }
                 // Start real-time listener for responses when cohouse is available
                 startResponsesListener(cohouse?.id)
+            }
+        }
+    }
+
+    private fun observeEditionChanges() {
+        viewModelScope.launch {
+            authRepository.currentUser.collect { user ->
+                val editionId = user?.activeEditionId
+                if (editionId != lastActiveEditionId) {
+                    lastActiveEditionId = editionId
+                    loadChallenges()
+                }
             }
         }
     }

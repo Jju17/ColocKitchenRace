@@ -65,6 +65,7 @@ class ChallengeRepositoryImpl @Inject constructor(
                 body = data["body"] as? String ?: "",
                 content = content,
                 points = (data["points"] as? Number)?.toInt(),
+                editionId = data["editionId"] as? String,
             )
         }
 

@@ -17,125 +17,132 @@ service cloud.firestore {
       return request.auth.uid;
     }
 
-    // ──────────────────────────────────────────────
-    // 1. USERS  (/users/{userId})
-    //
-    //  • Anyone signed-in can CREATE their own doc (signup).
-    //  • Only the owner (matched by authId field) can READ / UPDATE.
-    //  • Admins can READ all users and UPDATE (e.g. toggle isAdmin).
-    //  • Deletes are forbidden from client (account deletion
-    //    should go through a Cloud Function for cleanup).
-    // ──────────────────────────────────────────────
-    match /users/{userId} {
-      // Allow read if the caller owns this user doc OR is an admin.
-      allow read: if isSignedIn()
-                  && (resource.data.authId == authUid() || isAdmin());
-
-      // Allow create during signup — the authId in the new doc must
-      // match the caller so nobody can create a doc for someone else.
-      // Prevent self-promotion: isAdmin must be false at creation time.
-      allow create: if isSignedIn()
-                    && request.resource.data.authId == authUid()
-                    && request.resource.data.isAdmin == false;
-
-      // Allow update by the owner (authId + isAdmin immutable) or by an admin.
-      allow update: if isSignedIn()
-                    && (
-                      (resource.data.authId == authUid()
-                       && request.resource.data.authId == resource.data.authId
-                       && request.resource.data.isAdmin == resource.data.isAdmin)
-                      || isAdmin()
-                    );
-
-      allow delete: if false;
+    /// Super admin: full access to everything.
+    function isSuperAdmin() {
+      return request.auth.token.role == "super_admin"
+             || request.auth.token.admin == true; // Legacy compat during migration
     }
 
-    // Special rule: allow querying users by authId during signin.
-    // The above per-doc rule already covers this because Firestore
-    // evaluates rules on the documents that match the query.
-    // A query `whereField("authId", isEqualTo: auth.uid)` will only
-    // return docs where authId == auth.uid, which satisfies the read rule.
-
-    // ──────────────────────────────────────────────
-    // 2. COHOUSES  (/cohouses/{cohouseId})
-    //
-    //  • Any signed-in user can CREATE a cohouse (onboarding).
-    //  • READ: the cohouse code lookup needs to work for any
-    //    signed-in user (joining a cohouse by code).
-    //  • UPDATE: only members of the cohouse.
-    //  • DELETE: forbidden from client.
-    //
-    //  Subcollection /cohouses/{cohouseId}/users/{cohouseUserId}
-    //  • Members can read/write their cohouse's users.
-    // ──────────────────────────────────────────────
-    match /cohouses/{cohouseId} {
-      // Any signed-in user can read cohouses (needed for code lookup
-      // and cohouse fetching during signin).
-      allow read: if isSignedIn();
-
-      // Any signed-in user can create a cohouse (during onboarding).
-      allow create: if isSignedIn();
-
-      // Only cohouse members can update.
-      // We check that the caller is listed in the users subcollection.
-      allow update: if isSignedIn()
-                    && isCohouseMember(cohouseId);
-
-      allow delete: if false;
-
-      // ── Cohouse Users subcollection ──
-      match /users/{cohouseUserId} {
-        // Members can read the user list.
-        allow read: if isSignedIn();
-
-        // Members can add / update / remove users in their cohouse.
-        allow create, update, delete: if isSignedIn()
-                                      && isCohouseMember(cohouseId);
-      }
+    /// Edition admin: can create/manage their own editions.
+    function isEditionAdmin() {
+      return request.auth.token.role == "edition_admin";
     }
 
-    /// Check whether the caller has a CohouseUser doc in this cohouse
-    /// whose `userId` field matches one of their user docs.
-    /// Since we store the app-level user UUID (not Auth UID) in
-    /// CohouseUser.userId, we do a subcollection existence check.
-    ///
-    /// NOTE: This performs a get() which counts toward your daily reads.
-    /// For a small app this is fine; for scale you could denormalize.
+    /// Any admin role (super or edition).
+    function isAnyAdmin() {
+      return isSuperAdmin() || isEditionAdmin();
+    }
+
+    /// Legacy alias — kept so existing code referencing isAdmin() still works.
+    function isAdmin() {
+      return isSuperAdmin();
+    }
+
     /// Check whether the caller is a member of the given cohouse.
-    /// Uses a custom claim set by the setCohouseClaim Cloud Function
-    /// (same pattern as isAdmin() using request.auth.token.admin).
     function isCohouseMember(cohouseId) {
       return isSignedIn()
         && request.auth.token.cohouseId == cohouseId;
     }
 
+    /// Check whether the caller created this edition (for edition admin ownership).
+    function isEditionOwner(gameId) {
+      return isAnyAdmin()
+        && get(/databases/$(database)/documents/ckrGames/$(gameId)).data.createdByAuthUid == authUid();
+    }
+
+    /// Check whether the caller can manage this edition.
+    function canManageEdition(gameId) {
+      return isSuperAdmin() || isEditionOwner(gameId);
+    }
+
+    // ──────────────────────────────────────────────
+    // 1. USERS  (/users/{userId})
+    // ──────────────────────────────────────────────
+    match /users/{userId} {
+      allow read: if isSignedIn()
+                  && (resource.data.authId == authUid() || isSuperAdmin());
+
+      allow create: if isSignedIn()
+                    && request.resource.data.authId == authUid()
+                    && request.resource.data.isAdmin == false;
+
+      allow update: if isSignedIn()
+                    && (
+                      (resource.data.authId == authUid()
+                       && request.resource.data.authId == resource.data.authId
+                       && request.resource.data.isAdmin == resource.data.isAdmin
+                       && request.resource.data.activeEditionId == resource.data.activeEditionId)
+                      || isSuperAdmin()
+                    );
+
+      allow delete: if false;
+    }
+
+    // ──────────────────────────────────────────────
+    // 2. COHOUSES  (/cohouses/{cohouseId})
+    // ──────────────────────────────────────────────
+    match /cohouses/{cohouseId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn()
+                    && isCohouseMember(cohouseId);
+      allow delete: if false;
+
+      match /users/{cohouseUserId} {
+        allow read: if isSignedIn();
+        allow create, update, delete: if isSignedIn()
+                                      && isCohouseMember(cohouseId);
+      }
+    }
+
     // ──────────────────────────────────────────────
     // 3. CKR GAMES  (/ckrGames/{gameId})
     //
-    //  • All signed-in users can READ (see upcoming games).
-    //  • Only admins can CREATE / UPDATE / DELETE from client
-    //    (CKRAdmin app). Cloud Functions also write (registration,
-    //    matching) using the Admin SDK which bypasses rules.
-    //
-    //  Subcollection /ckrGames/{gameId}/registrations/{regId}
-    //  • Read: members of the registered cohouse + admins.
-    //  • Write: only via Cloud Functions (registerForGame).
+    //  Multi-edition rules:
+    //  • Published games: any signed-in user can read
+    //  • Draft games: only the creator or super admin
+    //  • Create: any admin (super or edition)
+    //  • Update/Delete: edition owner or super admin
     // ──────────────────────────────────────────────
     match /ckrGames/{gameId} {
-      allow read: if isSignedIn();
+      allow read: if isSignedIn()
+                  && (
+                    resource.data.status == "published"
+                    || resource.data.createdByAuthUid == authUid()
+                    || isSuperAdmin()
+                  );
 
-      // Create / Update / Delete: admin only.
-      allow create, update, delete: if isSignedIn() && isAdmin();
+      allow create: if isSignedIn() && isAnyAdmin();
+
+      allow update, delete: if isSignedIn() && canManageEdition(gameId);
 
       // ── Registrations subcollection ──
       match /registrations/{regId} {
-        // Only the cohouse that owns this registration or admins can read.
-        // regId === cohouseId by design (registration doc keyed by cohouse).
         allow read: if isSignedIn()
-                    && (isCohouseMember(regId) || isAdmin());
-
-        // Writes happen exclusively via Cloud Functions (Admin SDK).
+                    && (isCohouseMember(regId) || canManageEdition(gameId));
         allow create, update, delete: if false;
+      }
+
+      // ── Challenges subcollection (NEW — scoped per edition) ──
+      match /challenges/{challengeId} {
+        allow read: if isSignedIn();
+        allow create, update, delete: if isSignedIn() && canManageEdition(gameId);
+
+        // ── Challenge Responses ──
+        match /responses/{responseId} {
+          allow read: if isSignedIn();
+          allow create: if isSignedIn()
+                        && request.resource.data.submittedByAuthId == authUid();
+          allow update: if isSignedIn()
+                        && (canManageEdition(gameId) || resource.data.submittedByAuthId == authUid());
+          allow delete: if false;
+        }
+
+        // ── Notification markers (Cloud Functions only) ──
+        match /notifications/{notifId} {
+          allow read: if false;
+          allow write: if false;
+        }
       }
 
       // ── Notification markers (Cloud Functions only) ──
@@ -146,47 +153,24 @@ service cloud.firestore {
     }
 
     // ──────────────────────────────────────────────
-    // 4. CHALLENGES  (/challenges/{challengeId})
+    // 4. CHALLENGES (LEGACY — kept during migration)
     //
-    //  • All signed-in users can READ.
-    //  • Only admins can CREATE / UPDATE / DELETE from client.
-    //
-    //  Subcollection /challenges/{challengeId}/responses/{responseId}
-    //  • Read: the cohouse that submitted + admins.
-    //  • Create: any signed-in user (submitting a response).
-    //  • Update: admins (validating/invalidating) + the cohouse
-    //    owner (editing before validation).
-    //
-    //  Subcollection /challenges/{challengeId}/notifications/{notifId}
-    //  • Only Cloud Functions write these marker docs.
+    //  Will be removed once all challenges are migrated
+    //  to /ckrGames/{gameId}/challenges/{challengeId}
     // ──────────────────────────────────────────────
     match /challenges/{challengeId} {
       allow read: if isSignedIn();
-      allow create, update, delete: if isSignedIn() && isAdmin();
+      allow create, update, delete: if isSignedIn() && isSuperAdmin();
 
-      // ── Challenge Responses ──
       match /responses/{responseId} {
-        // Anyone signed in can read responses (needed for collection
-        // group queries on validated responses).
         allow read: if isSignedIn();
-
-        // Any signed-in user can create a response (submit).
-        // Enforce that submittedByAuthId matches the caller's auth UID
-        // to prevent impersonation.
         allow create: if isSignedIn()
                       && request.resource.data.submittedByAuthId == authUid();
-
-        // Updates allowed for admins (status change) or the
-        // original submitter (re-submit before validation).
-        // We check submittedByAuthId to verify the caller is the
-        // user who originally submitted the response.
         allow update: if isSignedIn()
-                      && (isAdmin() || resource.data.submittedByAuthId == authUid());
-
+                      && (isSuperAdmin() || resource.data.submittedByAuthId == authUid());
         allow delete: if false;
       }
 
-      // ── Notification markers (Cloud Functions only) ──
       match /notifications/{notifId} {
         allow read: if false;
         allow write: if false;
@@ -195,77 +179,37 @@ service cloud.firestore {
 
     // ──────────────────────────────────────────────
     // 5. NEWS  (/news/{newsId})
-    //
-    //  • All signed-in users can READ.
-    //  • Only admins can CREATE / UPDATE / DELETE.
     // ──────────────────────────────────────────────
     match /news/{newsId} {
       allow read: if isSignedIn();
-      allow create, update, delete: if isSignedIn() && isAdmin();
+      allow create, update, delete: if isSignedIn() && isSuperAdmin();
     }
 
     // ──────────────────────────────────────────────
     // 6. NOTIFICATION HISTORY  (/notificationHistory/{docId})
-    //
-    //  • Admins can READ (CKRAdmin history screen).
-    //  • Writes happen only via Cloud Functions (Admin SDK).
     // ──────────────────────────────────────────────
     match /notificationHistory/{docId} {
-      allow read: if isSignedIn() && isAdmin();
+      allow read: if isSignedIn() && isAnyAdmin();
       allow create, update, delete: if false;
     }
 
     // ──────────────────────────────────────────────
-    // Admin helper
-    //
-    // Reads the caller's user doc to check the isAdmin flag.
-    // This requires knowing the user's app-level doc ID from
-    // their Auth UID. Since user docs are keyed by app UUID
-    // (not Auth UID), we can't do a direct get().
-    //
-    // WORKAROUND: We use a custom claim set on the Auth token.
-    // The admin flag should be set as a custom claim when the
-    // user is promoted to admin:
-    //   admin.auth().setCustomUserClaims(uid, { admin: true })
-    //
-    // If you haven't set up custom claims yet, use the
-    // temporary fallback below.
-    // ──────────────────────────────────────────────
-    function isAdmin() {
-      // Option A (recommended): Custom claims on the Auth token.
-      // Set once via Cloud Function or Firebase Console:
-      //   admin.auth().setCustomUserClaims(uid, { admin: true })
-      // Then this works:
-      return request.auth.token.admin == true;
-
-      // Option B (temporary fallback): Hardcode your Auth UID.
-      // Uncomment and replace with your Firebase Auth UID:
-      // return request.auth.uid == "YOUR_FIREBASE_AUTH_UID";
-    }
-
-    // ──────────────────────────────────────────────
     // COLLECTION GROUP QUERIES
-    //
-    // Firestore requires explicit rules for collectionGroup()
-    // queries. The path-based rules above only match documents
-    // at their specific paths. For collectionGroup queries to
-    // work, we need wildcard rules that match the collection
-    // name at any depth in the hierarchy.
     // ──────────────────────────────────────────────
 
     // Allow collectionGroup("responses") queries for signed-in users.
-    // NOTE: This matches any subcollection named "responses" at any depth.
-    // Currently only challenges/{id}/responses exists. If new "responses"
-    // subcollections are added, they will inherit this rule.
     match /{path=**}/responses/{responseId} {
       allow read: if isSignedIn();
     }
 
     // Allow collectionGroup("users") queries for signed-in users
-    // (cohouse users subcollection only).
-    // Scoped to /cohouses/{cohouseId}/users/ to avoid exposing
-    // the top-level /users/{userId} collection via collectionGroup.
     match /cohouses/{cohouseId}/users/{userId} {
+      allow read: if isSignedIn();
+    }
+
+    // Allow collectionGroup("challenges") queries for signed-in users
+    // (needed for checkChallengeSchedules Cloud Function scheduler)
+    match /{path=**}/challenges/{challengeId} {
       allow read: if isSignedIn();
     }
   }

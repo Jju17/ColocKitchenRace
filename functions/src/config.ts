@@ -27,4 +27,24 @@ export function getStripe(): Stripe {
   return _stripe;
 }
 
+// FCM topic — environment-aware to prevent cross-environment notifications
+// Uses GCLOUD_PROJECT (set by Cloud Functions runtime) to avoid calling admin.app()
+// at module load time, which fails in test environments.
+function getProjectId(): string | undefined {
+  try {
+    return process.env.GCLOUD_PROJECT || admin.app().options.projectId;
+  } catch {
+    return undefined;
+  }
+}
+export function getFCMTopicAllUsers(): string {
+  return getProjectId() === "colocskitchenrace-prod" ? "all_users_prod" : "all_users_staging";
+}
+
+/** FCM topic for a specific edition (special editions only). */
+export function getFCMTopicEdition(gameId: string): string {
+  const suffix = getProjectId() === "colocskitchenrace-prod" ? "prod" : "staging";
+  return `edition_${gameId}_${suffix}`;
+}
+
 export { admin };

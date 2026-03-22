@@ -7,10 +7,24 @@
 
 import Foundation
 
+/// Admin role assigned via Firebase custom claims.
+enum AdminRole: String, Codable, Equatable, Hashable {
+    case superAdmin = "super_admin"
+    case editionAdmin = "edition_admin"
+
+    var displayName: String {
+        switch self {
+        case .superAdmin:  return "Super Admin"
+        case .editionAdmin: return "Edition Admin"
+        }
+    }
+}
+
 struct User: Equatable, Hashable, Identifiable, Codable {
     var id: UUID
     var authId: String = ""
     var isAdmin: Bool? = false
+    var role: AdminRole?
     var isSubscribeToNews: Bool = false
     var firstName: String = ""
     var lastName: String = ""
@@ -21,6 +35,13 @@ struct User: Equatable, Hashable, Identifiable, Codable {
 extension User {
     var fullName: String {
         "\(firstName) \(lastName)"
+    }
+
+    /// The effective role: prefers the explicit `role` field, falls back to legacy `isAdmin`.
+    var effectiveRole: AdminRole? {
+        if let role { return role }
+        if isAdmin == true { return .superAdmin }
+        return nil
     }
 }
 

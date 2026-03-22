@@ -28,6 +28,7 @@ struct HomeFeature {
         var coverImageData: Data?
         var refreshError: String?
         @Presents var registrationForm: CKRRegistrationFormFeature.State?
+        var joinEdition = JoinEditionFeature.State()
 
         var coverImage: UIImage? {
             coverImageData.flatMap { UIImage(data: $0) }
@@ -50,6 +51,7 @@ struct HomeFeature {
         case refreshFailed(String)
         case path(StackActionOf<Path>)
         case registrationForm(PresentationAction<CKRRegistrationFormFeature.Action>)
+        case joinEdition(JoinEditionFeature.Action)
         case delegate(Delegate)
 
         enum Delegate: Equatable {
@@ -62,6 +64,10 @@ struct HomeFeature {
     @Dependency(\.newsClient) var newsClient
 
     var body: some ReducerOf<Self> {
+        Scope(state: \.joinEdition, action: \.joinEdition) {
+            JoinEditionFeature()
+        }
+
         Reduce { state, action in
             switch action {
                 case let .coverImageLoaded(data):
@@ -84,7 +90,12 @@ struct HomeFeature {
                 case .refresh:
                     state.refreshError = nil
                     let coverImagePath = state.cohouse?.coverImagePath
+                    let hasActiveEdition = state.userInfo?.activeEditionId != nil
                     return .run { [ckrClient, newsClient, cohouseClient] send in
+                        // Load active edition info if user has one
+                        if hasActiveEdition {
+                            await send(.joinEdition(.loadActiveEdition))
+                        }
                         do {
                             let _ = try await ckrClient.getLast()
                         } catch {
@@ -142,6 +153,8 @@ struct HomeFeature {
                     return .none
                 case .registrationForm:
                     return .none
+                case .joinEdition:
+                    return .none
                 case .path:
                     return .none
                 case .delegate:
@@ -194,9 +207,17 @@ struct HomeView: View {
                         countdownStart: self.store.ckrGame?.startCKRCountdown
                     )
 
+                    JoinEditionTileView(
+                        store: store.scope(
+                            state: \.joinEdition,
+                            action: \.joinEdition
+                        )
+                    )
+
                     NewsTileView(allNews: self.store.$news)
                 }
             }
+            .scrollDismissesKeyboard(.interactively)
             .refreshable {
                 await store.send(.refresh).finish()
             }

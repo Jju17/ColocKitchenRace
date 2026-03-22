@@ -23,4 +23,6 @@ interface AuthRepository {
     fun listenAuthState(): Flow<Boolean>
     suspend fun storeFCMToken(token: String)
     suspend fun restoreSession(): User?
+    /** Update the in-memory current user's activeEditionId (also updates Firestore via UserRepository). */
+    fun updateLocalActiveEditionId(editionId: String?)
 }

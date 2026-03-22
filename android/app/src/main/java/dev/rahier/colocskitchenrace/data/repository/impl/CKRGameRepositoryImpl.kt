@@ -185,7 +185,6 @@ class CKRGameRepositoryImpl @Inject constructor(
 
             val groupPlannings = (data["groupPlannings"] as? List<Map<String, Any>>)?.map {
                 GroupPlanning(
-                    id = it["id"] as? String ?: "",
                     groupIndex = (it["groupIndex"] as? Number)?.toInt() ?: 0,
                     cohouseA = it["cohouseA"] as? String ?: "",
                     cohouseB = it["cohouseB"] as? String ?: "",
@@ -211,6 +210,14 @@ class CKRGameRepositoryImpl @Inject constructor(
                 groupPlannings = groupPlannings,
                 isRevealed = data["isRevealed"] as? Boolean ?: false,
                 revealedAt = (data["revealedAt"] as? Timestamp)?.toDate(),
+                // Multi-edition fields
+                editionType = try { CKREditionType.valueOf((data["editionType"] as? String ?: "global").uppercase()) } catch (_: Exception) { CKREditionType.GLOBAL },
+                title = data["title"] as? String,
+                editionDescription = data["editionDescription"] as? String,
+                joinCode = data["joinCode"] as? String,
+                createdByAuthUid = data["createdByAuthUid"] as? String,
+                status = try { CKRGameStatus.valueOf((data["status"] as? String ?: "published").uppercase()) } catch (_: Exception) { CKRGameStatus.PUBLISHED },
+                lastSavedAt = (data["lastSavedAt"] as? Timestamp)?.toDate(),
             )
         }
     }
