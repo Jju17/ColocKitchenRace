@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dev.rahier.colocskitchenrace.data.repository.AuthRepository
 import dev.rahier.colocskitchenrace.data.repository.CKRGameRepository
 import dev.rahier.colocskitchenrace.data.repository.CohouseRepository
 import kotlin.coroutines.cancellation.CancellationException
@@ -20,14 +21,17 @@ import javax.inject.Inject
 class PlanningViewModel @Inject constructor(
     private val gameRepository: CKRGameRepository,
     private val cohouseRepository: CohouseRepository,
+    private val authRepository: AuthRepository,
     @ApplicationContext private val context: Context,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(PlanningState())
     val state: StateFlow<PlanningState> = _state.asStateFlow()
+    private var lastActiveEditionId: String? = null
 
     init {
         observeGameAndLoad()
+        observeEditionChanges()
     }
 
     fun onIntent(intent: PlanningIntent) {
@@ -41,6 +45,19 @@ class PlanningViewModel @Inject constructor(
         viewModelScope.launch {
             gameRepository.currentGame.collect { game ->
                 if (game != null) loadPlanning()
+            }
+        }
+    }
+
+    /** Reload planning when the user switches editions. */
+    private fun observeEditionChanges() {
+        viewModelScope.launch {
+            authRepository.currentUser.collect { user ->
+                val editionId = user?.activeEditionId
+                if (editionId != lastActiveEditionId) {
+                    lastActiveEditionId = editionId
+                    loadPlanning()
+                }
             }
         }
     }

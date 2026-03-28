@@ -134,8 +134,8 @@ struct DemoCKRGameTests {
     func gameDatesAreInFuture() {
         let game = DemoMode.demoCKRGame
         let now = Date()
-        #expect(game.nextGameDate > now)
-        #expect(game.registrationDeadline > now)
+        #expect(game.nextGameDate! > now)
+        #expect(game.registrationDeadline! > now)
     }
 }
 

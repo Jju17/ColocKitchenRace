@@ -139,7 +139,7 @@ extension ChallengeResponseClient: DependencyKey {
                     .collection("responses")
                     .document(response.cohouseId)
 
-                try await doc.setData(from: response, merge: true)
+                try doc.setData(from: response, merge: true)
                 try await doc.updateData([
                     "serverTS": FieldValue.serverTimestamp(),
                     "submissionDate": FieldValue.serverTimestamp(),

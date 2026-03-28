@@ -166,7 +166,7 @@ class ChallengesViewModel @Inject constructor(
         }
     }
 
-    private fun compressImage(data: ByteArray, maxBytes: Int = 1024 * 1024): ByteArray =
+    private fun compressImage(data: ByteArray, maxBytes: Int = 500_000): ByteArray =
         ImageUtils.compressToJpeg(data, maxBytes)
 
     private fun loadChallenges() {
@@ -235,10 +235,8 @@ class ChallengesViewModel @Inject constructor(
             }
             // Real-time listener for status updates (admin validation/invalidation)
             try {
-                responseRepository.watchAllResponses().collect { responses ->
-                    // Filter to only this cohouse's responses
-                    val cohouseResponses = responses.filter { it.cohouseId == cohouseId }
-                    _state.update { it.copy(responses = cohouseResponses) }
+                responseRepository.watchAllResponses(cohouseId).collect { responses ->
+                    _state.update { it.copy(responses = responses) }
                 }
             } catch (e: CancellationException) {
                 throw e

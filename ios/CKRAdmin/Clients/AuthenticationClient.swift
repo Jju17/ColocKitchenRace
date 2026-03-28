@@ -89,21 +89,21 @@ extension AuthenticationClient: DependencyKey {
             return nil
         },
         listenAuthState: {
-            AsyncStream { continuation in
-                nonisolated(unsafe) var handle: AuthStateDidChangeListenerHandle?
+            let (stream, continuation) = AsyncStream.makeStream(of: FirebaseAuth.User?.self, bufferingPolicy: .bufferingNewest(1))
 
-                continuation.onTermination = { _ in
-                    if let handle {
-                        Auth.auth().removeStateDidChangeListener(handle)
-                    }
-                }
+            nonisolated(unsafe) var handle: AuthStateDidChangeListenerHandle?
 
-                DispatchQueue.main.async {
-                    handle = Auth.auth().addStateDidChangeListener { _, user in
-                        continuation.yield(user)
-                    }
+            handle = Auth.auth().addStateDidChangeListener { _, user in
+                continuation.yield(user)
+            }
+
+            continuation.onTermination = { _ in
+                if let handle {
+                    Auth.auth().removeStateDidChangeListener(handle)
                 }
             }
+
+            return stream
         }
     )
 

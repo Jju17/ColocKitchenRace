@@ -105,8 +105,9 @@ class ChallengeResponseRepositoryImpl @Inject constructor(
         awaitClose { registration.remove() }
     }
 
-    override fun watchAllResponses(): Flow<List<ChallengeResponse>> = callbackFlow {
+    override fun watchAllResponses(cohouseId: String): Flow<List<ChallengeResponse>> = callbackFlow {
         val registration = firestore.collectionGroup(Constants.RESPONSES_SUBCOLLECTION)
+            .whereEqualTo("cohouseId", cohouseId)
             .addSnapshotListener { snapshot, _ ->
                 val responses = snapshot?.documents?.mapNotNull { doc ->
                     doc.data?.let { mapToResponse(it, doc.id) }

@@ -58,12 +58,12 @@ enum CKRGameStatus: String, Codable, Equatable, Hashable {
 struct CKRGame: Equatable, Hashable, Identifiable, Codable {
     var id: UUID = UUID()
     var editionNumber: Int = 1
-    var startCKRCountdown: Date
-    var nextGameDate: Date
-    var registrationDeadline: Date
+    var startCKRCountdown: Date?
+    var nextGameDate: Date?
+    var registrationDeadline: Date?
     var maxParticipants: Int = 100
     var pricePerPersonCents: Int = 500  // 5,00 EUR – stored in cents (Stripe convention)
-    var publishedTimestamp: Date = Date()
+    var publishedTimestamp: Date?
     var cohouseIDs: [String] = []                // Registered cohouse IDs (for matching)
     var totalRegisteredParticipants: Int = 0      // Total number of individual persons registered
     var matchedGroups: [MatchedGroup]?            // Groups of 4 cohouse IDs after matching
@@ -84,7 +84,8 @@ struct CKRGame: Equatable, Hashable, Identifiable, Codable {
 
     /// Whether registrations are still open (deadline not passed and capacity not reached).
     var isRegistrationOpen: Bool {
-        Date() < registrationDeadline && totalRegisteredParticipants < maxParticipants
+        guard let registrationDeadline else { return false }
+        return Date() < registrationDeadline && totalRegisteredParticipants < maxParticipants
     }
 
     /// Number of remaining spots (in persons).
@@ -94,7 +95,8 @@ struct CKRGame: Equatable, Hashable, Identifiable, Codable {
 
     /// Whether the countdown has started (deletion no longer allowed without a real admin).
     var hasCountdownStarted: Bool {
-        Date() >= startCKRCountdown
+        guard let startCKRCountdown else { return false }
+        return Date() >= startCKRCountdown
     }
 
     private static let eurFormatter: NumberFormatter = {

@@ -6,6 +6,7 @@
 //
 import ComposableArchitecture
 import FirebaseAuth
+import os
 import SwiftUI
 
 @Reducer
@@ -46,6 +47,28 @@ struct AppFeature {
                 if let user {
                     if user.isEmailVerified {
                         @Shared(.userInfo) var userInfo
+
+                        // Post-reinstall recovery: Firebase Auth session survives in Keychain,
+                        // but FileStorage data is wiped. Re-fetch from Firestore.
+                        if userInfo == nil {
+                            state = .splashScreen(SplashScreenFeature.State())
+                            return .run { send in
+                                do {
+                                    let profile = try await self.authenticationClient.fetchProfile(user.uid)
+                                    if let profile, !profile.needsProfileCompletion {
+                                        // Profile restored — re-trigger auth flow
+                                        await send(.newAuthStateTrigger(user))
+                                    } else {
+                                        // No Firestore profile or incomplete — force profile completion
+                                        await send(.newAuthStateTrigger(user))
+                                    }
+                                } catch {
+                                    Logger.authLog.error("[AppFeature] Failed to fetch profile: \(error)")
+                                    // Can't recover — sign out and let user re-login
+                                    try? await self.authenticationClient.signOut()
+                                }
+                            }
+                        }
 
                         // Sync Firebase Auth email → Firestore if changed (e.g. after email re-verification)
                         var syncEffect: Effect<Action> = .none

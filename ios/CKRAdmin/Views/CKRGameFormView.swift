@@ -40,12 +40,16 @@ struct CKRGameFormFeature {
         var isEditing: Bool
 
         var isValid: Bool {
-            wipCKRGame.maxParticipants > 0
-            && wipCKRGame.pricePerPersonCents > 0
-            && wipCKRGame.nextGameDate > Date()
-            && wipCKRGame.registrationDeadline > Date()
-            && wipCKRGame.registrationDeadline < wipCKRGame.nextGameDate
-            && wipCKRGame.startCKRCountdown < wipCKRGame.registrationDeadline
+            guard let gameDate = wipCKRGame.nextGameDate,
+                  let deadline = wipCKRGame.registrationDeadline,
+                  let countdown = wipCKRGame.startCKRCountdown
+            else { return false }
+            return wipCKRGame.maxParticipants > 0
+                && wipCKRGame.pricePerPersonCents > 0
+                && gameDate > Date()
+                && deadline > Date()
+                && deadline < gameDate
+                && countdown < deadline
         }
 
         /// Create mode — new game with smart defaults.
@@ -82,20 +86,26 @@ struct CKRGameFormFeature {
             switch action {
             case .binding(\.wipCKRGame.nextGameDate):
                 // Auto-update deadline when game date changes (keep 2 weeks before)
-                let newDeadline = Self.defaultDeadline(for: state.wipCKRGame.nextGameDate)
-                if state.wipCKRGame.registrationDeadline > state.wipCKRGame.nextGameDate.addingTimeInterval(-Self.minimumDateGap)
-                    || state.wipCKRGame.registrationDeadline < Date() {
+                guard let gameDate = state.wipCKRGame.nextGameDate else { return .none }
+                let newDeadline = Self.defaultDeadline(for: gameDate)
+                let deadline = state.wipCKRGame.registrationDeadline ?? newDeadline
+                if deadline > gameDate.addingTimeInterval(-Self.minimumDateGap)
+                    || deadline < Date() {
                     state.wipCKRGame.registrationDeadline = newDeadline
                 }
                 // Ensure countdown stays at least 1h before deadline
-                if state.wipCKRGame.startCKRCountdown > state.wipCKRGame.registrationDeadline.addingTimeInterval(-Self.minimumDateGap) {
-                    state.wipCKRGame.startCKRCountdown = Self.defaultCountdown(for: state.wipCKRGame.registrationDeadline)
+                let updatedDeadline = state.wipCKRGame.registrationDeadline ?? newDeadline
+                if let countdown = state.wipCKRGame.startCKRCountdown,
+                   countdown > updatedDeadline.addingTimeInterval(-Self.minimumDateGap) {
+                    state.wipCKRGame.startCKRCountdown = Self.defaultCountdown(for: updatedDeadline)
                 }
                 return .none
             case .binding(\.wipCKRGame.registrationDeadline):
                 // Ensure countdown stays at least 1h before deadline
-                if state.wipCKRGame.startCKRCountdown > state.wipCKRGame.registrationDeadline.addingTimeInterval(-Self.minimumDateGap) {
-                    state.wipCKRGame.startCKRCountdown = Self.defaultCountdown(for: state.wipCKRGame.registrationDeadline)
+                guard let deadline = state.wipCKRGame.registrationDeadline else { return .none }
+                if let countdown = state.wipCKRGame.startCKRCountdown,
+                   countdown > deadline.addingTimeInterval(-Self.minimumDateGap) {
+                    state.wipCKRGame.startCKRCountdown = Self.defaultCountdown(for: deadline)
                 }
                 return .none
             case let .pricePerPersonEurosChanged(euros):
@@ -111,6 +121,30 @@ struct CKRGameFormFeature {
 struct CKRGameFormView: View {
     @Bindable var store: StoreOf<CKRGameFormFeature>
 
+    // Unwrapped date bindings (these dates are always set via init defaults)
+    private var countdownBinding: Binding<Date> {
+        Binding(
+            get: { store.wipCKRGame.startCKRCountdown ?? Date() },
+            set: { store.wipCKRGame.startCKRCountdown = $0 }
+        )
+    }
+    private var deadlineBinding: Binding<Date> {
+        Binding(
+            get: { store.wipCKRGame.registrationDeadline ?? Date() },
+            set: { store.wipCKRGame.registrationDeadline = $0 }
+        )
+    }
+    private var gameDateBinding: Binding<Date> {
+        Binding(
+            get: { store.wipCKRGame.nextGameDate ?? Date() },
+            set: { store.wipCKRGame.nextGameDate = $0 }
+        )
+    }
+
+    private var countdown: Date { store.wipCKRGame.startCKRCountdown ?? Date() }
+    private var deadline: Date { store.wipCKRGame.registrationDeadline ?? Date() }
+    private var gameDate: Date { store.wipCKRGame.nextGameDate ?? Date() }
+
     var body: some View {
         Form {
             Section("Edition") {
@@ -124,22 +158,22 @@ struct CKRGameFormView: View {
             Section("Dates") {
                 DatePicker(
                     "CKR Countdown start",
-                    selection: $store.wipCKRGame.startCKRCountdown,
-                    in: ...store.wipCKRGame.registrationDeadline.addingTimeInterval(-CKRGameFormFeature.minimumDateGap),
+                    selection: countdownBinding,
+                    in: ...deadline.addingTimeInterval(-CKRGameFormFeature.minimumDateGap),
                     displayedComponents: [.date, .hourAndMinute]
                 )
 
                 DatePicker(
                     "Registration deadline",
-                    selection: $store.wipCKRGame.registrationDeadline,
-                    in: store.wipCKRGame.startCKRCountdown.addingTimeInterval(CKRGameFormFeature.minimumDateGap)...store.wipCKRGame.nextGameDate.addingTimeInterval(-CKRGameFormFeature.minimumDateGap),
+                    selection: deadlineBinding,
+                    in: countdown.addingTimeInterval(CKRGameFormFeature.minimumDateGap)...gameDate.addingTimeInterval(-CKRGameFormFeature.minimumDateGap),
                     displayedComponents: [.date, .hourAndMinute]
                 )
 
                 DatePicker(
                     "Game date",
-                    selection: $store.wipCKRGame.nextGameDate,
-                    in: store.wipCKRGame.registrationDeadline.addingTimeInterval(CKRGameFormFeature.minimumDateGap)...,
+                    selection: gameDateBinding,
+                    in: deadline.addingTimeInterval(CKRGameFormFeature.minimumDateGap)...,
                     displayedComponents: [.date, .hourAndMinute]
                 )
             }

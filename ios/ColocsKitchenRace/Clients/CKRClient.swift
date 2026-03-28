@@ -63,6 +63,8 @@ extension CKRClient: DependencyKey {
 
                 let snapshot = try await Firestore.firestore()
                     .collection("ckrGames")
+                    .whereField("editionType", isEqualTo: "global")
+                    .whereField("status", isEqualTo: "published")
                     .order(by: "publishedTimestamp", descending: true)
                     .limit(to: 1)
                     .getDocuments()
@@ -96,6 +98,8 @@ extension CKRClient: DependencyKey {
 
                 let listener = Firestore.firestore()
                     .collection("ckrGames")
+                    .whereField("editionType", isEqualTo: "global")
+                    .whereField("status", isEqualTo: "published")
                     .order(by: "publishedTimestamp", descending: true)
                     .limit(to: 1)
                     .addSnapshotListener { snapshot, error in

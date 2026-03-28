@@ -24,15 +24,15 @@ struct AdminCKRApp: App {
 
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
+    @State private var store = Store(
+        initialState: AppFeature.State.splashScreen(SplashScreenFeature.State())
+    ) {
+        AppFeature()
+    }
+
     var body: some Scene {
         WindowGroup {
-            AppView(
-                store: Store(
-                    initialState: AppFeature.State.splashScreen(SplashScreenFeature.State())
-                ) {
-                    AppFeature()
-                }
-            )
+            AppView(store: store)
         }
     }
 }

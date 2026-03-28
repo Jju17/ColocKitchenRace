@@ -169,7 +169,7 @@ struct HomeFeature {
                 case .deleteGameButtonTapped:
                     guard let game = state.currentGame else { return .none }
                     let warning = game.hasCountdownStarted
-                        ? "\n\n⚠️ The CKR countdown has already started (\(game.startCKRCountdown.formatted(date: .abbreviated, time: .omitted)))."
+                        ? "\n\n⚠️ The CKR countdown has already started (\(game.startCKRCountdown?.formatted(date: .abbreviated, time: .omitted) ?? "N/A"))."
                         : ""
                     state.destination = .alert(
                         AlertState {
@@ -337,7 +337,7 @@ struct HomeFeature {
                         )
                     } else {
                         state.destination = .eventSettingsForm(
-                            CKREventSettingsFormFeature.State(gameDate: game.nextGameDate)
+                            CKREventSettingsFormFeature.State(gameDate: game.nextGameDate ?? Date())
                         )
                     }
                     return .none
@@ -911,9 +911,9 @@ struct HomeView: View {
     private func gameInfoItems(_ game: CKRGame) -> [GameInfoItem] {
         [
             GameInfoItem(label: "Edition", value: "#\(game.editionNumber)"),
-            GameInfoItem(label: "Countdown start", value: game.startCKRCountdown.formatted(date: .abbreviated, time: .omitted)),
-            GameInfoItem(label: "Registration deadline", value: game.registrationDeadline.formatted(date: .abbreviated, time: .omitted)),
-            GameInfoItem(label: "Game date", value: game.nextGameDate.formatted(date: .abbreviated, time: .omitted)),
+            GameInfoItem(label: "Countdown start", value: game.startCKRCountdown?.formatted(date: .abbreviated, time: .omitted) ?? "—"),
+            GameInfoItem(label: "Registration deadline", value: game.registrationDeadline?.formatted(date: .abbreviated, time: .omitted) ?? "—"),
+            GameInfoItem(label: "Game date", value: game.nextGameDate?.formatted(date: .abbreviated, time: .omitted) ?? "—"),
             GameInfoItem(label: "Max participants", value: "\(game.maxParticipants)"),
             GameInfoItem(label: "Price per person", value: game.formattedPricePerPerson),
             GameInfoItem(label: "Registered", value: "\(game.totalRegisteredParticipants) / \(game.maxParticipants) participants (\(game.cohouseIDs.count) cohouses)"),

@@ -1,39 +1,20 @@
 {
   "indexes": [
     {
-      "collectionGroup": "challenges",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "startDate", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "challenges",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "endDate", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "challenges",
-      "queryScope": "COLLECTION_GROUP",
-      "fields": [
-        { "fieldPath": "startDate", "order": "ASCENDING" }
-      ]
-    },
-    {
-      "collectionGroup": "challenges",
-      "queryScope": "COLLECTION_GROUP",
-      "fields": [
-        { "fieldPath": "endDate", "order": "ASCENDING" }
-      ]
-    },
-    {
       "collectionGroup": "cohouses",
       "queryScope": "COLLECTION",
       "fields": [
         { "fieldPath": "addressLower.street", "order": "ASCENDING" },
         { "fieldPath": "addressLower.city", "order": "ASCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "ckrGames",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "editionType", "order": "ASCENDING" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "publishedTimestamp", "order": "DESCENDING" }
       ]
     }
   ],

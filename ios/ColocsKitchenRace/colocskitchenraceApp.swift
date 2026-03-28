@@ -160,15 +160,15 @@ struct colocskitchenraceApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @Environment(\.scenePhase) private var scenePhase
 
+    @State private var store = Store(
+        initialState: AppFeature.State.splashScreen(SplashScreenFeature.State())
+    ) {
+        AppFeature()
+    }
+
     var body: some Scene {
         WindowGroup {
-            AppView(
-                store: Store(
-                    initialState: AppFeature.State.splashScreen(SplashScreenFeature.State())
-                ) {
-                    AppFeature()
-                }
-            )
+            AppView(store: store)
             .registerPopups(id: .shared) { config in config
                     .vertical { $0
                         .enableDragGesture(true)

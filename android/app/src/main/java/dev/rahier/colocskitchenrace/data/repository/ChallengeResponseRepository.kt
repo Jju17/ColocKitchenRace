@@ -11,7 +11,7 @@ interface ChallengeResponseRepository {
     suspend fun updateStatus(challengeId: String, cohouseId: String, status: ChallengeResponseStatus)
     suspend fun submit(response: ChallengeResponse): ChallengeResponse
     fun watchStatus(challengeId: String, cohouseId: String): Flow<ChallengeResponseStatus?>
-    fun watchAllResponses(): Flow<List<ChallengeResponse>>
+    fun watchAllResponses(cohouseId: String): Flow<List<ChallengeResponse>>
     fun watchAllValidatedResponses(): Flow<List<ChallengeResponse>>
     suspend fun uploadImage(challengeId: String, cohouseId: String, imageData: ByteArray): String
 }

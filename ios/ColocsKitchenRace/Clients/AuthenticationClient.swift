@@ -53,6 +53,8 @@ struct AuthenticationClient {
     var sendVerificationEmail: @Sendable (_ newEmail: String) async throws -> Void
     var reloadCurrentUser: @Sendable () async throws -> Bool
     var listenAuthState: @Sendable () -> AsyncStream<FirebaseAuth.User?> = { .never }
+    /// Re-fetch user profile from Firestore by authId (for post-reinstall recovery).
+    var fetchProfile: @Sendable (_ authUid: String) async throws -> User?
 }
 
 // MARK: - Implementations
@@ -348,24 +350,35 @@ extension AuthenticationClient: DependencyKey {
             return Auth.auth().currentUser?.isEmailVerified ?? false
         },
         listenAuthState: {
-            AsyncStream { continuation in
-                // Use nonisolated(unsafe) to bridge the handle across the
-                // concurrency boundary. The handle is set once on the main
-                // queue and only read on termination.
-                nonisolated(unsafe) var handle: AuthStateDidChangeListenerHandle?
+            let (stream, continuation) = AsyncStream.makeStream(of: FirebaseAuth.User?.self, bufferingPolicy: .bufferingNewest(1))
 
-                continuation.onTermination = { _ in
-                    if let handle {
-                        Auth.auth().removeStateDidChangeListener(handle)
-                    }
-                }
+            nonisolated(unsafe) var handle: AuthStateDidChangeListenerHandle?
 
-                DispatchQueue.main.async {
-                    handle = Auth.auth().addStateDidChangeListener { _, user in
-                        continuation.yield(user)
-                    }
+            handle = Auth.auth().addStateDidChangeListener { _, user in
+                continuation.yield(user)
+            }
+
+            continuation.onTermination = { _ in
+                if let handle {
+                    Auth.auth().removeStateDidChangeListener(handle)
                 }
             }
+
+            return stream
+        },
+        fetchProfile: { authUid in
+            let snapshot = try await Firestore.firestore()
+                .collection("users")
+                .whereField("authId", isEqualTo: authUid)
+                .limit(to: 1)
+                .getDocuments()
+
+            guard let doc = snapshot.documents.first else { return nil }
+            let user = try doc.data(as: User.self)
+
+            // Restore shared state (same as completeSignIn)
+            await completeSignIn(user)
+            return user
         }
     )
 
@@ -413,7 +426,8 @@ extension AuthenticationClient: DependencyKey {
         signInWithApple: { .mockUser },
         sendVerificationEmail: { _ in },
         reloadCurrentUser: { true },
-        listenAuthState: { AsyncStream { $0.finish() } }
+        listenAuthState: { AsyncStream { $0.finish() } },
+        fetchProfile: { _ in .mockUser }
     )
 
     // MARK: Preview
